@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta name="viewport"
@@ -11,38 +12,23 @@
           content="{{ csrf_token() }}">
 
     <title>
-        @yield('title', 'Sistema de Asistencia')
+        @yield('title', 'Sistema de Control de Asistencia')
     </title>
 
     <link rel="stylesheet"
           href="{{ asset('css/app.css') }}">
 
     @stack('styles')
+
 </head>
 
-<body>
+<body class="guest">
 
-<div class="app">
+<main class="guest__content">
 
-    @include('partials.sidebar')
+    @yield('content')
 
-    <div class="app__content">
-
-        @include('partials.navbar')
-
-        <main class="main-content">
-
-            <x-alert />
-
-            @yield('content')
-
-        </main>
-
-        @include('partials.footer')
-
-    </div>
-
-</div>
+</main>
 
 <script src="{{ asset('js/modal.js') }}"></script>
 <script src="{{ asset('js/app.js') }}"></script>

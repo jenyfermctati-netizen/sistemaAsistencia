@@ -23,7 +23,7 @@ class UsuarioPrincipalSeeder extends Seeder
 
         DB::table('users')->updateOrInsert(
             [
-                'email' => 'admin@asistencias.com',
+                'email' => 'admin@gmail.com',
             ],
             [
                 'trabajador_id' => null,
@@ -33,7 +33,7 @@ class UsuarioPrincipalSeeder extends Seeder
 
                 'email_verified_at' => now(),
 
-                'password' => Hash::make('Admin123456'),
+                'password' => Hash::make('password'),
 
                 'estado' => true,
                 'ultimo_acceso' => null,

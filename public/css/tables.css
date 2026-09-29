@@ -1,0 +1,57 @@
+.table-container {
+
+    overflow-x: auto;
+
+}
+
+
+.table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: white;
+
+}
+
+
+.table th,
+.table td {
+
+    padding:
+        12px 14px;
+
+    border-bottom:
+        1px solid
+        var(--border);
+
+    text-align: left;
+
+}
+
+
+.table th {
+
+    background: #f7f9fb;
+
+    color:
+        var(--text-muted);
+
+    font-size: 12px;
+
+}
+
+
+.table td {
+
+    font-size: 13px;
+
+}
+
+
+.table tbody tr:hover {
+
+    background: #fafcfd;
+
+}

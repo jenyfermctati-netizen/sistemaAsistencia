@@ -1,0 +1,30 @@
+:root {
+
+    --primary: #24537a;
+    --primary-dark: #193d5b;
+    --primary-light: #eaf2f8;
+
+    --success: #198754;
+    --warning: #d89b1d;
+    --danger: #c83939;
+
+    --background: #f4f6f8;
+    --surface: #ffffff;
+
+    --text: #1b2733;
+    --text-muted: #66727f;
+
+    --border: #dce3e9;
+
+    --sidebar-width: 260px;
+    --navbar-height: 70px;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+
+    --shadow:
+        0 4px 15px rgba(0, 0, 0, 0.07);
+
+    --transition: 0.2s ease;
+}

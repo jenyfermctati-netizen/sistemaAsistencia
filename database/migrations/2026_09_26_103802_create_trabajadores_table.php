@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
         Schema::create('trabajadores', function (Blueprint $table) {
@@ -21,7 +19,6 @@ return new class extends Migration
             $table->enum('tipo_vinculo', ['CONTRATADO','LOCADOR']);
             $table->string('cargo', 150)->nullable();
             $table->string('telefono', 20)->nullable();
-            $table->string('correo', 150)->nullable()->unique();
             $table->date('fecha_ingreso')->nullable();
             $table->date('fecha_fin')->nullable();
             $table->enum('estado', ['ACTIVO','INACTIVO'])->default('ACTIVO');

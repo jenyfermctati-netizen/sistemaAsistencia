@@ -1,0 +1,106 @@
+@import url('./variables.css');
+@import url('./layout.css');
+@import url('./components.css');
+@import url('./forms.css');
+@import url('./tables.css');
+@import url('./modal.css');
+
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    min-height: 100%;
+}
+
+
+body {
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: var(--background);
+
+    color: var(--text);
+}
+
+
+button,
+input,
+select,
+textarea {
+
+    font-family: inherit;
+
+}
+
+
+a {
+
+    color: inherit;
+
+    text-decoration: none;
+
+}
+
+
+h1,
+h2,
+h3,
+h4,
+p {
+
+    margin-top: 0;
+
+}
+
+
+.main-content {
+
+    flex: 1;
+
+    padding: 25px;
+
+}
+
+
+.page-header {
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 22px;
+
+}
+
+
+.page-header__title {
+
+    margin-bottom: 5px;
+
+    font-size: 24px;
+
+}
+
+
+.page-header__description {
+
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+
+}

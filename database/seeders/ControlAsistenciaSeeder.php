@@ -3,12 +3,11 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class ControlAsistenciaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         DB::table('roles')->insert([
@@ -21,7 +20,7 @@ class ControlAsistenciaSeeder extends Seeder
             ],
             [
                 'nombre' => 'ADMINISTRADOR',
-                'descripscion' => 'Gestiona personal, asistencia, solicitudes, vacaciones y configuraciones',
+                'descripcion' => 'Gestiona personal, asistencia, solicitudes, vacaciones y configuraciones',
                 'estado' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -36,11 +35,41 @@ class ControlAsistenciaSeeder extends Seeder
         ]);
 
         DB::table('areas')->insert([
-            ['nombre' => 'Gerencia General', 'descripcion' => 'Área de dirección y supervisión general', 'estado' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['nombre' => 'Administración Central', 'descripcion' => 'Área administrativa de la empresa', 'estado' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['nombre' => 'División de Ingeniería y Arquitectura', 'descripcion' => 'Área de ingeniería y arquitectura', 'estado' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['nombre' => 'Logística y Operaciones', 'descripcion' => 'Área encargada de logística y operaciones', 'estado' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['nombre' => 'Tecnología y Desarrollo', 'descripcion' => 'Área encargada de tecnología y desarrollo', 'estado' => true, 'created_at' => now(), 'updated_at' => now()],
+            [
+                'nombre' => 'Gerencia General',
+                'descripcion' => 'Área de dirección y supervisión general',
+                'estado' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nombre' => 'Administración Central',
+                'descripcion' => 'Área administrativa de la empresa',
+                'estado' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nombre' => 'División de Ingeniería y Arquitectura',
+                'descripcion' => 'Área de ingeniería y arquitectura',
+                'estado' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nombre' => 'Logística y Operaciones',
+                'descripcion' => 'Área encargada de logística y operaciones',
+                'estado' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nombre' => 'Tecnología y Desarrollo',
+                'descripcion' => 'Área encargada de tecnología y desarrollo',
+                'estado' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
 
         $horarioId = DB::table('horarios')->insertGetId([
