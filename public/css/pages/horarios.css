@@ -1,0 +1,605 @@
+/* =========================================================
+   HORARIOS - DISEÑO MODERNO
+   ========================================================= */
+
+/* ---------- HEADER ---------- */
+
+.page-header__actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   PANEL PRINCIPAL
+   ========================================================= */
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.03),
+        0 8px 24px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+.panel__header {
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+
+/* =========================================================
+   FILTROS
+   ========================================================= */
+
+.horarios-filtros {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) 190px auto auto;
+    gap: 12px;
+    align-items: center;
+}
+
+
+/* =========================================================
+   GRID DE HORARIOS
+   ========================================================= */
+
+.horarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+    padding: 22px;
+}
+
+
+/* =========================================================
+   TARJETA DE HORARIO
+   ========================================================= */
+
+.horario-card {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 2px 5px rgba(15, 23, 42, 0.03),
+        0 8px 20px rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.horario-card:hover {
+    transform: translateY(-3px);
+
+    border-color: rgba(59, 130, 246, 0.25);
+
+    box-shadow:
+        0 8px 16px rgba(15, 23, 42, 0.06),
+        0 16px 35px rgba(15, 23, 42, 0.08);
+}
+
+
+/* Línea superior decorativa */
+
+.horario-card::before {
+    content: "";
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 3px;
+
+    background: linear-gradient(
+        90deg,
+        #2563eb,
+        #3b82f6,
+        #60a5fa
+    );
+}
+
+
+/* =========================================================
+   HEADER DE LA TARJETA
+   ========================================================= */
+
+.horario-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 15px;
+
+    padding: 20px 18px 16px;
+
+    border-bottom: 1px solid var(--border);
+
+    background: linear-gradient(
+        180deg,
+        rgba(248, 250, 252, 0.8),
+        transparent
+    );
+}
+
+.horario-card__header h3 {
+    margin: 0 0 6px;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    color: var(--text);
+
+    letter-spacing: -0.2px;
+}
+
+.horario-card__header p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   DÍAS
+   ========================================================= */
+
+.horario-card__dias {
+    padding: 8px 18px;
+
+    flex: 1;
+}
+
+.horario-dia {
+    display: grid;
+
+    grid-template-columns: 85px 1fr auto;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 43px;
+
+    padding: 9px 2px;
+
+    border-bottom: 1px solid var(--border);
+
+    font-size: 12px;
+
+    transition: background 0.2s ease;
+}
+
+.horario-dia:hover {
+    background: var(--surface-secondary);
+}
+
+.horario-dia:last-child {
+    border-bottom: 0;
+}
+
+
+/* Nombre del día */
+
+.horario-dia > span:first-child,
+.horario-dia > strong:first-child {
+    font-weight: 600;
+    color: var(--text);
+}
+
+
+/* Información secundaria */
+
+.horario-dia small,
+.horario-dia__libre,
+.table-secondary-text,
+.table-empty {
+    color: var(--text-muted);
+}
+
+
+/* Día libre */
+
+.horario-dia__libre {
+    display: inline-flex;
+
+    align-items: center;
+
+    width: fit-content;
+
+    padding: 4px 8px;
+
+    border-radius: 20px;
+
+    background: var(--surface-secondary);
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   FOOTER DE LA TARJETA
+   ========================================================= */
+
+.horario-card__footer {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 14px 18px;
+
+    border-top: 1px solid var(--border);
+
+    background: var(--surface-secondary);
+}
+
+
+/* =========================================================
+   EDITOR DE DÍAS
+   ========================================================= */
+
+.dias-editor {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+.dia-editor {
+    display: grid;
+
+    grid-template-columns: 150px 1fr 1fr 120px;
+
+    gap: 12px;
+
+    align-items: center;
+
+    padding: 13px 14px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.dia-editor:hover {
+    border-color: rgba(59, 130, 246, 0.25);
+
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+}
+
+.dia-editor:focus-within {
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.10);
+}
+
+.dia-editor__nombre {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 12px;
+    font-weight: 650;
+
+    color: var(--text);
+}
+
+
+/* =========================================================
+   ASIGNACIONES
+   ========================================================= */
+
+.horarios-asignaciones {
+    margin-top: 26px;
+}
+
+
+/* =========================================================
+   FORMULARIOS
+   ========================================================= */
+
+.form-grid {
+    display: grid;
+
+    gap: 16px;
+}
+
+.form-grid--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+
+/* Caja de ayuda */
+
+.form-help-box {
+    position: relative;
+
+    padding: 14px 16px;
+
+    margin-top: 16px;
+
+    background: var(--surface-secondary);
+
+    border: 1px solid var(--border);
+    border-left: 3px solid #3b82f6;
+
+    border-radius: 10px;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   TABLAS
+   ========================================================= */
+
+.table-actions {
+    display: flex;
+
+    gap: 7px;
+
+    align-items: center;
+}
+
+.table-secondary-text {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+}
+
+.table-empty {
+    padding: 45px 25px;
+
+    text-align: center;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   BOTONES PEQUEÑOS
+   ========================================================= */
+
+.button--small {
+    min-height: 32px;
+
+    padding: 6px 11px;
+
+    border-radius: 8px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        background 0.15s ease;
+}
+
+.button--small:hover {
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   PAGINACIÓN
+   ========================================================= */
+
+.pagination-container {
+    display: flex;
+
+    justify-content: center;
+
+    margin-top: 22px;
+}
+
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.badge--secondary {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    color: var(--text-muted);
+
+    background: var(--surface-secondary);
+
+    border: 1px solid var(--border);
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   INPUTS DENTRO DEL MÓDULO
+   ========================================================= */
+
+.horarios-filtros input,
+.horarios-filtros select,
+.dia-editor input,
+.dia-editor select {
+
+    min-height: 40px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.horarios-filtros input:focus,
+.horarios-filtros select:focus,
+.dia-editor input:focus,
+.dia-editor select:focus {
+
+    outline: none;
+
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.10);
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .horarios-filtros {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .horarios-grid {
+        grid-template-columns: repeat(
+            auto-fill,
+            minmax(300px, 1fr)
+        );
+    }
+
+    .dia-editor {
+        grid-template-columns: 130px 1fr 1fr;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MÓVIL
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .page-header__actions {
+        width: 100%;
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .page-header__actions .button {
+        width: 100%;
+
+        justify-content: center;
+    }
+
+    .horarios-filtros,
+    .form-grid--2,
+    .dia-editor {
+        grid-template-columns: 1fr;
+    }
+
+    .horarios-grid {
+        grid-template-columns: 1fr;
+
+        padding: 14px;
+    }
+
+    .horario-card__footer {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .table-actions {
+        flex-wrap: wrap;
+    }
+}
+
+
+/* =========================================================
+   PANTALLAS PEQUEÑAS
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .panel__header {
+        padding: 16px;
+    }
+
+    .horarios-grid {
+        padding: 12px;
+        gap: 14px;
+    }
+
+    .horario-card__header {
+        padding: 17px 15px 14px;
+    }
+
+    .horario-card__dias {
+        padding: 7px 15px;
+    }
+
+    .horario-dia {
+        grid-template-columns: 70px 1fr;
+
+        gap: 8px;
+    }
+
+    .horario-card__footer {
+        padding: 13px 15px;
+    }
+
+    .dia-editor {
+        padding: 12px;
+    }
+}
