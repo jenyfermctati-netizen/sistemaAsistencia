@@ -1,74 +1,440 @@
-.app {
+/* ==========================================================
+   APP GENERAL
+========================================================== */
 
+.app {
     display: flex;
 
+    width: 100%;
     min-height: 100vh;
 
+    background: var(--background);
 }
 
 
+/* ==========================================================
+   CONTENIDO PRINCIPAL
+========================================================== */
+
 .app__content {
-
     display: flex;
-
     flex-direction: column;
 
-    width: calc(
-        100% - var(--sidebar-width)
-    );
-
+    width: calc(100% - var(--sidebar-width));
+    min-width: 0;
     min-height: 100vh;
 
     margin-left: var(--sidebar-width);
 
+    transition:
+        width 0.25s ease,
+        margin-left 0.25s ease;
 }
 
 
-.sidebar {
+/* ==========================================================
+   SIDEBAR
+========================================================== */
 
+.sidebar {
     position: fixed;
 
     top: 0;
     left: 0;
     bottom: 0;
 
-    display: flex;
+    z-index: 1000;
 
+    display: flex;
     flex-direction: column;
 
     width: var(--sidebar-width);
 
-    background: #172736;
+    background:
+        linear-gradient(
+            180deg,
+            #173530 0%,
+            #132d29 52%,
+            #102521 100%
+        );
 
-    color: white;
+    color: #ffffff;
 
-    z-index: 100;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
 
+    box-shadow:
+        6px 0 22px rgba(16, 37, 33, 0.08);
+
+    overflow: hidden;
 }
 
 
+/* ==========================================================
+   HEADER SIDEBAR
+========================================================== */
+
 .sidebar__header {
-
     display: flex;
-
     align-items: center;
 
     gap: 12px;
 
-    height: var(--navbar-height);
+    min-height: var(--navbar-height);
 
-    padding: 15px 20px;
+    padding: 14px 17px;
 
     border-bottom:
         1px solid
-        rgba(255,255,255,.1);
-
+        rgba(255, 255, 255, 0.07);
 }
 
 
+/* ==========================================================
+   LOGO
+========================================================== */
+
 .sidebar__logo {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--accent)
+        );
+
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 800;
+
+    letter-spacing: 0.4px;
+
+    box-shadow:
+        0 5px 14px
+        rgba(20, 184, 166, 0.18);
+}
+
+
+/* ==========================================================
+   MARCA
+========================================================== */
+
+.sidebar__brand {
+    min-width: 0;
+}
+
+.sidebar__brand strong,
+.sidebar__brand span {
+    display: block;
+}
+
+.sidebar__brand strong {
+    color: #f7faf8;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
+.sidebar__brand span {
+    margin-top: 2px;
+
+    color: #a8bbb6;
+
+    font-size: 12px;
+
+    line-height: 1.35;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   MENÚ
+========================================================== */
+
+.sidebar__menu {
+    flex: 1;
+
+    padding: 14px 10px 20px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+/* ==========================================================
+   SCROLLBAR SIDEBAR
+========================================================== */
+
+.sidebar__menu::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar__menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar__menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+
+    border-radius: 10px;
+}
+
+.sidebar__menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.20);
+}
+
+
+/* ==========================================================
+   TÍTULO DE SECCIÓN
+========================================================== */
+
+.sidebar__title {
+    margin:
+        18px
+        10px
+        8px;
+
+    color: #8da59e;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
+
+    text-transform: uppercase;
+}
+
+
+/* ==========================================================
+   ITEM SIDEBAR
+========================================================== */
+
+.sidebar__item {
+    position: relative;
 
     display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 46px;
+
+    padding: 7px 10px;
+
+    margin-bottom: 4px;
+
+    border-radius: 9px;
+
+    color: #d2ddda;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    line-height: 1.35;
+
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.sidebar__item:hover {
+    background: rgba(255, 255, 255, 0.065);
+
+    color: #ffffff;
+
+    transform: translateX(2px);
+}
+
+.sidebar__item.active {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(20, 184, 166, 0.20),
+            rgba(20, 184, 166, 0.07)
+        );
+
+    color: #ffffff;
+
+    font-weight: 600;
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(45, 212, 191, 0.08);
+}
+
+
+/* ==========================================================
+   INDICADOR ACTIVO
+========================================================== */
+
+.sidebar__item.active::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 8px;
+    bottom: 8px;
+
+    width: 3px;
+
+    border-radius:
+        0
+        4px
+        4px
+        0;
+
+    background: #2dd4bf;
+}
+
+
+/* ==========================================================
+   ICONO SIDEBAR
+========================================================== */
+
+.sidebar__icon {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    border-radius: 8px;
+
+    background:
+        rgba(255, 255, 255, 0.055);
+
+    color: #c4d5d0;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.sidebar__item:hover .sidebar__icon {
+    background:
+        rgba(255, 255, 255, 0.09);
+
+    color: #ffffff;
+}
+
+.sidebar__item.active .sidebar__icon {
+    background:
+        rgba(20, 184, 166, 0.18);
+
+    color: #99f6e4;
+}
+
+
+/* ==========================================================
+   FOOTER SIDEBAR
+========================================================== */
+
+.sidebar__footer {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 68px;
+
+    padding: 13px 16px;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+
+    background:
+        rgba(0, 0, 0, 0.08);
+
+    color: #8fa69f;
+
+    font-size: 12px;
+}
+
+
+/* ==========================================================
+   NAVBAR
+========================================================== */
+
+.navbar {
+    position: sticky;
+
+    top: 0;
+
+    z-index: 50;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: var(--navbar-height);
+
+    padding: 10px 22px;
+
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    border-bottom:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        0 1px 3px
+        rgba(23, 33, 31, 0.04);
+
+    backdrop-filter: blur(8px);
+}
+
+
+/* ==========================================================
+   NAVBAR IZQUIERDA
+========================================================== */
+
+.navbar__left {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    min-width: 0;
+}
+
+
+/* ==========================================================
+   BOTÓN MENÚ
+========================================================== */
+
+.navbar__menu-button {
+    display: none;
 
     align-items: center;
     justify-content: center;
@@ -76,352 +442,360 @@
     width: 40px;
     height: 40px;
 
-    background: var(--primary);
+    flex-shrink: 0;
 
-    border-radius: 10px;
+    padding: 0;
 
-    font-weight: bold;
+    border: 1px solid var(--border);
 
-}
+    border-radius: 8px;
 
+    background: var(--surface);
 
-.sidebar__brand strong,
-.sidebar__brand span {
+    color: var(--text);
 
-    display: block;
-
-}
-
-
-.sidebar__brand span {
-
-    margin-top: 2px;
-
-    color:
-        rgba(255,255,255,.6);
-
-    font-size: 12px;
-
-}
-
-
-.sidebar__menu {
-
-    flex: 1;
-
-    padding: 15px 10px;
-
-    overflow-y: auto;
-
-}
-
-
-.sidebar__title {
-
-    margin:
-
-        22px
-        10px
-        8px;
-
-    color:
-        rgba(255,255,255,.4);
-
-    font-size: 11px;
-
-    text-transform: uppercase;
-
-}
-
-
-.sidebar__item {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 11px 12px;
-
-    margin-bottom: 3px;
-
-    color:
-        rgba(255,255,255,.75);
-
-    border-radius:
-        var(--radius-sm);
-
-    transition:
-        var(--transition);
-
-}
-
-
-.sidebar__item:hover,
-.sidebar__item.active {
-
-    background:
-        rgba(255,255,255,.1);
-
-    color: white;
-
-}
-
-
-.sidebar__icon {
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    width: 28px;
-    height: 28px;
-
-    background:
-        rgba(255,255,255,.08);
-
-    border-radius: 6px;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-}
-
-
-.sidebar__footer {
-
-    padding: 15px 20px;
-
-    border-top:
-        1px solid
-        rgba(255,255,255,.1);
-
-    color:
-        rgba(255,255,255,.5);
-
-}
-
-
-.navbar {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    min-height:
-        var(--navbar-height);
-
-    padding:
-        10px 24px;
-
-    background:
-        var(--surface);
-
-    border-bottom:
-        1px solid
-        var(--border);
-
-}
-
-
-.navbar__left {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 15px;
-
-}
-
-
-.navbar__menu-button {
-
-    display: none;
-
-    border: none;
-
-    background: none;
-
-    font-size: 22px;
+    font-size: 21px;
 
     cursor: pointer;
 
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease;
 }
 
+.navbar__menu-button:hover {
+    background: var(--surface-secondary);
+
+    border-color: var(--border-strong);
+}
+
+
+/* ==========================================================
+   TÍTULO NAVBAR
+========================================================== */
 
 .navbar__title {
-
     margin: 0;
 
-    font-size: 18px;
+    color: var(--text);
 
+    font-size: 18px;
+    font-weight: 700;
+
+    line-height: 1.25;
+
+    letter-spacing: -0.2px;
 }
 
-
 .navbar__subtitle {
+    margin-top: 2px;
 
-    color:
-        var(--text-muted);
+    color: var(--text-muted);
 
     font-size: 12px;
 
+    line-height: 1.4;
 }
 
 
-.navbar__right {
+/* ==========================================================
+   NAVBAR DERECHA
+========================================================== */
 
+.navbar__right {
     display: flex;
 
     align-items: center;
 
-    gap: 12px;
+    gap: 11px;
 
+    flex-shrink: 0;
 }
 
+
+/* ==========================================================
+   INFORMACIÓN USUARIO
+========================================================== */
 
 .navbar__user-info {
-
     text-align: right;
 
+    line-height: 1.35;
 }
-
 
 .navbar__user-info strong,
 .navbar__user-info span {
-
     display: block;
-
 }
-
 
 .navbar__user-info strong {
+    color: var(--text);
 
     font-size: 13px;
-
+    font-weight: 600;
 }
-
 
 .navbar__user-info span {
+    margin-top: 1px;
 
-    color:
-        var(--text-muted);
+    color: var(--text-muted);
 
-    font-size: 11px;
-
+    font-size: 11.5px;
 }
 
 
-.navbar__avatar {
+/* ==========================================================
+   AVATAR
+========================================================== */
 
+.navbar__avatar {
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
     width: 38px;
     height: 38px;
 
+    flex-shrink: 0;
+
     border-radius: 50%;
 
     background:
-        var(--primary-light);
+        linear-gradient(
+            135deg,
+            var(--primary-light),
+            #d8f3ed
+        );
 
-    color:
-        var(--primary);
+    border:
+        1px solid
+        rgba(15, 118, 110, 0.12);
 
-    font-weight: bold;
+    color: var(--primary);
 
+    font-size: 13px;
+    font-weight: 700;
 }
 
 
-.footer {
+/* ==========================================================
+   FOOTER
+========================================================== */
 
+.footer {
     display: flex;
 
     justify-content: space-between;
+    align-items: center;
 
-    padding:
-        15px 25px;
+    gap: 12px;
 
-    background:
-        var(--surface);
+    margin-top: auto;
+
+    padding: 13px 22px;
+
+    background: var(--surface);
 
     border-top:
         1px solid
         var(--border);
 
-    color:
-        var(--text-muted);
+    color: var(--text-muted);
 
     font-size: 12px;
 
+    line-height: 1.4;
 }
 
+
+/* ==========================================================
+   OVERLAY
+========================================================== */
 
 .sidebar-overlay {
-
     display: none;
+}
+
+
+/* ==========================================================
+   RESPONSIVE - TABLET
+========================================================== */
+
+@media (max-width: 1100px) {
+
+    .navbar {
+        padding:
+            10px
+            18px;
+    }
 
 }
 
+
+/* ==========================================================
+   RESPONSIVE - SIDEBAR MÓVIL
+========================================================== */
 
 @media (max-width: 900px) {
 
     .app__content {
-
         width: 100%;
 
         margin-left: 0;
-
     }
 
-
     .sidebar {
+        width: min(280px, 86vw);
 
         transform:
             translateX(-100%);
 
         transition:
-            var(--transition);
-
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
     }
 
-
-    .sidebar.open {
-
+    .sidebar.open,
+    .sidebar.is-open {
         transform:
             translateX(0);
 
+        box-shadow:
+            10px 0 30px
+            rgba(16, 37, 33, 0.25);
     }
 
-
-    .sidebar-overlay.active {
-
+    .sidebar-overlay.active,
+    .sidebar-overlay.is-visible {
         display: block;
 
         position: fixed;
 
         inset: 0;
 
+        z-index: 999;
+
         background:
-            rgba(0,0,0,.4);
+            rgba(9, 27, 24, 0.48);
 
-        z-index: 90;
-
+        backdrop-filter:
+            blur(2px);
     }
 
+    .navbar__menu-button {
+        display: flex;
+    }
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE MÓVIL
+========================================================== */
+
+@media (max-width: 650px) {
+
+    .navbar {
+        padding:
+            9px
+            14px;
+    }
+
+    .navbar__left {
+        gap: 10px;
+    }
+
+    .navbar__title {
+        font-size: 16px;
+    }
+
+    .navbar__subtitle {
+        font-size: 11.5px;
+    }
+
+    .navbar__user-info {
+        display: none;
+    }
+
+    .navbar__avatar {
+        width: 36px;
+        height: 36px;
+
+        font-size: 12px;
+    }
+
+    .footer {
+        flex-direction: column;
+
+        justify-content: center;
+
+        gap: 4px;
+
+        padding:
+            12px
+            14px;
+
+        text-align: center;
+
+        font-size: 11.5px;
+    }
+
+}
+
+
+/* ==========================================================
+   MÓVILES PEQUEÑOS
+========================================================== */
+
+@media (max-width: 480px) {
+
+    .sidebar {
+        width: 88vw;
+    }
+
+    .sidebar__item {
+        min-height: 48px;
+
+        font-size: 14px;
+    }
+
+    .sidebar__icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .navbar__subtitle {
+        display: none;
+    }
+
+    .navbar__title {
+        font-size: 15px;
+    }
+
+}
+
+
+/* ==========================================================
+   PANTALLAS MUY PEQUEÑAS
+========================================================== */
+
+@media (max-width: 360px) {
+
+    .navbar {
+        padding:
+            8px
+            10px;
+    }
 
     .navbar__menu-button {
+        width: 38px;
+        height: 38px;
+    }
 
-        display: block;
-
+    .navbar__avatar {
+        width: 34px;
+        height: 34px;
     }
 
 }

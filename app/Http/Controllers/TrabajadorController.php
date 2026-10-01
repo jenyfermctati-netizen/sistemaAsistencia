@@ -13,13 +13,18 @@ use Illuminate\Validation\Rule;
 
 class TrabajadorController extends Controller
 {
+    /**
+     * Listado y filtros de trabajadores.
+     */
     public function index(Request $request)
     {
-        $query = Trabajador::with(['area','user.rol',]);
+        $query = Trabajador::with([
+            'area',
+            'user.rol',
+        ]);
 
-        // Buscador
         if ($request->filled('buscar')) {
-            $buscar = $request->buscar;
+            $buscar = trim($request->buscar);
 
             $query->where(function ($q) use ($buscar) {
                 $q->where('dni', 'like', "%{$buscar}%")
@@ -32,17 +37,14 @@ class TrabajadorController extends Controller
             });
         }
 
-        // Filtro área
         if ($request->filled('area_id')) {
             $query->where('area_id', $request->area_id);
         }
 
-        // Filtro tipo de vínculo
         if ($request->filled('tipo_vinculo')) {
             $query->where('tipo_vinculo', $request->tipo_vinculo);
         }
 
-        // Filtro estado
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
@@ -53,37 +55,99 @@ class TrabajadorController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $areas = Area::where('estado', true)->orderBy('nombre')->get();
-        $roles = Rol::where('estado', true)->orderBy('nombre')->get();
+        $areas = Area::where('estado', true)
+            ->orderBy('nombre')
+            ->get();
 
-        return view('trabajadores.index', compact('trabajadores', 'areas', 'roles'));
+        $roles = Rol::where('estado', true)
+            ->orderBy('nombre')
+            ->get();
+
+        return view('trabajadores.index', compact(
+            'trabajadores',
+            'areas',
+            'roles'
+        ));
     }
 
-    // Registrar trabajador y usuario
+    /**
+     * Registrar trabajador y usuario.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
-            // Trabajador
-            'area_id' => ['required', 'exists:areas,id'],
-            'codigo_biometrico' => ['nullable', 'string', 'max:50', 'unique:trabajadores,codigo_biometrico'],
-            'dni' => ['required', 'string', 'max:15', 'unique:trabajadores,dni'],
-            'nombres' => ['required', 'string', 'max:100'],
-            'apellidos' => ['required', 'string', 'max:100'],
-            'tipo_vinculo' => ['required', Rule::in(['CONTRATADO', 'LOCADOR'])],
-            'cargo' => ['nullable', 'string', 'max:150'],
-            'telefono' => ['nullable', 'string', 'max:20'],
-            'fecha_ingreso' => ['nullable', 'date'],
-            'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_ingreso'],
-            'estado' => ['required', Rule::in(['ACTIVO', 'INACTIVO'])],
-
-            // Acceso al sistema
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'rol_id' => ['required', 'exists:roles,id'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'area_id' => [
+                'required',
+                'exists:areas,id',
+            ],
+            'codigo_biometrico' => [
+                'nullable',
+                'string',
+                'max:50',
+                'unique:trabajadores,codigo_biometrico',
+            ],
+            'dni' => [
+                'required',
+                'string',
+                'max:15',
+                'unique:trabajadores,dni',
+            ],
+            'nombres' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+            'apellidos' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+            'tipo_vinculo' => [
+                'required',
+                Rule::in(['CONTRATADO', 'LOCADOR']),
+            ],
+            'cargo' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
+            'telefono' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+            'fecha_ingreso' => [
+                'nullable',
+                'date',
+            ],
+            'fecha_fin' => [
+                'nullable',
+                'date',
+                'after_or_equal:fecha_ingreso',
+            ],
+            'estado' => [
+                'required',
+                Rule::in(['ACTIVO', 'INACTIVO']),
+            ],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                'unique:users,email',
+            ],
+            'rol_id' => [
+                'required',
+                'exists:roles,id',
+            ],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+            ],
         ]);
 
         DB::transaction(function () use ($data) {
-            // Crear trabajador
             $trabajador = Trabajador::create([
                 'area_id' => $data['area_id'],
                 'codigo_biometrico' => $data['codigo_biometrico'] ?? null,
@@ -98,11 +162,12 @@ class TrabajadorController extends Controller
                 'estado' => $data['estado'],
             ]);
 
-            // Crear usuario
             User::create([
                 'trabajador_id' => $trabajador->id,
                 'rol_id' => $data['rol_id'],
-                'name' => trim("{$trabajador->nombres} {$trabajador->apellidos}"),
+                'name' => trim(
+                    "{$trabajador->nombres} {$trabajador->apellidos}"
+                ),
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'estado' => $trabajador->estado === 'ACTIVO',
@@ -111,51 +176,105 @@ class TrabajadorController extends Controller
 
         return redirect()
             ->route('trabajadores.index')
-            ->with('success', 'Trabajador y usuario registrados correctamente.');
+            ->with(
+                'success',
+                'Trabajador y usuario registrados correctamente.'
+            );
     }
 
-    // Actualizar trabajador y usuario
+    /**
+     * Actualizar trabajador y usuario.
+     */
     public function update(Request $request, Trabajador $trabajador)
     {
         $usuario = $trabajador->user;
 
         $data = $request->validate([
-            // Trabajador
-            'area_id' => ['required', 'exists:areas,id'],
+            'area_id' => [
+                'required',
+                'exists:areas,id',
+            ],
             'codigo_biometrico' => [
                 'nullable',
                 'string',
                 'max:50',
-                Rule::unique('trabajadores', 'codigo_biometrico')->ignore($trabajador->id),
+                Rule::unique(
+                    'trabajadores',
+                    'codigo_biometrico'
+                )->ignore($trabajador->id),
             ],
             'dni' => [
                 'required',
                 'string',
                 'max:15',
-                Rule::unique('trabajadores', 'dni')->ignore($trabajador->id),
+                Rule::unique(
+                    'trabajadores',
+                    'dni'
+                )->ignore($trabajador->id),
             ],
-            'nombres' => ['required', 'string', 'max:100'],
-            'apellidos' => ['required', 'string', 'max:100'],
-            'tipo_vinculo' => ['required', Rule::in(['CONTRATADO', 'LOCADOR'])],
-            'cargo' => ['nullable', 'string', 'max:150'],
-            'telefono' => ['nullable', 'string', 'max:20'],
-            'fecha_ingreso' => ['nullable', 'date'],
-            'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_ingreso'],
-            'estado' => ['required', Rule::in(['ACTIVO', 'INACTIVO'])],
-
-            // Usuario
+            'nombres' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+            'apellidos' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+            'tipo_vinculo' => [
+                'required',
+                Rule::in(['CONTRATADO', 'LOCADOR']),
+            ],
+            'cargo' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
+            'telefono' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+            'fecha_ingreso' => [
+                'nullable',
+                'date',
+            ],
+            'fecha_fin' => [
+                'nullable',
+                'date',
+                'after_or_equal:fecha_ingreso',
+            ],
+            'estado' => [
+                'required',
+                Rule::in(['ACTIVO', 'INACTIVO']),
+            ],
             'email' => [
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($usuario?->id),
+                Rule::unique(
+                    'users',
+                    'email'
+                )->ignore($usuario?->id),
             ],
-            'rol_id' => ['required', 'exists:roles,id'],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'rol_id' => [
+                'required',
+                'exists:roles,id',
+            ],
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'confirmed',
+            ],
         ]);
 
-        DB::transaction(function () use ($trabajador, $usuario, $data) {
-            // Actualizar trabajador
+        DB::transaction(function () use (
+            $trabajador,
+            $usuario,
+            $data
+        ) {
             $trabajador->update([
                 'area_id' => $data['area_id'],
                 'codigo_biometrico' => $data['codigo_biometrico'] ?? null,
@@ -170,51 +289,70 @@ class TrabajadorController extends Controller
                 'estado' => $data['estado'],
             ]);
 
-            // Actualizar o crear usuario
-            if (!$usuario) {
-                $usuario = new User();
-                $usuario->trabajador_id = $trabajador->id;
+            $usuarioActual = $usuario;
+
+            if (!$usuarioActual) {
+                $usuarioActual = new User();
+                $usuarioActual->trabajador_id = $trabajador->id;
             }
 
-            $usuario->rol_id = $data['rol_id'];
-            $usuario->name = trim("{$trabajador->nombres} {$trabajador->apellidos}");
-            $usuario->email = $data['email'];
-            $usuario->estado = $trabajador->estado === 'ACTIVO';
+            $usuarioActual->rol_id = $data['rol_id'];
+            $usuarioActual->name = trim(
+                "{$trabajador->nombres} {$trabajador->apellidos}"
+            );
+            $usuarioActual->email = $data['email'];
+            $usuarioActual->estado = $trabajador->estado === 'ACTIVO';
 
-            // Actualizar contraseña si se proporcionó una
             if (!empty($data['password'])) {
-                $usuario->password = Hash::make($data['password']);
+                $usuarioActual->password = Hash::make($data['password']);
             }
 
-            if (!$usuario->exists && empty($data['password'])) {
-                throw new \Exception('Se necesita una contraseña para crear el usuario.');
+            if (
+                !$usuarioActual->exists &&
+                empty($data['password'])
+            ) {
+                throw new \Exception(
+                    'Se necesita una contraseña para crear el usuario.'
+                );
             }
 
-            $usuario->save();
+            $usuarioActual->save();
         });
 
         return redirect()
             ->route('trabajadores.index')
-            ->with('success', 'Trabajador actualizado correctamente.');
+            ->with(
+                'success',
+                'Trabajador actualizado correctamente.'
+            );
     }
 
-    // Activar / desactivar trabajador
+    /**
+     * Activar o desactivar trabajador.
+     */
     public function cambiarEstado(Trabajador $trabajador)
     {
         DB::transaction(function () use ($trabajador) {
-            $nuevoEstado = $trabajador->estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
-            $trabajador->estado = $nuevoEstado;
-            $trabajador->save();
+            $nuevoEstado = $trabajador->estado === 'ACTIVO'
+                ? 'INACTIVO'
+                : 'ACTIVO';
 
-            // Sincronizar estado del usuario
+            $trabajador->update([
+                'estado' => $nuevoEstado,
+            ]);
+
             if ($trabajador->user) {
-                $trabajador->user->estado = $nuevoEstado === 'ACTIVO';
-                $trabajador->user->save();
+                $trabajador->user->update([
+                    'estado' => $nuevoEstado === 'ACTIVO',
+                ]);
             }
         });
 
         return redirect()
             ->route('trabajadores.index')
-            ->with('success', 'Estado del trabajador actualizado correctamente.');
+            ->with(
+                'success',
+                'Estado del trabajador actualizado correctamente.'
+            );
     }
 }

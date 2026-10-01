@@ -2,20 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Rol;
+use App\Models\Trabajador;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UsuarioController extends Controller
 {
+    /**
+     * Listado y filtros de usuarios.
+     */
     public function index(Request $request)
     {
-        $query = User::with(['rol', 'trabajador']);
+        $query = User::with([
+            'rol',
+            'trabajador',
+        ]);
 
         if ($request->filled('buscar')) {
-            $buscar = $request->buscar;
+            $buscar = trim($request->buscar);
 
             $query->where(function ($q) use ($buscar) {
-                $q
-                    ->where('name', 'like', "%{$buscar}%")
+                $q->where('name', 'like', "%{$buscar}%")
                     ->orWhere('email', 'like', "%{$buscar}%");
             });
         }
@@ -50,6 +60,9 @@ class UsuarioController extends Controller
         ));
     }
 
+    /**
+     * Registrar usuario.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -96,9 +109,15 @@ class UsuarioController extends Controller
 
         return redirect()
             ->route('usuarios.index')
-            ->with('success', 'Usuario creado correctamente.');
+            ->with(
+                'success',
+                'Usuario creado correctamente.'
+            );
     }
 
+    /**
+     * Actualizar usuario.
+     */
     public function update(Request $request, User $usuario)
     {
         $data = $request->validate([
@@ -150,21 +169,33 @@ class UsuarioController extends Controller
 
         return redirect()
             ->route('usuarios.index')
-            ->with('success', 'Usuario actualizado correctamente.');
+            ->with(
+                'success',
+                'Usuario actualizado correctamente.'
+            );
     }
 
+    /**
+     * Eliminar usuario.
+     */
     public function destroy(User $usuario)
     {
         if (auth()->id() === $usuario->id) {
             return redirect()
                 ->route('usuarios.index')
-                ->with('error', 'No puedes eliminar tu propia cuenta.');
+                ->with(
+                    'error',
+                    'No puedes eliminar tu propia cuenta.'
+                );
         }
 
         $usuario->delete();
 
         return redirect()
             ->route('usuarios.index')
-            ->with('success', 'Usuario eliminado correctamente.');
+            ->with(
+                'success',
+                'Usuario eliminado correctamente.'
+            );
     }
 }

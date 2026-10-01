@@ -1,0 +1,595 @@
+p/* ==========================================================
+   ACCIONES DEL HEADER
+========================================================== */
+
+.page-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+
+/* ==========================================================
+   PANEL
+========================================================== */
+
+.panel {
+    width: 100%;
+    max-width: 100%;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-lg);
+
+    box-shadow: var(--shadow);
+
+    overflow: hidden;
+}
+
+.panel__header {
+    padding: 17px 18px;
+
+    border-bottom: 1px solid var(--border);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.98),
+            rgba(248, 250, 249, 0.98)
+        );
+}
+
+
+/* ==========================================================
+   FILTROS
+========================================================== */
+
+.marcaciones-filtros {
+    display: grid;
+
+    grid-template-columns:
+        minmax(220px, 1.4fr)
+        minmax(140px, 0.8fr)
+        minmax(140px, 0.8fr)
+        minmax(130px, 0.7fr)
+        minmax(140px, 0.8fr)
+        minmax(130px, 0.7fr);
+
+    gap: 12px;
+
+    align-items: end;
+
+    width: 100%;
+}
+
+.marcaciones-filtros .form-group {
+    min-width: 0;
+}
+
+.marcaciones-filtros input,
+.marcaciones-filtros select {
+    width: 100%;
+
+    min-height: 42px;
+
+    font-size: 13px;
+}
+
+
+/* ==========================================================
+   ACCIONES DE FILTRO
+========================================================== */
+
+.marcaciones-filtros__actions {
+    grid-column: 1 / -1;
+
+    display: flex;
+
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 8px;
+
+    padding-top: 4px;
+}
+
+
+/* ==========================================================
+   CONTENEDOR DE TABLA
+========================================================== */
+
+.table-container {
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* ==========================================================
+   INFORMACIÓN DEL TRABAJADOR
+========================================================== */
+
+.trabajador-info {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-width: 180px;
+}
+
+.trabajador-info__avatar {
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-light),
+            #d9f3ee
+        );
+
+    border:
+        1px solid
+        rgba(15, 118, 110, 0.12);
+
+    color: var(--primary);
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.trabajador-info > div:last-child {
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+.trabajador-info strong {
+    color: var(--text);
+
+    font-size: 13.5px;
+    font-weight: 600;
+
+    line-height: 1.35;
+}
+
+.trabajador-info span,
+.trabajador-info small {
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    line-height: 1.4;
+}
+
+
+/* ==========================================================
+   TABLA DE MARCACIONES
+========================================================== */
+
+.marcaciones-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: var(--surface);
+}
+
+.marcaciones-table th {
+    padding: 12px 13px;
+
+    background: var(--surface-secondary);
+
+    color: var(--text-muted);
+
+    font-size: 12.5px;
+    font-weight: 700;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+.marcaciones-table td {
+    padding: 12px 13px;
+
+    vertical-align: middle;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--text);
+
+    font-size: 13.5px;
+
+    line-height: 1.45;
+}
+
+.marcaciones-table tbody tr {
+    transition:
+        background-color 0.16s ease;
+}
+
+.marcaciones-table tbody tr:hover {
+    background: #f8fbfa;
+}
+
+
+/* ==========================================================
+   HORA
+========================================================== */
+
+.marcacion-hora {
+    font-variant-numeric: tabular-nums;
+
+    font-size: 13.5px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   TEXTO SECUNDARIO
+========================================================== */
+
+.table-secondary-text {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    line-height: 1.4;
+}
+
+
+/* ==========================================================
+   ACCIONES
+========================================================== */
+
+.table-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    flex-wrap: wrap;
+}
+
+.button--small {
+    min-height: 34px;
+
+    padding: 6px 10px;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+}
+
+
+/* ==========================================================
+   FILA ANULADA
+========================================================== */
+
+.row-anulada {
+    opacity: 0.72;
+}
+
+.row-anulada td {
+    background: #f7f8f7;
+}
+
+.row-anulada:hover td {
+    background: #f2f5f3;
+}
+
+
+/* ==========================================================
+   ESTADO VACÍO
+========================================================== */
+
+.table-empty {
+    padding: 42px 24px !important;
+
+    text-align: center !important;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+.empty-state {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+}
+
+.empty-state strong {
+    color: var(--text);
+
+    font-size: 14px;
+}
+
+.empty-state span,
+.empty-state p {
+    color: var(--text-muted);
+
+    font-size: 12.5px;
+}
+
+
+/* ==========================================================
+   FORMULARIOS
+========================================================== */
+
+.form-grid {
+    display: grid;
+
+    gap: 14px;
+}
+
+.form-grid--2 {
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+}
+
+
+/* ==========================================================
+   INFORMACIÓN MANUAL
+========================================================== */
+
+.manual-info {
+    margin-top: 10px;
+
+    padding: 14px 15px;
+
+    border: 1px solid var(--border);
+
+    border-left:
+        3px solid
+        var(--primary);
+
+    border-radius: var(--radius-md);
+
+    background: #f8fbfa;
+}
+
+.manual-info strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--text);
+
+    font-size: 13px;
+}
+
+.manual-info p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 12.5px;
+
+    line-height: 1.55;
+}
+
+
+/* ==========================================================
+   INFORMACIÓN DE ANULACIÓN
+========================================================== */
+
+.anulacion-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    margin-bottom: 16px;
+
+    padding: 14px 15px;
+
+    background: var(--danger-light);
+
+    border:
+        1px solid
+        rgba(194, 65, 59, 0.16);
+
+    border-left:
+        3px solid
+        var(--danger);
+
+    border-radius: var(--radius-md);
+}
+
+.anulacion-info strong {
+    color: var(--text);
+
+    font-size: 13px;
+}
+
+.anulacion-info span {
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    line-height: 1.45;
+}
+
+
+/* ==========================================================
+   PAGINACIÓN
+========================================================== */
+
+.pagination-container {
+    display: flex;
+
+    justify-content: center;
+
+    margin-top: 18px;
+}
+
+
+/* ==========================================================
+   LAPTOP
+========================================================== */
+
+@media (max-width: 1250px) {
+
+    .marcaciones-filtros {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 950px) {
+
+    .marcaciones-filtros {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .marcaciones-table {
+        min-width: 760px;
+    }
+
+}
+
+
+/* ==========================================================
+   MÓVIL
+========================================================== */
+
+@media (max-width: 700px) {
+
+    .page-header__actions {
+        width: 100%;
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .page-header__actions .button {
+        width: 100%;
+
+        min-height: 42px;
+
+        font-size: 13px;
+    }
+
+    .marcaciones-filtros {
+        grid-template-columns: 1fr;
+
+        gap: 10px;
+    }
+
+    .marcaciones-filtros__actions {
+        grid-column: auto;
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .marcaciones-filtros__actions .button {
+        width: 100%;
+
+        min-height: 42px;
+
+        font-size: 13px;
+    }
+
+    .form-grid--2 {
+        grid-template-columns: 1fr;
+    }
+
+    .panel__header {
+        padding: 14px;
+    }
+
+    .marcaciones-table {
+        min-width: 720px;
+    }
+
+}
+
+
+/* ==========================================================
+   MÓVILES PEQUEÑOS
+========================================================== */
+
+@media (max-width: 480px) {
+
+    .panel {
+        border-radius: 10px;
+    }
+
+    .panel__header {
+        padding: 13px;
+    }
+
+    .trabajador-info {
+        min-width: 165px;
+    }
+
+    .trabajador-info__avatar {
+        width: 38px;
+        height: 38px;
+    }
+
+    .trabajador-info strong {
+        font-size: 13px;
+    }
+
+    .marcaciones-table th {
+        font-size: 12px;
+    }
+
+    .marcaciones-table td {
+        font-size: 13px;
+    }
+
+    .manual-info,
+    .anulacion-info {
+        padding: 12px 13px;
+    }
+
+}

@@ -1,130 +1,303 @@
+/* ==========================================================
+   BOTONES
+========================================================== */
+
 .button {
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
 
-    min-height: 38px;
+    gap: 8px;
 
-    padding:
-        8px 14px;
+    min-height: 40px;
 
-    border:
-        1px solid
-        transparent;
+    padding: 8px 14px;
 
-    border-radius:
-        var(--radius-sm);
+    border: 1px solid transparent;
+
+    border-radius: var(--radius-sm);
 
     cursor: pointer;
 
     font-size: 13px;
-
     font-weight: 600;
 
+    line-height: 1.2;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.15s ease;
 }
 
+.button:hover {
+    transform: translateY(-1px);
+}
+
+.button:active {
+    transform: translateY(0);
+}
+
+.button:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* ==========================================================
+   BOTÓN PRINCIPAL
+========================================================== */
 
 .button--primary {
+    background: var(--primary);
 
-    background:
-        var(--primary);
+    border-color: var(--primary);
 
-    color: white;
+    color: #ffffff;
 
+    box-shadow:
+        0 3px 8px rgba(15, 118, 110, 0.16);
 }
-
 
 .button--primary:hover {
+    background: var(--primary-hover);
 
-    background:
-        var(--primary-dark);
+    border-color: var(--primary-hover);
 
+    box-shadow:
+        0 5px 12px rgba(15, 118, 110, 0.20);
 }
 
+
+/* ==========================================================
+   BOTÓN SECUNDARIO
+========================================================== */
 
 .button--secondary {
+    background: var(--surface);
 
-    background: white;
+    border-color: var(--border);
 
-    border-color:
-        var(--border);
-
+    color: var(--text);
 }
 
+.button--secondary:hover {
+    background: var(--surface-secondary);
+
+    border-color: var(--border-strong);
+
+    color: var(--primary);
+}
+
+
+/* ==========================================================
+   BOTÓN DE PELIGRO
+========================================================== */
 
 .button--danger {
+    background: var(--danger);
 
-    background:
-        var(--danger);
+    border-color: var(--danger);
 
-    color: white;
+    color: #ffffff;
 
+    box-shadow:
+        0 3px 8px rgba(194, 65, 59, 0.14);
+}
+
+.button--danger:hover {
+    background: #a93631;
+
+    border-color: #a93631;
+
+    box-shadow:
+        0 5px 12px rgba(194, 65, 59, 0.18);
 }
 
 
+/* ==========================================================
+   BOTÓN GHOST
+========================================================== */
+
+.button--ghost {
+    background: transparent;
+
+    border-color: transparent;
+
+    color: var(--text-muted);
+}
+
+.button--ghost:hover {
+    background: var(--surface-secondary);
+
+    color: var(--text);
+}
+
+
+/* ==========================================================
+   BOTÓN PEQUEÑO
+========================================================== */
+
+.button--small {
+    min-height: 34px;
+
+    padding: 6px 10px;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+}
+
+
+/* ==========================================================
+   BOTÓN GRANDE
+========================================================== */
+
+.button--large {
+    min-height: 46px;
+
+    padding: 10px 18px;
+
+    font-size: 14px;
+}
+
+
+/* ==========================================================
+   ALERTAS
+========================================================== */
+
 .alert {
+    position: relative;
 
     display: flex;
 
     justify-content: space-between;
-
     align-items: flex-start;
 
-    gap: 15px;
+    gap: 14px;
 
     padding: 14px 16px;
 
     margin-bottom: 18px;
 
-    border-radius:
-        var(--radius-md);
+    border: 1px solid transparent;
 
+    border-radius: var(--radius-md);
+
+    font-size: 13px;
+
+    line-height: 1.55;
 }
 
+
+/* ==========================================================
+   ALERTA DE ÉXITO
+========================================================== */
 
 .alert--success {
+    background: var(--success-light);
 
-    background: #e8f7ef;
+    border-color: #bbf7d0;
 
-    color: #166c43;
-
+    color: #166534;
 }
 
+
+/* ==========================================================
+   ALERTA DE ERROR
+========================================================== */
 
 .alert--danger {
+    background: var(--danger-light);
 
-    background: #fdeaea;
+    border-color: #fecaca;
 
-    color: #9c3030;
-
+    color: #991b1b;
 }
 
+
+/* ==========================================================
+   ALERTA DE ADVERTENCIA
+========================================================== */
 
 .alert--warning {
+    background: var(--warning-light);
 
-    background: #fff6dd;
+    border-color: #fde68a;
 
-    color: #8a6117;
-
+    color: #92400e;
 }
 
 
+/* ==========================================================
+   ALERTA INFORMATIVA
+========================================================== */
+
+.alert--info {
+    background: var(--primary-light);
+
+    border-color: rgba(15, 118, 110, 0.18);
+
+    color: #115e59;
+}
+
+
+/* ==========================================================
+   BOTÓN CERRAR ALERTA
+========================================================== */
+
 .alert__close {
+    width: 32px;
+    height: 32px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
 
     border: none;
 
-    background: none;
+    border-radius: 7px;
+
+    background: transparent;
 
     color: inherit;
 
-    font-size: 20px;
-
     cursor: pointer;
 
+    font-size: 19px;
+
+    line-height: 1;
+
+    opacity: 0.7;
+
+    transition:
+        opacity 0.15s ease,
+        background-color 0.15s ease;
 }
+
+.alert__close:hover {
+    opacity: 1;
+
+    background: rgba(0, 0, 0, 0.05);
+}
+
+
+/* ==========================================================
+   DASHBOARD GRID
+========================================================== */
 
 .dashboard-grid {
     display: grid;
@@ -132,57 +305,315 @@
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap: 18px;
+    gap: 16px;
 
-    margin-bottom: 25px;
+    width: 100%;
+
+    margin-bottom: 24px;
 }
 
 
+/* ==========================================================
+   TARJETAS DEL DASHBOARD
+========================================================== */
+
 .dashboard-card {
+    position: relative;
+
+    min-width: 0;
+
     display: flex;
 
     flex-direction: column;
 
-    gap: 10px;
+    justify-content: center;
 
-    padding: 20px;
+    gap: 8px;
+
+    min-height: 125px;
+
+    padding: 18px 19px;
 
     background: var(--surface);
 
-    border:
-        1px solid
-        var(--border);
+    border: 1px solid var(--border);
 
-    border-radius:
-        var(--radius-lg);
+    border-radius: var(--radius-lg);
 
-    box-shadow:
-        var(--shadow);
+    box-shadow: var(--shadow-sm);
+
+    overflow: hidden;
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
 }
 
+.dashboard-card:hover {
+    transform: translateY(-2px);
+
+    border-color:
+        rgba(15, 118, 110, 0.22);
+
+    box-shadow: var(--shadow);
+}
+
+
+/* ==========================================================
+   LÍNEA DECORATIVA
+========================================================== */
+
+.dashboard-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 4px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary),
+            var(--accent)
+        );
+}
+
+
+/* ==========================================================
+   LABEL DE TARJETA
+========================================================== */
 
 .dashboard-card__label {
-    color:
-        var(--text-muted);
+    color: var(--text-muted);
 
-    font-size: 13px;
+    font-size: 12.5px;
+    font-weight: 600;
+
+    line-height: 1.4;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.04em;
 }
 
+
+/* ==========================================================
+   VALOR PRINCIPAL
+========================================================== */
 
 .dashboard-card__value {
-    font-size: 24px;
-}
+    margin: 0;
 
+    color: var(--text);
+
+    font-size: 26px;
+    font-weight: 700;
+
+    line-height: 1.15;
+
+    letter-spacing: -0.4px;
+}
 
 .dashboard-card__value--small {
-    font-size: 17px;
+    font-size: 18px;
+
+    line-height: 1.3;
 }
 
+
+/* ==========================================================
+   TEXTO SECUNDARIO
+========================================================== */
+
+.dashboard-card__description {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 12.5px;
+
+    line-height: 1.5;
+}
+
+
+/* ==========================================================
+   VARIANTES DE TARJETAS
+========================================================== */
+
+.dashboard-card--success::before {
+    background: #22c55e;
+}
+
+.dashboard-card--warning::before {
+    background: #f59e0b;
+}
+
+.dashboard-card--danger::before {
+    background: #ef4444;
+}
+
+.dashboard-card--neutral::before {
+    background: #94a3b8;
+}
+
+
+/* ==========================================================
+   ACCESIBILIDAD
+========================================================== */
+
+.button:focus-visible,
+.alert__close:focus-visible {
+    outline: 2px solid var(--accent);
+
+    outline-offset: 2px;
+}
+
+
+/* ==========================================================
+   LAPTOP
+========================================================== */
+
+@media (max-width: 1150px) {
+
+    .dashboard-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* ==========================================================
+   TABLET
+========================================================== */
 
 @media (max-width: 850px) {
 
     .dashboard-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 14px;
+    }
+
+    .dashboard-card {
+        min-height: 118px;
+
+        padding: 17px;
+    }
+
+    .dashboard-card__value {
+        font-size: 24px;
+    }
+
+}
+
+
+/* ==========================================================
+   MÓVIL
+========================================================== */
+
+@media (max-width: 650px) {
+
+    .dashboard-grid {
         grid-template-columns: 1fr;
+
+        gap: 12px;
+
+        margin-bottom: 18px;
+    }
+
+    .dashboard-card {
+        min-height: auto;
+
+        padding: 16px;
+    }
+
+    .dashboard-card__label {
+        font-size: 12px;
+    }
+
+    .dashboard-card__value {
+        font-size: 23px;
+    }
+
+    .dashboard-card__value--small {
+        font-size: 17px;
+    }
+
+    .dashboard-card__description {
+        font-size: 12.5px;
+    }
+
+    .alert {
+        padding: 13px 14px;
+
+        font-size: 13px;
+    }
+
+}
+
+
+/* ==========================================================
+   MÓVILES PEQUEÑOS
+========================================================== */
+
+@media (max-width: 480px) {
+
+    .button {
+        min-height: 40px;
+
+        padding: 8px 12px;
+
+        font-size: 13px;
+    }
+
+    .button--small {
+        min-height: 36px;
+
+        padding: 7px 10px;
+
+        font-size: 12px;
+    }
+
+    .dashboard-card {
+        padding: 15px;
+    }
+
+    .dashboard-card__value {
+        font-size: 22px;
+    }
+
+    .dashboard-card__description {
+        font-size: 12px;
+    }
+
+}
+
+
+/* ==========================================================
+   MÓVILES MUY PEQUEÑOS
+========================================================== */
+
+@media (max-width: 380px) {
+
+    .button {
+        width: 100%;
+    }
+
+    .dashboard-card__value {
+        font-size: 21px;
+    }
+
+    .alert {
+        gap: 10px;
+
+        padding: 12px;
     }
 
 }

@@ -10,6 +10,9 @@ use Illuminate\Validation\Rule;
 
 class ReporteAvanceController extends Controller
 {
+    /**
+     * Listado y filtros de reportes de avance.
+     */
     public function index(Request $request)
     {
         $usuario = Auth::user();
@@ -19,19 +22,12 @@ class ReporteAvanceController extends Controller
             'revisor',
         ]);
 
-        /*
-         * Un trabajador ve solo sus reportes.
-         * Administrador y gerente pueden ver todos.
-         */
         if ($usuario->rol?->nombre === 'TRABAJADOR') {
-            $query->where(
-                'trabajador_id',
-                $usuario->trabajador_id
-            );
+            $query->where('trabajador_id', $usuario->trabajador_id);
         }
 
         if ($request->filled('buscar')) {
-            $buscar = $request->buscar;
+            $buscar = trim($request->buscar);
 
             $query->where(function ($q) use ($buscar) {
                 $q->where('descripcion', 'like', "%{$buscar}%")
@@ -45,10 +41,7 @@ class ReporteAvanceController extends Controller
         }
 
         if ($request->filled('estado')) {
-            $query->where(
-                'estado',
-                $request->estado
-            );
+            $query->where('estado', $request->estado);
         }
 
         if ($request->filled('fecha_desde')) {
@@ -73,13 +66,12 @@ class ReporteAvanceController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view(
-            'reportesAvance.index',
-            compact('reportes')
-        );
+        return view('reportesAvance.index', compact('reportes'));
     }
 
-
+    /**
+     * Registrar reporte de avance.
+     */
     public function store(Request $request)
     {
         $usuario = Auth::user();
@@ -96,25 +88,21 @@ class ReporteAvanceController extends Controller
                 'required',
                 'date',
             ],
-
             'periodo_fin' => [
                 'required',
                 'date',
                 'after_or_equal:periodo_inicio',
             ],
-
             'descripcion' => [
                 'required',
                 'string',
             ],
-
             'porcentaje_avance' => [
                 'nullable',
                 'numeric',
                 'min:0',
                 'max:100',
             ],
-
             'archivo' => [
                 'nullable',
                 'file',
@@ -123,33 +111,18 @@ class ReporteAvanceController extends Controller
             ],
         ]);
 
-        $rutaArchivo = null;
-
-        if ($request->hasFile('archivo')) {
-            $rutaArchivo = $request
-                ->file('archivo')
-                ->store(
-                    'reportes-avance',
-                    'public'
-                );
-        }
+        $rutaArchivo = $request->hasFile('archivo')
+            ? $request->file('archivo')->store('reportes-avance', 'public')
+            : null;
 
         ReporteAvance::create([
             'trabajador_id' => $usuario->trabajador_id,
-
             'periodo_inicio' => $data['periodo_inicio'],
-
             'periodo_fin' => $data['periodo_fin'],
-
             'fecha_presentacion' => now()->toDateString(),
-
             'descripcion' => $data['descripcion'],
-
-            'porcentaje_avance' =>
-                $data['porcentaje_avance'] ?? null,
-
+            'porcentaje_avance' => $data['porcentaje_avance'] ?? null,
             'archivo' => $rutaArchivo,
-
             'estado' => 'PENDIENTE',
         ]);
 
@@ -161,26 +134,17 @@ class ReporteAvanceController extends Controller
             );
     }
 
-
-    public function update(
-        Request $request,
-        ReporteAvance $reporte
-    ) {
+    /**
+     * Actualizar reporte de avance.
+     */
+    public function update(Request $request, ReporteAvance $reporte)
+    {
         $usuario = Auth::user();
 
-        /*
-         * Solo el propietario puede editar.
-         */
-        if (
-            $reporte->trabajador_id
-            !== $usuario->trabajador_id
-        ) {
+        if ($reporte->trabajador_id !== $usuario->trabajador_id) {
             abort(403);
         }
 
-        /*
-         * Un reporte revisado ya no se modifica.
-         */
         if ($reporte->estado === 'REVISADO') {
             return back()->with(
                 'error',
@@ -193,25 +157,21 @@ class ReporteAvanceController extends Controller
                 'required',
                 'date',
             ],
-
             'periodo_fin' => [
                 'required',
                 'date',
                 'after_or_equal:periodo_inicio',
             ],
-
             'descripcion' => [
                 'required',
                 'string',
             ],
-
             'porcentaje_avance' => [
                 'nullable',
                 'numeric',
                 'min:0',
                 'max:100',
             ],
-
             'archivo' => [
                 'nullable',
                 'file',
@@ -223,57 +183,38 @@ class ReporteAvanceController extends Controller
         $rutaArchivo = $reporte->archivo;
 
         if ($request->hasFile('archivo')) {
-
             if (
-                $rutaArchivo
-                && Storage::disk('public')->exists($rutaArchivo)
+                $rutaArchivo &&
+                Storage::disk('public')->exists($rutaArchivo)
             ) {
                 Storage::disk('public')->delete($rutaArchivo);
             }
 
             $rutaArchivo = $request
                 ->file('archivo')
-                ->store(
-                    'reportes-avance',
-                    'public'
-                );
+                ->store('reportes-avance', 'public');
         }
+
+        $fueObservado = $reporte->estado === 'OBSERVADO';
 
         $reporte->update([
             'periodo_inicio' => $data['periodo_inicio'],
-
             'periodo_fin' => $data['periodo_fin'],
-
             'descripcion' => $data['descripcion'],
-
-            'porcentaje_avance' =>
-                $data['porcentaje_avance'] ?? null,
-
+            'porcentaje_avance' => $data['porcentaje_avance'] ?? null,
             'archivo' => $rutaArchivo,
-
-            /*
-             * Si estaba observado y se corrige,
-             * vuelve a pendiente para revisión.
-             */
-            'estado' =>
-                $reporte->estado === 'OBSERVADO'
-                    ? 'PENDIENTE'
-                    : $reporte->estado,
-
-            'revisado_por' =>
-                $reporte->estado === 'OBSERVADO'
-                    ? null
-                    : $reporte->revisado_por,
-
-            'comentario_revision' =>
-                $reporte->estado === 'OBSERVADO'
-                    ? null
-                    : $reporte->comentario_revision,
-
-            'fecha_revision' =>
-                $reporte->estado === 'OBSERVADO'
-                    ? null
-                    : $reporte->fecha_revision,
+            'estado' => $fueObservado
+                ? 'PENDIENTE'
+                : $reporte->estado,
+            'revisado_por' => $fueObservado
+                ? null
+                : $reporte->revisado_por,
+            'comentario_revision' => $fueObservado
+                ? null
+                : $reporte->comentario_revision,
+            'fecha_revision' => $fueObservado
+                ? null
+                : $reporte->fecha_revision,
         ]);
 
         return redirect()
@@ -284,17 +225,18 @@ class ReporteAvanceController extends Controller
             );
     }
 
-
-    public function revisar(
-        Request $request,
-        ReporteAvance $reporte
-    ) {
+    /**
+     * Revisar reporte de avance.
+     */
+    public function revisar(Request $request, ReporteAvance $reporte)
+    {
         $usuario = Auth::user();
 
         if (
             !in_array(
                 $usuario->rol?->nombre,
-                ['ADMINISTRADOR', 'GERENTE']
+                ['ADMINISTRADOR', 'GERENTE'],
+                true
             )
         ) {
             abort(403);
@@ -303,12 +245,8 @@ class ReporteAvanceController extends Controller
         $data = $request->validate([
             'estado' => [
                 'required',
-                Rule::in([
-                    'REVISADO',
-                    'OBSERVADO',
-                ]),
+                Rule::in(['REVISADO', 'OBSERVADO']),
             ],
-
             'comentario_revision' => [
                 'nullable',
                 'string',
@@ -317,24 +255,20 @@ class ReporteAvanceController extends Controller
         ]);
 
         if (
-            $data['estado'] === 'OBSERVADO'
-            && empty($data['comentario_revision'])
+            $data['estado'] === 'OBSERVADO' &&
+            empty($data['comentario_revision'])
         ) {
-            return back()
-                ->withErrors([
-                    'comentario_revision' =>
-                        'Debes indicar la observación del reporte.',
-                ]);
+            return back()->withErrors([
+                'comentario_revision' =>
+                    'Debes indicar la observación del reporte.',
+            ]);
         }
 
         $reporte->update([
             'estado' => $data['estado'],
-
             'revisado_por' => $usuario->id,
-
             'comentario_revision' =>
                 $data['comentario_revision'] ?? null,
-
             'fecha_revision' => now(),
         ]);
 

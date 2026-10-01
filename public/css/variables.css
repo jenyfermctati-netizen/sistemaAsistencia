@@ -1,30 +1,118 @@
 :root {
-
-    --primary: #24537a;
-    --primary-dark: #193d5b;
-    --primary-light: #eaf2f8;
-
-    --success: #198754;
-    --warning: #d89b1d;
-    --danger: #c83939;
-
-    --background: #f4f6f8;
-    --surface: #ffffff;
-
-    --text: #1b2733;
-    --text-muted: #66727f;
-
-    --border: #dce3e9;
+    /* ======================================================
+       DIMENSIONES GENERALES
+    ====================================================== */
 
     --sidebar-width: 260px;
-    --navbar-height: 70px;
+    --navbar-height: 68px;
 
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
+
+    /* ======================================================
+       COLOR PRINCIPAL
+    ====================================================== */
+
+    --primary: #0f766e;
+    --primary-hover: #0d665f;
+    --primary-dark: #0b5f59;
+    --primary-light: #e7f6f3;
+
+    --accent: #14b8a6;
+    --accent-hover: #0d9488;
+    --accent-soft: #ccfbf1;
+
+
+    /* ======================================================
+       FONDOS
+    ====================================================== */
+
+    --background: #f6f7f5;
+
+    --surface: #ffffff;
+    --surface-secondary: #f1f4f2;
+    --surface-hover: #f7faf8;
+
+
+    /* ======================================================
+       TEXTOS
+    ====================================================== */
+
+    --text: #17211f;
+    --text-muted: #66736f;
+    --text-soft: #94a09c;
+
+    --text-inverse: #ffffff;
+
+
+    /* ======================================================
+       BORDES
+    ====================================================== */
+
+    --border: #dde4e1;
+    --border-strong: #cbd5d1;
+
+
+    /* ======================================================
+       ESTADOS
+    ====================================================== */
+
+    --success: #15803d;
+    --success-hover: #166534;
+    --success-light: #ecfdf3;
+
+    --warning: #b7791f;
+    --warning-hover: #92400e;
+    --warning-light: #fff8e7;
+
+    --danger: #c2413b;
+    --danger-hover: #a93631;
+    --danger-light: #fff0ef;
+
+    --info: #0f766e;
+    --info-light: #e7f6f3;
+
+
+    /* ======================================================
+       SOMBRAS
+    ====================================================== */
+
+    --shadow-sm:
+        0 1px 3px rgba(23, 33, 31, 0.05);
 
     --shadow:
-        0 4px 15px rgba(0, 0, 0, 0.07);
+        0 8px 24px rgba(23, 33, 31, 0.07);
 
-    --transition: 0.2s ease;
+    --shadow-md:
+        0 12px 30px rgba(23, 33, 31, 0.10);
+
+    --shadow-lg:
+        0 20px 55px rgba(23, 33, 31, 0.16);
+
+
+    /* ======================================================
+       RADIOS
+    ====================================================== */
+
+    --radius-xs: 5px;
+    --radius-sm: 7px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+
+
+    /* ======================================================
+       TRANSICIONES
+    ====================================================== */
+
+    --transition-fast: 0.15s ease;
+    --transition: 0.18s ease;
+    --transition-slow: 0.25s ease;
+
+
+    /* ======================================================
+       Z-INDEX
+    ====================================================== */
+    --z-navbar: 50;
+    --z-sidebar: 1000;
+    --z-overlay: 999;
+    --z-modal: 1200;
 }

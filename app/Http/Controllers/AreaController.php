@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Area;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class AreaController extends Controller
 {
-    // Listado y filtros de áreas
+    /**
+     * Listado y filtros de áreas.
+     */
     public function index(Request $request)
     {
         $query = Area::query()
@@ -19,8 +20,7 @@ class AreaController extends Controller
             $buscar = $request->buscar;
 
             $query->where(function ($q) use ($buscar) {
-                $q
-                    ->where('nombre', 'like', "%{$buscar}%")
+                $q->where('nombre', 'like', "%{$buscar}%")
                     ->orWhere('descripcion', 'like', "%{$buscar}%");
             });
         }
@@ -37,13 +37,27 @@ class AreaController extends Controller
         return view('areas.index', compact('areas'));
     }
 
-    // Registrar área
+    /**
+     * Registrar área.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nombre' => ['required', 'string', 'max:150', 'unique:areas,nombre'],
-            'descripcion' => ['nullable', 'string', 'max:500'],
-            'estado' => ['required', 'boolean'],
+            'nombre' => [
+                'required',
+                'string',
+                'max:150',
+                'unique:areas,nombre',
+            ],
+            'descripcion' => [
+                'nullable',
+                'string',
+                'max:500',
+            ],
+            'estado' => [
+                'required',
+                'boolean',
+            ],
         ]);
 
         Area::create([
@@ -57,7 +71,9 @@ class AreaController extends Controller
             ->with('success', 'Área registrada correctamente.');
     }
 
-    // Actualizar área
+    /**
+     * Actualizar área.
+     */
     public function update(Request $request, Area $area)
     {
         $data = $request->validate([
@@ -67,8 +83,15 @@ class AreaController extends Controller
                 'max:150',
                 Rule::unique('areas', 'nombre')->ignore($area->id),
             ],
-            'descripcion' => ['nullable', 'string', 'max:500'],
-            'estado' => ['required', 'boolean'],
+            'descripcion' => [
+                'nullable',
+                'string',
+                'max:500',
+            ],
+            'estado' => [
+                'required',
+                'boolean',
+            ],
         ]);
 
         $area->update([
@@ -82,24 +105,30 @@ class AreaController extends Controller
             ->with('success', 'Área actualizada correctamente.');
     }
 
-    // Cambiar estado activo/inactivo
+    /**
+     * Cambiar estado activo/inactivo.
+     */
     public function cambiarEstado(Area $area)
     {
         if ($area->estado) {
-            $trabajadoresActivos = $area
+            $tieneTrabajadoresActivos = $area
                 ->trabajadores()
                 ->where('estado', 'ACTIVO')
                 ->exists();
 
-            if ($trabajadoresActivos) {
+            if ($tieneTrabajadoresActivos) {
                 return redirect()
                     ->route('areas.index')
-                    ->with('error', 'No puedes desactivar un área que tiene trabajadores activos.');
+                    ->with(
+                        'error',
+                        'No puedes desactivar un área que tiene trabajadores activos.'
+                    );
             }
         }
 
-        $area->estado = !$area->estado;
-        $area->save();
+        $area->update([
+            'estado' => !$area->estado,
+        ]);
 
         return redirect()
             ->route('areas.index')
