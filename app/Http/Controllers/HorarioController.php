@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Area;
 use App\Models\Horario;
 use App\Models\Trabajador;
 use App\Models\TrabajadorHorario;
@@ -9,20 +10,25 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 
 class HorarioController extends Controller
 {
-    /**
-     * Listado de horarios, trabajadores y asignaciones.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | LISTADO
+    |--------------------------------------------------------------------------
+    */
     public function index(Request $request)
     {
         $query = Horario::with('dias')
-            ->withCount('trabajadorHorarios');
+            ->withCount([
+                'trabajadorHorarios as asignaciones_activas' => function ($q) {
+                    $q->where('estado', true);
+                },
+            ]);
 
         if ($request->filled('buscar')) {
-            $buscar = $request->buscar;
+            $buscar = trim($request->buscar);
 
             $query->where(function ($q) use ($buscar) {
                 $q->where('nombre', 'like', "%{$buscar}%")
@@ -31,102 +37,174 @@ class HorarioController extends Controller
         }
 
         if ($request->filled('estado')) {
-            $query->where('estado', $request->estado === '1');
+            if ($request->estado === 'ACTIVO') {
+                $query->where('estado', true);
+            }
+
+            if ($request->estado === 'INACTIVO') {
+                $query->where('estado', false);
+            }
         }
 
         $horarios = $query
+            ->orderByDesc('estado')
             ->orderBy('nombre')
             ->paginate(10)
             ->withQueryString();
 
+        /*
+        |--------------------------------------------------------------------------
+        | HORARIOS DISPONIBLES
+        |--------------------------------------------------------------------------
+        */
+        $horariosActivos = Horario::with('dias')
+            ->where('estado', true)
+            ->orderBy('nombre')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRABAJADORES ACTIVOS
+        |--------------------------------------------------------------------------
+        */
         $trabajadores = Trabajador::with([
             'area',
-            'horarioActual.horario',
         ])
             ->where('estado', 'ACTIVO')
             ->orderBy('apellidos')
             ->orderBy('nombres')
             ->get();
 
-        $horariosActivos = Horario::where('estado', true)
+        /*
+        |--------------------------------------------------------------------------
+        | ÁREAS
+        |--------------------------------------------------------------------------
+        */
+        $areas = Area::where('estado', true)
             ->orderBy('nombre')
             ->get();
 
+        /*
+        |--------------------------------------------------------------------------
+        | HISTORIAL DE ASIGNACIONES
+        |--------------------------------------------------------------------------
+        */
         $asignaciones = TrabajadorHorario::with([
             'trabajador.area',
             'horario',
         ])
             ->orderByDesc('fecha_inicio')
-            ->paginate(10, ['*'], 'asignaciones_page');
+            ->orderByDesc('id')
+            ->paginate(
+                15,
+                ['*'],
+                'historial'
+            );
 
-        return view('trabajadores.horarios', compact(
-            'horarios',
-            'trabajadores',
-            'horariosActivos',
-            'asignaciones'
-        ));
+        return view(
+            'trabajadores.horarios',
+            compact(
+                'horarios',
+                'horariosActivos',
+                'trabajadores',
+                'areas',
+                'asignaciones'
+            )
+        );
     }
 
-    /**
-     * Registrar horario.
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | CREAR HORARIO
+    |--------------------------------------------------------------------------
+    */
     public function store(Request $request)
     {
         $data = $this->validarHorario($request);
 
         DB::transaction(function () use ($data) {
+
             $horario = Horario::create([
                 'nombre' => $data['nombre'],
                 'descripcion' => $data['descripcion'] ?? null,
                 'estado' => true,
             ]);
 
-            $this->guardarDias($horario, $data['dias']);
+            $this->guardarDias(
+                $horario,
+                $data['dias']
+            );
         });
 
         return redirect()
             ->route('trabajadores.horarios')
-            ->with('success', 'Horario creado correctamente.');
+            ->with(
+                'success',
+                'Horario registrado correctamente.'
+            );
     }
 
-    /**
-     * Actualizar horario.
-     */
-    public function update(Request $request, Horario $horario)
-    {
-        $data = $this->validarHorario($request, $horario);
 
-        DB::transaction(function () use ($horario, $data) {
+    /*
+    |--------------------------------------------------------------------------
+    | ACTUALIZAR HORARIO
+    |--------------------------------------------------------------------------
+    */
+    public function update(
+        Request $request,
+        Horario $horario
+    ) {
+        $data = $this->validarHorario(
+            $request,
+            $horario->id
+        );
+
+        DB::transaction(function () use (
+            $data,
+            $horario
+        ) {
+
             $horario->update([
                 'nombre' => $data['nombre'],
                 'descripcion' => $data['descripcion'] ?? null,
             ]);
 
-            $this->guardarDias($horario, $data['dias']);
+            $this->guardarDias(
+                $horario,
+                $data['dias']
+            );
         });
 
         return redirect()
             ->route('trabajadores.horarios')
-            ->with('success', 'Horario actualizado correctamente.');
+            ->with(
+                'success',
+                'Horario actualizado correctamente.'
+            );
     }
 
-    /**
-     * Cambiar estado activo/inactivo.
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | CAMBIAR ESTADO
+    |--------------------------------------------------------------------------
+    */
     public function cambiarEstado(Horario $horario)
     {
         if ($horario->estado) {
-            $tieneAsignacionesActivas = TrabajadorHorario::where(
+
+            $tieneAsignaciones = TrabajadorHorario::where(
                 'horario_id',
                 $horario->id
             )
                 ->where('estado', true)
                 ->exists();
 
-            if ($tieneAsignacionesActivas) {
+            if ($tieneAsignaciones) {
                 return back()->with(
                     'error',
-                    'No puedes desactivar este horario porque tiene trabajadores asignados.'
+                    'No puedes desactivar este horario porque tiene trabajadores asignados actualmente.'
                 );
             }
         }
@@ -135,14 +213,20 @@ class HorarioController extends Controller
             'estado' => !$horario->estado,
         ]);
 
-        return redirect()
-            ->route('trabajadores.horarios')
-            ->with('success', 'Estado del horario actualizado correctamente.');
+        return back()->with(
+            'success',
+            $horario->estado
+                ? 'Horario activado correctamente.'
+                : 'Horario desactivado correctamente.'
+        );
     }
 
-    /**
-     * Asignar horario a trabajador.
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | ASIGNACIÓN INDIVIDUAL
+    |--------------------------------------------------------------------------
+    */
     public function asignar(Request $request)
     {
         $data = $request->validate([
@@ -150,114 +234,314 @@ class HorarioController extends Controller
                 'required',
                 'exists:trabajadores,id',
             ],
+
             'horario_id' => [
                 'required',
                 'exists:horarios,id',
             ],
+
             'fecha_inicio' => [
                 'required',
                 'date',
             ],
+        ], [
+            'trabajador_id.required' =>
+                'Selecciona un trabajador.',
+
+            'horario_id.required' =>
+                'Selecciona un horario.',
+
+            'fecha_inicio.required' =>
+                'Selecciona una fecha de inicio.',
         ]);
 
-        $trabajador = Trabajador::findOrFail($data['trabajador_id']);
+        $trabajador = Trabajador::findOrFail(
+            $data['trabajador_id']
+        );
 
-        $horario = Horario::where('id', $data['horario_id'])
-            ->where('estado', true)
-            ->firstOrFail();
+        $horario = Horario::findOrFail(
+            $data['horario_id']
+        );
 
-        $tipoControl = $trabajador->tipo_vinculo === 'CONTRATADO'
-            ? 'OBLIGATORIO'
-            : 'REFERENCIAL';
+        if (!$horario->estado) {
+            return back()->with(
+                'error',
+                'No puedes asignar un horario inactivo.'
+            );
+        }
 
-        $fechaInicio = Carbon::parse($data['fecha_inicio']);
+        $fechaInicio = Carbon::parse(
+            $data['fecha_inicio']
+        );
 
         DB::transaction(function () use (
             $trabajador,
             $horario,
-            $tipoControl,
             $fechaInicio
         ) {
-            $asignacionActual = TrabajadorHorario::where(
-                'trabajador_id',
-                $trabajador->id
-            )
-                ->where('estado', true)
-                ->first();
 
-            if ($asignacionActual) {
-                if ($fechaInicio->lte($asignacionActual->fecha_inicio)) {
-                    throw ValidationException::withMessages([
-                        'fecha_inicio' =>
-                            'La nueva fecha debe ser posterior al inicio del horario actual.',
-                    ]);
-                }
+            $this->cerrarAsignacionesActuales(
+                $trabajador,
+                $fechaInicio
+            );
 
-                $asignacionActual->update([
-                    'fecha_fin' => $fechaInicio
-                        ->copy()
-                        ->subDay()
-                        ->toDateString(),
-                    'estado' => false,
-                ]);
-            }
-
-            TrabajadorHorario::create([
-                'trabajador_id' => $trabajador->id,
-                'horario_id' => $horario->id,
-                'tipo_control' => $tipoControl,
-                'fecha_inicio' => $fechaInicio->toDateString(),
-                'fecha_fin' => null,
-                'estado' => true,
-            ]);
+            $this->crearAsignacion(
+                $trabajador,
+                $horario,
+                $fechaInicio
+            );
         });
 
         return redirect()
             ->route('trabajadores.horarios')
-            ->with('success', 'Horario asignado correctamente.');
+            ->with(
+                'success',
+                'Horario asignado correctamente.'
+            );
     }
 
-    /**
-     * Validar datos del horario.
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | ASIGNACIÓN MASIVA
+    |--------------------------------------------------------------------------
+    */
+    public function asignarMasivo(Request $request)
+    {
+        $data = $request->validate([
+            'horario_id' => [
+                'required',
+                'exists:horarios,id',
+            ],
+
+            'fecha_inicio' => [
+                'required',
+                'date',
+            ],
+
+            'trabajadores' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'trabajadores.*' => [
+                'integer',
+                'exists:trabajadores,id',
+            ],
+        ], [
+            'horario_id.required' =>
+                'Selecciona un horario.',
+
+            'fecha_inicio.required' =>
+                'Selecciona una fecha de inicio.',
+
+            'trabajadores.required' =>
+                'Selecciona al menos un trabajador.',
+
+            'trabajadores.min' =>
+                'Selecciona al menos un trabajador.',
+        ]);
+
+        $horario = Horario::findOrFail(
+            $data['horario_id']
+        );
+
+        if (!$horario->estado) {
+            return back()->with(
+                'error',
+                'No puedes asignar un horario inactivo.'
+            );
+        }
+
+        $fechaInicio = Carbon::parse(
+            $data['fecha_inicio']
+        );
+
+        $trabajadores = Trabajador::whereIn(
+            'id',
+            $data['trabajadores']
+        )
+            ->where('estado', 'ACTIVO')
+            ->get();
+
+        if ($trabajadores->isEmpty()) {
+            return back()->with(
+                'error',
+                'No se encontraron trabajadores activos.'
+            );
+        }
+
+        DB::transaction(function () use (
+            $trabajadores,
+            $horario,
+            $fechaInicio
+        ) {
+
+            foreach ($trabajadores as $trabajador) {
+
+                $this->cerrarAsignacionesActuales(
+                    $trabajador,
+                    $fechaInicio
+                );
+
+                $this->crearAsignacion(
+                    $trabajador,
+                    $horario,
+                    $fechaInicio
+                );
+            }
+        });
+
+        return redirect()
+            ->route('trabajadores.horarios')
+            ->with(
+                'success',
+                'Horario asignado correctamente a '
+                . $trabajadores->count()
+                . ' trabajadores.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CERRAR HORARIO ANTERIOR
+    |--------------------------------------------------------------------------
+    */
+    private function cerrarAsignacionesActuales(
+        Trabajador $trabajador,
+        Carbon $fechaInicio
+    ): void {
+
+        $asignaciones = TrabajadorHorario::where(
+            'trabajador_id',
+            $trabajador->id
+        )
+            ->where('estado', true)
+            ->get();
+
+        foreach ($asignaciones as $asignacion) {
+
+            $inicioAnterior = Carbon::parse(
+                $asignacion->fecha_inicio
+            );
+
+            /*
+             * Si el horario anterior comenzó antes
+             * de la nueva asignación, cerramos
+             * el día anterior.
+             */
+            if ($inicioAnterior->lt($fechaInicio)) {
+
+                $asignacion->update([
+                    'fecha_fin' => $fechaInicio
+                        ->copy()
+                        ->subDay()
+                        ->toDateString(),
+
+                    'estado' => false,
+                ]);
+
+            } else {
+
+                /*
+                 * Si tenía la misma fecha de inicio,
+                 * simplemente lo desactivamos.
+                 */
+                $asignacion->update([
+                    'estado' => false,
+                ]);
+            }
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CREAR ASIGNACIÓN
+    |--------------------------------------------------------------------------
+    */
+    private function crearAsignacion(
+        Trabajador $trabajador,
+        Horario $horario,
+        Carbon $fechaInicio
+    ): void {
+
+        /*
+         * CONTRATADO = obligatorio
+         * LOCADOR    = referencial
+         */
+        $tipoControl =
+            $trabajador->tipo_vinculo === 'LOCADOR'
+                ? 'REFERENCIAL'
+                : 'OBLIGATORIO';
+
+        TrabajadorHorario::create([
+            'trabajador_id' => $trabajador->id,
+            'horario_id' => $horario->id,
+            'tipo_control' => $tipoControl,
+            'fecha_inicio' => $fechaInicio->toDateString(),
+            'fecha_fin' => null,
+            'estado' => true,
+        ]);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDACIÓN DE HORARIO
+    |--------------------------------------------------------------------------
+    */
     private function validarHorario(
         Request $request,
-        ?Horario $horario = null
+        ?int $horarioId = null
     ): array {
-        $data = $request->validate([
+
+        return $request->validate([
             'nombre' => [
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('horarios', 'nombre')->ignore($horario?->id),
+
+                Rule::unique(
+                    'horarios',
+                    'nombre'
+                )->ignore($horarioId),
             ],
+
             'descripcion' => [
                 'nullable',
                 'string',
                 'max:300',
             ],
+
             'dias' => [
                 'required',
                 'array',
                 'size:7',
             ],
+
             'dias.*.dia_semana' => [
                 'required',
                 'integer',
                 'between:1,7',
             ],
+
             'dias.*.es_laborable' => [
-                'required',
-                'boolean',
+                'nullable',
             ],
+
             'dias.*.hora_entrada' => [
                 'nullable',
                 'date_format:H:i',
             ],
+
             'dias.*.hora_salida' => [
                 'nullable',
                 'date_format:H:i',
             ],
+
             'dias.*.tolerancia_minutos' => [
                 'nullable',
                 'integer',
@@ -265,52 +549,73 @@ class HorarioController extends Controller
                 'max:180',
             ],
         ]);
-
-        foreach ($data['dias'] as $index => $dia) {
-            $esLaborable = (bool) $dia['es_laborable'];
-
-            if (!$esLaborable) {
-                $data['dias'][$index]['hora_entrada'] = null;
-                $data['dias'][$index]['hora_salida'] = null;
-                $data['dias'][$index]['tolerancia_minutos'] = 0;
-
-                continue;
-            }
-
-            if (empty($dia['hora_entrada']) || empty($dia['hora_salida'])) {
-                throw ValidationException::withMessages([
-                    "dias.$index.hora_entrada" =>
-                        'Los días laborables deben tener hora de entrada y salida.',
-                ]);
-            }
-
-            if ($dia['hora_salida'] <= $dia['hora_entrada']) {
-                throw ValidationException::withMessages([
-                    "dias.$index.hora_salida" =>
-                        'La hora de salida debe ser posterior a la hora de entrada.',
-                ]);
-            }
-        }
-
-        return $data;
     }
 
-    /**
-     * Guardar configuración semanal del horario.
-     */
-    private function guardarDias(Horario $horario, array $dias): void
-    {
+
+    /*
+    |--------------------------------------------------------------------------
+    | GUARDAR DÍAS
+    |--------------------------------------------------------------------------
+    */
+    private function guardarDias(
+        Horario $horario,
+        array $dias
+    ): void {
+
         foreach ($dias as $dia) {
+
+            $esLaborable = isset(
+                $dia['es_laborable']
+            )
+                && (string) $dia['es_laborable'] === '1';
+
+            if ($esLaborable) {
+
+                if (
+                    empty($dia['hora_entrada'])
+                    ||
+                    empty($dia['hora_salida'])
+                ) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'dias' =>
+                            'Los días laborables deben tener hora de entrada y salida.',
+                    ]);
+                }
+
+                if (
+                    $dia['hora_salida']
+                    <= $dia['hora_entrada']
+                ) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'dias' =>
+                            'La hora de salida debe ser posterior a la hora de entrada.',
+                    ]);
+                }
+            }
+
             $horario->dias()->updateOrCreate(
                 [
-                    'dia_semana' => $dia['dia_semana'],
+                    'dia_semana' =>
+                        $dia['dia_semana'],
                 ],
                 [
-                    'es_laborable' => (bool) $dia['es_laborable'],
-                    'hora_entrada' => $dia['hora_entrada'] ?? null,
-                    'hora_salida' => $dia['hora_salida'] ?? null,
+                    'es_laborable' =>
+                        $esLaborable,
+
+                    'hora_entrada' =>
+                        $esLaborable
+                            ? $dia['hora_entrada']
+                            : null,
+
+                    'hora_salida' =>
+                        $esLaborable
+                            ? $dia['hora_salida']
+                            : null,
+
                     'tolerancia_minutos' =>
-                        $dia['tolerancia_minutos'] ?? 0,
+                        $esLaborable
+                            ? ($dia['tolerancia_minutos'] ?? 0)
+                            : 0,
                 ]
             );
         }

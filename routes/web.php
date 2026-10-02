@@ -131,42 +131,46 @@ Route::middleware('auth')->group(function () {
         [TrabajadorController::class, 'cambiarEstado']
     )->name('trabajadores.estado');
 
+/*
+|--------------------------------------------------------------------------
+| HORARIOS
+|--------------------------------------------------------------------------
+*/
 
-    /*
-    |--------------------------------------------------------------------------
-    | HORARIOS
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/trabajadores/horarios',
-        [HorarioController::class, 'index']
-    )->name('trabajadores.horarios');
-
-
-    Route::post(
-        '/trabajadores/horarios',
-        [HorarioController::class, 'store']
-    )->name('trabajadores.horarios.store');
+Route::get(
+    '/trabajadores/horarios',
+    [HorarioController::class, 'index']
+)->name('trabajadores.horarios');
 
 
-    Route::post(
-        '/trabajadores/horarios/asignar',
-        [HorarioController::class, 'asignar']
-    )->name('trabajadores.horarios.asignar');
+Route::post(
+    '/trabajadores/horarios',
+    [HorarioController::class, 'store']
+)->name('trabajadores.horarios.store');
 
 
-    Route::put(
-        '/trabajadores/horarios/{horario}',
-        [HorarioController::class, 'update']
-    )->name('trabajadores.horarios.update');
+Route::post(
+    '/trabajadores/horarios/asignar',
+    [HorarioController::class, 'asignar']
+)->name('trabajadores.horarios.asignar');
 
 
-    Route::patch(
-        '/trabajadores/horarios/{horario}/estado',
-        [HorarioController::class, 'cambiarEstado']
-    )->name('trabajadores.horarios.estado');
+Route::post(
+    '/trabajadores/horarios/asignar-masivo',
+    [HorarioController::class, 'asignarMasivo']
+)->name('trabajadores.horarios.asignarMasivo');
 
+
+Route::put(
+    '/trabajadores/horarios/{horario}',
+    [HorarioController::class, 'update']
+)->name('trabajadores.horarios.update');
+
+
+Route::patch(
+    '/trabajadores/horarios/{horario}/estado',
+    [HorarioController::class, 'cambiarEstado']
+)->name('trabajadores.horarios.estado');
 
     /*
     |--------------------------------------------------------------------------
@@ -249,6 +253,12 @@ Route::post(
     '/asistencias/procesar',
     [AsistenciaController::class, 'procesar']
 )->name('asistencias.procesar');
+
+/*
+|--------------------------------------------------------------------------
+| FERIADOS
+|--------------------------------------------------------------------------
+*/
 
 /*
 |--------------------------------------------------------------------------

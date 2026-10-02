@@ -603,3 +603,328 @@
         padding: 12px;
     }
 }
+
+/* ==========================================================
+   ASIGNACIÓN MASIVA
+========================================================== */
+
+.page-header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+
+.form-grid {
+    display: grid;
+    gap: 14px;
+}
+
+
+.form-grid--2 {
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+}
+
+
+.asignacion-masiva__filtros {
+    display: grid;
+
+    grid-template-columns:
+        minmax(200px, 1fr)
+        minmax(170px, 0.8fr)
+        minmax(160px, 0.7fr);
+
+    gap: 12px;
+
+    margin-top: 18px;
+}
+
+
+.asignacion-masiva__toolbar {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-top: 16px;
+    margin-bottom: 10px;
+
+    padding: 11px 13px;
+
+    background: var(--surface-secondary);
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+
+.check-all {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    cursor: pointer;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.check-all input {
+    width: 17px;
+    height: 17px;
+}
+
+
+.seleccionados-contador {
+    color: var(--text-muted);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+.trabajadores-masivo {
+    max-height: 400px;
+
+    overflow-y: auto;
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+
+    background: var(--surface);
+}
+
+
+.trabajador-masivo {
+    display: grid;
+
+    grid-template-columns:
+        28px
+        40px
+        minmax(0, 1fr)
+        auto;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 67px;
+
+    padding: 10px 13px;
+
+    border-bottom: 1px solid var(--border);
+
+    cursor: pointer;
+
+    transition: background .15s ease;
+}
+
+
+.trabajador-masivo:last-child {
+    border-bottom: none;
+}
+
+
+.trabajador-masivo:hover {
+    background: var(--surface-secondary);
+}
+
+
+.trabajador-masivo[hidden] {
+    display: none;
+}
+
+
+.trabajador-masivo-checkbox {
+    width: 17px;
+    height: 17px;
+
+    cursor: pointer;
+}
+
+
+.trabajador-masivo__avatar {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: var(--primary-light);
+
+    color: var(--primary);
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+
+.trabajador-masivo__info {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+
+.trabajador-masivo__info strong {
+    color: var(--text);
+
+    font-size: 13px;
+}
+
+
+.trabajador-masivo__info span,
+.trabajador-masivo__info small {
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+
+.control-obligatorio,
+.control-referencial {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border-radius: 8px;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+.control-obligatorio {
+    background: var(--primary-light);
+
+    color: var(--primary);
+}
+
+
+.control-referencial {
+    background: var(--surface-secondary);
+
+    color: var(--text-muted);
+
+    border: 1px solid var(--border);
+}
+
+
+.asignacion-masiva__nota,
+.tipo-control-preview {
+    margin-top: 14px;
+
+    padding: 12px 14px;
+
+    background: var(--surface-secondary);
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+}
+
+
+.asignacion-masiva__nota strong,
+.tipo-control-preview strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 12px;
+}
+
+
+.asignacion-masiva__nota p,
+.tipo-control-preview span {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+.masivo-sin-resultados {
+    padding: 25px;
+
+    text-align: center;
+
+    color: var(--text-muted);
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    font-size: 12px;
+}
+
+
+.button--small {
+    padding: 6px 10px;
+
+    min-height: 32px;
+
+    font-size: 11px;
+}
+
+
+.table-secondary-text {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+
+.historial-panel {
+    margin-top: 25px;
+}
+
+
+@media (max-width: 850px) {
+
+    .asignacion-masiva__filtros,
+    .form-grid--2 {
+        grid-template-columns: 1fr;
+    }
+
+
+    .asignacion-masiva__toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .trabajador-masivo {
+        grid-template-columns:
+            25px
+            38px
+            minmax(0, 1fr);
+    }
+
+
+    .trabajador-masivo > div:last-child {
+        grid-column: 3;
+    }
+
+}
