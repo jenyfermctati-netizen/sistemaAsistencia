@@ -28,7 +28,7 @@ class AuthController extends Controller
 
         $credenciales['estado'] = 1;
 
-        if (Auth::attempt($credenciales)) {
+        if (Auth::attempt($credenciales, $request->boolean('remember'))) {
 
             $request->session()->regenerate();
 

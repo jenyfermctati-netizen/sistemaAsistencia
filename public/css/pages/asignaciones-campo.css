@@ -1,0 +1,296 @@
+/* ==========================================================
+   FILTROS
+========================================================== */
+
+.campo-filtros {
+    display: grid;
+
+    grid-template-columns:
+        minmax(240px, 1.4fr)
+        200px
+        170px
+        180px;
+
+    gap: 12px;
+
+    align-items: end;
+}
+
+.campo-filtros__actions {
+    grid-column: 1 / -1;
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+}
+
+/* ==========================================================
+   CARDS
+========================================================== */
+
+.campo-grid {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+
+    gap: 18px;
+
+    margin-top: 20px;
+}
+
+.campo-card {
+    display: flex;
+    flex-direction: column;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+}
+
+.campo-card__header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 18px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.campo-card__trabajador {
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    min-width: 0;
+}
+
+.campo-card__avatar {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background: var(--primary-light);
+
+    color: var(--primary);
+
+    font-weight: 800;
+}
+
+.campo-card__trabajador h3 {
+    margin: 0 0 3px;
+
+    color: var(--text);
+
+    font-size: 14px;
+}
+
+.campo-card__trabajador span {
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+/* ==========================================================
+   ESTADOS
+========================================================== */
+
+.campo-estado {
+    display: inline-flex;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    text-transform: uppercase;
+}
+
+.campo-estado--programada {
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.campo-estado--activa {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.campo-estado--finalizada {
+    background: #eef2f1;
+    color: var(--text-muted);
+}
+
+.campo-estado--cancelada {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ==========================================================
+   INFORMACIÓN
+========================================================== */
+
+.campo-card__body {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 14px;
+
+    padding: 18px;
+}
+
+.campo-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+.campo-info--full {
+    grid-column: 1 / -1;
+}
+
+.campo-info__label {
+    color: var(--text-muted);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.04em;
+}
+
+.campo-info strong {
+    color: var(--text);
+
+    font-size: 12px;
+}
+
+.campo-info p {
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: 12px;
+
+    line-height: 1.55;
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.campo-card__footer {
+    margin-top: auto;
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 14px 18px;
+
+    border-top: 1px solid var(--border);
+
+    background: var(--surface-secondary);
+}
+
+.campo-card__cancelada {
+    color: var(--text-muted);
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+.button--small {
+    min-height: 32px;
+
+    padding: 6px 10px;
+
+    font-size: 11px;
+}
+
+/* ==========================================================
+   FORM
+========================================================== */
+
+.form-grid {
+    display: grid;
+
+    gap: 14px;
+}
+
+.form-grid--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 950px) {
+    .campo-filtros {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .campo-filtros,
+    .form-grid--2 {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-filtros__actions {
+        grid-column: auto;
+    }
+
+    .campo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-card__body {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-info--full {
+        grid-column: auto;
+    }
+
+    .campo-card__header {
+        align-items: flex-start;
+    }
+}

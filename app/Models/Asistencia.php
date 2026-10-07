@@ -69,4 +69,12 @@ class Asistencia extends Model
             'marcacion_salida_id'
         );
     }
+
+    public function solicitudes()
+    {
+        return $this->hasMany(
+            Solicitud::class,
+            'asistencia_id'
+        );
+    }
 }

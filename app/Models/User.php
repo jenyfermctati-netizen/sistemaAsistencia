@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -39,11 +38,25 @@ class User extends Authenticatable
 
     public function rol()
     {
-        return $this->belongsTo(Rol::class, 'rol_id');
+        return $this->belongsTo(
+            Rol::class,
+            'rol_id'
+        );
     }
 
     public function trabajador()
     {
-        return $this->belongsTo(Trabajador::class, 'trabajador_id');
+        return $this->belongsTo(
+            Trabajador::class,
+            'trabajador_id'
+        );
+    }
+
+    public function solicitudesRevisadas()
+    {
+        return $this->hasMany(
+            Solicitud::class,
+            'revisado_por'
+        );
     }
 }

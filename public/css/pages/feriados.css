@@ -1,0 +1,152 @@
+/* ==========================================================
+   SINCRONIZACIÓN NAGER.DATE
+========================================================== */
+
+.page-header__actions {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sincronizar-feriados {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.sincronizar-feriados__campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.sincronizar-feriados__campo label {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.sincronizar-feriados__campo input {
+    width: 100px;
+    min-height: 38px;
+
+    padding: 7px 10px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    font: inherit;
+}
+
+
+/* ==========================================================
+   PANEL Y FILTROS
+========================================================== */
+
+.panel {
+    width: 100%;
+    max-width: 100%;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+.panel__header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.feriados-filtros {
+    display: grid;
+    grid-template-columns:
+        minmax(200px, 1fr)
+        145px
+        180px
+        145px
+        100px
+        auto
+        auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.feriados-filtros input,
+.feriados-filtros select {
+    width: 100%;
+    min-height: 34px;
+    padding: 6px 9px;
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    background: var(--surface);
+    color: var(--text);
+
+    font-size: 12px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.feriados-filtros input::placeholder {
+    color: var(--text-muted);
+}
+
+.feriados-filtros input:focus,
+.feriados-filtros select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.10);
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 1200px) {
+    .feriados-filtros {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .feriados-filtros {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .sincronizar-feriados {
+        width: 100%;
+    }
+
+    .sincronizar-feriados__campo {
+        flex: 1;
+    }
+
+    .sincronizar-feriados__campo input {
+        width: 100%;
+    }
+
+    .feriados-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .feriados-filtros .button {
+        width: 100%;
+    }
+
+    .panel__header {
+        padding: 14px;
+    }
+}

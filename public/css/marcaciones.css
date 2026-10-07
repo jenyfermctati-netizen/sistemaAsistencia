@@ -1,4 +1,4 @@
-p/* ==========================================================
+/* ==========================================================
    ACCIONES DEL HEADER
 ========================================================== */
 
@@ -30,16 +30,9 @@ p/* ==========================================================
 }
 
 .panel__header {
-    padding: 17px 18px;
+    padding: 14px 16px;
 
     border-bottom: 1px solid var(--border);
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.98),
-            rgba(248, 250, 249, 0.98)
-        );
 }
 
 
@@ -49,51 +42,43 @@ p/* ==========================================================
 
 .marcaciones-filtros {
     display: grid;
-
     grid-template-columns:
-        minmax(220px, 1.4fr)
-        minmax(140px, 0.8fr)
-        minmax(140px, 0.8fr)
-        minmax(130px, 0.7fr)
-        minmax(140px, 0.8fr)
-        minmax(130px, 0.7fr);
-
-    gap: 12px;
-
-    align-items: end;
-
-    width: 100%;
-}
-
-.marcaciones-filtros .form-group {
-    min-width: 0;
+        minmax(190px, 1fr)
+        130px
+        130px
+        125px
+        145px
+        135px
+        auto
+        auto;
+    gap: 8px;
+    align-items: center;
 }
 
 .marcaciones-filtros input,
 .marcaciones-filtros select {
     width: 100%;
-
-    min-height: 42px;
-
-    font-size: 13px;
+    min-height: 34px;
+    padding: 6px 9px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 12px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
+.marcaciones-filtros input::placeholder {
+    color: var(--text-muted);
+}
 
-/* ==========================================================
-   ACCIONES DE FILTRO
-========================================================== */
-
-.marcaciones-filtros__actions {
-    grid-column: 1 / -1;
-
-    display: flex;
-
-    justify-content: flex-end;
-    align-items: center;
-
-    gap: 8px;
-
-    padding-top: 4px;
+.marcaciones-filtros input:focus,
+.marcaciones-filtros select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.10);
 }
 
 
@@ -465,11 +450,11 @@ p/* ==========================================================
    LAPTOP
 ========================================================== */
 
-@media (max-width: 1250px) {
+@media (max-width: 1300px) {
 
     .marcaciones-filtros {
         grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+            repeat(4, minmax(0, 1fr));
     }
 
 }
@@ -479,7 +464,7 @@ p/* ==========================================================
    TABLET
 ========================================================== */
 
-@media (max-width: 950px) {
+@media (max-width: 1000px) {
 
     .marcaciones-filtros {
         grid-template-columns:
@@ -517,24 +502,11 @@ p/* ==========================================================
 
     .marcaciones-filtros {
         grid-template-columns: 1fr;
-
-        gap: 10px;
+        gap: 8px;
     }
 
-    .marcaciones-filtros__actions {
-        grid-column: auto;
-
-        flex-direction: column;
-
-        align-items: stretch;
-    }
-
-    .marcaciones-filtros__actions .button {
+    .marcaciones-filtros .button {
         width: 100%;
-
-        min-height: 42px;
-
-        font-size: 13px;
     }
 
     .form-grid--2 {

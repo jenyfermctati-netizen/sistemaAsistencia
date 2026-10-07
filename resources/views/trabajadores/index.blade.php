@@ -152,7 +152,7 @@
 
     {{-- PAGINACIÓN --}}
     <div class="pagination-container">
-        {{ $trabajadores->links() }}
+        {{ $trabajadores->onEachSide(1)->links('components.pagination') }}
     </div>
 
     {{-- MODAL CREAR TRABAJADOR --}}

@@ -51,8 +51,6 @@
 
     transform: none;
 }
-
-
 /* ==========================================================
    BOTÓN PRINCIPAL
 ========================================================== */
@@ -617,3 +615,118 @@
     }
 
 }
+/* ==========================================================
+   PAGINACIÓN
+========================================================== */
+
+.pagination-container {
+    width: 100%;
+    margin-top: 14px;
+}
+
+.pagination {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.pagination__summary {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.pagination__summary strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.pagination__controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.pagination__item {
+    min-width: 32px;
+    height: 32px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 9px;
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    background: var(--surface);
+    color: var(--text-muted);
+
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+
+    transition:
+        color var(--transition-fast),
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+a.pagination__item:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.pagination__item.is-active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--text-inverse);
+    box-shadow: 0 3px 8px rgba(15, 118, 110, 0.18);
+}
+
+.pagination__item.is-disabled {
+    background: var(--surface-secondary);
+    color: var(--text-soft);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.pagination__item--arrow {
+    padding: 0;
+
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.pagination__item--dots {
+    border-color: transparent;
+    background: transparent;
+}
+
+@media (max-width: 650px) {
+    .pagination {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .pagination__summary {
+        text-align: center;
+    }
+
+    .pagination__controls {
+        justify-content: center;
+    }
+}
+/* Fin de la paginación. */
