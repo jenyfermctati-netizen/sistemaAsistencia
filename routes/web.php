@@ -312,3 +312,39 @@ Route::middleware('auth')->group(function () {
         [AuthController::class, 'logout']
     )->name('logout');
 });
+
+/*
+|--------------------------------------------------------------------------
+| VACACIONES
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/vacaciones',
+    [VacacionesController::class, 'index']
+)->name('vacaciones.index');
+
+Route::post(
+    '/vacaciones',
+    [VacacionesController::class, 'store']
+)->name('vacaciones.store');
+
+Route::put(
+    '/vacaciones/{vacacion}',
+    [VacacionesController::class, 'update']
+)->name('vacaciones.update');
+
+Route::patch(
+    '/vacaciones/{vacacion}/revisar',
+    [VacacionesController::class, 'revisar']
+)->name('vacaciones.revisar');
+
+Route::patch(
+    '/vacaciones/{vacacion}/cancelar',
+    [VacacionesController::class, 'cancelar']
+)->name('vacaciones.cancelar');
+
+Route::patch(
+    '/vacaciones/{vacacion}/reprogramar',
+    [VacacionesController::class, 'reprogramar']
+)->name('vacaciones.reprogramar');

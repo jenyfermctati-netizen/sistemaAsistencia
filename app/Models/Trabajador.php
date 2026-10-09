@@ -108,4 +108,11 @@ class Trabajador extends Model
             'trabajador_id'
         );
     }
+    public function vacaciones()
+{
+    return $this->hasMany(
+        Vacaciones::class,
+        'trabajador_id'
+    );
+}
 }
