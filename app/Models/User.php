@@ -61,27 +61,26 @@ class User extends Authenticatable
     }
 
     public function vacacionesRegistradas()
-{
-    return $this->hasMany(
-        Vacaciones::class,
-        'registrado_por'
-    );
-}
+    {
+        return $this->hasMany(
+            Vacaciones::class,
+            'registrado_por'
+        );
+    }
 
-public function vacacionesRevisadas()
-{
-    return $this->hasMany(
-        Vacaciones::class,
-        'revisado_por'
-    );
-}
+    public function vacacionesRevisadas()
+    {
+        return $this->hasMany(
+            Vacaciones::class,
+            'revisado_por'
+        );
+    }
 
-public function reprogramacionesVacaciones()
-{
-    return $this->hasMany(
-        ReprogramacionVacacion::class,
-        'reprogramado_por'
-    );
-}
-
+    public function reprogramacionesVacaciones()
+    {
+        return $this->hasMany(
+            ReprogramacionVacacion::class,
+            'reprogramado_por'
+        );
+    }
 }
