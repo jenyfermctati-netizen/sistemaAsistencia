@@ -35,26 +35,17 @@ class Trabajador extends Model
 
     public function area()
     {
-        return $this->belongsTo(
-            Area::class,
-            'area_id'
-        );
+        return $this->belongsTo(Area::class, 'area_id');
     }
 
     public function user()
     {
-        return $this->hasOne(
-            User::class,
-            'trabajador_id'
-        );
+        return $this->hasOne(User::class, 'trabajador_id');
     }
 
     public function trabajadorHorarios()
     {
-        return $this->hasMany(
-            TrabajadorHorario::class,
-            'trabajador_id'
-        );
+        return $this->hasMany(TrabajadorHorario::class, 'trabajador_id');
     }
 
     public function horarios()
@@ -89,7 +80,6 @@ class Trabajador extends Model
                 now()->toDateString()
             )
             ->where(function ($query) {
-
                 $query
                     ->whereNull('fecha_fin')
                     ->orWhereDate(
@@ -103,16 +93,21 @@ class Trabajador extends Model
 
     public function solicitudes()
     {
-        return $this->hasMany(
-            Solicitud::class,
-            'trabajador_id'
-        );
+        return $this->hasMany(Solicitud::class, 'trabajador_id');
     }
+
     public function vacaciones()
-{
-    return $this->hasMany(
-        Vacaciones::class,
-        'trabajador_id'
-    );
-}
+    {
+        return $this->hasMany(Vacaciones::class, 'trabajador_id');
+    }
+
+    public function reportesAvance()
+    {
+        return $this->hasMany(ReporteAvance::class, 'trabajador_id');
+    }
+
+    public function pendientesResueltos()
+    {
+        return $this->hasMany(PendienteAvance::class, 'resuelto_por');
+    }
 }

@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/reportesAvance', [ReporteAvanceController::class, 'store'])->name('reportesAvance.store');
     Route::put('/reportesAvance/{reporte}', [ReporteAvanceController::class, 'update'])->name('reportesAvance.update');
     Route::patch('/reportesAvance/{reporte}/revisar', [ReporteAvanceController::class, 'revisar'])->name('reportesAvance.revisar');
+    Route::patch('/reportesAvance/pendientes/{pendiente}/resolver', [ReporteAvanceController::class, 'resolverPendiente'])->name('reportesAvance.pendientes.resolver');
 
     // Vacaciones
     Route::get('/vacaciones', [VacacionesController::class, 'index'])->name('vacaciones.index');

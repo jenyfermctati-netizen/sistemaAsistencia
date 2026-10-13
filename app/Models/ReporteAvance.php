@@ -38,25 +38,21 @@ class ReporteAvance extends Model
 
     public function trabajador()
     {
-        return $this->belongsTo(
-            Trabajador::class,
-            'trabajador_id'
-        );
+        return $this->belongsTo(Trabajador::class, 'trabajador_id');
     }
 
     public function revisor()
     {
-        return $this->belongsTo(
-            User::class,
-            'revisado_por'
-        );
+        return $this->belongsTo(User::class, 'revisado_por');
     }
 
-    public function reportesAvance()
+    public function actividades()
     {
-        return $this->hasMany(
-            ReporteAvance::class,
-            'trabajador_id'
-        );
-}
+        return $this->hasMany(ActividadReporte::class, 'reporte_avance_id');
+    }
+
+    public function pendientes()
+    {
+        return $this->hasMany(PendienteAvance::class, 'reporte_avance_id');
+    }
 }
