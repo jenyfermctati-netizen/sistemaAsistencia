@@ -8,31 +8,6 @@
 @endpush
 
 @section('content')
-
-    {{-- MENSAJES --}}
-    @if (session('success'))
-        <div class="alert alert--success">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert--danger">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert--danger">
-            <strong>Revisa la información ingresada.</strong>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     {{-- ENCABEZADO --}}
     <div class="page-header">
         <div>
@@ -199,8 +174,10 @@
 
     {{-- MODAL CREAR --}}
     <x-modal id="modalCrearFeriado" title="Nuevo feriado">
-        <form method="POST" action="{{ route('feriados.store') }}" class="form">
+        <form method="POST" action="{{ route('feriados.store') }}" class="form" data-form-crear-feriado
+            data-reopen-on-error="{{ $errors->any() && old('_form') === 'crear' ? '1' : '0' }}">
             @csrf
+            <input type="hidden" name="_form" value="crear">
 
             <div class="form-grid form-grid--2">
                 <div class="form-group">
@@ -212,17 +189,17 @@
                     <label class="form-label">Tipo *</label>
                     <select name="tipo" class="form-select" required>
                         <option value="">Seleccione</option>
-                        <option value="NACIONAL">Nacional</option>
-                        <option value="REGIONAL">Regional</option>
-                        <option value="LOCAL">Local</option>
-                        <option value="INSTITUCIONAL">Institucional</option>
+                        <option value="NACIONAL" @selected(old('tipo') === 'NACIONAL')>Nacional</option>
+                        <option value="REGIONAL" @selected(old('tipo') === 'REGIONAL')>Regional</option>
+                        <option value="LOCAL" @selected(old('tipo') === 'LOCAL')>Local</option>
+                        <option value="INSTITUCIONAL" @selected(old('tipo') === 'INSTITUCIONAL')>Institucional</option>
                     </select>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Nombre *</label>
-                <input type="text" name="nombre" class="form-control" maxlength="150"
+                <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-control" maxlength="150"
                     placeholder="Ej. Fiestas Patrias" required>
             </div>
 
@@ -231,7 +208,7 @@
                 <select name="area_id" class="form-select">
                     <option value="">Todas las áreas</option>
                     @foreach ($areas as $area)
-                        <option value="{{ $area->id }}">{{ $area->nombre }}</option>
+                        <option value="{{ $area->id }}" @selected(old('area_id') == $area->id)>{{ $area->nombre }}</option>
                     @endforeach
                 </select>
                 <small class="form-help">
@@ -242,7 +219,7 @@
             <div class="form-group">
                 <label class="form-label">Descripción</label>
                 <textarea name="descripcion" class="form-textarea" rows="3" maxlength="500"
-                    placeholder="Descripción opcional..."></textarea>
+                    placeholder="Descripción opcional...">{{ old('descripcion') }}</textarea>
             </div>
 
             <div class="modal__actions">

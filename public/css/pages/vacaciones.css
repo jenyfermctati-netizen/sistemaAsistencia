@@ -1,0 +1,460 @@
+.vacaciones-filtros {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.3fr) 180px 180px 140px;
+    gap: 12px;
+    align-items: end;
+}
+
+.vacaciones-filtros__actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.vacaciones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.vacacion-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, .05);
+}
+
+.vacacion-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.vacacion-card__persona {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+.vacacion-card__avatar {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.vacacion-card__persona h3 {
+    margin: 0 0 4px;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.vacacion-card__persona span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.vacacion-estado {
+    display: inline-flex;
+    align-items: center;
+    min-height: 27px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.vacacion-estado--pendiente {
+    background: #fff7ed;
+    color: #b45309;
+}
+
+.vacacion-estado--aprobada {
+    background: #ecfdf5;
+    color: #15803d;
+}
+
+.vacacion-estado--programada {
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.vacacion-estado--en-curso {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.vacacion-estado--gozada {
+    background: #f1f5f4;
+    color: var(--text-muted);
+}
+
+.vacacion-estado--rechazada {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.vacacion-estado--cancelada {
+    background: #f1f5f4;
+    color: var(--text-muted);
+}
+
+.vacacion-card__body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding: 18px;
+}
+
+.vacacion-periodo {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 13px;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--surface-secondary);
+}
+
+.vacacion-fecha {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vacacion-fecha:last-child {
+    text-align: right;
+}
+
+.vacacion-fecha strong {
+    color: var(--text);
+    font-size: 13px;
+}
+
+.vacacion-periodo__linea {
+    width: 36px;
+    height: 1px;
+    background: var(--border-strong);
+}
+
+.vacacion-dias {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.vacacion-dias span {
+    color: var(--primary);
+    font-size: 26px;
+    font-weight: 800;
+}
+
+.vacacion-dias small {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.vacacion-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vacacion-info--full {
+    grid-column: 1 / -1;
+}
+
+.vacacion-info__label {
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.vacacion-info strong {
+    color: var(--text);
+    font-size: 12px;
+}
+
+.vacacion-info p {
+    margin: 0;
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.vacacion-card__revision {
+    display: grid;
+    gap: 10px;
+    margin: 0 18px 18px;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--surface-secondary);
+}
+
+.vacacion-card__revision > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.vacacion-card__revision span {
+    color: var(--text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+.vacacion-card__revision strong {
+    color: var(--text);
+    font-size: 12px;
+}
+
+.vacacion-card__comentario p {
+    margin: 2px 0 0;
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.vacacion-historial {
+    margin: 0 18px 18px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    overflow: hidden;
+}
+
+.vacacion-historial summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 11px 13px;
+    cursor: pointer;
+    color: var(--text);
+    background: var(--surface-secondary);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.vacacion-historial summary span {
+    min-width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 10px;
+}
+
+.vacacion-historial__contenido {
+    padding: 12px;
+}
+
+.vacacion-reprogramacion {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.vacacion-reprogramacion:last-child {
+    border-bottom: 0;
+}
+
+.vacacion-reprogramacion > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.vacacion-reprogramacion span {
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.vacacion-reprogramacion strong,
+.vacacion-reprogramacion p {
+    margin: 0;
+    color: var(--text);
+    font-size: 11px;
+}
+
+.vacacion-reprogramacion__motivo {
+    grid-column: 1 / -1;
+}
+
+.vacacion-card__footer {
+    margin-top: auto;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 13px 18px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-secondary);
+}
+
+.button--small {
+    min-height: 32px;
+    padding: 6px 11px;
+    font-size: 11px;
+}
+
+.form-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.form-grid--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-help {
+    display: block;
+    margin-top: 5px;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.vacaciones-form-info,
+.vacaciones-revision-resumen {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--surface-secondary);
+}
+
+.vacaciones-form-info strong,
+.vacaciones-revision-resumen strong {
+    color: var(--text);
+    font-size: 13px;
+}
+
+.vacaciones-form-info span,
+.vacaciones-revision-resumen span,
+.vacaciones-revision-resumen small {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.vacaciones-calculo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--primary-light);
+}
+
+.vacaciones-calculo span {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.vacaciones-calculo strong {
+    color: var(--primary);
+    font-size: 14px;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    min-height: 190px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 20px;
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    color: var(--text-muted);
+}
+
+.empty-state strong {
+    color: var(--text);
+}
+
+@media (max-width: 950px) {
+    .vacaciones-filtros {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .vacaciones-filtros,
+    .form-grid--2,
+    .vacacion-card__body {
+        grid-template-columns: 1fr;
+    }
+
+    .vacaciones-filtros__actions,
+    .vacacion-info--full {
+        grid-column: auto;
+    }
+
+    .vacaciones-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vacacion-card__header {
+        flex-direction: column;
+    }
+
+    .vacacion-periodo {
+        grid-template-columns: 1fr;
+    }
+
+    .vacacion-periodo__linea {
+        width: 100%;
+    }
+
+    .vacacion-fecha:last-child {
+        text-align: left;
+    }
+
+    .vacacion-reprogramacion {
+        grid-template-columns: 1fr;
+    }
+
+    .vacacion-reprogramacion__motivo {
+        grid-column: auto;
+    }
+}

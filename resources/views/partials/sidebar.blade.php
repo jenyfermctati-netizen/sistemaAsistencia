@@ -21,7 +21,9 @@
         </div>
 
         @auth
-            @if(auth()->user()->rol?->nombre === 'ADMINISTRADOR')
+            @php($rolUsuario = auth()->user()->rol?->nombre)
+
+            @if($rolUsuario === 'ADMINISTRADOR')
 
                 <div class="sidebar__section">
                     <div class="sidebar__title">Administración</div>
@@ -87,10 +89,13 @@
                     </a>
                 </div>
 
+            @endif
+
+            @if(in_array($rolUsuario, ['ADMINISTRADOR', 'TRABAJADOR', 'GERENTE'], true))
                 <div class="sidebar__section">
                     <div class="sidebar__title">Gestión</div>
 
-                    @if(Route::has('solicitudes.index'))
+                    @if(in_array($rolUsuario, ['ADMINISTRADOR', 'TRABAJADOR'], true))
                         <a
                             href="{{ route('solicitudes.index') }}"
                             class="sidebar__item {{ request()->routeIs('solicitudes.*') ? 'active' : '' }}"
@@ -98,9 +103,7 @@
                             <span class="sidebar__icon">SO</span>
                             <span class="sidebar__label">Solicitudes</span>
                         </a>
-                    @endif
 
-                    @if(Route::has('vacaciones.index'))
                         <a
                             href="{{ route('vacaciones.index') }}"
                             class="sidebar__item {{ request()->routeIs('vacaciones.*') ? 'active' : '' }}"
@@ -110,17 +113,14 @@
                         </a>
                     @endif
 
-                    @if(Route::has('reportesAvance.index'))
-                        <a
-                            href="{{ route('reportesAvance.index') }}"
-                            class="sidebar__item {{ request()->routeIs('reportesAvance.*') ? 'active' : '' }}"
-                        >
-                            <span class="sidebar__icon">RA</span>
-                            <span class="sidebar__label">Reportes de avance</span>
-                        </a>
-                    @endif
+                    <a
+                        href="{{ route('reportesAvance.index') }}"
+                        class="sidebar__item {{ request()->routeIs('reportesAvance.*') ? 'active' : '' }}"
+                    >
+                        <span class="sidebar__icon">RA</span>
+                        <span class="sidebar__label">Reportes de avance</span>
+                    </a>
                 </div>
-
             @endif
         @endauth
 
