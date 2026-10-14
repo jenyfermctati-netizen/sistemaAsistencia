@@ -853,3 +853,28 @@ textarea:focus-visible {
     }
 
 }
+/* Actualizaciones parciales de formularios */
+.live-region--loading {
+    opacity: .55;
+    pointer-events: none;
+    transition: opacity .18s ease;
+}
+
+.live-form-errors {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 12px;
+}
+
+.live-form-errors ul {
+    margin: 7px 0 0;
+    padding-left: 18px;
+}
+
+[aria-invalid="true"] {
+    border-color: #dc2626 !important;
+}

@@ -14,6 +14,7 @@ class Horario extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
+        'formato_hora',
         'estado',
     ];
 

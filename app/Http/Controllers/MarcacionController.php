@@ -10,7 +10,6 @@ use Illuminate\Validation\Rule;
 
 class MarcacionController extends Controller
 {
-
     public function index(Request $request)
     {
         $this->verificarAdministrador();
@@ -72,7 +71,6 @@ class MarcacionController extends Controller
         ));
     }
 
-
     public function store(Request $request)
     {
         $this->verificarAdministrador();
@@ -96,14 +94,10 @@ class MarcacionController extends Controller
                 'max:500',
             ],
         ], [
-            'trabajador_id.required' =>
-                'Selecciona un trabajador.',
-            'fecha_hora.required' =>
-                'Ingresa la fecha y hora de la marcación.',
-            'tipo.required' =>
-                'Selecciona el tipo de marcación.',
-            'motivo_manual.required' =>
-                'Debes indicar el motivo del registro manual.',
+            'trabajador_id.required' => 'Selecciona un trabajador.',
+            'fecha_hora.required' => 'Ingresa la fecha y hora de la marcación.',
+            'tipo.required' => 'Selecciona el tipo de marcación.',
+            'motivo_manual.required' => 'Debes indicar el motivo del registro manual.',
         ]);
 
         Marcacion::create([
@@ -116,12 +110,18 @@ class MarcacionController extends Controller
             'anulada' => false,
         ]);
 
+        $mensaje = 'Marcación manual registrada correctamente.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $mensaje,
+                'refresh_url' => route('marcaciones.index'),
+            ], 201);
+        }
+
         return redirect()
             ->route('marcaciones.index')
-            ->with(
-                'success',
-                'Marcación manual registrada correctamente.'
-            );
+            ->with('success', $mensaje);
     }
 
     /**
@@ -132,6 +132,12 @@ class MarcacionController extends Controller
         $this->verificarAdministrador();
 
         if ($marcacion->anulada) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Esta marcación ya se encuentra anulada.',
+                ], 422);
+            }
+
             return back()->with(
                 'error',
                 'Esta marcación ya se encuentra anulada.'
@@ -145,8 +151,7 @@ class MarcacionController extends Controller
                 'max:500',
             ],
         ], [
-            'motivo_anulacion.required' =>
-                'Debes indicar el motivo de la anulación.',
+            'motivo_anulacion.required' => 'Debes indicar el motivo de la anulación.',
         ]);
 
         $marcacion->update([
@@ -156,12 +161,18 @@ class MarcacionController extends Controller
             'fecha_anulacion' => now(),
         ]);
 
+        $mensaje = 'Marcación anulada correctamente.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $mensaje,
+                'refresh_url' => route('marcaciones.index'),
+            ]);
+        }
+
         return redirect()
             ->route('marcaciones.index')
-            ->with(
-                'success',
-                'Marcación anulada correctamente.'
-            );
+            ->with('success', $mensaje);
     }
 
     private function verificarAdministrador(): void

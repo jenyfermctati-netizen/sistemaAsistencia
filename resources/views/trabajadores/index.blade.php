@@ -19,6 +19,10 @@
 
         <div class="page-header__actions">
 
+            <a href="{{ route('reportesAvance.index') }}" class="button button--secondary">
+                Reportes de avance
+            </a>
+
             <a href="{{ route('trabajadores.horarios') }}" class="button button--secondary">
                 Horarios
             </a>
@@ -110,6 +114,22 @@
                             </td>
                             <td>
                                 <div class="table-actions">
+                                    @if ($trabajador->reporte_hoy)
+                                        <a href="{{ route('reportesAvance.index', ['buscar' => $trabajador->dni]) }}"
+                                            class="badge badge--success" title="Ver el avance registrado">
+                                            Avance registrado hoy
+                                        </a>
+                                    @elseif ($trabajador->estado === 'ACTIVO')
+                                        <button type="button" class="button button--primary button--small"
+                                            data-registrar-avance
+                                            data-trabajador-id="{{ $trabajador->id }}"
+                                            data-trabajador-nombre="{{ $trabajador->nombres }} {{ $trabajador->apellidos }}"
+                                            data-trabajador-area="{{ $trabajador->area?->nombre ?? 'Sin área' }}"
+                                            data-store-url="{{ route('trabajadores.reportes-avance.store', $trabajador) }}">
+                                            Registrar avance
+                                        </button>
+                                    @endif
+
                                     {{-- EDITAR --}}
                                     <button type="button" class="button button--secondary button--small"
                                         data-editar-trabajador
@@ -154,6 +174,8 @@
     <div class="pagination-container">
         {{ $trabajadores->onEachSide(1)->links('components.pagination') }}
     </div>
+
+    @include('trabajadores.partials.modal-reporte-avance')
 
     {{-- MODAL CREAR TRABAJADOR --}}
     <x-modal id="modalCrearTrabajador" title="Nuevo trabajador" size="large">

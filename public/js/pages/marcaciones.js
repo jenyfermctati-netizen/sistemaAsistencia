@@ -1,42 +1,27 @@
 document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('click', function (evento) {
+        const boton = evento.target.closest('[data-anular-marcacion]');
 
-    const formAnular =
-        document.getElementById('formAnularMarcacion');
+        if (!boton) {
+            return;
+        }
 
-    const infoAnular =
-        document.getElementById('anularMarcacionInfo');
+        const formulario = document.getElementById('formAnularMarcacion');
+        const informacion = document.getElementById('anularMarcacionInfo');
 
+        if (!formulario || !informacion) {
+            return;
+        }
 
-    document
-        .querySelectorAll('[data-anular-marcacion]')
-        .forEach(function (button) {
+        formulario.action = boton.dataset.url;
+        informacion.replaceChildren();
 
-            button.addEventListener('click', function () {
+        const trabajador = document.createElement('strong');
+        trabajador.textContent = boton.dataset.trabajador || '';
+        const fecha = document.createElement('span');
+        fecha.textContent = boton.dataset.fecha || '';
 
-                if (!formAnular || !infoAnular) {
-                    return;
-                }
-
-                formAnular.action =
-                    button.dataset.url;
-
-                const trabajador =
-                    button.dataset.trabajador ?? '';
-
-                const fecha =
-                    button.dataset.fecha ?? '';
-
-                infoAnular.innerHTML = `
-                    <strong>${trabajador}</strong>
-                    <span>${fecha}</span>
-                `;
-
-                window.AppModal.open(
-                    'modalAnularMarcacion'
-                );
-
-            });
-
-        });
-
+        informacion.append(trabajador, fecha);
+        window.AppModal?.open('modalAnularMarcacion');
+    });
 });

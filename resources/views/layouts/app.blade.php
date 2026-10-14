@@ -24,6 +24,7 @@
     </div>
     <script src="{{ asset('js/modal.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/live-forms.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

@@ -244,6 +244,7 @@
         LISTADO
     ========================================================== --}}
 
+    <div data-live-region="solicitudes" data-live-poll="5000">
     <section class="solicitudes-list">
 
         @forelse($solicitudes as $solicitud)
@@ -722,6 +723,7 @@
     <div class="pagination-container">
         {{ $solicitudes->links() }}
     </div>
+    </div>
 
 
 
@@ -741,6 +743,9 @@
                 action="{{ route('solicitudes.store') }}"
                 enctype="multipart/form-data"
                 class="form"
+                data-live-form
+                data-live-target="solicitudes"
+                data-reset-on-success
             >
 
                 @csrf
@@ -930,6 +935,8 @@
                 id="formEditarSolicitud"
                 enctype="multipart/form-data"
                 class="form"
+                data-live-form
+                data-live-target="solicitudes"
             >
 
                 @csrf
@@ -1116,6 +1123,8 @@
             <form
                 method="POST"
                 id="formCancelarSolicitud"
+                data-live-form
+                data-live-target="solicitudes"
             >
 
                 @csrf
@@ -1169,6 +1178,8 @@
                 method="POST"
                 id="formRevisarSolicitud"
                 class="form"
+                data-live-form
+                data-live-target="solicitudes"
             >
 
                 @csrf

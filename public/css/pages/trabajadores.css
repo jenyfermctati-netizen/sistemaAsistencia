@@ -146,7 +146,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
 }
 
 .button--small {
@@ -367,6 +367,129 @@
 
 
 /* =========================================================
+   REGISTRO DE AVANCES
+   ========================================================= */
+
+.avance-form-errors {
+    margin-bottom: 14px;
+    padding: 11px 13px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 12px;
+}
+
+.avance-form-errors ul {
+    margin: 6px 0 0 18px;
+    padding: 0;
+}
+
+.avance-trabajador-seleccion {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-secondary);
+}
+
+.avance-trabajador-seleccion div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.avance-trabajador-seleccion span {
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.avance-trabajador-seleccion strong {
+    color: var(--text);
+    font-size: 12px;
+}
+
+.avance-form-section {
+    margin-bottom: 18px;
+}
+
+.avance-form-section__heading,
+.avance-item__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.avance-form-section__heading {
+    margin-bottom: 10px;
+}
+
+.avance-form-section__heading h3 {
+    margin: 0 0 3px;
+    color: var(--text);
+    font-size: 13px;
+}
+
+.avance-form-section__heading p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.avance-items {
+    display: grid;
+    gap: 10px;
+}
+
+.avance-item {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface-secondary);
+}
+
+.avance-item--pendiente {
+    border-left: 3px solid #f59e0b;
+}
+
+.avance-item__heading strong {
+    color: var(--text);
+    font-size: 11px;
+}
+
+.avance-item .form-group {
+    margin: 0;
+}
+
+.avance-item textarea,
+.avance-item input {
+    width: 100%;
+}
+
+.button-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.button-link--danger {
+    color: #dc2626;
+}
+
+
+/* =========================================================
    PAGINACIÓN
    ========================================================= */
 
@@ -417,6 +540,15 @@
 
     .form-group--full {
         grid-column: auto;
+    }
+
+    .avance-trabajador-seleccion {
+        grid-template-columns: 1fr;
+    }
+
+    .avance-form-section__heading {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     .table-actions {

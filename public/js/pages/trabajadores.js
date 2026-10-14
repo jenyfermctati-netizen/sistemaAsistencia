@@ -54,4 +54,129 @@ document.addEventListener('DOMContentLoaded', function () {
             window.AppModal.open('modalEstadoTrabajador');
         });
     });
+
+    // Registrar el avance diario desde la ficha del trabajador
+    const formAvance = document.getElementById('formRegistrarAvanceTrabajador');
+
+    if (formAvance) {
+        const actividadesContainer = document.getElementById('actividadesAvanceTrabajador');
+        const pendientesContainer = document.getElementById('pendientesAvanceTrabajador');
+        const templateActividad = document.getElementById('templateActividadAvanceTrabajador');
+        const templatePendiente = document.getElementById('templatePendienteAvanceTrabajador');
+        const trabajadorId = document.getElementById('reporteTrabajadorId');
+        const trabajadorNombreValor = document.getElementById('reporteTrabajadorNombreValor');
+        const trabajadorAreaValor = document.getElementById('reporteTrabajadorAreaValor');
+        const trabajadorNombre = document.getElementById('reporteTrabajadorNombre');
+        const trabajadorArea = document.getElementById('reporteTrabajadorArea');
+        let indiceActividad = siguienteIndice(actividadesContainer, '[data-actividad-avance]');
+        let indicePendiente = siguienteIndice(pendientesContainer, '[data-pendiente-avance]');
+
+        function siguienteIndice(container, selector) {
+            const indices = Array.from(container.querySelectorAll(selector))
+                .map((item) => Number(item.dataset.index))
+                .filter(Number.isFinite);
+
+            return indices.length ? Math.max(...indices) + 1 : 0;
+        }
+
+        function agregarDesdeTemplate(container, template, indice) {
+            const html = template.innerHTML.replaceAll('__INDEX__', String(indice));
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function actualizarNumeracion() {
+            const actividades = actividadesContainer.querySelectorAll('[data-actividad-avance]');
+
+            actividades.forEach(function (item, indice) {
+                item.querySelector('[data-numero-actividad]').textContent = indice + 1;
+                item.querySelector('[data-quitar-actividad-avance]').hidden = actividades.length === 1;
+            });
+
+            pendientesContainer.querySelectorAll('[data-pendiente-avance]').forEach(function (item, indice) {
+                item.querySelector('[data-numero-pendiente]').textContent = indice + 1;
+            });
+        }
+
+        function reiniciarListas() {
+            actividadesContainer.innerHTML = '';
+            pendientesContainer.innerHTML = '';
+            indiceActividad = 0;
+            indicePendiente = 0;
+            agregarDesdeTemplate(actividadesContainer, templateActividad, indiceActividad++);
+            actualizarNumeracion();
+        }
+
+        function configurarTrabajador(id, nombre, area, url) {
+            trabajadorId.value = id;
+            trabajadorNombreValor.value = nombre;
+            trabajadorAreaValor.value = area;
+            trabajadorNombre.textContent = nombre;
+            trabajadorArea.textContent = area;
+            formAvance.action = url;
+        }
+
+        document.querySelectorAll('[data-registrar-avance]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                formAvance.reset();
+                reiniciarListas();
+
+                const errores = formAvance.querySelector('.avance-form-errors');
+                if (errores) {
+                    errores.hidden = true;
+                }
+
+                configurarTrabajador(
+                    button.dataset.trabajadorId,
+                    button.dataset.trabajadorNombre,
+                    button.dataset.trabajadorArea,
+                    button.dataset.storeUrl
+                );
+
+                window.AppModal.open('modalRegistrarAvanceTrabajador');
+            });
+        });
+
+        document.querySelector('[data-agregar-actividad-avance]')?.addEventListener('click', function () {
+            agregarDesdeTemplate(actividadesContainer, templateActividad, indiceActividad++);
+            actualizarNumeracion();
+        });
+
+        document.querySelector('[data-agregar-pendiente-avance]')?.addEventListener('click', function () {
+            agregarDesdeTemplate(pendientesContainer, templatePendiente, indicePendiente++);
+            actualizarNumeracion();
+        });
+
+        actividadesContainer.addEventListener('click', function (event) {
+            const button = event.target.closest('[data-quitar-actividad-avance]');
+            if (!button || actividadesContainer.querySelectorAll('[data-actividad-avance]').length === 1) {
+                return;
+            }
+
+            button.closest('[data-actividad-avance]').remove();
+            actualizarNumeracion();
+        });
+
+        pendientesContainer.addEventListener('click', function (event) {
+            const button = event.target.closest('[data-quitar-pendiente-avance]');
+            if (!button) {
+                return;
+            }
+
+            button.closest('[data-pendiente-avance]').remove();
+            actualizarNumeracion();
+        });
+
+        actualizarNumeracion();
+
+        if (formAvance.dataset.hasErrors === '1' && trabajadorId.value) {
+            const url = formAvance.dataset.storeUrlTemplate.replace('__TRABAJADOR__', trabajadorId.value);
+            configurarTrabajador(
+                trabajadorId.value,
+                trabajadorNombreValor.value,
+                trabajadorAreaValor.value,
+                url
+            );
+            window.AppModal.open('modalRegistrarAvanceTrabajador');
+        }
+    }
 });

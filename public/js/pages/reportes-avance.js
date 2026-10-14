@@ -7,16 +7,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const actividadesContainer = document.getElementById('actividadesContainer');
     const pendientesContainer = document.getElementById('pendientesContainer');
+    const actividadesAdicionalesContainer = document.getElementById('actividadesAdicionalesContainer');
+    const pendientesAdicionalesContainer = document.getElementById('pendientesAdicionalesContainer');
     const editarActividadesContainer = document.getElementById('editarActividadesContainer');
     const editarPendientesContainer = document.getElementById('editarPendientesContainer');
 
     const agregarActividad = document.getElementById('agregarActividad');
     const agregarPendiente = document.getElementById('agregarPendiente');
+    const agregarActividadAdicional = document.getElementById('agregarActividadAdicional');
+    const agregarPendienteAdicional = document.getElementById('agregarPendienteAdicional');
     const agregarActividadEditar = document.getElementById('agregarActividadEditar');
     const agregarPendienteEditar = document.getElementById('agregarPendienteEditar');
 
     const formEditar = document.getElementById('formEditarReporte');
     const formRevisar = document.getElementById('formRevisarReporte');
+    const formObservarPendiente = document.getElementById('formObservarPendiente');
 
     function actualizarTitulos(container, tipo) {
         if (!container) return;
@@ -129,9 +134,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function actualizarEstadoSinPendientes() {
         const sinPendientes = document.getElementById('sinPendientes');
-        if (!sinPendientes || !pendientesContainer) return;
+        if (sinPendientes && pendientesContainer) {
+            sinPendientes.style.display = pendientesContainer.children.length ? 'none' : 'block';
+        }
 
-        sinPendientes.style.display = pendientesContainer.children.length ? 'none' : 'block';
+        const sinPendientesAdicionales = document.getElementById('sinPendientesAdicionales');
+        if (sinPendientesAdicionales && pendientesAdicionalesContainer) {
+            sinPendientesAdicionales.style.display = pendientesAdicionalesContainer.children.length ? 'none' : 'block';
+        }
     }
 
     if (agregarActividad && actividadesContainer) {
@@ -140,11 +150,39 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    actividadesContainer?.querySelectorAll('.actividad-form-item').forEach(function (item) {
+        configurarEliminar(item, actividadesContainer, 'actividad');
+    });
+
     if (agregarPendiente && pendientesContainer) {
         agregarPendiente.addEventListener('click', function () {
             crearPendiente(pendientesContainer);
         });
     }
+
+    pendientesContainer?.querySelectorAll('.pendiente-form-item').forEach(function (item) {
+        configurarEliminar(item, pendientesContainer, 'pendiente');
+    });
+
+    if (agregarActividadAdicional && actividadesAdicionalesContainer) {
+        agregarActividadAdicional.addEventListener('click', function () {
+            crearActividad(actividadesAdicionalesContainer);
+        });
+    }
+
+    actividadesAdicionalesContainer?.querySelectorAll('.actividad-form-item').forEach(function (item) {
+        configurarEliminar(item, actividadesAdicionalesContainer, 'actividad');
+    });
+
+    if (agregarPendienteAdicional && pendientesAdicionalesContainer) {
+        agregarPendienteAdicional.addEventListener('click', function () {
+            crearPendiente(pendientesAdicionalesContainer);
+        });
+    }
+
+    pendientesAdicionalesContainer?.querySelectorAll('.pendiente-form-item').forEach(function (item) {
+        configurarEliminar(item, pendientesAdicionalesContainer, 'pendiente');
+    });
 
     if (agregarActividadEditar && editarActividadesContainer) {
         agregarActividadEditar.addEventListener('click', function () {
@@ -232,16 +270,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     const item = document.createElement('div');
                     item.className = 'detalle-pendiente';
 
+                    const estadoPendiente = obtenerEstadoPendiente(pendiente);
+
                     item.innerHTML = `
                         <div class="detalle-pendiente__header">
                             <strong>${escapeHtml(pendiente.descripcion)}</strong>
-                            <span class="badge ${pendiente.estado === 'RESUELTO' ? 'badge--success' : 'badge--warning'}">
-                                ${pendiente.estado === 'RESUELTO' ? 'Resuelto' : 'Pendiente'}
+                            <span class="badge ${estadoPendiente.clase}">
+                                ${estadoPendiente.texto}
                             </span>
                         </div>
                         ${pendiente.detalle ? `<p>${escapeHtml(pendiente.detalle)}</p>` : ''}
                         ${pendiente.ruta_archivos
                             ? `<div class="detalle-ruta"><span>Archivos:</span><code>${escapeHtml(pendiente.ruta_archivos)}</code></div>`
+                            : ''
+                        }
+                        ${pendiente.observacion_revision
+                            ? `<div class="pendiente-observacion"><span>Observación del administrador</span><p>${escapeHtml(pendiente.observacion_revision)}</p></div>`
                             : ''
                         }
                     `;
@@ -267,6 +311,41 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    document.querySelectorAll('[data-observar-pendiente]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            if (!formObservarPendiente) return;
+
+            formObservarPendiente.action = button.dataset.url;
+
+            const url = document.getElementById('pendienteRevisionUrl');
+            const nombre = document.getElementById('pendienteObservadoNombre');
+            if (url) url.value = button.dataset.url;
+            if (nombre) nombre.textContent = button.dataset.pendiente || 'este pendiente';
+
+            window.AppModal.open('modalObservarPendiente');
+        });
+    });
+
+    function obtenerEstadoPendiente(pendiente) {
+        if (pendiente.estado === 'RESUELTO') {
+            return { texto: 'Completado', clase: 'badge--success' };
+        }
+
+        if (pendiente.estado_revision === 'POR_REVISAR') {
+            return { texto: 'Por revisar', clase: 'badge--info' };
+        }
+
+        if (pendiente.estado_revision === 'OBSERVADO') {
+            return { texto: 'Observado', clase: 'badge--warning' };
+        }
+
+        if (pendiente.estado_revision === 'RECHAZADO') {
+            return { texto: 'No completado', clase: 'badge--danger' };
+        }
+
+        return { texto: 'Pendiente', clase: 'badge--warning' };
+    }
+
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text ?? '';
@@ -274,5 +353,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     actualizarNombresActividad(actividadesContainer);
+    actualizarNombresPendiente(pendientesContainer);
+    actualizarNombresActividad(actividadesAdicionalesContainer);
+    actualizarNombresPendiente(pendientesAdicionalesContainer);
     actualizarEstadoSinPendientes();
 });

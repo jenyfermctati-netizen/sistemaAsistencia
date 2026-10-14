@@ -46,14 +46,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/trabajadores', [TrabajadorController::class, 'store'])->name('trabajadores.store');
     Route::put('/trabajadores/{trabajador}', [TrabajadorController::class, 'update'])->name('trabajadores.update');
     Route::patch('/trabajadores/{trabajador}/estado', [TrabajadorController::class, 'cambiarEstado'])->name('trabajadores.estado');
+    Route::post('/trabajadores/{trabajador}/reportes-avance', [ReporteAvanceController::class, 'storeParaTrabajador'])
+        ->name('trabajadores.reportes-avance.store');
 
     // Horarios
     Route::get('/trabajadores/horarios', [HorarioController::class, 'index'])->name('trabajadores.horarios');
     Route::post('/trabajadores/horarios', [HorarioController::class, 'store'])->name('trabajadores.horarios.store');
-    Route::post('/trabajadores/horarios/asignar', [HorarioController::class, 'asignar'])->name('trabajadores.horarios.asignar');
-    Route::post('/trabajadores/horarios/asignar-masivo', [HorarioController::class, 'asignarMasivo'])->name('trabajadores.horarios.asignarMasivo');
     Route::put('/trabajadores/horarios/{horario}', [HorarioController::class, 'update'])->name('trabajadores.horarios.update');
-    Route::patch('/trabajadores/horarios/{horario}/estado', [HorarioController::class, 'cambiarEstado'])->name('trabajadores.horarios.estado');
 
     // Marcaciones
     Route::get('/marcaciones', [MarcacionController::class, 'index'])->name('marcaciones.index');
@@ -87,9 +86,16 @@ Route::middleware('auth')->group(function () {
     // Reportes de avance
     Route::get('/reportesAvance', [ReporteAvanceController::class, 'index'])->name('reportesAvance.index');
     Route::post('/reportesAvance', [ReporteAvanceController::class, 'store'])->name('reportesAvance.store');
+    Route::post('/reportesAvance/{reporte}/agregar', [ReporteAvanceController::class, 'agregarAvance'])
+        ->name('reportesAvance.agregar');
     Route::put('/reportesAvance/{reporte}', [ReporteAvanceController::class, 'update'])->name('reportesAvance.update');
     Route::patch('/reportesAvance/{reporte}/revisar', [ReporteAvanceController::class, 'revisar'])->name('reportesAvance.revisar');
+    Route::post('/reportesAvance/pendientes', [ReporteAvanceController::class, 'storePendiente'])->name('reportesAvance.pendientes.store');
+    Route::post('/reportesAvance/pendientes/registrar', [ReporteAvanceController::class, 'storePendienteTrabajador'])
+        ->name('reportesAvance.pendientes.trabajador.store');
     Route::patch('/reportesAvance/pendientes/{pendiente}/resolver', [ReporteAvanceController::class, 'resolverPendiente'])->name('reportesAvance.pendientes.resolver');
+    Route::patch('/reportesAvance/pendientes/{pendiente}/revisar', [ReporteAvanceController::class, 'revisarPendiente'])
+        ->name('reportesAvance.pendientes.revisar');
 
     // Vacaciones
     Route::get('/vacaciones', [VacacionesController::class, 'index'])->name('vacaciones.index');

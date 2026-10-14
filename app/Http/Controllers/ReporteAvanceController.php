@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActividadReporte;
+use App\Models\Area;
 use App\Models\PendienteAvance;
 use App\Models\ReporteAvance;
+use App\Models\Trabajador;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,12 +19,17 @@ class ReporteAvanceController extends Controller
     public function index(Request $request)
     {
         $usuario = Auth::user();
+        $puedeGestionar = $usuario->rol?->nombre === 'ADMINISTRADOR';
+        $pestanaActiva = in_array($request->query('pestana'), ['avances', 'pendientes'], true)
+            ? $request->query('pestana')
+            : 'avances';
 
         $query = ReporteAvance::with([
             'trabajador.area',
             'revisor',
             'actividades',
             'pendientes.resueltoPor',
+            'pendientes.revisadoPor',
         ]);
 
         if ($usuario->rol?->nombre === 'TRABAJADOR') {
@@ -51,6 +59,12 @@ class ReporteAvanceController extends Controller
             $query->where('estado', $request->estado);
         }
 
+        if ($puedeGestionar && $request->filled('area_id')) {
+            $query->whereHas('trabajador', function ($trabajador) use ($request) {
+                $trabajador->where('area_id', $request->integer('area_id'));
+            });
+        }
+
         if ($request->filled('fecha_desde')) {
             $query->whereDate('fecha_presentacion', '>=', $request->fecha_desde);
         }
@@ -65,20 +79,55 @@ class ReporteAvanceController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $pendientesArea = collect();
+        $pendientesQuery = PendienteAvance::with([
+            'area',
+            'creadoPor.trabajador',
+            'reporte.trabajador.area',
+            'resueltoPor',
+            'revisadoPor',
+        ])->where('estado', 'PENDIENTE');
 
-        if ($usuario->trabajador?->area_id) {
-            $pendientesArea = PendienteAvance::with([
-                'reporte.trabajador.area',
-                'resueltoPor',
-            ])
-                ->where('estado', 'PENDIENTE')
-                ->whereHas('reporte.trabajador', function ($q) use ($usuario) {
-                    $q->where('area_id', $usuario->trabajador->area_id);
-                })
-                ->orderByDesc('created_at')
-                ->get();
+        if (! $puedeGestionar) {
+            $areaId = $usuario->trabajador?->area_id;
+
+            if (! $areaId) {
+                $pendientesQuery->whereRaw('1 = 0');
+            } else {
+                $pendientesQuery->where(function ($query) use ($areaId) {
+                    $query->where('area_id', $areaId)
+                        ->orWhere(function ($legado) use ($areaId) {
+                            $legado->whereNull('area_id')
+                                ->whereHas('reporte.trabajador', function ($trabajador) use ($areaId) {
+                                    $trabajador->where('area_id', $areaId);
+                                });
+                        });
+                });
+            }
+        } elseif ($request->filled('area_id')) {
+            $areaId = $request->integer('area_id');
+
+            $pendientesQuery->where(function ($query) use ($areaId) {
+                $query->where('area_id', $areaId)
+                    ->orWhere(function ($legado) use ($areaId) {
+                        $legado->whereNull('area_id')
+                            ->whereHas('reporte.trabajador', function ($trabajador) use ($areaId) {
+                                $trabajador->where('area_id', $areaId);
+                            });
+                    });
+            });
         }
+
+        $pendientesArea = $pendientesQuery
+            ->orderByDesc('created_at')
+            ->get();
+
+        $pendientesPorRevisar = $puedeGestionar
+            ? $pendientesArea->where('estado_revision', 'POR_REVISAR')->values()
+            : collect();
+
+        $areas = $puedeGestionar
+            ? Area::where('estado', true)->orderBy('nombre')->get()
+            : collect();
 
         $reporteHoy = null;
 
@@ -88,66 +137,85 @@ class ReporteAvanceController extends Controller
                 ->first();
         }
 
-        return view('reportesAvance.index', compact('reportes', 'pendientesArea', 'reporteHoy'));
+        $vista = $usuario->rol?->nombre === 'TRABAJADOR'
+            ? 'reportesAvance.trabajador.index'
+            : 'reportesAvance.admin.index';
+
+        return view($vista, compact(
+            'reportes',
+            'pendientesArea',
+            'reporteHoy',
+            'areas',
+            'puedeGestionar',
+            'pestanaActiva',
+            'pendientesPorRevisar'
+        ));
     }
 
     public function store(Request $request)
     {
         $usuario = Auth::user();
 
-        if (!$usuario->trabajador_id) {
+        if (! $usuario->trabajador_id) {
             return back()->with('error', 'Este usuario no está asociado a un trabajador.');
         }
 
         if (ReporteAvance::where('trabajador_id', $usuario->trabajador_id)
-                ->whereDate('fecha_presentacion', today())
-                ->exists()) {
+            ->whereDate('fecha_presentacion', today())
+            ->exists()) {
             return back()->with('error', 'Ya registraste tu reporte de avance de hoy.');
         }
 
         $data = $this->validarReporte($request);
 
-        DB::transaction(function () use ($request, $data, $usuario) {
-            $reporte = ReporteAvance::create([
-                'trabajador_id' => $usuario->trabajador_id,
-                'fecha_presentacion' => today(),
-                'periodo_inicio' => null,
-                'periodo_fin' => null,
-                'descripcion' => null,
-                'porcentaje_avance' => null,
-                'archivo' => null,
-                'estado' => 'PENDIENTE',
-            ]);
-
-            foreach ($data['actividades'] as $indice => $actividad) {
-                $archivo = $request->file("actividades.{$indice}.archivo");
-                $ruta = $archivo
-                    ? $archivo->store('reportes-avance/actividades', 'public')
-                    : null;
-
-                $reporte->actividades()->create([
-                    'descripcion' => $actividad['descripcion'],
-                    'archivo' => $ruta,
-                ]);
-            }
-
-            foreach ($data['pendientes'] ?? [] as $pendiente) {
-                if (blank($pendiente['descripcion'] ?? null)) {
-                    continue;
-                }
-
-                $reporte->pendientes()->create([
-                    'descripcion' => $pendiente['descripcion'],
-                    'detalle' => $pendiente['detalle'] ?? null,
-                    'ruta_archivos' => $pendiente['ruta_archivos'] ?? null,
-                    'estado' => 'PENDIENTE',
-                ]);
-            }
-        });
+        $this->crearReporte(
+            $request,
+            $data,
+            $usuario->trabajador,
+            $usuario,
+            'TRABAJADOR'
+        );
 
         return redirect()
             ->route('reportesAvance.index')
             ->with('success', 'Reporte diario registrado correctamente.');
+    }
+
+    public function storeParaTrabajador(Request $request, Trabajador $trabajador)
+    {
+        $usuario = Auth::user();
+
+        abort_unless($usuario->rol?->nombre === 'ADMINISTRADOR', 403);
+
+        if ($trabajador->estado !== 'ACTIVO') {
+            return back()->with('error', 'Solo puedes registrar avances para trabajadores activos.');
+        }
+
+        if (ReporteAvance::where('trabajador_id', $trabajador->id)
+            ->whereDate('fecha_presentacion', today())
+            ->exists()) {
+            return back()->with(
+                'error',
+                "{$trabajador->nombres} {$trabajador->apellidos} ya tiene un reporte registrado hoy."
+            );
+        }
+
+        $data = $this->validarReporte($request, false, 'avanceTrabajador');
+
+        $this->crearReporte(
+            $request,
+            $data,
+            $trabajador,
+            $usuario,
+            'ADMINISTRADOR'
+        );
+
+        return redirect()
+            ->route('trabajadores.index')
+            ->with(
+                'success',
+                "Avance de {$trabajador->nombres} {$trabajador->apellidos} registrado correctamente."
+            );
     }
 
     public function update(Request $request, ReporteAvance $reporte)
@@ -183,6 +251,59 @@ class ReporteAvanceController extends Controller
             ->with('success', 'Reporte diario actualizado correctamente.');
     }
 
+    public function agregarAvance(Request $request, ReporteAvance $reporte)
+    {
+        $usuario = Auth::user();
+
+        abort_unless(
+            $usuario->trabajador_id && $reporte->trabajador_id === $usuario->trabajador_id,
+            403
+        );
+
+        if (! $reporte->fecha_presentacion?->isToday()) {
+            return back()->with('error', 'Solo puedes agregar avances al reporte del día actual.');
+        }
+
+        $data = $this->validarContenidoNuevo($request, 'agregarAvance');
+
+        DB::transaction(function () use ($request, $data, $reporte, $usuario) {
+            foreach ($data['actividades'] as $indice => $actividad) {
+                $archivo = $request->file("actividades.{$indice}.archivo");
+                $ruta = $archivo
+                    ? $archivo->store('reportes-avance/actividades', 'public')
+                    : null;
+
+                $reporte->actividades()->create([
+                    'descripcion' => $actividad['descripcion'],
+                    'archivo' => $ruta,
+                ]);
+            }
+
+            foreach ($data['pendientes'] ?? [] as $pendiente) {
+                $reporte->pendientes()->create([
+                    'area_id' => $usuario->trabajador->area_id,
+                    'creado_por' => $usuario->id,
+                    'origen' => 'TRABAJADOR',
+                    'descripcion' => $pendiente['descripcion'],
+                    'detalle' => $pendiente['detalle'] ?? null,
+                    'ruta_archivos' => $pendiente['ruta_archivos'] ?? null,
+                    'estado' => 'PENDIENTE',
+                ]);
+            }
+
+            $reporte->update([
+                'estado' => 'PENDIENTE',
+                'revisado_por' => null,
+                'comentario_revision' => null,
+                'fecha_revision' => null,
+            ]);
+        });
+
+        return redirect()
+            ->route('reportesAvance.index')
+            ->with('success', 'El nuevo avance se agregó al reporte de hoy.');
+    }
+
     public function revisar(Request $request, ReporteAvance $reporte)
     {
         $usuario = Auth::user();
@@ -215,38 +336,205 @@ class ReporteAvanceController extends Controller
             ->with('success', 'Reporte revisado correctamente.');
     }
 
+    public function storePendiente(Request $request)
+    {
+        $usuario = Auth::user();
+
+        abort_unless(
+            $usuario->rol?->nombre === 'ADMINISTRADOR',
+            403
+        );
+
+        $data = $request->validateWithBag('pendienteArea', [
+            'area_id' => ['required', 'integer', 'exists:areas,id'],
+            'descripcion' => ['required', 'string', 'max:500'],
+            'detalle' => ['nullable', 'string', 'max:2000'],
+            'ruta_archivos' => ['nullable', 'string', 'max:500'],
+        ], [
+            'area_id.required' => 'Selecciona el área responsable.',
+            'descripcion.required' => 'Describe la tarea pendiente.',
+        ]);
+
+        $areaActiva = Area::whereKey($data['area_id'])
+            ->where('estado', true)
+            ->exists();
+
+        if (! $areaActiva) {
+            return back()->withErrors([
+                'area_id' => 'El área seleccionada no está activa.',
+            ], 'pendienteArea')->withInput();
+        }
+
+        PendienteAvance::create([
+            'reporte_avance_id' => null,
+            'area_id' => $data['area_id'],
+            'creado_por' => $usuario->id,
+            'origen' => 'ADMINISTRADOR',
+            'descripcion' => $data['descripcion'],
+            'detalle' => $data['detalle'] ?? null,
+            'ruta_archivos' => $data['ruta_archivos'] ?? null,
+            'estado' => 'PENDIENTE',
+        ]);
+
+        return redirect()
+            ->route('reportesAvance.index', ['pestana' => 'pendientes'])
+            ->with('success', 'Tarea pendiente asignada al área correctamente.');
+    }
+
+    public function storePendienteTrabajador(Request $request)
+    {
+        $usuario = Auth::user();
+        $trabajador = $usuario->trabajador;
+
+        abort_unless(
+            $usuario->rol?->nombre === 'TRABAJADOR' && $trabajador?->area_id,
+            403
+        );
+
+        if (! $trabajador->area()->where('estado', true)->exists()) {
+            return back()->with('error', 'Tu área no se encuentra activa.');
+        }
+
+        $data = $request->validateWithBag('pendienteTrabajador', [
+            'descripcion' => ['required', 'string', 'max:500'],
+            'detalle' => ['nullable', 'string', 'max:2000'],
+            'ruta_archivos' => ['nullable', 'string', 'max:500'],
+        ], [
+            'descripcion.required' => 'Describe la tarea que quedó pendiente.',
+        ]);
+
+        PendienteAvance::create([
+            'reporte_avance_id' => null,
+            'area_id' => $trabajador->area_id,
+            'creado_por' => $usuario->id,
+            'origen' => 'TRABAJADOR',
+            'descripcion' => $data['descripcion'],
+            'detalle' => $data['detalle'] ?? null,
+            'ruta_archivos' => $data['ruta_archivos'] ?? null,
+            'estado' => 'PENDIENTE',
+        ]);
+
+        return redirect()
+            ->route('reportesAvance.index', ['pestana' => 'pendientes'])
+            ->with('success', 'Pendiente registrado y compartido con tu área.');
+    }
+
     public function resolverPendiente(PendienteAvance $pendiente)
     {
         $usuario = Auth::user();
 
-        if (!$usuario->trabajador_id || !$usuario->trabajador?->area_id) {
+        if (! $usuario->trabajador_id || ! $usuario->trabajador?->area_id) {
             abort(403);
         }
 
-        $pendiente->load('reporte.trabajador');
+        $pendiente->load('reporte.trabajador', 'area');
 
-        if ($pendiente->reporte?->trabajador?->area_id !== $usuario->trabajador->area_id) {
+        $areaPendiente = $pendiente->area_id
+            ?? $pendiente->reporte?->trabajador?->area_id;
+
+        if ($areaPendiente !== $usuario->trabajador->area_id) {
             abort(403);
         }
 
         if ($pendiente->estado === 'RESUELTO') {
-            return back()->with('error', 'Este pendiente ya fue marcado como resuelto.');
+            return back()->with('error', 'Este pendiente ya fue aprobado como resuelto.');
+        }
+
+        if ($pendiente->estado_revision === 'POR_REVISAR') {
+            return back()->with('error', 'Este pendiente ya fue enviado para revisión.');
         }
 
         $pendiente->update([
-            'estado' => 'RESUELTO',
+            'estado' => 'PENDIENTE',
+            'estado_revision' => 'POR_REVISAR',
+            'observacion_revision' => null,
+            'revisado_por' => null,
+            'fecha_revision' => null,
             'resuelto_por' => $usuario->trabajador_id,
             'fecha_resolucion' => now(),
         ]);
 
         return redirect()
-            ->route('reportesAvance.index')
-            ->with('success', 'Pendiente marcado como resuelto.');
+            ->route('reportesAvance.index', ['pestana' => 'pendientes'])
+            ->with('success', 'Pendiente marcado como finalizado y enviado al administrador para revisión.');
     }
 
-    private function validarReporte(Request $request, bool $actualizando = false): array
+    public function revisarPendiente(Request $request, PendienteAvance $pendiente)
     {
-        return $request->validate([
+        $usuario = Auth::user();
+
+        abort_unless($usuario->rol?->nombre === 'ADMINISTRADOR', 403);
+
+        if ($pendiente->estado_revision !== 'POR_REVISAR') {
+            return back()->with('error', 'Este pendiente no está esperando revisión.');
+        }
+
+        $data = $request->validateWithBag('revisionPendiente', [
+            'decision' => ['required', Rule::in(['APROBADO', 'RECHAZADO', 'OBSERVADO'])],
+            'observacion_revision' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        if ($data['decision'] === 'OBSERVADO' && blank($data['observacion_revision'] ?? null)) {
+            return back()->withErrors([
+                'observacion_revision' => 'Debes escribir la observación del pendiente.',
+            ], 'revisionPendiente')->withInput();
+        }
+
+        $aprobado = $data['decision'] === 'APROBADO';
+
+        $pendiente->update([
+            'estado' => $aprobado ? 'RESUELTO' : 'PENDIENTE',
+            'estado_revision' => $data['decision'],
+            'observacion_revision' => $data['decision'] === 'OBSERVADO'
+                ? $data['observacion_revision']
+                : null,
+            'revisado_por' => $usuario->id,
+            'fecha_revision' => now(),
+            'fecha_resolucion' => $aprobado ? $pendiente->fecha_resolucion : null,
+        ]);
+
+        $mensajes = [
+            'APROBADO' => 'Pendiente aprobado como completado.',
+            'RECHAZADO' => 'Pendiente marcado como no completado.',
+            'OBSERVADO' => 'Observación registrada en el pendiente.',
+        ];
+
+        return redirect()
+            ->route('reportesAvance.index', ['pestana' => 'pendientes'])
+            ->with('success', $mensajes[$data['decision']]);
+    }
+
+    private function validarContenidoNuevo(Request $request, string $errorBag): array
+    {
+        return $request->validateWithBag($errorBag, [
+            'actividades' => ['required', 'array', 'min:1'],
+            'actividades.*.descripcion' => ['required', 'string', 'max:500'],
+            'actividades.*.archivo' => [
+                'nullable',
+                'file',
+                'mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
+                'max:5120',
+            ],
+            'pendientes' => ['nullable', 'array'],
+            'pendientes.*.descripcion' => ['required', 'string', 'max:500'],
+            'pendientes.*.detalle' => ['nullable', 'string', 'max:2000'],
+            'pendientes.*.ruta_archivos' => ['nullable', 'string', 'max:500'],
+        ], [
+            'actividades.required' => 'Debes registrar al menos una actividad realizada.',
+            'actividades.min' => 'Debes registrar al menos una actividad realizada.',
+            'actividades.*.descripcion.required' => 'Cada actividad debe tener una descripción.',
+            'actividades.*.archivo.max' => 'Cada archivo debe pesar como máximo 5 MB.',
+            'pendientes.*.descripcion.required' => 'Cada pendiente debe tener una descripción.',
+        ]);
+    }
+
+    private function validarReporte(
+        Request $request,
+        bool $actualizando = false,
+        ?string $errorBag = null
+    ): array
+    {
+        $reglas = [
             'actividades' => ['required', 'array', 'min:1'],
             'actividades.*.id' => ['nullable', 'integer', 'exists:actividades_reporte,id'],
             'actividades.*.descripcion' => ['required', 'string', 'max:500'],
@@ -258,20 +546,84 @@ class ReporteAvanceController extends Controller
             ],
             'pendientes' => ['nullable', 'array'],
             'pendientes.*.id' => ['nullable', 'integer', 'exists:pendientes_avance,id'],
-            'pendientes.*.descripcion' => ['nullable', 'string', 'max:500'],
+            'pendientes.*.descripcion' => ['required', 'string', 'max:500'],
             'pendientes.*.detalle' => ['nullable', 'string', 'max:2000'],
             'pendientes.*.ruta_archivos' => ['nullable', 'string', 'max:500'],
-        ], [
+        ];
+
+        $mensajes = [
             'actividades.required' => 'Debes registrar al menos una actividad realizada.',
             'actividades.min' => 'Debes registrar al menos una actividad realizada.',
             'actividades.*.descripcion.required' => 'Cada actividad debe tener una descripción.',
             'actividades.*.archivo.max' => 'Cada archivo debe pesar como máximo 5 MB.',
-        ]);
+            'pendientes.*.descripcion.required' => 'Cada pendiente debe tener una descripción.',
+        ];
+
+        return $errorBag
+            ? $request->validateWithBag($errorBag, $reglas, $mensajes)
+            : $request->validate($reglas, $mensajes);
+    }
+
+    private function crearReporte(
+        Request $request,
+        array $data,
+        Trabajador $trabajador,
+        User $usuario,
+        string $origenPendientes
+    ): ReporteAvance {
+        return DB::transaction(function () use (
+            $request,
+            $data,
+            $trabajador,
+            $usuario,
+            $origenPendientes
+        ) {
+            $reporte = ReporteAvance::create([
+                'trabajador_id' => $trabajador->id,
+                'fecha_presentacion' => today(),
+                'periodo_inicio' => null,
+                'periodo_fin' => null,
+                'descripcion' => null,
+                'porcentaje_avance' => null,
+                'archivo' => null,
+                'estado' => 'PENDIENTE',
+            ]);
+
+            foreach ($data['actividades'] as $indice => $actividad) {
+                $archivo = $request->file("actividades.{$indice}.archivo");
+                $ruta = $archivo
+                    ? $archivo->store('reportes-avance/actividades', 'public')
+                    : null;
+
+                $reporte->actividades()->create([
+                    'descripcion' => $actividad['descripcion'],
+                    'archivo' => $ruta,
+                ]);
+            }
+
+            foreach ($data['pendientes'] ?? [] as $pendiente) {
+                if (blank($pendiente['descripcion'] ?? null)) {
+                    continue;
+                }
+
+                $reporte->pendientes()->create([
+                    'area_id' => $trabajador->area_id,
+                    'creado_por' => $usuario->id,
+                    'origen' => $origenPendientes,
+                    'descripcion' => $pendiente['descripcion'],
+                    'detalle' => $pendiente['detalle'] ?? null,
+                    'ruta_archivos' => $pendiente['ruta_archivos'] ?? null,
+                    'estado' => 'PENDIENTE',
+                ]);
+            }
+
+            return $reporte;
+        });
     }
 
     private function sincronizarActividades(Request $request, ReporteAvance $reporte, array $actividades): void
     {
-        $idsRecibidos = collect($actividades)->pluck('id')->filter()->map(fn($id) => (int) $id);
+        $idsRecibidos = collect($actividades)->pluck('id')->filter()->map(fn ($id) => (int) $id);
 
         $reporte
             ->actividades()
@@ -310,7 +662,7 @@ class ReporteAvanceController extends Controller
 
     private function sincronizarPendientes(ReporteAvance $reporte, array $pendientes): void
     {
-        $idsRecibidos = collect($pendientes)->pluck('id')->filter()->map(fn($id) => (int) $id);
+        $idsRecibidos = collect($pendientes)->pluck('id')->filter()->map(fn ($id) => (int) $id);
 
         $reporte
             ->pendientes()
@@ -327,6 +679,9 @@ class ReporteAvanceController extends Controller
                 ? $reporte->pendientes()->where('estado', 'PENDIENTE')->findOrFail($data['id'])
                 : new PendienteAvance([
                     'reporte_avance_id' => $reporte->id,
+                    'area_id' => $reporte->trabajador->area_id,
+                    'creado_por' => Auth::id(),
+                    'origen' => 'TRABAJADOR',
                     'estado' => 'PENDIENTE',
                 ]);
 
@@ -334,6 +689,7 @@ class ReporteAvanceController extends Controller
             $pendiente->detalle = $data['detalle'] ?? null;
             $pendiente->ruta_archivos = $data['ruta_archivos'] ?? null;
             $pendiente->reporte_avance_id = $reporte->id;
+            $pendiente->area_id = $reporte->trabajador->area_id;
             $pendiente->save();
         }
     }

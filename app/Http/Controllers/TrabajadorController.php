@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Area;
+use App\Models\Horario;
 use App\Models\Rol;
 use App\Models\Trabajador;
 use App\Models\User;
+use App\Services\HorarioEmpresaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -13,6 +15,10 @@ use Illuminate\Validation\Rule;
 
 class TrabajadorController extends Controller
 {
+    public function __construct(
+        private readonly HorarioEmpresaService $horarioEmpresaService
+    ) {}
+
     /**
      * Listado y filtros de trabajadores.
      */
@@ -21,6 +27,10 @@ class TrabajadorController extends Controller
         $query = Trabajador::with([
             'area',
             'user.rol',
+        ])->withExists([
+            'reportesAvance as reporte_hoy' => function ($reporte) {
+                $reporte->whereDate('fecha_presentacion', today());
+            },
         ]);
 
         if ($request->filled('buscar')) {
@@ -172,6 +182,16 @@ class TrabajadorController extends Controller
                 'password' => Hash::make($data['password']),
                 'estado' => $trabajador->estado === 'ACTIVO',
             ]);
+
+            $horario = Horario::where('estado', true)->orderBy('id')->first();
+
+            if ($trabajador->estado === 'ACTIVO' && $horario) {
+                $this->horarioEmpresaService->asignar(
+                    $trabajador,
+                    $horario,
+                    $trabajador->fecha_ingreso?->startOfDay() ?? now()->startOfDay()
+                );
+            }
         });
 
         return redirect()
@@ -291,8 +311,8 @@ class TrabajadorController extends Controller
 
             $usuarioActual = $usuario;
 
-            if (!$usuarioActual) {
-                $usuarioActual = new User();
+            if (! $usuarioActual) {
+                $usuarioActual = new User;
                 $usuarioActual->trabajador_id = $trabajador->id;
             }
 
@@ -303,12 +323,12 @@ class TrabajadorController extends Controller
             $usuarioActual->email = $data['email'];
             $usuarioActual->estado = $trabajador->estado === 'ACTIVO';
 
-            if (!empty($data['password'])) {
+            if (! empty($data['password'])) {
                 $usuarioActual->password = Hash::make($data['password']);
             }
 
             if (
-                !$usuarioActual->exists &&
+                ! $usuarioActual->exists &&
                 empty($data['password'])
             ) {
                 throw new \Exception(
@@ -317,6 +337,12 @@ class TrabajadorController extends Controller
             }
 
             $usuarioActual->save();
+
+            $horario = Horario::where('estado', true)->orderBy('id')->first();
+
+            if ($trabajador->estado === 'ACTIVO' && $horario) {
+                $this->horarioEmpresaService->asignar($trabajador, $horario, now()->startOfDay());
+            }
         });
 
         return redirect()
@@ -345,6 +371,14 @@ class TrabajadorController extends Controller
                 $trabajador->user->update([
                     'estado' => $nuevoEstado === 'ACTIVO',
                 ]);
+            }
+
+            if ($nuevoEstado === 'ACTIVO') {
+                $horario = Horario::where('estado', true)->orderBy('id')->first();
+
+                if ($horario) {
+                    $this->horarioEmpresaService->asignar($trabajador, $horario, now()->startOfDay());
+                }
             }
         });
 

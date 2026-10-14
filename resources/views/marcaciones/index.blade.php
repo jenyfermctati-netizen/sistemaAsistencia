@@ -43,6 +43,7 @@
 
 
     {{-- FILTROS --}}
+    <div data-live-region="marcaciones" data-live-poll="5000">
     <section class="panel">
 
         <div class="panel__header">
@@ -359,6 +360,7 @@
     <div class="pagination-container">
         {{ $marcaciones->onEachSide(1)->links('components.pagination') }}
     </div>
+    </div>
 
 
 
@@ -374,6 +376,9 @@
             method="POST"
             action="{{ route('marcaciones.store') }}"
             class="form"
+            data-live-form
+            data-live-target="marcaciones"
+            data-reset-on-success
         >
 
             @csrf
@@ -577,6 +582,8 @@
             method="POST"
             id="formAnularMarcacion"
             class="form"
+            data-live-form
+            data-live-target="marcaciones"
         >
 
             @csrf

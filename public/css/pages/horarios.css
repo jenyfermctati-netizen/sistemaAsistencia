@@ -928,3 +928,132 @@
     }
 
 }
+
+/* =========================================================
+   HORARIO GENERAL UNICO Y SELECTOR 12/24 HORAS
+   ========================================================= */
+
+.horario-general {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.horario-general__header,
+.form-section__heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.horario-general__header h3,
+.form-section__heading h3 {
+    margin: 0;
+}
+
+.horario-general__form {
+    padding: 22px;
+}
+
+.form-grid--3 {
+    grid-template-columns: minmax(180px, .8fr) minmax(260px, 1.4fr) minmax(210px, .8fr);
+}
+
+.form-errors {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 12px;
+}
+
+.form-errors ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+
+.form-section__heading {
+    margin-top: 24px;
+}
+
+.formato-indicador {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface-secondary);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.horario-general .dia-editor {
+    grid-template-columns: 140px minmax(180px, 1fr) minmax(180px, 1fr) 125px;
+}
+
+.hora-editor {
+    min-width: 0;
+}
+
+.hora-12 {
+    display: none;
+    grid-template-columns: minmax(90px, 1fr) 72px;
+    gap: 7px;
+}
+
+.formato-12 .hora-12 {
+    display: grid;
+}
+
+.formato-12 .hora-campo--24 {
+    display: none;
+}
+
+.hora-periodo {
+    padding-left: 9px;
+    padding-right: 9px;
+}
+
+.horario-general__actions {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 1000px) {
+    .form-grid--3 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .horario-general .dia-editor {
+        grid-template-columns: 120px 1fr 1fr;
+    }
+
+    .horario-general .dia-editor > .form-group:last-child {
+        grid-column: 2 / 4;
+    }
+}
+
+@media (max-width: 800px) {
+    .horario-general__form {
+        padding: 16px;
+    }
+
+    .form-grid--3,
+    .horario-general .dia-editor {
+        grid-template-columns: 1fr;
+    }
+
+    .horario-general .dia-editor > .form-group:last-child {
+        grid-column: auto;
+    }
+
+    .form-section__heading {
+        flex-direction: column;
+    }
+}

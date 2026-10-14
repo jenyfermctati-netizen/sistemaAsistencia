@@ -26,4 +26,9 @@ class Area extends Model
     {
         return $this->hasMany(Trabajador::class, 'area_id');
     }
+
+    public function pendientesAvance()
+    {
+        return $this->hasMany(PendienteAvance::class, 'area_id');
+    }
 }

@@ -35,9 +35,9 @@ class SolicitudController extends Controller
         | SI NO ES ADMINISTRADOR SOLO VE SUS SOLICITUDES
         |--------------------------------------------------------------------------
         */
-        if (!$esAdministrador) {
+        if (! $esAdministrador) {
 
-            if (!$usuario->trabajador_id) {
+            if (! $usuario->trabajador_id) {
 
                 $query->whereRaw('1 = 0');
 
@@ -168,7 +168,6 @@ class SolicitudController extends Controller
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | REGISTRAR SOLICITUD
@@ -189,7 +188,13 @@ class SolicitudController extends Controller
             abort(403);
         }
 
-        if (!$usuario->trabajador_id) {
+        if (! $usuario->trabajador_id) {
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Tu cuenta no está asociada a un trabajador.',
+                ], 422);
+            }
 
             return back()->with(
                 'error',
@@ -239,54 +244,46 @@ class SolicitudController extends Controller
             );
 
         Solicitud::create([
-            'trabajador_id' =>
-                $usuario->trabajador_id,
+            'trabajador_id' => $usuario->trabajador_id,
 
-            'asistencia_id' =>
-                $asistenciaId,
+            'asistencia_id' => $asistenciaId,
 
-            'tipo' =>
-                $data['tipo'],
+            'tipo' => $data['tipo'],
 
-            'fecha_inicio' =>
-                $data['fecha_inicio'],
+            'fecha_inicio' => $data['fecha_inicio'],
 
-            'fecha_fin' =>
-                $data['fecha_fin'] ?? null,
+            'fecha_fin' => $data['fecha_fin'] ?? null,
 
-            'hora_inicio' =>
-                $data['hora_inicio'] ?? null,
+            'hora_inicio' => $data['hora_inicio'] ?? null,
 
-            'hora_fin' =>
-                $data['hora_fin'] ?? null,
+            'hora_fin' => $data['hora_fin'] ?? null,
 
-            'motivo' =>
-                $data['motivo'],
+            'motivo' => $data['motivo'],
 
-            'archivo' =>
-                $archivo,
+            'archivo' => $archivo,
 
-            'estado' =>
-                'PENDIENTE',
+            'estado' => 'PENDIENTE',
 
-            'revisado_por' =>
-                null,
+            'revisado_por' => null,
 
-            'comentario_revision' =>
-                null,
+            'comentario_revision' => null,
 
-            'fecha_revision' =>
-                null,
+            'fecha_revision' => null,
         ]);
+
+        $mensaje = 'Solicitud registrada correctamente.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $mensaje,
+                'refresh_url' => route('solicitudes.index'),
+            ], 201);
+        }
 
         return redirect()
             ->route('solicitudes.index')
-            ->with(
-                'success',
-                'Solicitud registrada correctamente.'
-            );
+            ->with('success', $mensaje);
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -305,6 +302,12 @@ class SolicitudController extends Controller
             $solicitud->estado
             !== 'PENDIENTE'
         ) {
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Solo puedes editar solicitudes pendientes.',
+                ], 422);
+            }
 
             return back()->with(
                 'error',
@@ -352,39 +355,36 @@ class SolicitudController extends Controller
             );
 
         $solicitud->update([
-            'tipo' =>
-                $data['tipo'],
+            'tipo' => $data['tipo'],
 
-            'fecha_inicio' =>
-                $data['fecha_inicio'],
+            'fecha_inicio' => $data['fecha_inicio'],
 
-            'fecha_fin' =>
-                $data['fecha_fin'] ?? null,
+            'fecha_fin' => $data['fecha_fin'] ?? null,
 
-            'hora_inicio' =>
-                $data['hora_inicio'] ?? null,
+            'hora_inicio' => $data['hora_inicio'] ?? null,
 
-            'hora_fin' =>
-                $data['hora_fin'] ?? null,
+            'hora_fin' => $data['hora_fin'] ?? null,
 
-            'motivo' =>
-                $data['motivo'],
+            'motivo' => $data['motivo'],
 
-            'archivo' =>
-                $archivo,
+            'archivo' => $archivo,
 
-            'asistencia_id' =>
-                $asistenciaId,
+            'asistencia_id' => $asistenciaId,
         ]);
+
+        $mensaje = 'Solicitud actualizada correctamente.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $mensaje,
+                'refresh_url' => route('solicitudes.index'),
+            ]);
+        }
 
         return redirect()
             ->route('solicitudes.index')
-            ->with(
-                'success',
-                'Solicitud actualizada correctamente.'
-            );
+            ->with('success', $mensaje);
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -392,6 +392,7 @@ class SolicitudController extends Controller
     |--------------------------------------------------------------------------
     */
     public function cancelar(
+        Request $request,
         Solicitud $solicitud
     ) {
         $this->verificarPropietario(
@@ -403,6 +404,12 @@ class SolicitudController extends Controller
             !== 'PENDIENTE'
         ) {
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Solo puedes cancelar solicitudes pendientes.',
+                ], 422);
+            }
+
             return back()->with(
                 'error',
                 'Solo puedes cancelar solicitudes pendientes.'
@@ -413,14 +420,19 @@ class SolicitudController extends Controller
             'estado' => 'CANCELADA',
         ]);
 
+        $mensaje = 'Solicitud cancelada correctamente.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $mensaje,
+                'refresh_url' => route('solicitudes.index'),
+            ]);
+        }
+
         return redirect()
             ->route('solicitudes.index')
-            ->with(
-                'success',
-                'Solicitud cancelada correctamente.'
-            );
+            ->with('success', $mensaje);
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -437,6 +449,12 @@ class SolicitudController extends Controller
             $solicitud->estado
             !== 'PENDIENTE'
         ) {
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Esta solicitud ya fue revisada o cancelada.',
+                ], 422);
+            }
 
             return back()->with(
                 'error',
@@ -474,24 +492,19 @@ class SolicitudController extends Controller
         ) {
 
             throw ValidationException::withMessages([
-                'comentario_revision' =>
-                    'Debes indicar el motivo del rechazo.',
+                'comentario_revision' => 'Debes indicar el motivo del rechazo.',
             ]);
         }
 
         $solicitud->update([
-            'estado' =>
-                $data['decision'],
+            'estado' => $data['decision'],
 
-            'revisado_por' =>
-                Auth::id(),
+            'revisado_por' => Auth::id(),
 
-            'comentario_revision' =>
-                $data['comentario_revision']
+            'comentario_revision' => $data['comentario_revision']
                 ?? null,
 
-            'fecha_revision' =>
-                now(),
+            'fecha_revision' => now(),
         ]);
 
         /*
@@ -510,17 +523,21 @@ class SolicitudController extends Controller
         |
         */
 
+        $mensaje = $data['decision'] === 'APROBADA'
+            ? 'Solicitud aprobada correctamente.'
+            : 'Solicitud rechazada correctamente.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $mensaje,
+                'refresh_url' => route('solicitudes.index'),
+            ]);
+        }
+
         return redirect()
             ->route('solicitudes.index')
-            ->with(
-                'success',
-                $data['decision']
-                    === 'APROBADA'
-                    ? 'Solicitud aprobada correctamente.'
-                    : 'Solicitud rechazada correctamente.'
-            );
+            ->with('success', $mensaje);
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -579,32 +596,23 @@ class SolicitudController extends Controller
                 'max:5120',
             ],
         ], [
-            'tipo.required' =>
-                'Selecciona el tipo de solicitud.',
+            'tipo.required' => 'Selecciona el tipo de solicitud.',
 
-            'fecha_inicio.required' =>
-                'Selecciona la fecha de inicio.',
+            'fecha_inicio.required' => 'Selecciona la fecha de inicio.',
 
-            'fecha_fin.after_or_equal' =>
-                'La fecha de fin no puede ser anterior a la fecha de inicio.',
+            'fecha_fin.after_or_equal' => 'La fecha de fin no puede ser anterior a la fecha de inicio.',
 
-            'motivo.required' =>
-                'Debes indicar el motivo de la solicitud.',
+            'motivo.required' => 'Debes indicar el motivo de la solicitud.',
 
-            'archivo.mimes' =>
-                'El sustento debe ser PDF, JPG, JPEG o PNG.',
+            'archivo.mimes' => 'El sustento debe ser PDF, JPG, JPEG o PNG.',
 
-            'archivo.max' =>
-                'El archivo no puede superar los 5 MB.',
+            'archivo.max' => 'El archivo no puede superar los 5 MB.',
 
-            'hora_inicio.required_with' =>
-                'Debes indicar también la hora de inicio.',
+            'hora_inicio.required_with' => 'Debes indicar también la hora de inicio.',
 
-            'hora_fin.required_with' =>
-                'Debes indicar también la hora de fin.',
+            'hora_fin.required_with' => 'Debes indicar también la hora de fin.',
         ]);
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -616,21 +624,19 @@ class SolicitudController extends Controller
     ): void {
 
         if (
-            !empty($data['hora_inicio'])
+            ! empty($data['hora_inicio'])
             &&
-            !empty($data['hora_fin'])
+            ! empty($data['hora_fin'])
             &&
             $data['hora_fin']
                 < $data['hora_inicio']
         ) {
 
             throw ValidationException::withMessages([
-                'hora_fin' =>
-                    'La hora de fin no puede ser anterior a la hora de inicio.',
+                'hora_fin' => 'La hora de fin no puede ser anterior a la hora de inicio.',
             ]);
         }
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -666,7 +672,6 @@ class SolicitudController extends Controller
             ->value('id');
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | PROPIETARIO
@@ -686,7 +691,6 @@ class SolicitudController extends Controller
             403
         );
     }
-
 
     /*
     |--------------------------------------------------------------------------

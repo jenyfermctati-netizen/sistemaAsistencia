@@ -1,567 +1,198 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('formHorarioGeneral');
+    const selectorFormato = document.getElementById('formatoHora');
+    const indicadorFormato = document.getElementById('formatoIndicador');
 
-    /*
-    |--------------------------------------------------------------------------
-    | HABILITAR / DESHABILITAR HORAS SEGÚN DÍA
-    |--------------------------------------------------------------------------
-    */
-
-    function configurarDiaLaborable(checkbox) {
-
-        const fila = checkbox.closest('.dia-editor');
-
-        if (!fila) {
-            return;
-        }
-
-        const campos =
-            fila.querySelectorAll('.dia-hora');
-
-        campos.forEach(function (campo) {
-            campo.disabled = !checkbox.checked;
-        });
+    if (!form || !selectorFormato) {
+        return;
     }
 
-
-    document
-        .querySelectorAll('.dia-laborable')
-        .forEach(function (checkbox) {
-
-            configurarDiaLaborable(checkbox);
-
-            checkbox.addEventListener(
-                'change',
-                function () {
-                    configurarDiaLaborable(checkbox);
-                }
-            );
-        });
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | EDITAR HORARIO
-    |--------------------------------------------------------------------------
-    */
-
-    const formEditar =
-        document.getElementById('formEditarHorario');
-
-    const nombreEditar =
-        document.getElementById('editarHorarioNombre');
-
-    const descripcionEditar =
-        document.getElementById(
-            'editarHorarioDescripcion'
-        );
-
-
-    document
-        .querySelectorAll('[data-editar-horario]')
-        .forEach(function (button) {
-
-            button.addEventListener('click', function () {
-
-                if (!formEditar) {
-                    return;
-                }
-
-                formEditar.action =
-                    button.dataset.url;
-
-                nombreEditar.value =
-                    button.dataset.nombre || '';
-
-                descripcionEditar.value =
-                    button.dataset.descripcion || '';
-
-                let dias = [];
-
-                try {
-                    dias = JSON.parse(
-                        button.dataset.dias || '[]'
-                    );
-                } catch (error) {
-                    dias = [];
-                }
-
-
-                dias.forEach(function (dia) {
-
-                    const fila =
-                        document.querySelector(
-                            '#editarDiasHorario ' +
-                            `[data-dia="${dia.dia_semana}"]`
-                        );
-
-                    if (!fila) {
-                        return;
-                    }
-
-
-                    const checkbox =
-                        fila.querySelector(
-                            '.dia-laborable'
-                        );
-
-                    const entrada =
-                        fila.querySelector(
-                            '.hora-entrada'
-                        );
-
-                    const salida =
-                        fila.querySelector(
-                            '.hora-salida'
-                        );
-
-                    const tolerancia =
-                        fila.querySelector(
-                            '.tolerancia'
-                        );
-
-
-                    checkbox.checked =
-                        Boolean(dia.es_laborable);
-
-                    entrada.value =
-                        dia.hora_entrada || '';
-
-                    salida.value =
-                        dia.hora_salida || '';
-
-                    tolerancia.value =
-                        dia.tolerancia_minutos ?? 0;
-
-
-                    configurarDiaLaborable(
-                        checkbox
-                    );
-                });
-
-
-                if (window.AppModal) {
-                    window.AppModal.open(
-                        'modalEditarHorario'
-                    );
-                }
-
-            });
-        });
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CAMBIAR ESTADO
-    |--------------------------------------------------------------------------
-    */
-
-    const formEstado =
-        document.getElementById(
-            'formEstadoHorario'
-        );
-
-    const mensajeEstado =
-        document.getElementById(
-            'estadoHorarioMensaje'
-        );
-
-    const botonEstado =
-        document.getElementById(
-            'btnEstadoHorario'
-        );
-
-
-    document
-        .querySelectorAll(
-            '[data-cambiar-estado-horario]'
-        )
-        .forEach(function (button) {
-
-            button.addEventListener(
-                'click',
-                function () {
-
-                    if (!formEstado) {
-                        return;
-                    }
-
-                    const activo =
-                        button.dataset.activo === '1';
-
-                    const nombre =
-                        button.dataset.nombre || 'este horario';
-
-
-                    formEstado.action =
-                        button.dataset.url;
-
-
-                    mensajeEstado.textContent =
-                        activo
-                            ? `¿Deseas desactivar el horario "${nombre}"?`
-                            : `¿Deseas activar el horario "${nombre}"?`;
-
-
-                    botonEstado.textContent =
-                        activo
-                            ? 'Desactivar'
-                            : 'Activar';
-
-
-                    if (window.AppModal) {
-                        window.AppModal.open(
-                            'modalEstadoHorario'
-                        );
-                    }
-
-                }
-            );
-        });
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | PREVISUALIZACIÓN CONTROL INDIVIDUAL
-    |--------------------------------------------------------------------------
-    */
-
-    const trabajadorIndividual =
-        document.getElementById(
-            'asignarTrabajador'
-        );
-
-    const previewControl =
-        document.getElementById(
-            'tipoControlPreview'
-        );
-
-
-    function actualizarControlIndividual() {
-
-        if (
-            !trabajadorIndividual
-            ||
-            !previewControl
-        ) {
-            return;
+    function hora12Desde24(valor) {
+        const partes = /^(\d{2}):(\d{2})$/.exec(valor || '');
+
+        if (!partes) {
+            return { hora: '', periodo: 'AM' };
         }
 
-        const opcion =
-            trabajadorIndividual
-                .options[
-                    trabajadorIndividual.selectedIndex
-                ];
+        const hora24 = Number(partes[1]);
+        const minutos = partes[2];
+        const periodo = hora24 >= 12 ? 'PM' : 'AM';
+        const hora12 = hora24 % 12 || 12;
 
+        return {
+            hora: `${String(hora12).padStart(2, '0')}:${minutos}`,
+            periodo: periodo,
+        };
+    }
 
-        if (
-            !opcion
-            ||
-            !opcion.value
-        ) {
-            previewControl.hidden = true;
-            return;
+    function hora24Desde12(valor, periodo) {
+        const partes = /^(\d{1,2}):(\d{2})$/.exec((valor || '').trim());
+
+        if (!partes) {
+            return null;
         }
 
+        let hora = Number(partes[1]);
+        const minutos = Number(partes[2]);
 
-        const vinculo =
-            opcion.dataset.vinculo;
+        if (hora < 1 || hora > 12 || minutos < 0 || minutos > 59) {
+            return null;
+        }
 
-
-        if (vinculo === 'LOCADOR') {
-
-            previewControl.innerHTML = `
-                <strong>Control referencial</strong>
-                <span>
-                    No genera tardanza ni falta automática.
-                </span>
-            `;
-
+        if (periodo === 'AM') {
+            hora = hora === 12 ? 0 : hora;
         } else {
-
-            previewControl.innerHTML = `
-                <strong>Control obligatorio</strong>
-                <span>
-                    Se utilizará para asistencia, tardanza y faltas.
-                </span>
-            `;
+            hora = hora === 12 ? 12 : hora + 12;
         }
 
-
-        previewControl.hidden = false;
+        return `${String(hora).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
     }
 
+    function hora24Valida(valor) {
+        const partes = /^(\d{2}):(\d{2})$/.exec((valor || '').trim());
 
-    trabajadorIndividual?.addEventListener(
-        'change',
-        actualizarControlIndividual
-    );
+        if (!partes) {
+            return false;
+        }
 
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ASIGNACIÓN MASIVA
-    |--------------------------------------------------------------------------
-    */
-
-    const buscador =
-        document.getElementById(
-            'filtroMasivoBuscar'
-        );
-
-    const filtroArea =
-        document.getElementById(
-            'filtroMasivoArea'
-        );
-
-    const filtroVinculo =
-        document.getElementById(
-            'filtroMasivoVinculo'
-        );
-
-    const seleccionarTodos =
-        document.getElementById(
-            'seleccionarTodosMasivo'
-        );
-
-    const contador =
-        document.getElementById(
-            'contadorSeleccionadosMasivo'
-        );
-
-    const botonAsignar =
-        document.getElementById(
-            'btnAsignarMasivo'
-        );
-
-    const sinResultados =
-        document.getElementById(
-            'sinResultadosMasivo'
-        );
-
-
-    function filasMasivas() {
-
-        return Array.from(
-            document.querySelectorAll(
-                '[data-trabajador-masivo]'
-            )
-        );
+        return Number(partes[1]) <= 23 && Number(partes[2]) <= 59;
     }
 
+    function sincronizarDesde24(editor) {
+        const campo24 = editor.querySelector('[data-hora-24]');
+        const normalizada = editor.querySelector('[data-hora-normalizada]');
 
-    function normalizar(texto) {
+        if (!hora24Valida(campo24.value)) {
+            campo24.setCustomValidity('Ingresa una hora válida entre 00:00 y 23:59.');
+            return false;
+        }
 
-        return (texto || '')
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(
-                /[\u0300-\u036f]/g,
-                ''
-            );
+        campo24.setCustomValidity('');
+        normalizada.value = campo24.value.trim();
+        actualizarVistasHora(editor);
+        return true;
     }
 
+    function actualizarVistasHora(editor) {
+        const normalizada = editor.querySelector('[data-hora-normalizada]');
+        const campo24 = editor.querySelector('[data-hora-24]');
+        const campo12 = editor.querySelector('[data-hora-12-texto]');
+        const periodo = editor.querySelector('[data-hora-periodo]');
+        const conversion = hora12Desde24(normalizada.value);
 
-    function actualizarSeleccion() {
-
-        const checkboxes =
-            document.querySelectorAll(
-                '.trabajador-masivo-checkbox'
-            );
-
-        const seleccionados =
-            Array.from(checkboxes)
-                .filter(function (checkbox) {
-                    return checkbox.checked;
-                });
-
-
-        if (contador) {
-
-            contador.textContent =
-                `${seleccionados.length} seleccionados`;
-
-        }
-
-
-        if (botonAsignar) {
-
-            botonAsignar.disabled =
-                seleccionados.length === 0;
-
-        }
-
-
-        const visibles =
-            filasMasivas()
-                .filter(function (fila) {
-                    return !fila.hidden;
-                });
-
-
-        const visiblesMarcados =
-            visibles.filter(function (fila) {
-
-                const checkbox =
-                    fila.querySelector(
-                        '.trabajador-masivo-checkbox'
-                    );
-
-                return checkbox?.checked;
-            });
-
-
-        if (seleccionarTodos) {
-
-            seleccionarTodos.checked =
-                visibles.length > 0
-                &&
-                visibles.length
-                === visiblesMarcados.length;
-
-        }
+        campo24.value = normalizada.value;
+        campo12.value = conversion.hora;
+        periodo.value = conversion.periodo;
+        campo12.setCustomValidity('');
     }
 
+    function sincronizarDesde12(editor) {
+        const campo12 = editor.querySelector('[data-hora-12-texto]');
+        const periodo = editor.querySelector('[data-hora-periodo]');
+        const normalizada = editor.querySelector('[data-hora-normalizada]');
+        const campo24 = editor.querySelector('[data-hora-24]');
+        const valor = hora24Desde12(campo12.value, periodo.value);
 
-    function filtrar() {
-
-        const texto =
-            normalizar(
-                buscador?.value
-            );
-
-        const area =
-            filtroArea?.value || '';
-
-        const vinculo =
-            filtroVinculo?.value || '';
-
-        let cantidadVisibles = 0;
-
-
-        filasMasivas().forEach(
-            function (fila) {
-
-                const coincideTexto =
-                    !texto
-                    ||
-                    normalizar(
-                        fila.dataset.busqueda
-                    ).includes(texto);
-
-
-                const coincideArea =
-                    !area
-                    ||
-                    fila.dataset.area === area;
-
-
-                const coincideVinculo =
-                    !vinculo
-                    ||
-                    fila.dataset.vinculo
-                    === vinculo;
-
-
-                const visible =
-                    coincideTexto
-                    &&
-                    coincideArea
-                    &&
-                    coincideVinculo;
-
-
-                fila.hidden = !visible;
-
-
-                if (visible) {
-                    cantidadVisibles++;
-                }
-
-            }
-        );
-
-
-        if (sinResultados) {
-
-            sinResultados.hidden =
-                cantidadVisibles > 0;
-
+        if (valor === null) {
+            campo12.setCustomValidity('Ingresa una hora válida entre 01:00 y 12:59.');
+            return false;
         }
 
-
-        actualizarSeleccion();
+        campo12.setCustomValidity('');
+        normalizada.value = valor;
+        campo24.value = valor;
+        return true;
     }
 
+    function configurarDia(fila) {
+        const laborable = fila.querySelector('.dia-laborable').checked;
+        const formato12 = selectorFormato.value === '12';
 
-    buscador?.addEventListener(
-        'input',
-        filtrar
-    );
+        fila.querySelectorAll('[data-hora-editor]').forEach(function (editor) {
+            const campo24 = editor.querySelector('[data-hora-24]');
+            const campo12 = editor.querySelector('[data-hora-12-texto]');
+            const periodo = editor.querySelector('[data-hora-periodo]');
 
-
-    filtroArea?.addEventListener(
-        'change',
-        filtrar
-    );
-
-
-    filtroVinculo?.addEventListener(
-        'change',
-        filtrar
-    );
-
-
-    seleccionarTodos?.addEventListener(
-        'change',
-        function () {
-
-            const checked =
-                seleccionarTodos.checked;
-
-
-            filasMasivas()
-                .filter(function (fila) {
-                    return !fila.hidden;
-                })
-                .forEach(function (fila) {
-
-                    const checkbox =
-                        fila.querySelector(
-                            '.trabajador-masivo-checkbox'
-                        );
-
-                    if (checkbox) {
-                        checkbox.checked =
-                            checked;
-                    }
-
-                });
-
-
-            actualizarSeleccion();
-
-        }
-    );
-
-
-    document
-        .querySelectorAll(
-            '.trabajador-masivo-checkbox'
-        )
-        .forEach(function (checkbox) {
-
-            checkbox.addEventListener(
-                'change',
-                actualizarSeleccion
-            );
-
+            campo24.disabled = !laborable || formato12;
+            campo12.disabled = !laborable || !formato12;
+            periodo.disabled = !laborable || !formato12;
+            campo24.required = laborable && !formato12;
+            campo12.required = laborable && formato12;
         });
 
+        const tolerancia = fila.querySelector('.tolerancia');
+        tolerancia.disabled = !laborable;
+    }
 
-    filtrar();
+    function aplicarFormato() {
+        const formato12 = selectorFormato.value === '12';
+        form.classList.toggle('formato-12', formato12);
+        form.classList.toggle('formato-24', !formato12);
 
+        if (indicadorFormato) {
+            indicadorFormato.textContent = formato12
+                ? 'Formato activo: 12 horas (AM/PM)'
+                : 'Formato activo: 24 horas';
+        }
+
+        form.querySelectorAll('[data-hora-editor]').forEach(actualizarVistasHora);
+        form.querySelectorAll('.dia-editor').forEach(configurarDia);
+    }
+
+    form.querySelectorAll('[data-hora-editor]').forEach(function (editor) {
+        const normalizada = editor.querySelector('[data-hora-normalizada]');
+        const campo24 = editor.querySelector('[data-hora-24]');
+        const campo12 = editor.querySelector('[data-hora-12-texto]');
+        const periodo = editor.querySelector('[data-hora-periodo]');
+
+        campo24.addEventListener('input', function () {
+            campo24.setCustomValidity('');
+        });
+        campo24.addEventListener('change', function () {
+            sincronizarDesde24(editor);
+        });
+
+        campo12.addEventListener('input', function () {
+            campo12.setCustomValidity('');
+        });
+        campo12.addEventListener('change', function () {
+            sincronizarDesde12(editor);
+        });
+        periodo.addEventListener('change', function () {
+            sincronizarDesde12(editor);
+        });
+    });
+
+    form.querySelectorAll('.dia-laborable').forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            configurarDia(checkbox.closest('.dia-editor'));
+        });
+    });
+
+    selectorFormato.addEventListener('change', aplicarFormato);
+
+    form.addEventListener('submit', function (event) {
+        let valido = true;
+
+        form.querySelectorAll('.dia-editor').forEach(function (fila) {
+            if (!fila.querySelector('.dia-laborable').checked) {
+                return;
+            }
+
+            fila.querySelectorAll('[data-hora-editor]').forEach(function (editor) {
+                if (selectorFormato.value === '12') {
+                    valido = sincronizarDesde12(editor) && valido;
+                } else {
+                    valido = sincronizarDesde24(editor) && valido;
+                }
+            });
+        });
+
+        if (!valido || !form.checkValidity()) {
+            event.preventDefault();
+            form.reportValidity();
+        }
+    });
+
+    aplicarFormato();
 });
