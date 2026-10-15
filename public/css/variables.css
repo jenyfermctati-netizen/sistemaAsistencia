@@ -3,42 +3,42 @@
        DIMENSIONES GENERALES
     ====================================================== */
 
-    --sidebar-width: 260px;
-    --navbar-height: 68px;
+    --sidebar-width: 268px;
+    --navbar-height: 72px;
 
 
     /* ======================================================
        COLOR PRINCIPAL
     ====================================================== */
 
-    --primary: #0f766e;
-    --primary-hover: #0d665f;
-    --primary-dark: #0b5f59;
-    --primary-light: #e7f6f3;
+    --primary: #3f5543;
+    --primary-hover: #344738;
+    --primary-dark: #2a3c30;
+    --primary-light: #e8eee5;
 
-    --accent: #14b8a6;
-    --accent-hover: #0d9488;
-    --accent-soft: #ccfbf1;
+    --accent: #a66848;
+    --accent-hover: #8f573b;
+    --accent-soft: #f4e6dc;
 
 
     /* ======================================================
        FONDOS
     ====================================================== */
 
-    --background: #f6f7f5;
+    --background: #f3f0e9;
 
-    --surface: #ffffff;
-    --surface-secondary: #f1f4f2;
-    --surface-hover: #f7faf8;
+    --surface: #fffefa;
+    --surface-secondary: #f7f3eb;
+    --surface-hover: #f1f4ed;
 
 
     /* ======================================================
        TEXTOS
     ====================================================== */
 
-    --text: #17211f;
-    --text-muted: #66736f;
-    --text-soft: #94a09c;
+    --text: #28332d;
+    --text-muted: #71786f;
+    --text-soft: #969b94;
 
     --text-inverse: #ffffff;
 
@@ -47,28 +47,28 @@
        BORDES
     ====================================================== */
 
-    --border: #dde4e1;
-    --border-strong: #cbd5d1;
+    --border: #ded9ce;
+    --border-strong: #c9c2b5;
 
 
     /* ======================================================
        ESTADOS
     ====================================================== */
 
-    --success: #15803d;
-    --success-hover: #166534;
-    --success-light: #ecfdf3;
+    --success: #52704f;
+    --success-hover: #405b3e;
+    --success-light: #eaf3e7;
 
-    --warning: #b7791f;
-    --warning-hover: #92400e;
-    --warning-light: #fff8e7;
+    --warning: #9b743c;
+    --warning-hover: #7f5d2e;
+    --warning-light: #fbf2e4;
 
-    --danger: #c2413b;
-    --danger-hover: #a93631;
-    --danger-light: #fff0ef;
+    --danger: #a5524b;
+    --danger-hover: #8d433d;
+    --danger-light: #f8e9e7;
 
-    --info: #0f766e;
-    --info-light: #e7f6f3;
+    --info: #5c7058;
+    --info-light: #edf3eb;
 
 
     /* ======================================================
@@ -76,27 +76,27 @@
     ====================================================== */
 
     --shadow-sm:
-        0 1px 3px rgba(23, 33, 31, 0.05);
+        0 2px 8px rgba(40, 51, 45, 0.05);
 
     --shadow:
-        0 8px 24px rgba(23, 33, 31, 0.07);
+        0 14px 34px rgba(40, 51, 45, 0.08);
 
     --shadow-md:
-        0 12px 30px rgba(23, 33, 31, 0.10);
+        0 18px 42px rgba(40, 51, 45, 0.11);
 
     --shadow-lg:
-        0 20px 55px rgba(23, 33, 31, 0.16);
+        0 24px 60px rgba(40, 51, 45, 0.17);
 
 
     /* ======================================================
        RADIOS
     ====================================================== */
 
-    --radius-xs: 5px;
-    --radius-sm: 7px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --radius-xl: 18px;
+    --radius-xs: 6px;
+    --radius-sm: 10px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 22px;
 
 
     /* ======================================================

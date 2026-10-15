@@ -8,6 +8,7 @@
     <title>@yield('title', 'Sistema de Asistencia')</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/theme-natural.css') }}">
 </head>
 
 <body>

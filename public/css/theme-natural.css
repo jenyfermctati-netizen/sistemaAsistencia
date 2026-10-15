@@ -1,0 +1,757 @@
+/* ==========================================================
+   TEMA GLOBAL · BOSQUE, SALVIA, PIEDRA Y PAPEL
+   Cargado al final para armonizar todos los módulos.
+========================================================== */
+
+::selection {
+    background: #d9e3d5;
+    color: #28332d;
+}
+
+html { scrollbar-color: #aeb9a9 #ede9e0; }
+
+body:not(.guest) {
+    background:
+        radial-gradient(circle at 88% 2%, rgba(166, 104, 72, 0.055), transparent 24rem),
+        #f3f0e9;
+}
+
+.main-content {
+    padding: clamp(20px, 2.5vw, 32px);
+    background:
+        radial-gradient(circle at 96% 0%, rgba(102, 123, 97, 0.07), transparent 24rem),
+        linear-gradient(180deg, #f6f3ed 0%, #f3f0e9 100%);
+}
+
+/* ==========================================================
+   NAVEGACIÓN PRINCIPAL
+========================================================== */
+
+.sidebar {
+    border-right: 1px solid rgba(255, 255, 255, 0.075);
+    background:
+        radial-gradient(circle at 20% 2%, rgba(223, 231, 218, 0.1), transparent 17rem),
+        linear-gradient(180deg, #2f4136 0%, #34493b 54%, #283a30 100%);
+    box-shadow: 10px 0 32px rgba(40, 51, 45, 0.11);
+}
+
+.sidebar::after {
+    content: "";
+    position: absolute;
+    right: -62px;
+    bottom: 76px;
+    width: 150px;
+    height: 105px;
+    border: 1px solid rgba(223, 231, 218, 0.08);
+    border-radius: 100% 0 100% 0;
+    transform: rotate(-18deg);
+    pointer-events: none;
+}
+
+.sidebar__header {
+    min-height: var(--navbar-height);
+    padding: 14px 18px;
+    border-bottom-color: rgba(255, 255, 255, 0.09);
+}
+
+.sidebar__logo {
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 14px 14px 14px 5px;
+    background: #f7f3eb;
+    color: #35493a;
+    box-shadow: 0 10px 24px rgba(20, 32, 25, 0.2);
+}
+
+.sidebar__brand strong { color: #fffdf7; font-weight: 750; }
+.sidebar__brand span { color: #b9c6b6; }
+.sidebar__menu { padding: 15px 11px 22px; }
+
+.sidebar__title {
+    margin: 20px 11px 9px;
+    color: #9fad9b;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.sidebar__item {
+    min-height: 47px;
+    padding: 7px 9px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: #d5ddd2;
+}
+
+.sidebar__item:hover {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.07);
+    color: #fffdf7;
+}
+
+.sidebar__item.active {
+    border-color: rgba(223, 231, 218, 0.16);
+    background: linear-gradient(90deg, rgba(223, 231, 218, 0.17), rgba(223, 231, 218, 0.07));
+    color: #fffdf7;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.sidebar__item.active::before {
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    background: #d4a083;
+}
+
+.sidebar__icon {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.055);
+    color: #c6d2c2;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+.sidebar__item.active .sidebar__icon {
+    border-color: rgba(212, 160, 131, 0.22);
+    background: rgba(166, 104, 72, 0.25);
+    color: #ffe6d7;
+}
+
+.sidebar__footer {
+    position: relative;
+    z-index: 1;
+    border-top-color: rgba(255, 255, 255, 0.08);
+    background: rgba(18, 31, 23, 0.13);
+    color: #aebcab;
+}
+
+.sidebar__footer strong,
+.sidebar__footer span { display: block; }
+.sidebar__footer strong { color: #e9eee6; font-size: 11px; }
+.sidebar__footer span { margin-top: 2px; font-size: 10px; }
+
+.sidebar__footer-icon {
+    display: grid;
+    flex: 0 0 32px;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px 10px 10px 4px;
+    background: rgba(255, 255, 255, 0.07);
+    color: #dfe7da;
+    font-size: 9px;
+    font-weight: 850;
+}
+
+.navbar {
+    min-height: var(--navbar-height);
+    padding: 10px 24px;
+    border-bottom: 1px solid rgba(201, 194, 181, 0.72);
+    background: rgba(255, 254, 250, 0.88);
+    box-shadow: 0 4px 18px rgba(40, 51, 45, 0.045);
+    backdrop-filter: blur(16px);
+}
+
+.navbar__title { color: #28332d; font-size: 17px; font-weight: 750; letter-spacing: -0.025em; }
+.navbar__subtitle { color: #7a8079; }
+
+.navbar__avatar {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #cbd6c7;
+    border-radius: 14px 14px 14px 5px;
+    background: #e2eadf;
+    color: #3f5543;
+    font-weight: 850;
+}
+
+.navbar__menu-button {
+    border-color: #ded9ce;
+    border-radius: 11px;
+    background: #fffefa;
+    color: #3f5543;
+}
+
+.footer {
+    padding: 15px 24px;
+    border-top-color: #ded9ce;
+    background: #fffefa;
+    color: #777d75;
+}
+
+/* ==========================================================
+   CABECERAS DE PÁGINA
+========================================================== */
+
+.main-content > .page-header {
+    position: relative;
+    isolation: isolate;
+    min-height: 164px;
+    margin: 0 0 26px;
+    padding: clamp(25px, 3.2vw, 38px);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 26px;
+    background:
+        radial-gradient(circle at 88% 16%, rgba(223, 231, 218, 0.17), transparent 25%),
+        linear-gradient(135deg, #2f4136 0%, #405747 58%, #4d614e 100%);
+    box-shadow: 0 22px 52px rgba(40, 51, 45, 0.16);
+}
+
+.main-content > .page-header::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -105px;
+    right: -50px;
+    width: 245px;
+    aspect-ratio: 1;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 50%;
+    box-shadow: 0 0 0 34px rgba(255, 255, 255, 0.028), 0 0 0 68px rgba(255, 255, 255, 0.02);
+}
+
+.main-content > .page-header > div:first-child::before {
+    content: "Gestión interna";
+    display: block;
+    margin-bottom: 10px;
+    color: #dfe8db;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.main-content > .page-header .page-header__title {
+    margin: 0 0 8px;
+    color: #fffdf7;
+    font-size: clamp(25px, 2.6vw, 35px);
+    font-weight: 760;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+}
+
+.main-content > .page-header .page-header__description {
+    max-width: 720px;
+    margin: 0;
+    color: rgba(255, 253, 247, 0.76);
+    line-height: 1.65;
+}
+
+.main-content > .page-header .page-header__actions { position: relative; z-index: 1; }
+.main-content > .page-header .button--primary {
+    border-color: rgba(255, 255, 255, 0.62);
+    background: #fffdf7;
+    color: #304236;
+    box-shadow: 0 11px 25px rgba(20, 32, 25, 0.2);
+}
+
+.main-content > .page-header .button--primary:hover { border-color: #fff; background: #fff; color: #223228; }
+.main-content > .page-header .button--secondary {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fffdf7;
+    box-shadow: none;
+    backdrop-filter: blur(8px);
+}
+
+.main-content > .page-header .button--secondary:hover { background: rgba(255, 255, 255, 0.17); color: #fff; }
+
+/* ==========================================================
+   BOTONES, FORMULARIOS Y ESTADOS
+========================================================== */
+
+.button {
+    min-height: 42px;
+    padding: 9px 15px;
+    border-radius: 11px;
+    font-weight: 700;
+}
+
+.button--primary {
+    border-color: #3f5543;
+    background: #3f5543;
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(63, 85, 67, 0.18);
+}
+
+.button--primary:hover {
+    border-color: #304236;
+    background: #304236;
+    box-shadow: 0 11px 24px rgba(63, 85, 67, 0.24);
+}
+
+.button--secondary {
+    border-color: #ded9ce;
+    background: #fffefa;
+    color: #465149;
+    box-shadow: 0 2px 7px rgba(40, 51, 45, 0.04);
+}
+
+.button--secondary:hover { border-color: #b9c5b5; background: #eff3ec; color: #304236; }
+.button--danger { border-color: #a5524b; background: #a5524b; box-shadow: 0 7px 16px rgba(165, 82, 75, 0.16); }
+.button--danger:hover { border-color: #8d433d; background: #8d433d; }
+.button--small { min-height: 35px; padding: 7px 11px; border-radius: 9px; }
+
+.form-label { margin-bottom: 7px; color: #465149; font-size: 12px; font-weight: 750; }
+
+.form-control,
+.form-select,
+.form-textarea {
+    min-height: 44px;
+    padding: 10px 13px;
+    border-color: #ded9ce;
+    border-radius: 11px;
+    background: #fbfaf6;
+    color: #28332d;
+}
+
+.form-control:hover,
+.form-select:hover,
+.form-textarea:hover { border-color: #c9c2b5; }
+
+.form-control:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: #667b61;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(102, 123, 97, 0.13);
+}
+
+:is(.trabajadores-filtros, .feriados-filtros, .marcaciones-filtros, .horarios-filtros) :is(input, select):focus,
+.form-grid :is(input, select, textarea):focus,
+.dia-editor :is(input, select):focus {
+    border-color: #667b61;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(102, 123, 97, 0.13);
+}
+
+input[type="file"]::file-selector-button {
+    margin-right: 10px;
+    padding: 7px 11px;
+    border: 0;
+    border-radius: 8px;
+    background: #dfe7da;
+    color: #304236;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.badge {
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+}
+
+.badge--success { border-color: #ccddca; background: #eaf3e7; color: #456244; }
+.badge--danger { border-color: #ead0cd; background: #f8e9e7; color: #93473f; }
+.badge--warning { border-color: #ead8be; background: #f8efe2; color: #8a6230; }
+.badge--info,
+.badge--primary { border-color: #d1ddd0; background: #edf3eb; color: #4b654c; }
+.badge--secondary { border-color: #ded9ce; background: #f4f1ea; color: #666d66; }
+
+:is(.solicitud-tipo, .solicitud-estado, .vacacion-estado, .campo-estado, .feriado-tipo, .area-badge) {
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+:is(.solicitud-estado--aprobada, .vacacion-estado--aprobada, .vacacion-estado--en-curso,
+    .campo-estado--activa) {
+    border-color: #ccddca;
+    background: #eaf3e7;
+    color: #456244;
+}
+
+:is(.solicitud-estado--pendiente, .vacacion-estado--pendiente, .campo-estado--programada,
+    .solicitud-tipo--tardanza, .feriado-tipo--nacional) {
+    border-color: #ead8be;
+    background: #f8efe2;
+    color: #8a6230;
+}
+
+:is(.solicitud-estado--rechazada, .vacacion-estado--rechazada, .campo-estado--cancelada,
+    .solicitud-tipo--falta) {
+    border-color: #ead0cd;
+    background: #f8e9e7;
+    color: #93473f;
+}
+
+:is(.solicitud-estado--cancelada, .vacacion-estado--cancelada, .vacacion-estado--gozada,
+    .campo-estado--finalizada) {
+    border-color: #ded9ce;
+    background: #f4f1ea;
+    color: #666d66;
+}
+
+:is(.solicitud-tipo--permiso, .vacacion-estado--programada) {
+    border-color: #e6d3c7;
+    background: #f4e6dc;
+    color: #8f573b;
+}
+
+:is(.solicitud-tipo--omision-marcacion, .feriado-tipo--regional, .area-badge) {
+    border-color: #d1ddd0;
+    background: #edf3eb;
+    color: #4b654c;
+}
+
+.area-badge--general { border-color: #e4d2c5; background: #f6e9df; color: #8f573b; }
+
+.alert { border-radius: 14px; box-shadow: 0 4px 14px rgba(40, 51, 45, 0.045); }
+.alert--success { border-color: #cadbc7; background: #eaf3e7; color: #405d40; }
+.alert--danger { border-color: #e8cbc8; background: #f8e9e7; color: #8d433d; }
+.alert--warning { border-color: #e7d3b6; background: #fbf2e4; color: #7f5d2e; }
+.alert--info { border-color: #d2ded0; background: #edf3eb; color: #415b43; }
+
+/* ==========================================================
+   PANELES, FILTROS Y TABLAS
+========================================================== */
+
+.panel {
+    overflow: hidden;
+    border: 1px solid #ded9ce;
+    border-radius: 20px;
+    background: #fffefa;
+    box-shadow: 0 12px 32px rgba(40, 51, 45, 0.065);
+}
+
+.panel__header {
+    padding: 18px;
+    border-bottom: 1px solid #e6e1d7;
+    background: #faf8f2;
+}
+
+:is(.areas-filtros, .trabajadores-filtros, .feriados-filtros, .marcaciones-filtros,
+    .asistencias-filtros, .solicitudes-filtros, .vacaciones-filtros, .campo-filtros,
+    .horarios-filtros) {
+    gap: 10px;
+}
+
+.table-container {
+    border-color: #ded9ce;
+    border-radius: 18px;
+    background: #fffefa;
+    box-shadow: 0 10px 28px rgba(40, 51, 45, 0.055);
+}
+
+.table { background: #fffefa; color: #28332d; }
+.table th,
+.panel table th {
+    padding: 13px 14px;
+    border-bottom-color: #ded9ce;
+    background: #f3efe7;
+    color: #626a62;
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.table td,
+.panel table td { border-color: #e7e2d8; color: #354039; }
+.table tbody tr:hover,
+.panel table tbody tr:hover { background: #f1f4ed; }
+.table-actions { gap: 7px; }
+.table-empty { background: #faf8f2; color: #71786f; }
+
+.pagination__item {
+    border-color: #ded9ce;
+    border-radius: 9px;
+    background: #fffefa;
+    color: #687068;
+}
+
+a.pagination__item:hover { border-color: #667b61; background: #eff3ec; color: #3f5543; }
+.pagination__item.is-active { border-color: #3f5543; background: #3f5543; box-shadow: 0 6px 14px rgba(63, 85, 67, 0.18); }
+.pagination__item.is-disabled { background: #f3f0e9; }
+
+/* ==========================================================
+   TARJETAS DE MÓDULOS
+========================================================== */
+
+.dashboard-grid { gap: 16px; }
+.dashboard-card {
+    min-height: 142px;
+    padding: 21px;
+    border-color: #ded9ce;
+    border-radius: 19px;
+    background: #fffefa;
+    box-shadow: 0 10px 28px rgba(40, 51, 45, 0.06);
+}
+
+.dashboard-card::before { height: 4px; background: #667b61; }
+.dashboard-card:nth-child(2)::before { background: #a66848; }
+.dashboard-card:nth-child(3)::before { background: #9b743c; }
+.dashboard-card:hover { border-color: #c5d0c1; box-shadow: 0 18px 40px rgba(40, 51, 45, 0.1); }
+.dashboard-card__label { color: #71786f; font-size: 11px; font-weight: 850; letter-spacing: 0.075em; }
+.dashboard-card__value { color: #28332d; font-size: 28px; }
+
+:is(.solicitud-card, .vacacion-card, .campo-card, .horario-card) {
+    border-color: #ded9ce;
+    border-radius: 19px;
+    background: #fffefa;
+    box-shadow: 0 9px 26px rgba(40, 51, 45, 0.06);
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+:is(.solicitud-card, .vacacion-card, .campo-card, .horario-card):hover {
+    transform: translateY(-3px);
+    border-color: #c5d0c1;
+    box-shadow: 0 18px 42px rgba(40, 51, 45, 0.105);
+}
+
+:is(.solicitud-card__header, .vacacion-card__header, .campo-card__header, .horario-card__header) {
+    border-bottom-color: #e7e2d8;
+    background: #faf8f2;
+}
+
+:is(.solicitud-card__footer, .vacacion-card__footer, .campo-card__footer, .horario-card__footer) {
+    border-top-color: #e7e2d8;
+    background: #f7f4ed;
+}
+
+:is(.vacacion-card__avatar, .campo-card__avatar, .trabajador-info__avatar, .trabajador-masivo__avatar) {
+    border: 1px solid #ced9ca;
+    border-radius: 14px 14px 14px 5px;
+    background: #dfe7da;
+    color: #3f5543;
+}
+
+:is(.solicitud-info__label, .vacacion-info__label, .campo-info__label) {
+    color: #71786f;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+}
+
+:is(.manual-info, .procesar-info, .vacaciones-form-info, .vacaciones-revision-resumen,
+    .solicitud-revision-resumen, .form-help-box, .asignacion-masiva__nota, .tipo-control-preview) {
+    border-color: #d6dfd2;
+    border-radius: 13px;
+    background: #eff3ec;
+}
+
+.empty-state {
+    border-color: #c9c2b5;
+    border-radius: 18px;
+    background: #f7f3eb;
+    color: #71786f;
+}
+
+.horario-card::before { background: #667b61; }
+.horario-dia,
+.dia-editor,
+.trabajador-masivo { border-color: #e4dfd4; background: #faf9f5; }
+.horario-dia:hover,
+.dia-editor:hover,
+.trabajador-masivo:hover { border-color: #ccd6c8; background: #eff3ec; }
+
+.form-section__title::before { background: #a66848; }
+.form-help-box { border-left-color: #667b61; }
+.avance-item--pendiente { border-left-color: #a66848; }
+.tardanza-minutos { color: #9b743c; }
+.row-anulada { background: #f8e9e7; }
+
+/* ==========================================================
+   REPORTES DE AVANCE · ADMINISTRACIÓN
+========================================================== */
+
+.ra-admin {
+    --ra-primary: #3f5543;
+    --ra-primary-light: #e8eee5;
+    --ra-surface: #fffefa;
+    --ra-subtle: #f7f3eb;
+    --ra-text: #28332d;
+    --ra-muted: #71786f;
+    --ra-border: #ded9ce;
+    --ra-shadow: 0 10px 28px rgba(40, 51, 45, 0.06);
+}
+
+.ra-admin__header {
+    position: relative;
+    isolation: isolate;
+    min-height: 164px;
+    padding: clamp(25px, 3.2vw, 38px);
+    overflow: hidden;
+    border-radius: 26px;
+    background:
+        radial-gradient(circle at 88% 16%, rgba(223, 231, 218, 0.17), transparent 25%),
+        linear-gradient(135deg, #2f4136 0%, #405747 58%, #4d614e 100%);
+    color: #fffdf7;
+    box-shadow: 0 22px 52px rgba(40, 51, 45, 0.16);
+}
+
+.ra-admin__header::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -100px;
+    right: -45px;
+    width: 235px;
+    aspect-ratio: 1;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 50%;
+    box-shadow: 0 0 0 32px rgba(255, 255, 255, 0.03), 0 0 0 65px rgba(255, 255, 255, 0.02);
+}
+
+.ra-admin__header h2 { color: #fffdf7; font-size: clamp(25px, 2.6vw, 35px); }
+.ra-admin__header p { color: rgba(255, 253, 247, 0.76); line-height: 1.65; }
+.ra-admin__header .ra-btn--primary {
+    border-color: rgba(255, 255, 255, 0.65);
+    background: #fffdf7;
+    color: #304236;
+    box-shadow: 0 11px 25px rgba(20, 32, 25, 0.2);
+}
+
+.ra-admin__header .ra-btn--primary:hover { background: #fff; color: #223228; }
+.ra-nav { padding: 6px; border: 1px solid #ded9ce; border-radius: 15px; background: #ebe7de; }
+.ra-nav__item { border-radius: 10px; }
+.ra-nav__item.is-active { background: #fffefa; color: #3f5543; box-shadow: 0 4px 12px rgba(40, 51, 45, 0.08); }
+.ra-panel,
+.ra-report,
+.ra-pending { border-radius: 19px; box-shadow: 0 10px 28px rgba(40, 51, 45, 0.06); }
+.ra-report__head { background: #faf8f2; }
+.ra-person__avatar { border: 1px solid #ced9ca; border-radius: 14px 14px 14px 5px; background: #dfe7da; color: #3f5543; }
+.ra-activity { border: 1px solid #e5e1d7; background: #faf9f5; }
+.ra-pending { border-top: 3px solid rgba(166, 104, 72, 0.7); }
+.ra-area { background: #f4e6dc; color: #8f573b; }
+
+/* ==========================================================
+   MODALES
+========================================================== */
+
+.modal__overlay { background: rgba(24, 36, 29, 0.58); backdrop-filter: blur(5px); }
+.modal__content {
+    border-color: rgba(222, 217, 206, 0.9);
+    border-radius: 20px;
+    background: #fffefa;
+    box-shadow: 0 30px 80px rgba(31, 43, 35, 0.25);
+}
+
+.modal__header {
+    padding: 18px 20px;
+    border-bottom-color: #e4dfd4;
+    background: rgba(250, 248, 242, 0.95);
+}
+
+.modal__header h2 { color: #28332d; font-size: 18px; font-weight: 780; }
+.modal__body { background: #fffefa; }
+.modal__close { border-color: #ded9ce; border-radius: 10px; background: #f3f0e9; color: #687068; }
+.modal__close:hover { border-color: #e1c3bf; background: #f8e9e7; color: #a5524b; }
+
+/* ==========================================================
+   ACCESO
+========================================================== */
+
+.guest {
+    --login-primary: #3f5543;
+    --login-primary-dark: #304236;
+    --login-ink: #28332d;
+    --login-text: #465149;
+    --login-muted: #71786f;
+    --login-border: #ded9ce;
+    --login-surface: #fffefa;
+    background:
+        radial-gradient(circle at 8% 10%, rgba(102, 123, 97, 0.14), transparent 28%),
+        radial-gradient(circle at 92% 88%, rgba(166, 104, 72, 0.1), transparent 30%),
+        #f0ede6;
+}
+
+.login-shell {
+    border-color: rgba(255, 255, 255, 0.72);
+    border-radius: 28px;
+    background: #fffefa;
+    box-shadow: 0 30px 78px rgba(40, 51, 45, 0.2);
+}
+
+.login-hero {
+    background-image:
+        linear-gradient(180deg, rgba(31, 51, 38, 0.48) 0%, rgba(41, 61, 46, 0.14) 38%, rgba(27, 46, 34, 0.88) 100%),
+        linear-gradient(90deg, rgba(34, 54, 40, 0.42), rgba(34, 54, 40, 0.03)),
+        url('../images/auth/login-office.png');
+}
+
+.login-hero::after { background: linear-gradient(145deg, rgba(68, 89, 67, 0.24), transparent 52%); }
+.login-hero__brand { border-radius: 15px 15px 15px 6px; background: rgba(255, 254, 250, 0.92); }
+.login-hero__eyebrow,
+.login-card__eyebrow { color: #d7a88e; }
+.login-feature__icon { border-color: rgba(223, 231, 218, 0.38); background: rgba(223, 231, 218, 0.14); color: #e7eee4; }
+.login-panel { background: #fffefa; }
+.login-card__logo { border-color: #ded9ce; border-radius: 16px 16px 16px 6px; background: #f7f3eb; }
+.login-field__control input { border-color: #ded9ce; border-radius: 12px; background: #fbfaf6; color: #28332d; }
+.login-field__control input:focus { border-color: #667b61; background: #fff; box-shadow: 0 0 0 4px rgba(102, 123, 97, 0.13); }
+.login-field__icon,
+.password-toggle { color: #788077; }
+.remember-option input { accent-color: #3f5543; }
+.login-submit {
+    border-radius: 12px;
+    background: linear-gradient(135deg, #3f5543, #304236);
+    box-shadow: 0 12px 24px rgba(63, 85, 67, 0.22);
+}
+
+.login-submit:hover { box-shadow: 0 16px 30px rgba(63, 85, 67, 0.28); }
+.login-security__icon { background: #e8eee5; color: #3f5543; }
+
+/* ==========================================================
+   ACCESIBILIDAD Y RESPONSIVE
+========================================================== */
+
+:is(a, button, input, select, textarea, summary):focus-visible {
+    outline: 2px solid #667b61;
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .main-content { padding: 20px; }
+    .sidebar.open,
+    .sidebar.is-open { box-shadow: 16px 0 44px rgba(31, 43, 35, 0.28); }
+    .sidebar-overlay.active,
+    .sidebar-overlay.is-visible { background: rgba(24, 36, 29, 0.58); backdrop-filter: blur(4px); }
+}
+
+@media (max-width: 700px) {
+    .main-content { padding: 17px 15px; }
+    .main-content > .page-header { min-height: 0; padding: 24px 21px; border-radius: 21px; }
+    .main-content > .page-header .page-header__title { font-size: 25px; }
+    .main-content > .page-header .page-header__actions { width: 100%; }
+    .main-content > .page-header .page-header__actions .button { width: 100%; }
+    .ra-admin__header { min-height: 0; padding: 24px 21px; border-radius: 21px; }
+    .panel { border-radius: 17px; }
+    .panel__header { padding: 14px; }
+    .navbar { padding: 9px 14px; }
+}
+
+@media (max-width: 480px) {
+    .main-content { padding: 14px 12px; }
+    .main-content > .page-header { padding: 22px 18px; }
+    .main-content > .page-header .page-header__title { font-size: 23px; }
+    .dashboard-card { min-height: auto; border-radius: 16px; }
+    :is(.solicitud-card, .vacacion-card, .campo-card, .horario-card) { border-radius: 16px; }
+    .modal { padding: 12px; }
+    .modal__content { max-height: calc(100vh - 24px); border-radius: 17px; }
+    .login-shell { border-radius: 21px; }
+}
