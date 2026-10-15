@@ -442,6 +442,25 @@ input[type="file"]::file-selector-button {
     gap: 10px;
 }
 
+/* Estos formularios se renderizan directamente dentro del panel y no reciben
+   el espacio interior que normalmente aporta .panel__header. */
+.panel > :is(.solicitudes-filtros, .vacaciones-filtros) {
+    width: 100%;
+    min-width: 0;
+    padding: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+}
+
+.panel > :is(.solicitudes-filtros, .vacaciones-filtros) > * {
+    min-width: 0;
+}
+
+.panel > :is(.solicitudes-filtros, .vacaciones-filtros)
+    > :is(.solicitudes-filtros__actions, .vacaciones-filtros__actions) {
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+}
+
 .table-container {
     border-color: #ded9ce;
     border-radius: 18px;
@@ -742,6 +761,7 @@ a.pagination__item:hover { border-color: #667b61; background: #eff3ec; color: #3
     .ra-admin__header { min-height: 0; padding: 24px 21px; border-radius: 21px; }
     .panel { border-radius: 17px; }
     .panel__header { padding: 14px; }
+    .panel > :is(.solicitudes-filtros, .vacaciones-filtros) { padding: 14px; }
     .navbar { padding: 9px 14px; }
 }
 
@@ -754,4 +774,7 @@ a.pagination__item:hover { border-color: #667b61; background: #eff3ec; color: #3
     .modal { padding: 12px; }
     .modal__content { max-height: calc(100vh - 24px); border-radius: 17px; }
     .login-shell { border-radius: 21px; }
+    .panel > :is(.solicitudes-filtros, .vacaciones-filtros)
+        > :is(.solicitudes-filtros__actions, .vacaciones-filtros__actions)
+        > * { width: 100%; }
 }
