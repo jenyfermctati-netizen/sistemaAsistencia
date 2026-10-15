@@ -1,567 +1,926 @@
-/* ==========================================================
-   FILTROS
-========================================================== */
+.solicitudes-page {
+    --sol-primary: var(--primary, #0f766e);
+    --sol-primary-hover: var(--primary-hover, #0d665f);
+    --sol-primary-light: var(--primary-light, #e7f6f3);
+    --sol-surface: var(--surface, #fff);
+    --sol-subtle: var(--surface-secondary, #f4f6f5);
+    --sol-text: var(--text, #17211f);
+    --sol-muted: var(--text-muted, #66736f);
+    --sol-border: var(--border, #dde4e1);
+    --sol-shadow: 0 6px 20px rgba(20, 45, 38, 0.05);
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    display: grid;
+    gap: 22px;
+    color: var(--sol-text);
+    font-size: 14px;
+}
+
+.solicitudes-page,
+.solicitudes-page *,
+.solicitudes-page *::before,
+.solicitudes-page *::after {
+    box-sizing: border-box;
+}
+
+.solicitudes-page h2,
+.solicitudes-page h3,
+.solicitudes-page h4,
+.solicitudes-page p {
+    margin: 0;
+}
+
+.solicitudes-page a {
+    text-decoration: none;
+}
+
+/* CABECERA */
+
+.solicitudes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.solicitudes-header > div {
+    min-width: 0;
+}
+
+.solicitudes-header > .button {
+    max-width: 100%;
+}
+
+.solicitudes-header h2 {
+    color: var(--sol-text);
+    font-size: clamp(22px, 2vw, 27px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+}
+
+.solicitudes-header p {
+    margin-top: 5px;
+    color: var(--sol-muted);
+    font-size: 12px;
+}
+
+/* ALERTAS */
+
+.solicitudes-alert {
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.solicitudes-alert--success {
+    background: #e8f6ec;
+    color: #166534;
+}
+
+.solicitudes-alert--error {
+    background: #feeaea;
+    color: #991b1b;
+}
+
+/* FILTROS */
+
+.solicitudes-filter-panel {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 19px;
+    border: 1px solid var(--sol-border);
+    border-radius: 16px;
+    background: var(--sol-surface);
+    box-shadow: var(--sol-shadow);
+}
+
+.solicitudes-filter-panel__heading {
+    margin-bottom: 15px;
+}
+
+.solicitudes-filter-panel__heading h3,
+.solicitudes-table-heading h3 {
+    color: var(--sol-text);
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.solicitudes-filter-panel__heading p,
+.solicitudes-table-heading p {
+    margin-top: 3px;
+    color: var(--sol-muted);
+    font-size: 11px;
+}
 
 .solicitudes-filtros {
     display: grid;
-
     grid-template-columns:
-        minmax(240px, 1.4fr)
-        190px
-        170px
-        180px;
-
-    gap: 12px;
-
+        minmax(230px, 1.5fr)
+        minmax(155px, 0.8fr)
+        minmax(155px, 0.8fr)
+        minmax(160px, 0.8fr);
+    gap: 11px;
     align-items: end;
 }
 
+.solicitudes-field {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.solicitudes-field span {
+    color: var(--sol-muted);
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.solicitudes-page .form-control,
+.solicitudes-page .form-select,
+.solicitudes-page .form-textarea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 41px;
+    padding: 9px 11px;
+    border: 1px solid var(--sol-border);
+    border-radius: 9px;
+    background: #fbfcfb;
+    color: var(--sol-text);
+    outline: none;
+}
+
+.solicitudes-page .form-textarea {
+    min-height: 105px;
+    resize: vertical;
+}
+
+.solicitudes-page .form-control:focus,
+.solicitudes-page .form-select:focus,
+.solicitudes-page .form-textarea:focus {
+    border-color: var(--sol-primary);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+}
 
 .solicitudes-filtros__actions {
     grid-column: 1 / -1;
-
     display: flex;
-
     justify-content: flex-end;
-
     gap: 8px;
 }
 
+/* TABLA */
 
-/* ==========================================================
-   LISTADO
-========================================================== */
-
-.solicitudes-list {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 16px;
-
-    margin-top: 20px;
+.solicitudes-table-section {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
 }
 
-
-.solicitud-card {
-    background: var(--surface);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 16px;
-
-    overflow: hidden;
-
-    box-shadow:
-        0 6px 18px
-        rgba(15, 23, 42, .05);
-}
-
-
-/* ==========================================================
-   HEADER
-========================================================== */
-
-.solicitud-card__header {
+.solicitudes-table-heading {
     display: flex;
-
-    align-items: flex-start;
-    justify-content: space-between;
-
-    gap: 20px;
-
-    padding: 18px 20px;
-
-    border-bottom:
-        1px solid
-        var(--border);
-}
-
-
-.solicitud-card__tipo {
-    display: flex;
-
     align-items: center;
-
-    flex-wrap: wrap;
-
-    gap: 7px;
-
-    margin-bottom: 8px;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 13px;
 }
 
-
-.solicitud-card__trabajador {
-    margin: 0;
-
-    color: var(--text);
-
-    font-size: 15px;
-}
-
-
-.solicitud-card__dni {
-    display: block;
-
-    margin-top: 4px;
-
-    color: var(--text-muted);
-
+.solicitudes-count {
+    display: grid;
+    place-items: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 9px;
+    border-radius: 999px;
+    background: var(--sol-primary-light);
+    color: var(--sol-primary);
     font-size: 11px;
+    font-weight: 850;
 }
 
-
-.solicitud-card__fecha-registro {
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: flex-end;
-
-    gap: 3px;
-
-    flex-shrink: 0;
+.solicitudes-table-wrap {
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    border: 1px solid var(--sol-border);
+    border-radius: 15px;
+    background: var(--sol-surface);
+    box-shadow: var(--sol-shadow);
 }
 
+.solicitudes-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+}
 
-.solicitud-card__fecha-registro span {
-    color: var(--text-muted);
+.solicitudes-table th,
+.solicitudes-table td {
+    padding: 13px 15px;
+    border-bottom: 1px solid var(--sol-border);
+    text-align: left;
+    vertical-align: middle;
+}
 
-    font-size: 10px;
-
+.solicitudes-table thead th {
+    background: #fafcfb;
+    color: var(--sol-muted);
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
 }
 
+.solicitudes-table tbody tr:last-child td {
+    border-bottom: 0;
+}
 
-.solicitud-card__fecha-registro strong {
-    color: var(--text);
+.solicitud-table-row {
+    cursor: pointer;
+    transition: 0.15s ease;
+}
 
+.solicitud-table-row:hover {
+    background: #fafcfb;
+}
+
+.solicitud-table-row:focus-visible {
+    outline: 2px solid var(--sol-primary);
+    outline-offset: -2px;
+}
+
+/* PERSONA */
+
+.solicitud-persona {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.solicitud-persona__avatar {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: var(--sol-primary-light);
+    color: var(--sol-primary);
+    font-size: 14px;
+    font-weight: 850;
+}
+
+.solicitud-persona > div:last-child {
+    min-width: 0;
+}
+
+.solicitud-persona strong {
+    display: block;
+    color: var(--sol-text);
+    font-size: 12px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.solicitud-persona span {
+    display: block;
+    margin-top: 2px;
+    color: var(--sol-muted);
+    font-size: 9px;
+}
+
+/* FECHA */
+
+.solicitud-table-date {
+    display: grid;
+    gap: 2px;
+}
+
+.solicitud-table-date strong {
+    color: var(--sol-text);
     font-size: 11px;
 }
 
+.solicitud-table-date span {
+    color: var(--sol-muted);
+    font-size: 9px;
+}
 
-/* ==========================================================
-   TIPOS
-========================================================== */
+/* TIPO */
 
 .solicitud-tipo,
 .solicitud-estado {
     display: inline-flex;
-
     align-items: center;
-
+    justify-content: center;
     min-height: 27px;
-
     padding: 5px 9px;
-
     border-radius: 999px;
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-    text-transform: uppercase;
+    font-size: 9px;
+    font-weight: 850;
+    white-space: nowrap;
 }
-
 
 .solicitud-tipo {
-    background:
-        var(--surface-secondary);
-
-    color:
-        var(--text);
+    background: var(--sol-subtle);
+    color: var(--sol-text);
 }
-
 
 .solicitud-tipo--permiso {
     background: #eef2ff;
     color: #4338ca;
 }
 
-
 .solicitud-tipo--tardanza {
     background: #fff7ed;
     color: #c2410c;
 }
-
 
 .solicitud-tipo--falta {
     background: #fef2f2;
     color: #b91c1c;
 }
 
-
 .solicitud-tipo--omision-marcacion {
     background: #f0fdfa;
     color: #0f766e;
 }
 
-
-/* ==========================================================
-   ESTADOS
-========================================================== */
+/* ESTADOS */
 
 .solicitud-estado--pendiente {
     background: #fff7ed;
     color: #b45309;
 }
 
-
 .solicitud-estado--aprobada {
     background: #ecfdf5;
     color: #15803d;
 }
-
 
 .solicitud-estado--rechazada {
     background: #fef2f2;
     color: #b91c1c;
 }
 
-
 .solicitud-estado--cancelada {
     background: #f1f5f4;
-    color: var(--text-muted);
+    color: var(--sol-muted);
 }
 
+/* FLECHA */
 
-/* ==========================================================
-   BODY
-========================================================== */
+.solicitud-table-action {
+    width: 55px;
+    text-align: right !important;
+}
 
-.solicitud-card__body {
+.solicitud-open {
+    width: 32px;
+    height: 32px;
     display: grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
-
-    gap: 16px;
-
-    padding: 18px 20px;
+    place-items: center;
+    margin-left: auto;
+    padding: 0;
+    border: 1px solid var(--sol-border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--sol-primary);
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    transition: 0.15s ease;
 }
 
+.solicitud-open:hover {
+    border-color: var(--sol-primary);
+    background: var(--sol-primary-light);
+}
 
-.solicitud-info {
+/* VACÍO */
+
+.solicitudes-empty {
+    min-height: 180px;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 4px;
+    color: var(--sol-muted);
+    font-size: 11px;
+    text-align: center;
+}
+
+.solicitudes-empty strong {
+    color: var(--sol-text);
+    font-size: 13px;
+}
+
+/* DETALLE */
+
+.solicitud-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(330px, 0.9fr);
+    gap: 20px;
+    min-width: 0;
+}
+
+.solicitud-detail-info {
+    min-width: 0;
+    display: grid;
+    align-content: start;
+    gap: 15px;
+}
+
+.solicitud-detail-person {
     display: flex;
-
-    flex-direction: column;
-
-    gap: 5px;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--sol-border);
 }
 
-
-.solicitud-info--full {
-    grid-column: 1 / -1;
+.solicitud-detail-avatar {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    background: var(--sol-primary-light);
+    color: var(--sol-primary);
+    font-size: 17px;
+    font-weight: 850;
 }
 
+.solicitud-detail-person h3 {
+    color: var(--sol-text);
+    font-size: 15px;
+    font-weight: 800;
+}
 
-.solicitud-info__label {
-    color:
-        var(--text-muted);
-
+.solicitud-detail-person span,
+.solicitud-detail-person small {
+    display: block;
+    margin-top: 2px;
+    color: var(--sol-muted);
     font-size: 10px;
-
-    font-weight: 700;
-
-    text-transform: uppercase;
-
-    letter-spacing: .04em;
 }
 
-
-.solicitud-info strong {
-    color: var(--text);
-
-    font-size: 12px;
-}
-
-
-.solicitud-info p {
-    margin: 0;
-
-    color: var(--text);
-
-    font-size: 12px;
-
-    line-height: 1.55;
-}
-
-
-.solicitud-archivo {
-    width: fit-content;
-
-    color: var(--primary);
-
-    font-size: 12px;
-
-    font-weight: 700;
-
-    text-decoration: none;
-}
-
-
-.solicitud-archivo:hover {
-    text-decoration: underline;
-}
-
-
-/* ==========================================================
-   REVISIÓN
-========================================================== */
-
-.solicitud-card__revision {
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
-
-    gap: 14px;
-
-    margin:
-        0 20px 18px;
-
-    padding: 14px;
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 12px;
-
-    background:
-        var(--surface-secondary);
-}
-
-
-.solicitud-card__revision > div {
+.solicitud-detail-badges {
     display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
 
-    flex-direction: column;
+.solicitud-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
 
+.solicitud-detail-field {
+    display: grid;
+    gap: 4px;
+    padding: 11px 12px;
+    border: 1px solid var(--sol-border);
+    border-radius: 9px;
+    background: var(--sol-subtle);
+}
+
+.solicitud-detail-field span,
+.solicitud-detail-motivo > span,
+.solicitud-detail-review span {
+    color: var(--sol-muted);
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.solicitud-detail-field strong {
+    color: var(--sol-text);
+    font-size: 11px;
+}
+
+.solicitud-detail-motivo {
+    display: grid;
+    gap: 6px;
+}
+
+.solicitud-detail-motivo p {
+    min-height: 85px;
+    padding: 12px 13px;
+    border: 1px solid var(--sol-border);
+    border-radius: 9px;
+    background: #fafcfb;
+    color: var(--sol-text);
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* REVISIÓN */
+
+.solicitud-detail-review {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 13px;
+    border: 1px solid var(--sol-border);
+    border-radius: 10px;
+    background: var(--sol-subtle);
+}
+
+.solicitud-detail-review > div {
+    display: grid;
     gap: 3px;
 }
 
-
-.solicitud-card__revision span {
-    color:
-        var(--text-muted);
-
-    font-size: 10px;
-
-    text-transform: uppercase;
+.solicitud-detail-review strong {
+    color: var(--sol-text);
+    font-size: 11px;
 }
 
-
-.solicitud-card__revision strong {
-    color: var(--text);
-
-    font-size: 12px;
-}
-
-
-.solicitud-card__comentario {
+.solicitud-detail-review__comment {
     grid-column: 1 / -1;
 }
 
-
-.solicitud-card__comentario p {
-    margin: 3px 0 0;
-
-    font-size: 12px;
-
+.solicitud-detail-review__comment p {
+    margin-top: 2px;
+    color: var(--sol-text);
+    font-size: 11px;
     line-height: 1.5;
 }
 
-
-/* ==========================================================
-   FOOTER
-========================================================== */
-
-.solicitud-card__footer {
-    min-height: 55px;
-
+.solicitud-detail-actions {
     display: flex;
-
-    align-items: center;
     justify-content: flex-end;
-
     gap: 8px;
-
-    padding: 11px 20px;
-
-    border-top:
-        1px solid
-        var(--border);
-
-    background:
-        var(--surface-secondary);
+    padding-top: 3px;
 }
 
+/* DOCUMENTO */
 
-.button--small {
-    min-height: 32px;
-
-    padding: 6px 11px;
-
-    font-size: 11px;
+.solicitud-document {
+    min-width: 0;
+    min-height: 460px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--sol-border);
+    border-radius: 13px;
+    background: #f8faf9;
 }
 
+.solicitud-document__header {
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--sol-border);
+    background: var(--sol-subtle);
+}
 
-/* ==========================================================
-   FORMULARIOS
-========================================================== */
+.solicitud-document__header strong {
+    display: block;
+    color: var(--sol-text);
+    font-size: 12px;
+}
+
+.solicitud-document__header span {
+    display: block;
+    margin-top: 2px;
+    color: var(--sol-muted);
+    font-size: 9px;
+}
+
+.solicitud-document__empty {
+    flex: 1;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 6px;
+    padding: 25px;
+    color: var(--sol-muted);
+    text-align: center;
+}
+
+.solicitud-document__empty-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 4px;
+    border-radius: 14px;
+    background: var(--sol-subtle);
+    color: var(--sol-primary);
+    font-size: 22px;
+}
+
+.solicitud-document__empty strong {
+    color: var(--sol-text);
+    font-size: 12px;
+}
+
+.solicitud-document__empty span {
+    max-width: 220px;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.solicitud-document__viewer {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.solicitud-document__preview {
+    flex: 1;
+    min-height: 390px;
+    display: grid;
+    place-items: center;
+    overflow: auto;
+    background: #e9eeeb;
+}
+
+.solicitud-document__preview iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 390px;
+    border: 0;
+    background: #fff;
+}
+
+.solicitud-document__preview img {
+    display: block;
+    max-width: 100%;
+    max-height: 520px;
+    object-fit: contain;
+}
+
+.solicitud-document__actions {
+    display: flex;
+    gap: 8px;
+    padding: 11px;
+    border-top: 1px solid var(--sol-border);
+    background: #fff;
+}
+
+.solicitud-document__actions .button {
+    flex: 1;
+}
+
+/* FORMULARIOS */
 
 .form-grid {
     display: grid;
-
-    gap: 14px;
+    gap: 13px;
 }
-
 
 .form-grid--2 {
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-
 
 .form-help {
     display: block;
-
     margin-top: 5px;
-
-    color:
-        var(--text-muted);
-
-    font-size: 11px;
+    color: var(--sol-muted);
+    font-size: 10px;
 }
-
-
-/* ==========================================================
-   REVISIÓN ADMIN
-========================================================== */
 
 .solicitud-revision-resumen {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 4px;
-
+    display: grid;
+    gap: 3px;
     margin-bottom: 16px;
-
-    padding: 14px;
-
-    border-radius: 12px;
-
-    background:
-        var(--surface-secondary);
-
-    border:
-        1px solid
-        var(--border);
+    padding: 13px;
+    border: 1px solid var(--sol-border);
+    border-radius: 10px;
+    background: var(--sol-subtle);
 }
-
 
 .solicitud-revision-resumen span,
 .solicitud-revision-resumen small {
-    color:
-        var(--text-muted);
-
-    font-size: 11px;
+    color: var(--sol-muted);
+    font-size: 10px;
 }
-
 
 .solicitud-revision-resumen strong {
-    color: var(--text);
-
-    font-size: 14px;
+    color: var(--sol-text);
+    font-size: 13px;
 }
 
+/* PAGINACIÓN */
 
-/* ==========================================================
-   VACÍO
-========================================================== */
-
-.empty-state {
-    min-height: 180px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 6px;
-
-    border:
-        1px dashed
-        var(--border);
-
-    border-radius: 16px;
-
-    color:
-        var(--text-muted);
+.pagination-container {
+    margin-top: 16px;
+    min-width: 0;
+    overflow-x: auto;
 }
 
+/* RESPONSIVE */
 
-.empty-state strong {
-    color: var(--text);
-}
-
-
-/* ==========================================================
-   RESPONSIVE
-========================================================== */
-
-@media (max-width: 950px) {
-
-    .solicitudes-filtros {
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0, 1fr)
-            );
+@media (max-width: 1050px) {
+    .solicitudes-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
     }
 
-}
+    .solicitudes-header > .button {
+        justify-self: start;
+    }
 
+    .solicitudes-filtros {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 
-@media (max-width: 700px) {
-
-    .solicitudes-filtros,
-    .form-grid--2,
-    .solicitud-card__body,
-    .solicitud-card__revision {
+    .solicitudes-detail-layout {
         grid-template-columns: 1fr;
     }
 
+    .solicitud-document {
+        min-height: 390px;
+    }
 
-    .solicitudes-filtros__actions,
-    .solicitud-info--full,
-    .solicitud-card__comentario {
+    .solicitudes-table-wrap {
+        overflow: visible;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .solicitudes-table,
+    .solicitudes-table tbody {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .solicitudes-table thead {
+        display: none;
+    }
+
+    .solicitudes-table tbody {
+        display: grid;
+        gap: 12px;
+    }
+
+    .solicitud-table-row {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+        overflow: hidden;
+        border: 1px solid var(--sol-border);
+        border-radius: 16px;
+        background: var(--sol-surface);
+        box-shadow: var(--sol-shadow);
+    }
+
+    .solicitudes-table .solicitud-table-row > td {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 6px;
+        padding: 13px 15px;
+        border: 0;
+        border-right: 1px solid var(--sol-border);
+        overflow-wrap: anywhere;
+    }
+
+    .solicitudes-table .solicitud-table-row > td::before {
+        content: attr(data-label);
+        color: var(--sol-muted);
+        font-size: 8px;
+        font-weight: 850;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .solicitudes-table .solicitud-table-row > td:first-child {
+        grid-column: 1 / -1;
+        padding-right: 60px;
+        border-right: 0;
+        border-bottom: 1px solid var(--sol-border);
+        background: linear-gradient(90deg, #f4f8f9, var(--sol-surface));
+    }
+
+    .solicitudes-table .solicitud-table-row > td:first-child::before,
+    .solicitudes-table .solicitud-table-action::before {
+        display: none;
+    }
+
+    .solicitudes-table .solicitud-table-row > td:nth-child(4) {
+        border-right: 0;
+    }
+
+    .solicitud-table-action {
+        position: absolute;
+        top: 16px;
+        right: 15px;
+        width: auto;
+        padding: 0 !important;
+        border: 0 !important;
+    }
+
+    .solicitud-open {
+        margin: 0;
+    }
+
+    .solicitudes-empty-row,
+    .solicitudes-empty-row td {
+        display: block;
+        width: 100%;
+    }
+}
+
+@media (max-width: 700px) {
+    .solicitudes-header {
+        align-items: stretch;
+    }
+
+    .solicitudes-header > .button {
+        width: 100%;
+    }
+
+    .solicitudes-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .solicitudes-filtros__actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .form-grid--2,
+    .solicitud-detail-grid,
+    .solicitud-detail-review {
+        grid-template-columns: 1fr;
+    }
+
+    .solicitud-detail-review__comment {
         grid-column: auto;
     }
 
-
-    .solicitud-card__header {
+    .solicitud-detail-actions {
         flex-direction: column;
     }
 
-
-    .solicitud-card__fecha-registro {
-        align-items: flex-start;
+    .solicitud-detail-actions .button {
+        width: 100%;
     }
 
+    .solicitud-document__actions {
+        flex-direction: column;
+    }
+
+    .solicitud-table-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .solicitudes-table .solicitud-table-row > td:nth-child(4) {
+        border-top: 1px solid var(--sol-border);
+    }
+
+    .solicitudes-table .solicitud-table-row > td:nth-child(3),
+    .solicitudes-table .solicitud-table-row > td:nth-child(4) {
+        border-right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .solicitudes-page { gap: 17px; }
+
+    .solicitudes-filter-panel { padding: 16px; border-radius: 15px; }
+
+    .solicitudes-filtros__actions {
+        grid-template-columns: 1fr;
+    }
+
+    .solicitud-table-row {
+        grid-template-columns: 1fr;
+    }
+
+    .solicitudes-table .solicitud-table-row > td,
+    .solicitudes-table .solicitud-table-row > td:nth-child(3),
+    .solicitudes-table .solicitud-table-row > td:nth-child(4) {
+        border: 0;
+        border-bottom: 1px solid var(--sol-border);
+    }
+
+    .solicitudes-table .solicitud-table-row > td:nth-child(4) {
+        border-bottom: 0;
+    }
+
+    .solicitudes-table-heading {
+        align-items: flex-start;
+    }
 }

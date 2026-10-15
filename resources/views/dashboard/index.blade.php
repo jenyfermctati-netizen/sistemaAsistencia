@@ -1,81 +1,31 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', $pageTitle.' | Control de Asistencia')
+@section('page-title', 'Inicio')
+@section('page-subtitle', $pageSubtitle)
 
-@section('page-title', 'Dashboard')
-
-@section('page-subtitle', 'Resumen general del sistema')
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/pages/dashboard.css') }}">
+@endpush
 
 @section('content')
+    <div class="page-header dashboard-hero">
+        <div class="dashboard-hero__content">
+            <span class="dashboard-hero__eyebrow">{{ $heroEyebrow }}</span>
+            <h2 class="page-header__title">{{ $heroTitle }}</h2>
+            <p class="page-header__description">{{ $heroDescription }}</p>
+        </div>
 
-<div class="page-header">
-
-    <div>
-
-        <h2 class="page-header__title">
-            Bienvenido,
-            {{ auth()->user()->name }}
-        </h2>
-
-        <p class="page-header__description">
-            Panel principal del sistema de control de asistencia.
-        </p>
-
+        <div class="page-header__actions dashboard-hero__meta">
+            <span class="dashboard-scope">
+                <span class="dashboard-scope__dot" aria-hidden="true"></span>
+                {{ $scopeLabel }}
+            </span>
+            <span class="dashboard-date">{{ now()->translatedFormat('d M Y') }}</span>
+        </div>
     </div>
 
-</div>
-
-
-<div class="dashboard-grid">
-
-    <div class="dashboard-card">
-
-        <span class="dashboard-card__label">
-            Rol
-        </span>
-
-        <strong class="dashboard-card__value">
-            {{ auth()->user()->rol?->nombre ?? 'Sin rol' }}
-        </strong>
-
+    <div class="dashboard-page">
+        @include($dashboardView)
     </div>
-
-
-    <div class="dashboard-card">
-
-        <span class="dashboard-card__label">
-            Estado
-        </span>
-
-        <strong class="dashboard-card__value">
-
-            {{ auth()->user()->estado
-                ? 'Activo'
-                : 'Inactivo'
-            }}
-
-        </strong>
-
-    </div>
-
-
-    <div class="dashboard-card">
-
-        <span class="dashboard-card__label">
-            Último acceso
-        </span>
-
-        <strong class="dashboard-card__value dashboard-card__value--small">
-
-            {{ auth()->user()->ultimo_acceso
-                ? auth()->user()->ultimo_acceso->format('d/m/Y H:i')
-                : 'Primer acceso'
-            }}
-
-        </strong>
-
-    </div>
-
-</div>
-
 @endsection

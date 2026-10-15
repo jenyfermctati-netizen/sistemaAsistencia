@@ -751,7 +751,7 @@ a.pagination__item:hover { border-color: var(--palette-smoke-blue); background: 
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
     .main-content { padding: 20px; }
     .sidebar.open,
     .sidebar.is-open { box-shadow: 16px 0 44px rgba(26, 47, 56, 0.28); }

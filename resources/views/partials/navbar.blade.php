@@ -30,8 +30,9 @@
 
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="button button--secondary">
-                    Cerrar sesión
+                <button type="submit" class="button button--secondary navbar__logout-button" aria-label="Cerrar sesión">
+                    <span class="navbar__logout-label">Cerrar sesión</span>
+                    <span class="navbar__logout-icon" aria-hidden="true">↪</span>
                 </button>
             </form>
         @endauth

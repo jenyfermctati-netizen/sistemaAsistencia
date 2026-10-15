@@ -96,6 +96,16 @@ class Trabajador extends Model
         return $this->hasMany(Solicitud::class, 'trabajador_id');
     }
 
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class, 'trabajador_id');
+    }
+
+    public function marcaciones()
+    {
+        return $this->hasMany(Marcacion::class, 'trabajador_id');
+    }
+
     public function vacaciones()
     {
         return $this->hasMany(Vacaciones::class, 'trabajador_id');

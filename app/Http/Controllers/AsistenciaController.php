@@ -20,7 +20,9 @@ class AsistenciaController extends Controller
 {
     public function index(Request $request)
     {
-        $this->verificarAdministrador();
+        $this->verificarConsulta();
+
+        $puedeProcesar = $this->rolActual() === 'ADMINISTRADOR';
 
         $query = Asistencia::with([
             'trabajador.area',
@@ -61,7 +63,7 @@ class AsistenciaController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('asistencias.index', compact('asistencias'));
+        return view('asistencias.index', compact('asistencias', 'puedeProcesar'));
     }
 
     public function procesar(Request $request)
@@ -461,8 +463,21 @@ class AsistenciaController extends Controller
     private function verificarAdministrador(): void
     {
         abort_unless(
-            Auth::check() && Auth::user()->rol?->nombre === 'ADMINISTRADOR',
+            Auth::check() && $this->rolActual() === 'ADMINISTRADOR',
             403
         );
+    }
+
+    private function verificarConsulta(): void
+    {
+        abort_unless(
+            Auth::check() && in_array($this->rolActual(), ['ADMINISTRADOR', 'GERENTE'], true),
+            403
+        );
+    }
+
+    private function rolActual(): string
+    {
+        return strtoupper(trim((string) Auth::user()?->rol?->nombre));
     }
 }
