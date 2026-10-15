@@ -1,51 +1,22 @@
-<x-modal id="modalDetalleSolicitud"
-    title="Detalle de solicitud"
-    size="large">
-
+<x-modal id="modalDetalleSolicitud" title="Detalle de solicitud" size="large">
     <div class="solicitud-detail-layout">
 
-        {{-- INFORMACIÓN --}}
         <section class="solicitud-detail-info">
-
             <div class="solicitud-detail-person">
-
-                <div class="solicitud-detail-avatar"
-                    id="detalleSolicitudAvatar">
-                    ?
-                </div>
-
+                <div class="solicitud-detail-avatar" id="detalleSolicitudAvatar">?</div>
                 <div>
-                    <h3 id="detalleSolicitudTrabajador">
-                        -
-                    </h3>
-
-                    <span id="detalleSolicitudDni">
-                        -
-                    </span>
-
-                    <small id="detalleSolicitudArea">
-                        -
-                    </small>
+                    <h3 id="detalleSolicitudTrabajador">-</h3>
+                    <span id="detalleSolicitudDni">-</span>
+                    <small id="detalleSolicitudArea">-</small>
                 </div>
-
             </div>
 
             <div class="solicitud-detail-badges">
-
-                <span id="detalleSolicitudTipo"
-                    class="solicitud-tipo">
-                    -
-                </span>
-
-                <span id="detalleSolicitudEstado"
-                    class="solicitud-estado">
-                    -
-                </span>
-
+                <span id="detalleSolicitudTipo" class="solicitud-tipo">-</span>
+                <span id="detalleSolicitudEstado" class="solicitud-estado">-</span>
             </div>
 
             <div class="solicitud-detail-grid">
-
                 <div class="solicitud-detail-field">
                     <span>Fecha de inicio</span>
                     <strong id="detalleSolicitudInicio">-</strong>
@@ -65,176 +36,121 @@
                     <span>Hora de fin</span>
                     <strong id="detalleSolicitudHoraFin">-</strong>
                 </div>
-
             </div>
 
             <div class="solicitud-detail-motivo">
-
-                <span>
-                    Motivo de la solicitud
-                </span>
-
-                <p id="detalleSolicitudMotivo">
-                    -
-                </p>
-
+                <span>Motivo de la solicitud</span>
+                <p id="detalleSolicitudMotivo">-</p>
             </div>
 
-            {{-- REVISIÓN --}}
-            <div class="solicitud-detail-review"
-                id="detalleSolicitudRevision"
-                hidden>
-
+            <div class="solicitud-detail-review" id="detalleSolicitudRevision" hidden>
                 <div>
-
-                    <span>
-                        Revisada por
-                    </span>
-
-                    <strong id="detalleSolicitudRevisadoPor">
-                        -
-                    </strong>
-
+                    <span>Revisada por</span>
+                    <strong id="detalleSolicitudRevisadoPor">-</strong>
                 </div>
 
                 <div>
-
-                    <span>
-                        Fecha de revisión
-                    </span>
-
-                    <strong id="detalleSolicitudFechaRevision">
-                        -
-                    </strong>
-
+                    <span>Fecha de revisión</span>
+                    <strong id="detalleSolicitudFechaRevision">-</strong>
                 </div>
 
                 <div class="solicitud-detail-review__comment">
-
-                    <span>
-                        Comentario
-                    </span>
-
-                    <p id="detalleSolicitudComentario">
-                        -
-                    </p>
-
+                    <span>Comentario</span>
+                    <p id="detalleSolicitudComentario">-</p>
                 </div>
-
             </div>
 
-            {{-- ACCIONES ADMINISTRADOR --}}
             @if($esAdministrador)
-
-                <div class="solicitud-detail-actions"
-                    id="detalleAdminActions"
+                <form method="POST" id="formDecisionSolicitud"
+                    class="solicitud-decision"
+                    data-live-form data-live-target="solicitudes"
                     hidden>
+                    @csrf
+                    @method('PATCH')
 
-                    <button type="button"
-                        class="button button--primary"
-                        id="detalleSolicitudRevisar">
-                        Revisar solicitud
-                    </button>
+                    <input type="hidden" name="decision" id="decisionSolicitud">
 
-                </div>
+                    <div class="solicitud-rechazo" id="solicitudRechazo" hidden>
+                        <label class="form-label" for="motivoRechazoSolicitud">Motivo del rechazo *</label>
+                        <textarea name="comentario_revision" id="motivoRechazoSolicitud"
+                            class="form-textarea" rows="4" maxlength="500"
+                            placeholder="Indica por qué la solicitud está siendo rechazada..."></textarea>
 
+                        <div class="solicitud-rechazo__actions">
+                            <button type="button" class="button button--secondary" id="cancelarRechazoSolicitud">
+                                Volver
+                            </button>
+
+                            <button type="button" class="button button--danger" id="confirmarRechazoSolicitud">
+                                Confirmar rechazo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="solicitud-detail-actions" id="accionesDecisionSolicitud">
+                        <button type="button" class="button button--primary" id="aprobarSolicitud">
+                            ✓ Aprobar
+                        </button>
+
+                        <button type="button" class="button button--danger" id="rechazarSolicitud">
+                            ✕ Rechazar
+                        </button>
+
+                        <button type="button" class="button button--secondary" data-modal-close>
+                            Cerrar
+                        </button>
+                    </div>
+                </form>
             @else
-
-                {{-- ACCIONES TRABAJADOR --}}
-                <div class="solicitud-detail-actions"
-                    id="detalleWorkerActions"
-                    hidden>
-
-                    <button type="button"
-                        class="button button--secondary"
-                        id="detalleSolicitudEditar">
+                <div class="solicitud-detail-actions" id="detalleWorkerActions" hidden>
+                    <button type="button" class="button button--secondary" id="detalleSolicitudEditar">
                         Editar
                     </button>
 
-                    <button type="button"
-                        class="button button--danger"
-                        id="detalleSolicitudCancelar">
+                    <button type="button" class="button button--danger" id="detalleSolicitudCancelar">
                         Cancelar solicitud
                     </button>
 
+                    <button type="button" class="button button--secondary" data-modal-close>
+                        Cerrar
+                    </button>
                 </div>
-
             @endif
-
         </section>
 
-        {{-- DOCUMENTO --}}
         <aside class="solicitud-document">
-
             <header class="solicitud-document__header">
-
                 <div>
                     <strong>Documento adjunto</strong>
-                    <span>Sustento de la solicitud</span>
+                    <span>Sustento presentado con la solicitud</span>
                 </div>
-
             </header>
 
-            {{-- SIN DOCUMENTO --}}
-            <div class="solicitud-document__empty"
-                id="solicitudDocumentoVacio">
-
-                <div class="solicitud-document__empty-icon">
-                    ⧉
-                </div>
-
-                <strong>
-                    Sin documento adjunto
-                </strong>
-
-                <span>
-                    Esta solicitud no tiene un archivo de sustento.
-                </span>
-
+            <div class="solicitud-document__empty" id="solicitudDocumentoVacio">
+                <div class="solicitud-document__empty-icon">⧉</div>
+                <strong>Sin documento adjunto</strong>
+                <span>Esta solicitud no tiene un archivo de sustento.</span>
             </div>
 
-            {{-- DOCUMENTO --}}
-            <div class="solicitud-document__viewer"
-                id="solicitudDocumentoViewer"
-                hidden>
-
+            <div class="solicitud-document__viewer" id="solicitudDocumentoViewer" hidden>
                 <div class="solicitud-document__preview">
-
-                    <iframe id="solicitudDocumentoFrame"
-                        title="Vista previa del documento"
-                        loading="lazy"
-                        hidden>
-                    </iframe>
-
-                    <img id="solicitudDocumentoImagen"
-                        alt="Sustento de la solicitud"
-                        hidden>
-
+                    <iframe id="solicitudDocumentoFrame" title="Vista previa del documento" hidden></iframe>
+                    <img id="solicitudDocumentoImagen" alt="Sustento de la solicitud" hidden>
                 </div>
 
                 <div class="solicitud-document__actions">
-
-                    <a href="#"
-                        id="solicitudDocumentoAbrir"
-                        target="_blank"
-                        rel="noopener"
-                        class="button button--secondary">
+                    <a href="#" id="solicitudDocumentoAbrir" target="_blank"
+                        rel="noopener" class="button button--secondary">
                         Ver aparte
                     </a>
 
-                    <a href="#"
-                        id="solicitudDocumentoDescargar"
-                        download
+                    <a href="#" id="solicitudDocumentoDescargar"
                         class="button button--primary">
                         Descargar
                     </a>
-
                 </div>
-
             </div>
-
         </aside>
 
     </div>
-
 </x-modal>

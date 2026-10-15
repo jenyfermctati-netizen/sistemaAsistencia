@@ -82,7 +82,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/solicitudes/{solicitud}', [SolicitudController::class, 'update'])->name('solicitudes.update');
     Route::patch('/solicitudes/{solicitud}/cancelar', [SolicitudController::class, 'cancelar'])->name('solicitudes.cancelar');
     Route::patch('/solicitudes/{solicitud}/revisar', [SolicitudController::class, 'revisar'])->name('solicitudes.revisar');
-
+    Route::get('/solicitudes/{solicitud}/archivo', [SolicitudController::class, 'verArchivo'])->name('solicitudes.archivo.ver');
+    Route::get('/solicitudes/{solicitud}/archivo/descargar', [SolicitudController::class, 'descargarArchivo'])->name('solicitudes.archivo.descargar');
+    
     // Reportes de avance
     Route::get('/reportesAvance', [ReporteAvanceController::class, 'index'])->name('reportesAvance.index');
     Route::post('/reportesAvance', [ReporteAvanceController::class, 'store'])->name('reportesAvance.store');

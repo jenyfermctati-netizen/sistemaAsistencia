@@ -763,3 +763,92 @@
         flex-direction: column;
     }
 }
+
+.solicitud-decision {
+    display: grid;
+    gap: 12px;
+    padding-top: 4px;
+}
+.solicitud-detail-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.solicitud-rechazo {
+    display: grid;
+    gap: 8px;
+    padding: 13px;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #fff8f8;
+}
+.solicitud-rechazo .form-label {
+    color: #991b1b;
+    font-size: 11px;
+    font-weight: 800;
+}
+.solicitud-rechazo__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 3px;
+}
+@media (max-width: 600px) {
+    .solicitud-detail-actions,
+    .solicitud-rechazo__actions {
+        flex-direction: column;
+    }
+    .solicitud-detail-actions .button,
+    .solicitud-rechazo__actions .button {
+        width: 100%;
+    }
+}
+
+.solicitudes-page [hidden],
+.solicitud-detail-layout [hidden] {
+    display: none !important;
+}
+
+.solicitud-decision {
+    display: grid;
+    gap: 12px;
+    padding-top: 4px;
+}
+
+.solicitud-detail-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.solicitud-rechazo {
+    padding: 14px;
+    border: 1px solid #fecaca;
+    border-radius: 11px;
+    background: #fff8f8;
+}
+
+.solicitud-rechazo:not([hidden]) {
+    display: grid;
+    gap: 10px;
+}
+
+.solicitud-rechazo__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+@media (max-width: 600px) {
+    .solicitud-detail-actions,
+    .solicitud-rechazo__actions {
+        flex-direction: column;
+    }
+
+    .solicitud-detail-actions .button,
+    .solicitud-rechazo__actions .button {
+        width: 100%;
+    }
+}

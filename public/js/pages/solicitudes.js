@@ -1,150 +1,180 @@
 document.addEventListener('DOMContentLoaded', () => {
     const $ = id => document.getElementById(id);
-    const txt = (id, value, fallback = '-') => { const el = $(id); if (el) el.textContent = value || fallback; };
-    const formatearTipo = tipo => ({TARDANZA:'Justificación de tardanza',FALTA:'Justificación de falta',PERMISO:'Permiso',OMISION_MARCACION:'Omisión de marcación',OTRO:'Otro'})[tipo] || tipo || '-';
+    const txt = (id,value,fallback='-') => { const el=$(id); if(el) el.textContent=value||fallback; };
 
-    function abrirEditar(data) {
-        const form = $('formEditarSolicitud'); if (!form) return;
-        form.action = data.url || data.editarUrl || '';
-        $('editarSolicitudTipo').value = data.tipo || data.tipoCodigo || '';
-        $('editarSolicitudInicio').value = data.inicio || data.fechaInicioEdit || '';
-        $('editarSolicitudFin').value = data.fin || data.fechaFinEdit || '';
-        $('editarSolicitudHoraInicio').value = data.horaInicio || '';
-        $('editarSolicitudHoraFin').value = data.horaFin || '';
-        $('editarSolicitudMotivo').value = data.motivo || '';
+    function editar(d) {
+        const form=$('formEditarSolicitud'); if(!form)return;
+        form.action=d.url||d.editarUrl||'';
+        $('editarSolicitudTipo').value=d.tipo||d.tipoCodigo||'';
+        $('editarSolicitudInicio').value=d.inicio||d.fechaInicioEdit||'';
+        $('editarSolicitudFin').value=d.fin||d.fechaFinEdit||'';
+        $('editarSolicitudHoraInicio').value=d.horaInicio||'';
+        $('editarSolicitudHoraFin').value=d.horaFin||'';
+        $('editarSolicitudMotivo').value=d.motivo||'';
         window.AppModal?.open('modalEditarSolicitud');
     }
 
-    function abrirCancelar(url) {
-        const form = $('formCancelarSolicitud'); if (!form) return;
-        form.action = url;
+    function cancelar(url) {
+        const form=$('formCancelarSolicitud'); if(!form)return;
+        form.action=url;
         window.AppModal?.open('modalCancelarSolicitud');
     }
 
-    function abrirRevision(data) {
-        const form = $('formRevisarSolicitud'); if (!form) return;
-        form.action = data.url || data.revisarUrl || '';
-        txt('revisionTrabajador', data.trabajador);
-        txt('revisionTipo', data.tipoCodigo ? formatearTipo(data.tipoCodigo) : data.tipo);
-        if ($('revisionDecision')) $('revisionDecision').value = '';
-        window.AppModal?.open('modalRevisarSolicitud');
+    function configurarDocumento(d) {
+        const viewer=$('solicitudDocumentoViewer'), vacio=$('solicitudDocumentoVacio');
+        const frame=$('solicitudDocumentoFrame'), img=$('solicitudDocumentoImagen');
+        const abrir=$('solicitudDocumentoAbrir'), descargar=$('solicitudDocumentoDescargar');
+        if(!viewer||!vacio)return;
+
+        if(frame){frame.hidden=true;frame.removeAttribute('src');}
+        if(img){img.hidden=true;img.removeAttribute('src');}
+
+        if(!d.archivo){
+            viewer.hidden=true; vacio.hidden=false;
+            if(abrir) abrir.href='#';
+            if(descargar) descargar.href='#';
+            return;
+        }
+
+        viewer.hidden=false; vacio.hidden=true;
+        const nombre=(d.archivoNombre||d.archivo).toLowerCase();
+
+        if(/\.(jpg|jpeg|png|webp)$/.test(nombre)){
+            if(img){img.src=d.archivo;img.hidden=false;}
+        }else{
+            if(frame){frame.src=d.archivo;frame.hidden=false;}
+        }
+
+        if(abrir) abrir.href=d.archivo;
+        if(descargar) descargar.href=d.descargar||d.archivo;
+    }
+
+    function configurarAdmin(d) {
+        const form=$('formDecisionSolicitud'); if(!form)return;
+        const pendiente=d.estadoCodigo==='PENDIENTE'&&d.revisarUrl;
+
+        form.hidden=!pendiente;
+        form.action=pendiente?d.revisarUrl:'';
+
+        if($('solicitudRechazo')) $('solicitudRechazo').hidden=true;
+        if($('accionesDecisionSolicitud')) $('accionesDecisionSolicitud').hidden=false;
+        if($('motivoRechazoSolicitud')){
+            $('motivoRechazoSolicitud').value='';
+            $('motivoRechazoSolicitud').required=false;
+        }
+        if($('decisionSolicitud')) $('decisionSolicitud').value='';
+    }
+
+    function configurarTrabajador(d) {
+        const acciones=$('detalleWorkerActions'); if(!acciones)return;
+        const pendiente=d.estadoCodigo==='PENDIENTE'&&d.editarUrl&&d.cancelarUrl;
+        acciones.hidden=!pendiente;
+        if(!pendiente)return;
+
+        $('detalleSolicitudEditar').onclick=()=>{
+            window.AppModal?.close('modalDetalleSolicitud');
+            editar(d);
+        };
+
+        $('detalleSolicitudCancelar').onclick=()=>{
+            window.AppModal?.close('modalDetalleSolicitud');
+            cancelar(d.cancelarUrl);
+        };
     }
 
     function abrirDetalle(row) {
-        const d = row.dataset, trabajador = d.trabajador || '-', tipoCodigo = d.tipoCodigo || '', estadoCodigo = d.estadoCodigo || '', archivo = d.archivo || '';
-        txt('detalleSolicitudTrabajador', trabajador);
-        txt('detalleSolicitudDni', `DNI: ${d.dni || '-'}`);
-        txt('detalleSolicitudArea', d.area);
-        txt('detalleSolicitudAvatar', trabajador.trim().charAt(0).toUpperCase() || '?');
+        const d=row.dataset, trabajador=d.trabajador||'-';
+        txt('detalleSolicitudTrabajador',trabajador);
+        txt('detalleSolicitudDni',`DNI: ${d.dni||'-'}`);
+        txt('detalleSolicitudArea',d.area);
+        txt('detalleSolicitudAvatar',trabajador.trim().charAt(0).toUpperCase()||'?');
+        txt('detalleSolicitudInicio',d.fechaInicio);
+        txt('detalleSolicitudFin',d.fechaFin||d.fechaInicio);
+        txt('detalleSolicitudHoraInicio',d.horaInicio,'No especificada');
+        txt('detalleSolicitudHoraFin',d.horaFin,'No especificada');
+        txt('detalleSolicitudMotivo',d.motivo);
 
-        const tipo = $('detalleSolicitudTipo');
-        if (tipo) { tipo.textContent = d.tipo || '-'; tipo.className = `solicitud-tipo solicitud-tipo--${tipoCodigo.toLowerCase().replaceAll('_','-')}`; }
+        const tipo=$('detalleSolicitudTipo');
+        if(tipo){
+            tipo.textContent=d.tipo||'-';
+            tipo.className=`solicitud-tipo solicitud-tipo--${(d.tipoCodigo||'').toLowerCase().replaceAll('_','-')}`;
+        }
 
-        const estado = $('detalleSolicitudEstado');
-        if (estado) { estado.textContent = d.estado || '-'; estado.className = `solicitud-estado solicitud-estado--${estadoCodigo.toLowerCase()}`; }
+        const estado=$('detalleSolicitudEstado');
+        if(estado){
+            estado.textContent=d.estado||'-';
+            estado.className=`solicitud-estado solicitud-estado--${(d.estadoCodigo||'').toLowerCase()}`;
+        }
 
-        txt('detalleSolicitudInicio', d.fechaInicio);
-        txt('detalleSolicitudFin', d.fechaFin || d.fechaInicio);
-        txt('detalleSolicitudHoraInicio', d.horaInicio, 'No especificada');
-        txt('detalleSolicitudHoraFin', d.horaFin, 'No especificada');
-        txt('detalleSolicitudMotivo', d.motivo);
-
-        const revision = $('detalleSolicitudRevision');
-        if (revision) {
-            const tieneRevision = d.revisadoPor || d.fechaRevision || d.comentario;
-            revision.hidden = !tieneRevision;
-            if (tieneRevision) {
-                txt('detalleSolicitudRevisadoPor', d.revisadoPor);
-                txt('detalleSolicitudFechaRevision', d.fechaRevision);
-                txt('detalleSolicitudComentario', d.comentario, 'Sin comentario.');
+        const revision=$('detalleSolicitudRevision');
+        if(revision){
+            const tiene=d.revisadoPor||d.fechaRevision||d.comentario;
+            revision.hidden=!tiene;
+            if(tiene){
+                txt('detalleSolicitudRevisadoPor',d.revisadoPor);
+                txt('detalleSolicitudFechaRevision',d.fechaRevision);
+                txt('detalleSolicitudComentario',d.comentario,'Sin comentario.');
             }
         }
 
-        configurarDocumento(archivo);
-        configurarAcciones(row);
+        configurarDocumento(d);
+        configurarAdmin(d);
+        configurarTrabajador(d);
         window.AppModal?.open('modalDetalleSolicitud');
     }
 
-    function configurarDocumento(archivo) {
-        const viewer = $('solicitudDocumentoViewer'), vacio = $('solicitudDocumentoVacio'), frame = $('solicitudDocumentoFrame'), imagen = $('solicitudDocumentoImagen'), abrir = $('solicitudDocumentoAbrir'), descargar = $('solicitudDocumentoDescargar');
-        if (!viewer || !vacio) return;
-
-        if (frame) { frame.hidden = true; frame.removeAttribute('src'); }
-        if (imagen) { imagen.hidden = true; imagen.removeAttribute('src'); }
-
-        if (!archivo) {
-            viewer.hidden = true; vacio.hidden = false;
-            if (abrir) abrir.href = '#';
-            if (descargar) descargar.href = '#';
-            return;
-        }
-
-        viewer.hidden = false; vacio.hidden = true;
-        const limpio = archivo.split('?')[0].toLowerCase();
-
-        if (/\.(jpg|jpeg|png|webp)$/.test(limpio) && imagen) {
-            imagen.src = archivo; imagen.hidden = false;
-        } else if (frame) {
-            frame.src = archivo; frame.hidden = false;
-        }
-
-        if (abrir) abrir.href = archivo;
-        if (descargar) descargar.href = archivo;
-    }
-
-    function configurarAcciones(row) {
-        const d = row.dataset, admin = $('detalleAdminActions'), worker = $('detalleWorkerActions');
-
-        if (admin) {
-            const puede = d.estadoCodigo === 'PENDIENTE' && d.revisarUrl;
-            admin.hidden = !puede;
-            if (puede && $('detalleSolicitudRevisar')) $('detalleSolicitudRevisar').onclick = () => {
-                window.AppModal?.close('modalDetalleSolicitud');
-                abrirRevision(d);
-            };
-        }
-
-        if (worker) {
-            const puede = d.estadoCodigo === 'PENDIENTE' && d.editarUrl && d.cancelarUrl;
-            worker.hidden = !puede;
-            if (!puede) return;
-
-            $('detalleSolicitudEditar').onclick = () => {
-                window.AppModal?.close('modalDetalleSolicitud');
-                abrirEditar(d);
-            };
-
-            $('detalleSolicitudCancelar').onclick = () => {
-                window.AppModal?.close('modalDetalleSolicitud');
-                abrirCancelar(d.cancelarUrl);
-            };
-        }
-    }
-
-    document.addEventListener('click', e => {
-        const editar = e.target.closest('[data-editar-solicitud]');
-        if (editar) { abrirEditar(editar.dataset); return; }
-
-        const cancelar = e.target.closest('[data-cancelar-solicitud]');
-        if (cancelar) { abrirCancelar(cancelar.dataset.url); return; }
-
-        const revisar = e.target.closest('[data-revisar-solicitud]');
-        if (revisar) { abrirRevision(revisar.dataset); return; }
-
-        const botonDetalle = e.target.closest('[data-ver-solicitud-button]');
-        if (botonDetalle) {
-            const row = botonDetalle.closest('[data-ver-solicitud]');
-            if (row) abrirDetalle(row);
-            return;
-        }
-
-        const row = e.target.closest('[data-ver-solicitud]');
-        if (row && !e.target.closest('a,button,form,input,select,textarea')) abrirDetalle(row);
+    $('aprobarSolicitud')?.addEventListener('click',()=>{
+        const form=$('formDecisionSolicitud'); if(!form)return;
+        $('decisionSolicitud').value='APROBADA';
+        $('motivoRechazoSolicitud').required=false;
+        $('motivoRechazoSolicitud').value='';
+        form.requestSubmit();
     });
 
-    document.addEventListener('keydown', e => {
-        const row = e.target.closest('[data-ver-solicitud]');
-        if (!row || !['Enter',' '].includes(e.key)) return;
+    $('rechazarSolicitud')?.addEventListener('click',()=>{
+        $('accionesDecisionSolicitud').hidden=true;
+        $('solicitudRechazo').hidden=false;
+        $('motivoRechazoSolicitud').required=true;
+        $('motivoRechazoSolicitud').focus();
+    });
+
+    $('cancelarRechazoSolicitud')?.addEventListener('click',()=>{
+        $('solicitudRechazo').hidden=true;
+        $('accionesDecisionSolicitud').hidden=false;
+        $('motivoRechazoSolicitud').required=false;
+        $('motivoRechazoSolicitud').value='';
+        $('decisionSolicitud').value='';
+    });
+
+    $('confirmarRechazoSolicitud')?.addEventListener('click',()=>{
+        const form=$('formDecisionSolicitud'), motivo=$('motivoRechazoSolicitud');
+        if(!form||!motivo)return;
+        if(!motivo.value.trim()){motivo.reportValidity();return;}
+        $('decisionSolicitud').value='RECHAZADA';
+        form.requestSubmit();
+    });
+
+    document.addEventListener('click',e=>{
+        const editarBtn=e.target.closest('[data-editar-solicitud]');
+        if(editarBtn){editar(editarBtn.dataset);return;}
+
+        const cancelarBtn=e.target.closest('[data-cancelar-solicitud]');
+        if(cancelarBtn){cancelar(cancelarBtn.dataset.url);return;}
+
+        const btn=e.target.closest('[data-ver-solicitud-button]');
+        if(btn){
+            const row=btn.closest('[data-ver-solicitud]');
+            if(row)abrirDetalle(row);
+            return;
+        }
+
+        const row=e.target.closest('[data-ver-solicitud]');
+        if(row&&!e.target.closest('a,button,form,input,select,textarea')) abrirDetalle(row);
+    });
+
+    document.addEventListener('keydown',e=>{
+        const row=e.target.closest('[data-ver-solicitud]');
+        if(!row||!['Enter',' '].includes(e.key))return;
         e.preventDefault();
         abrirDetalle(row);
     });

@@ -12,485 +12,173 @@ use Illuminate\Validation\ValidationException;
 
 class SolicitudController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | LISTADO
-    |--------------------------------------------------------------------------
-    */
     public function index(Request $request)
     {
         $usuario = Auth::user();
+        $esAdministrador = $usuario->rol?->nombre === 'ADMINISTRADOR';
 
-        $esAdministrador =
-            $usuario->rol?->nombre === 'ADMINISTRADOR';
+        $query = Solicitud::with(['trabajador.area', 'asistencia', 'revisadoPor']);
 
-        $query = Solicitud::with([
-            'trabajador.area',
-            'asistencia',
-            'revisadoPor',
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | SI NO ES ADMINISTRADOR SOLO VE SUS SOLICITUDES
-        |--------------------------------------------------------------------------
-        */
-        if (! $esAdministrador) {
-
-            if (! $usuario->trabajador_id) {
-
+        if (!$esAdministrador) {
+            if (!$usuario->trabajador_id)
                 $query->whereRaw('1 = 0');
-
-            } else {
-
-                $query->where(
-                    'trabajador_id',
-                    $usuario->trabajador_id
-                );
-            }
+            else
+                $query->where('trabajador_id', $usuario->trabajador_id);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | BUSCAR
-        |--------------------------------------------------------------------------
-        */
         if ($request->filled('buscar')) {
-
-            $buscar = trim(
-                $request->buscar
-            );
-
+            $buscar = trim($request->buscar);
             $query->where(function ($q) use ($buscar) {
-
-                $q->where(
-                    'motivo',
-                    'like',
-                    "%{$buscar}%"
-                )
-                    ->orWhereHas(
-                        'trabajador',
-                        function ($trabajadorQuery) use ($buscar) {
-
-                            $trabajadorQuery
-                                ->where(
-                                    'dni',
-                                    'like',
-                                    "%{$buscar}%"
-                                )
-                                ->orWhere(
-                                    'nombres',
-                                    'like',
-                                    "%{$buscar}%"
-                                )
-                                ->orWhere(
-                                    'apellidos',
-                                    'like',
-                                    "%{$buscar}%"
-                                );
-                        }
-                    );
+                $q
+                    ->where('motivo', 'like', "%{$buscar}%")
+                    ->orWhereHas('trabajador', function ($trabajador) use ($buscar) {
+                        $trabajador
+                            ->where('dni', 'like', "%{$buscar}%")
+                            ->orWhere('nombres', 'like', "%{$buscar}%")
+                            ->orWhere('apellidos', 'like', "%{$buscar}%");
+                    });
             });
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | TIPO
-        |--------------------------------------------------------------------------
-        */
-        if ($request->filled('tipo')) {
+        if ($request->filled('tipo'))
+            $query->where('tipo', $request->tipo);
+        if ($request->filled('estado'))
+            $query->where('estado', $request->estado);
 
-            $query->where(
-                'tipo',
-                $request->tipo
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | ESTADO
-        |--------------------------------------------------------------------------
-        */
-        if ($request->filled('estado')) {
-
-            $query->where(
-                'estado',
-                $request->estado
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | FECHA
-        |--------------------------------------------------------------------------
-        */
         if ($request->filled('fecha')) {
-
             $fecha = $request->fecha;
-
-            $query->whereDate(
-                'fecha_inicio',
-                '<=',
-                $fecha
-            )
+            $query
+                ->whereDate('fecha_inicio', '<=', $fecha)
                 ->where(function ($q) use ($fecha) {
-
-                    $q->whereNull(
-                        'fecha_fin'
-                    )
-                        ->orWhereDate(
-                            'fecha_fin',
-                            '>=',
-                            $fecha
-                        );
+                    $q->whereNull('fecha_fin')->orWhereDate('fecha_fin', '>=', $fecha);
                 });
         }
 
         $solicitudes = $query
-            ->orderByRaw(
-                "CASE
-                    WHEN estado = 'PENDIENTE' THEN 1
-                    WHEN estado = 'APROBADA' THEN 2
-                    WHEN estado = 'RECHAZADA' THEN 3
-                    ELSE 4
-                END"
-            )
+            ->orderByRaw("CASE WHEN estado='PENDIENTE' THEN 1 WHEN estado='APROBADA' THEN 2 WHEN estado='RECHAZADA' THEN 3 ELSE 4 END")
             ->orderByDesc('created_at')
             ->paginate(15)
             ->withQueryString();
 
-        return view(
-            'trabajadores.solicitudes',
-            compact(
-                'solicitudes',
-                'esAdministrador'
-            )
-        );
+        return view('trabajadores.solicitudes', compact('solicitudes', 'esAdministrador'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | REGISTRAR SOLICITUD
-    |--------------------------------------------------------------------------
-    */
     public function store(Request $request)
     {
         $usuario = Auth::user();
-
-        /*
-         * El administrador revisa solicitudes;
-         * no registra solicitudes en nombre de otros.
-         */
-        if (
-            $usuario->rol?->nombre
-            === 'ADMINISTRADOR'
-        ) {
+        if ($usuario->rol?->nombre === 'ADMINISTRADOR')
             abort(403);
-        }
 
-        if (! $usuario->trabajador_id) {
-
+        if (!$usuario->trabajador_id) {
             if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Tu cuenta no está asociada a un trabajador.',
-                ], 422);
+                return response()->json(['message' => 'Tu cuenta no está asociada a un trabajador.'], 422);
             }
-
-            return back()->with(
-                'error',
-                'Tu cuenta no está asociada a un trabajador.'
-            );
+            return back()->with('error', 'Tu cuenta no está asociada a un trabajador.');
         }
 
-        $data = $this->validarSolicitud(
-            $request
+        $data = $this->validarSolicitud($request);
+        $this->validarHoras($data);
+
+        $archivo = $request->hasFile('archivo')
+            ? $request->file('archivo')->store('solicitudes', 'public')
+            : null;
+
+        $asistenciaId = $this->obtenerAsistenciaRelacionada(
+            $usuario->trabajador_id,
+            $data['fecha_inicio'],
+            $data['fecha_fin'] ?? null
         );
-
-        $this->validarHoras(
-            $data
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | ARCHIVO
-        |--------------------------------------------------------------------------
-        */
-        $archivo = null;
-
-        if ($request->hasFile('archivo')) {
-
-            $archivo = $request
-                ->file('archivo')
-                ->store(
-                    'solicitudes',
-                    'public'
-                );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | ASISTENCIA RELACIONADA
-        |--------------------------------------------------------------------------
-        |
-        | Solo vinculamos automáticamente cuando se trata
-        | de una solicitud de un único día.
-        |
-        */
-        $asistenciaId =
-            $this->obtenerAsistenciaRelacionada(
-                $usuario->trabajador_id,
-                $data['fecha_inicio'],
-                $data['fecha_fin'] ?? null
-            );
 
         Solicitud::create([
             'trabajador_id' => $usuario->trabajador_id,
-
             'asistencia_id' => $asistenciaId,
-
             'tipo' => $data['tipo'],
-
             'fecha_inicio' => $data['fecha_inicio'],
-
             'fecha_fin' => $data['fecha_fin'] ?? null,
-
             'hora_inicio' => $data['hora_inicio'] ?? null,
-
             'hora_fin' => $data['hora_fin'] ?? null,
-
             'motivo' => $data['motivo'],
-
             'archivo' => $archivo,
-
             'estado' => 'PENDIENTE',
-
             'revisado_por' => null,
-
             'comentario_revision' => null,
-
             'fecha_revision' => null,
         ]);
 
-        $mensaje = 'Solicitud registrada correctamente.';
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => $mensaje,
-                'refresh_url' => route('solicitudes.index'),
-            ], 201);
-        }
-
-        return redirect()
-            ->route('solicitudes.index')
-            ->with('success', $mensaje);
+        return $this->respuesta($request, 'Solicitud registrada correctamente.', 201);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ACTUALIZAR SOLICITUD
-    |--------------------------------------------------------------------------
-    */
-    public function update(
-        Request $request,
-        Solicitud $solicitud
-    ) {
-        $this->verificarPropietario(
-            $solicitud
-        );
+    public function update(Request $request, Solicitud $solicitud)
+    {
+        $this->verificarPropietario($solicitud);
 
-        if (
-            $solicitud->estado
-            !== 'PENDIENTE'
-        ) {
-
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Solo puedes editar solicitudes pendientes.',
-                ], 422);
-            }
-
-            return back()->with(
-                'error',
-                'Solo puedes editar solicitudes pendientes.'
-            );
+        if ($solicitud->estado !== 'PENDIENTE') {
+            return $this->error($request, 'Solo puedes editar solicitudes pendientes.');
         }
 
-        $data = $this->validarSolicitud(
-            $request
-        );
+        $data = $this->validarSolicitud($request);
+        $this->validarHoras($data);
 
-        $this->validarHoras(
-            $data
-        );
-
-        $archivo =
-            $solicitud->archivo;
+        $archivo = $solicitud->archivo;
 
         if ($request->hasFile('archivo')) {
-
-            if (
-                $archivo
-                &&
-                Storage::disk('public')
-                    ->exists($archivo)
-            ) {
-
-                Storage::disk('public')
-                    ->delete($archivo);
+            if ($archivo && Storage::disk('public')->exists($archivo)) {
+                Storage::disk('public')->delete($archivo);
             }
-
-            $archivo = $request
-                ->file('archivo')
-                ->store(
-                    'solicitudes',
-                    'public'
-                );
+            $archivo = $request->file('archivo')->store('solicitudes', 'public');
         }
 
-        $asistenciaId =
-            $this->obtenerAsistenciaRelacionada(
-                $solicitud->trabajador_id,
-                $data['fecha_inicio'],
-                $data['fecha_fin'] ?? null
-            );
+        $asistenciaId = $this->obtenerAsistenciaRelacionada(
+            $solicitud->trabajador_id,
+            $data['fecha_inicio'],
+            $data['fecha_fin'] ?? null
+        );
 
         $solicitud->update([
             'tipo' => $data['tipo'],
-
             'fecha_inicio' => $data['fecha_inicio'],
-
             'fecha_fin' => $data['fecha_fin'] ?? null,
-
             'hora_inicio' => $data['hora_inicio'] ?? null,
-
             'hora_fin' => $data['hora_fin'] ?? null,
-
             'motivo' => $data['motivo'],
-
             'archivo' => $archivo,
-
             'asistencia_id' => $asistenciaId,
         ]);
 
-        $mensaje = 'Solicitud actualizada correctamente.';
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => $mensaje,
-                'refresh_url' => route('solicitudes.index'),
-            ]);
-        }
-
-        return redirect()
-            ->route('solicitudes.index')
-            ->with('success', $mensaje);
+        return $this->respuesta($request, 'Solicitud actualizada correctamente.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | CANCELAR POR EL TRABAJADOR
-    |--------------------------------------------------------------------------
-    */
-    public function cancelar(
-        Request $request,
-        Solicitud $solicitud
-    ) {
-        $this->verificarPropietario(
-            $solicitud
-        );
+    public function cancelar(Request $request, Solicitud $solicitud)
+    {
+        $this->verificarPropietario($solicitud);
 
-        if (
-            $solicitud->estado
-            !== 'PENDIENTE'
-        ) {
-
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Solo puedes cancelar solicitudes pendientes.',
-                ], 422);
-            }
-
-            return back()->with(
-                'error',
-                'Solo puedes cancelar solicitudes pendientes.'
-            );
+        if ($solicitud->estado !== 'PENDIENTE') {
+            return $this->error($request, 'Solo puedes cancelar solicitudes pendientes.');
         }
 
-        $solicitud->update([
-            'estado' => 'CANCELADA',
-        ]);
+        $solicitud->update(['estado' => 'CANCELADA']);
 
-        $mensaje = 'Solicitud cancelada correctamente.';
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => $mensaje,
-                'refresh_url' => route('solicitudes.index'),
-            ]);
-        }
-
-        return redirect()
-            ->route('solicitudes.index')
-            ->with('success', $mensaje);
+        return $this->respuesta($request, 'Solicitud cancelada correctamente.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | REVISAR POR EL ADMINISTRADOR
-    |--------------------------------------------------------------------------
-    */
-    public function revisar(
-        Request $request,
-        Solicitud $solicitud
-    ) {
+    public function revisar(Request $request, Solicitud $solicitud)
+    {
         $this->verificarAdministrador();
 
-        if (
-            $solicitud->estado
-            !== 'PENDIENTE'
-        ) {
-
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Esta solicitud ya fue revisada o cancelada.',
-                ], 422);
-            }
-
-            return back()->with(
-                'error',
-                'Esta solicitud ya fue revisada o cancelada.'
-            );
+        if ($solicitud->estado !== 'PENDIENTE') {
+            return $this->error($request, 'Esta solicitud ya fue revisada o cancelada.');
         }
 
         $data = $request->validate([
-            'decision' => [
-                'required',
-                Rule::in([
-                    'APROBADA',
-                    'RECHAZADA',
-                ]),
-            ],
-
-            'comentario_revision' => [
-                'nullable',
-                'string',
-                'max:500',
-            ],
+            'decision' => ['required', Rule::in(['APROBADA', 'RECHAZADA'])],
+            'comentario_revision' => ['nullable', 'string', 'max:500'],
+        ], [
+            'decision.required' => 'Selecciona una decisión.',
+            'decision.in' => 'La decisión seleccionada no es válida.',
+            'comentario_revision.max' => 'El motivo no puede superar los 500 caracteres.',
         ]);
 
-        /*
-         * Si se rechaza, exigimos comentario.
-         */
-        if (
-            $data['decision']
-            === 'RECHAZADA'
-            &&
-            blank(
-                $data['comentario_revision']
-                ?? null
-            )
-        ) {
-
+        if ($data['decision'] === 'RECHAZADA' && blank($data['comentario_revision'] ?? null)) {
             throw ValidationException::withMessages([
                 'comentario_revision' => 'Debes indicar el motivo del rechazo.',
             ]);
@@ -498,40 +186,128 @@ class SolicitudController extends Controller
 
         $solicitud->update([
             'estado' => $data['decision'],
-
             'revisado_por' => Auth::id(),
-
-            'comentario_revision' => $data['comentario_revision']
-                ?? null,
-
+            'comentario_revision' => $data['decision'] === 'RECHAZADA'
+                ? trim($data['comentario_revision'])
+                : null,
             'fecha_revision' => now(),
         ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | IMPORTANTE
-        |--------------------------------------------------------------------------
-        |
-        | Todavía NO modificamos la tabla asistencias.
-        |
-        | Cuando terminemos Vacaciones integraremos:
-        |
-        | TARDANZA aprobada          -> JUSTIFICADO
-        | FALTA aprobada             -> JUSTIFICADO
-        | PERMISO aprobado           -> PERMISO
-        | OMISION_MARCACION aprobada -> JUSTIFICADO / regularización
-        |
-        */
 
         $mensaje = $data['decision'] === 'APROBADA'
             ? 'Solicitud aprobada correctamente.'
             : 'Solicitud rechazada correctamente.';
 
+        return $this->respuesta($request, $mensaje);
+    }
+
+    public function verArchivo(Solicitud $solicitud)
+    {
+        $this->verificarAccesoArchivo($solicitud);
+        $this->verificarExistenciaArchivo($solicitud);
+
+        $ruta = Storage::disk('public')->path($solicitud->archivo);
+        $mime = Storage::disk('public')->mimeType($solicitud->archivo) ?: 'application/octet-stream';
+
+        return response()->file($ruta, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline; filename="' . basename($solicitud->archivo) . '"',
+        ]);
+    }
+
+    public function descargarArchivo(Solicitud $solicitud)
+    {
+        $this->verificarAccesoArchivo($solicitud);
+        $this->verificarExistenciaArchivo($solicitud);
+
+        return Storage::disk('public')->download(
+            $solicitud->archivo,
+            basename($solicitud->archivo)
+        );
+    }
+
+    private function validarSolicitud(Request $request): array
+    {
+        return $request->validate([
+            'tipo' => ['required', Rule::in(['TARDANZA', 'FALTA', 'PERMISO', 'OMISION_MARCACION', 'OTRO'])],
+            'fecha_inicio' => ['required', 'date'],
+            'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+            'hora_inicio' => ['nullable', 'date_format:H:i', 'required_with:hora_fin'],
+            'hora_fin' => ['nullable', 'date_format:H:i', 'required_with:hora_inicio'],
+            'motivo' => ['required', 'string', 'max:2000'],
+            'archivo' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+        ], [
+            'tipo.required' => 'Selecciona el tipo de solicitud.',
+            'fecha_inicio.required' => 'Selecciona la fecha de inicio.',
+            'fecha_fin.after_or_equal' => 'La fecha de fin no puede ser anterior a la fecha de inicio.',
+            'motivo.required' => 'Debes indicar el motivo de la solicitud.',
+            'archivo.mimes' => 'El sustento debe ser PDF, JPG, JPEG o PNG.',
+            'archivo.max' => 'El archivo no puede superar los 5 MB.',
+            'hora_inicio.required_with' => 'Debes indicar también la hora de inicio.',
+            'hora_fin.required_with' => 'Debes indicar también la hora de fin.',
+        ]);
+    }
+
+    private function validarHoras(array $data): void
+    {
+        if (!empty($data['hora_inicio']) && !empty($data['hora_fin']) && $data['hora_fin'] < $data['hora_inicio']) {
+            throw ValidationException::withMessages([
+                'hora_fin' => 'La hora de fin no puede ser anterior a la hora de inicio.',
+            ]);
+        }
+    }
+
+    private function obtenerAsistenciaRelacionada(int $trabajadorId, string $fechaInicio, ?string $fechaFin): ?int
+    {
+        if ($fechaFin && $fechaFin !== $fechaInicio)
+            return null;
+
+        return Asistencia::where('trabajador_id', $trabajadorId)
+            ->whereDate('fecha', $fechaInicio)
+            ->value('id');
+    }
+
+    private function verificarPropietario(Solicitud $solicitud): void
+    {
+        $usuario = Auth::user();
+        abort_unless($usuario && $usuario->trabajador_id === $solicitud->trabajador_id, 403);
+    }
+
+    private function verificarAdministrador(): void
+    {
+        abort_unless(
+            Auth::check() && Auth::user()->rol?->nombre === 'ADMINISTRADOR',
+            403
+        );
+    }
+
+    private function verificarAccesoArchivo(Solicitud $solicitud): void
+    {
+        $usuario = Auth::user();
+        abort_unless(
+            $usuario && (
+                $usuario->rol?->nombre === 'ADMINISTRADOR' ||
+                $usuario->trabajador_id === $solicitud->trabajador_id
+            ),
+            403
+        );
+    }
+
+    private function verificarExistenciaArchivo(Solicitud $solicitud): void
+    {
+        abort_unless(
+            $solicitud->archivo &&
+                Storage::disk('public')->exists($solicitud->archivo),
+            404
+        );
+    }
+
+    private function respuesta(Request $request, string $mensaje, int $status = 200)
+    {
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => $mensaje,
                 'refresh_url' => route('solicitudes.index'),
-            ]);
+            ], $status);
         }
 
         return redirect()
@@ -539,172 +315,12 @@ class SolicitudController extends Controller
             ->with('success', $mensaje);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | VALIDACIÓN GENERAL
-    |--------------------------------------------------------------------------
-    */
-    private function validarSolicitud(
-        Request $request
-    ): array {
-
-        return $request->validate([
-            'tipo' => [
-                'required',
-                Rule::in([
-                    'TARDANZA',
-                    'FALTA',
-                    'PERMISO',
-                    'OMISION_MARCACION',
-                    'OTRO',
-                ]),
-            ],
-
-            'fecha_inicio' => [
-                'required',
-                'date',
-            ],
-
-            'fecha_fin' => [
-                'nullable',
-                'date',
-                'after_or_equal:fecha_inicio',
-            ],
-
-            'hora_inicio' => [
-                'nullable',
-                'date_format:H:i',
-                'required_with:hora_fin',
-            ],
-
-            'hora_fin' => [
-                'nullable',
-                'date_format:H:i',
-                'required_with:hora_inicio',
-            ],
-
-            'motivo' => [
-                'required',
-                'string',
-                'max:2000',
-            ],
-
-            'archivo' => [
-                'nullable',
-                'file',
-                'mimes:pdf,jpg,jpeg,png',
-                'max:5120',
-            ],
-        ], [
-            'tipo.required' => 'Selecciona el tipo de solicitud.',
-
-            'fecha_inicio.required' => 'Selecciona la fecha de inicio.',
-
-            'fecha_fin.after_or_equal' => 'La fecha de fin no puede ser anterior a la fecha de inicio.',
-
-            'motivo.required' => 'Debes indicar el motivo de la solicitud.',
-
-            'archivo.mimes' => 'El sustento debe ser PDF, JPG, JPEG o PNG.',
-
-            'archivo.max' => 'El archivo no puede superar los 5 MB.',
-
-            'hora_inicio.required_with' => 'Debes indicar también la hora de inicio.',
-
-            'hora_fin.required_with' => 'Debes indicar también la hora de fin.',
-        ]);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | VALIDAR RANGO DE HORAS
-    |--------------------------------------------------------------------------
-    */
-    private function validarHoras(
-        array $data
-    ): void {
-
-        if (
-            ! empty($data['hora_inicio'])
-            &&
-            ! empty($data['hora_fin'])
-            &&
-            $data['hora_fin']
-                < $data['hora_inicio']
-        ) {
-
-            throw ValidationException::withMessages([
-                'hora_fin' => 'La hora de fin no puede ser anterior a la hora de inicio.',
-            ]);
-        }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | BUSCAR ASISTENCIA DEL DÍA
-    |--------------------------------------------------------------------------
-    */
-    private function obtenerAsistenciaRelacionada(
-        int $trabajadorId,
-        string $fechaInicio,
-        ?string $fechaFin
-    ): ?int {
-
-        /*
-         * Si tiene rango de varios días,
-         * no vinculamos una sola asistencia.
-         */
-        if (
-            $fechaFin
-            &&
-            $fechaFin !== $fechaInicio
-        ) {
-            return null;
-        }
-
-        return Asistencia::where(
-            'trabajador_id',
-            $trabajadorId
-        )
-            ->whereDate(
-                'fecha',
-                $fechaInicio
-            )
-            ->value('id');
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | PROPIETARIO
-    |--------------------------------------------------------------------------
-    */
-    private function verificarPropietario(
-        Solicitud $solicitud
-    ): void {
-
-        $usuario = Auth::user();
-
-        abort_unless(
-            $usuario
-            &&
-            $usuario->trabajador_id
-                === $solicitud->trabajador_id,
-            403
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | ADMINISTRADOR
-    |--------------------------------------------------------------------------
-    */
-    private function verificarAdministrador(): void
+    private function error(Request $request, string $mensaje)
     {
-        abort_unless(
-            Auth::check()
-            &&
-            Auth::user()->rol?->nombre
-                === 'ADMINISTRADOR',
-            403
-        );
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $mensaje], 422);
+        }
+
+        return back()->with('error', $mensaje);
     }
 }
