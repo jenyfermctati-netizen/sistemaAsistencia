@@ -12,7 +12,7 @@
 
 @push('styles')
 
-    <link rel="stylesheet" href="{{ asset('css/pages/reportes-avance-trabajador.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/pages/reporte-avance-trabajador.css') }}">
 
 @endpush
 
@@ -35,7 +35,9 @@
     <div class="ra-worker">
     <div class="page-header">
 
-        <div>
+        <div class="page-header__copy">
+
+            <span class="page-header__eyebrow">Bitácora de trabajo</span>
 
             <h2 class="page-header__title">Reportes de avance</h2>
 
@@ -65,7 +67,8 @@
 
                     <button type="button" class="button button--primary" data-modal-open="modalCrearReporte">
 
-                        + Registrar reporte de hoy
+                        <span class="button__icon" aria-hidden="true">+</span>
+                        Registrar reporte de hoy
 
                     </button>
 
@@ -197,8 +200,8 @@
         <section class="panel">
             <div class="panel__header">
                 <form method="GET" action="{{ route('reportesAvance.index') }}" class="reportes-filtros">
-                    <input type="search" name="buscar" value="{{ request('buscar') }}" class="form-control" placeholder="Buscar actividad o reporte...">
-                    <select name="estado" class="form-select">
+                    <input type="search" name="buscar" value="{{ request('buscar') }}" class="form-control" placeholder="Buscar actividad o reporte..." aria-label="Buscar actividad o reporte">
+                    <select name="estado" class="form-select" aria-label="Filtrar por estado">
                         <option value="">Todos los estados</option>
                         <option value="PENDIENTE" @selected(request('estado') === 'PENDIENTE')>Pendiente de revisión</option>
                         <option value="REVISADO" @selected(request('estado') === 'REVISADO')>Revisado</option>
