@@ -149,6 +149,34 @@
     flex-wrap: wrap;
 }
 
+.trabajador-actions-cell {
+    width: 210px;
+    min-width: 210px;
+}
+
+.trabajador-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 7px;
+    width: 100%;
+}
+
+.trabajador-actions__primary {
+    grid-column: 1 / -1;
+}
+
+.trabajador-actions :is(.button, .badge) {
+    width: 100%;
+    min-width: 0;
+    min-height: 34px;
+    justify-content: center;
+    padding: 7px 9px;
+    border-radius: 9px;
+    text-align: center;
+    white-space: nowrap;
+}
+
 .button--small {
     min-height: 28px;
 

@@ -112,15 +112,17 @@
                                     <span class="badge badge--danger">Inactivo</span>
                                 @endif
                             </td>
-                            <td>
-                                <div class="table-actions">
+                            <td class="trabajador-actions-cell">
+                                <div class="table-actions trabajador-actions">
                                     @if ($trabajador->reporte_hoy)
                                         <a href="{{ route('reportesAvance.index', ['buscar' => $trabajador->dni]) }}"
-                                            class="badge badge--success" title="Ver el avance registrado">
+                                            class="badge badge--success trabajador-actions__primary"
+                                            title="Ver el avance registrado">
                                             Avance registrado hoy
                                         </a>
                                     @elseif ($trabajador->estado === 'ACTIVO')
-                                        <button type="button" class="button button--primary button--small"
+                                        <button type="button"
+                                            class="button button--primary button--small trabajador-actions__primary"
                                             data-registrar-avance
                                             data-trabajador-id="{{ $trabajador->id }}"
                                             data-trabajador-nombre="{{ $trabajador->nombres }} {{ $trabajador->apellidos }}"
@@ -131,7 +133,8 @@
                                     @endif
 
                                     {{-- EDITAR --}}
-                                    <button type="button" class="button button--secondary button--small"
+                                    <button type="button"
+                                        class="button button--secondary button--small trabajador-actions__edit"
                                         data-editar-trabajador
                                         data-update-url="{{ route('trabajadores.update', $trabajador) }}"
                                         data-area-id="{{ $trabajador->area_id }}"
@@ -150,7 +153,7 @@
 
                                     {{-- CAMBIAR ESTADO --}}
                                     <button type="button"
-                                        class="button button--small {{ $trabajador->estado === 'ACTIVO' ? 'button--danger' : 'button--primary' }}"
+                                        class="button button--small trabajador-actions__status {{ $trabajador->estado === 'ACTIVO' ? 'button--danger' : 'button--primary' }}"
                                         data-cambiar-estado
                                         data-name="{{ $trabajador->nombres }} {{ $trabajador->apellidos }}"
                                         data-estado="{{ $trabajador->estado }}"
