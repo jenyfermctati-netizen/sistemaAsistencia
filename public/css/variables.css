@@ -1,5 +1,15 @@
 :root {
     /* ======================================================
+       PALETA NATURAL DEL SISTEMA
+    ====================================================== */
+
+    --palette-petrol: #264653;
+    --palette-smoke-blue: #afcdde;
+    --palette-sand: #d9cdbf;
+    --palette-ivory: #faf8f4;
+    --palette-graphite: #495057;
+
+    /* ======================================================
        DIMENSIONES GENERALES
     ====================================================== */
 
@@ -11,34 +21,34 @@
        COLOR PRINCIPAL
     ====================================================== */
 
-    --primary: #3f5543;
-    --primary-hover: #344738;
-    --primary-dark: #2a3c30;
-    --primary-light: #e8eee5;
+    --primary: var(--palette-petrol);
+    --primary-hover: #1f3a45;
+    --primary-dark: #18313b;
+    --primary-light: #e8f1f5;
 
-    --accent: #a66848;
-    --accent-hover: #8f573b;
-    --accent-soft: #f4e6dc;
+    --accent: var(--palette-smoke-blue);
+    --accent-hover: #8fb7cc;
+    --accent-soft: #eef5f8;
 
 
     /* ======================================================
        FONDOS
     ====================================================== */
 
-    --background: #f3f0e9;
+    --background: var(--palette-ivory);
 
-    --surface: #fffefa;
-    --surface-secondary: #f7f3eb;
-    --surface-hover: #f1f4ed;
+    --surface: #fffefc;
+    --surface-secondary: #f2ede6;
+    --surface-hover: #eef3f5;
 
 
     /* ======================================================
        TEXTOS
     ====================================================== */
 
-    --text: #28332d;
-    --text-muted: #71786f;
-    --text-soft: #969b94;
+    --text: var(--palette-graphite);
+    --text-muted: #6b7378;
+    --text-soft: #93999d;
 
     --text-inverse: #ffffff;
 
@@ -47,17 +57,17 @@
        BORDES
     ====================================================== */
 
-    --border: #ded9ce;
-    --border-strong: #c9c2b5;
+    --border: var(--palette-sand);
+    --border-strong: #bcae9c;
 
 
     /* ======================================================
        ESTADOS
     ====================================================== */
 
-    --success: #52704f;
-    --success-hover: #405b3e;
-    --success-light: #eaf3e7;
+    --success: #356173;
+    --success-hover: #294e5d;
+    --success-light: #e8f1f5;
 
     --warning: #9b743c;
     --warning-hover: #7f5d2e;
@@ -67,8 +77,8 @@
     --danger-hover: #8d433d;
     --danger-light: #f8e9e7;
 
-    --info: #5c7058;
-    --info-light: #edf3eb;
+    --info: #527f97;
+    --info-light: #eef5f8;
 
 
     /* ======================================================
@@ -76,16 +86,16 @@
     ====================================================== */
 
     --shadow-sm:
-        0 2px 8px rgba(40, 51, 45, 0.05);
+        0 2px 8px rgba(38, 70, 83, 0.05);
 
     --shadow:
-        0 14px 34px rgba(40, 51, 45, 0.08);
+        0 14px 34px rgba(38, 70, 83, 0.08);
 
     --shadow-md:
-        0 18px 42px rgba(40, 51, 45, 0.11);
+        0 18px 42px rgba(38, 70, 83, 0.11);
 
     --shadow-lg:
-        0 24px 60px rgba(40, 51, 45, 0.17);
+        0 24px 60px rgba(38, 70, 83, 0.17);
 
 
     /* ======================================================

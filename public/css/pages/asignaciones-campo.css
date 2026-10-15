@@ -5,6 +5,11 @@
 .campo-filtros {
     display: grid;
 
+    width: 100%;
+    min-width: 0;
+
+    padding: 20px;
+
     grid-template-columns:
         minmax(240px, 1.4fr)
         200px
@@ -14,6 +19,10 @@
     gap: 12px;
 
     align-items: end;
+}
+
+.campo-filtros > * {
+    min-width: 0;
 }
 
 .campo-filtros__actions {
@@ -274,8 +283,13 @@
         grid-template-columns: 1fr;
     }
 
+    .campo-filtros {
+        padding: 14px;
+    }
+
     .campo-filtros__actions {
-        grid-column: auto;
+        grid-column: 1 / -1;
+        flex-wrap: wrap;
     }
 
     .campo-grid {
@@ -292,5 +306,11 @@
 
     .campo-card__header {
         align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .campo-filtros__actions > * {
+        width: 100%;
     }
 }
