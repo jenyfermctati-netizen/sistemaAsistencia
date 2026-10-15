@@ -1,567 +1,88 @@
-/* ==========================================================
-   ACCIONES DEL HEADER
-========================================================== */
+.marcaciones-page{--mc-primary:var(--primary,#0f766e);--mc-primary-hover:var(--primary-hover,#0d665f);--mc-primary-light:var(--primary-light,#e7f6f3);--mc-surface:var(--surface,#fff);--mc-subtle:var(--surface-secondary,#f1f4f2);--mc-text:var(--text,#17211f);--mc-muted:var(--text-muted,#66736f);--mc-border:var(--border,#dde4e1);--mc-shadow:0 6px 20px rgba(20,45,38,.05);width:100%;min-width:0;display:grid;gap:20px;color:var(--mc-text);font-size:14px}
+.marcaciones-page,.marcaciones-page *,.marcaciones-page *::before,.marcaciones-page *::after{box-sizing:border-box}
+.marcaciones-page h2,.marcaciones-page h3,.marcaciones-page h4,.marcaciones-page p{margin:0}
+.marcaciones-page [hidden]{display:none!important}
 
-.page-header__actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+.marcaciones-header{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.marcaciones-header h2{font-size:26px;font-weight:800;letter-spacing:-.025em}
+.marcaciones-header p{margin-top:5px;color:var(--mc-muted);font-size:12px}
+.marcaciones-back{display:inline-block;margin-bottom:8px;color:var(--mc-primary);font-size:11px;font-weight:750;text-decoration:none}
+.marcaciones-now{display:grid;gap:2px;justify-items:end}
+.marcaciones-now span{color:var(--mc-muted);font-size:9px;font-weight:800;text-transform:uppercase}
+.marcaciones-now strong{font-size:14px}
+
+.marcaciones-alert{padding:12px 14px;border-radius:10px;font-size:12px}
+.marcaciones-alert--success{background:#e8f6ec;color:#166534}
+.marcaciones-alert--error{background:#feeaea;color:#991b1b}
+
+.marcaciones-panel,.manual-panel{overflow:hidden;border:1px solid var(--mc-border);border-radius:16px;background:var(--mc-surface);box-shadow:var(--mc-shadow)}
+.marcaciones-filtros{display:grid;grid-template-columns:minmax(210px,1.4fr) 145px 145px 135px 150px 140px auto;gap:9px;align-items:center;padding:15px;border-bottom:1px solid var(--mc-border)}
+.marcaciones-filtros__actions{display:flex;gap:7px}
+
+.marcaciones-page .form-control,.marcaciones-page .form-select,.marcaciones-page .form-textarea{width:100%;min-width:0;min-height:39px;padding:8px 10px;border:1px solid var(--mc-border);border-radius:8px;background:#fff;color:var(--mc-text);outline:none}
+.marcaciones-page .form-textarea{resize:vertical}
+.marcaciones-page .form-control:focus,.marcaciones-page .form-select:focus,.marcaciones-page .form-textarea:focus{border-color:var(--mc-primary);box-shadow:0 0 0 3px rgba(15,118,110,.1)}
+
+.table-container,.manual-table-wrap{width:100%;overflow-x:auto}
+.marcaciones-table,.manual-table{width:100%;min-width:820px;border-collapse:collapse;background:#fff}
+.marcaciones-table th,.manual-table th{padding:11px 13px;background:#fafcfb;color:var(--mc-muted);font-size:9px;font-weight:850;text-align:left;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.marcaciones-table td,.manual-table td{padding:12px 13px;border-top:1px solid var(--mc-border);color:var(--mc-text);font-size:12px;vertical-align:middle}
+.marcaciones-table tbody tr:hover,.manual-table tbody tr:hover{background:#fafcfb}
+
+.trabajador-info{display:flex;align-items:center;gap:10px;min-width:185px}
+.trabajador-info__avatar{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:11px;background:var(--mc-primary-light);color:var(--mc-primary);font-size:13px;font-weight:800}
+.trabajador-info>div:last-child{display:grid;gap:2px;min-width:0}
+.trabajador-info strong{font-size:12px;font-weight:750}
+.trabajador-info span,.trabajador-info small{color:var(--mc-muted);font-size:9px}
+.marcacion-hora,.manual-time{font-variant-numeric:tabular-nums;font-size:12px;font-weight:750}
+.table-secondary-text{display:block;margin-top:3px;color:var(--mc-muted);font-size:9px}
+.row-anulada{opacity:.65}
+.row-anulada td{background:#f7f8f7}
+
+.manual-panel__header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 18px;border-bottom:1px solid var(--mc-border)}
+.manual-panel__header h3{font-size:16px;font-weight:800}
+.manual-panel__header p{margin-top:3px;color:var(--mc-muted);font-size:10px}
+
+.manual-filters{display:grid;grid-template-columns:minmax(260px,1fr) 220px auto auto;gap:9px;padding:13px 18px;border-bottom:1px solid var(--mc-border);background:#fafcfb}
+
+.manual-empty{color:#a4aca8}
+.manual-complete{color:#15803d;font-size:10px;font-weight:800}
+
+.registro-especial{padding:17px 18px;border-bottom:1px solid var(--mc-border);background:#fbfcfb}
+.registro-especial__heading{margin-bottom:12px}
+.registro-especial__heading h4{font-size:13px;font-weight:800}
+.registro-especial__heading p{margin-top:3px;color:var(--mc-muted);font-size:10px}
+.registro-especial__form{display:grid;grid-template-columns:1.3fr 1fr .7fr;gap:11px;align-items:end}
+.registro-especial__motivo{grid-column:1 / -1}
+.registro-especial__actions{grid-column:1 / -1;display:flex;justify-content:flex-end}
+.form-group{display:grid;gap:5px}
+.form-label{color:var(--mc-muted);font-size:10px;font-weight:750}
+
+.anulacion-info{display:grid;gap:3px;margin-bottom:15px;padding:12px 13px;border:1px solid #fecaca;border-left:3px solid #b42318;border-radius:9px;background:#fff7f7}
+.anulacion-info strong{font-size:12px}
+.anulacion-info span{color:var(--mc-muted);font-size:10px}
+
+.empty-state{min-height:160px;display:grid;place-content:center;justify-items:center;gap:4px;color:var(--mc-muted);font-size:10px;text-align:center}
+.empty-state strong{color:var(--mc-text);font-size:12px}
+.table-empty{padding:35px!important}
+.pagination-container{display:flex;justify-content:center;margin-top:16px}
+
+@media(max-width:1250px){
+    .marcaciones-filtros{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .marcaciones-filtros__actions{grid-column:1 / -1;justify-content:flex-end}
 }
-
-
-/* ==========================================================
-   PANEL
-========================================================== */
-
-.panel {
-    width: 100%;
-    max-width: 100%;
-
-    background: var(--surface);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius-lg);
-
-    box-shadow: var(--shadow);
-
-    overflow: hidden;
+@media(max-width:850px){
+    .manual-filters{grid-template-columns:1fr 1fr}
+    .registro-especial__form{grid-template-columns:1fr 1fr}
 }
-
-.panel__header {
-    padding: 14px 16px;
-
-    border-bottom: 1px solid var(--border);
-}
-
-
-/* ==========================================================
-   FILTROS
-========================================================== */
-
-.marcaciones-filtros {
-    display: grid;
-    grid-template-columns:
-        minmax(190px, 1fr)
-        130px
-        130px
-        125px
-        145px
-        135px
-        auto
-        auto;
-    gap: 8px;
-    align-items: center;
-}
-
-.marcaciones-filtros input,
-.marcaciones-filtros select {
-    width: 100%;
-    min-height: 34px;
-    padding: 6px 9px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    background: var(--surface);
-    color: var(--text);
-    font-size: 12px;
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.marcaciones-filtros input::placeholder {
-    color: var(--text-muted);
-}
-
-.marcaciones-filtros input:focus,
-.marcaciones-filtros select:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.10);
-}
-
-
-/* ==========================================================
-   CONTENEDOR DE TABLA
-========================================================== */
-
-.table-container {
-    width: 100%;
-    max-width: 100%;
-
-    overflow-x: auto;
-
-    -webkit-overflow-scrolling: touch;
-}
-
-
-/* ==========================================================
-   INFORMACIÓN DEL TRABAJADOR
-========================================================== */
-
-.trabajador-info {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    min-width: 180px;
-}
-
-.trabajador-info__avatar {
-    width: 40px;
-    height: 40px;
-
-    flex-shrink: 0;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 10px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--primary-light),
-            #d9f3ee
-        );
-
-    border:
-        1px solid
-        rgba(15, 118, 110, 0.12);
-
-    color: var(--primary);
-
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.trabajador-info > div:last-child {
-    min-width: 0;
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 2px;
-}
-
-.trabajador-info strong {
-    color: var(--text);
-
-    font-size: 13.5px;
-    font-weight: 600;
-
-    line-height: 1.35;
-}
-
-.trabajador-info span,
-.trabajador-info small {
-    color: var(--text-muted);
-
-    font-size: 12px;
-
-    line-height: 1.4;
-}
-
-
-/* ==========================================================
-   TABLA DE MARCACIONES
-========================================================== */
-
-.marcaciones-table {
-    width: 100%;
-
-    border-collapse: collapse;
-
-    background: var(--surface);
-}
-
-.marcaciones-table th {
-    padding: 12px 13px;
-
-    background: var(--surface-secondary);
-
-    color: var(--text-muted);
-
-    font-size: 12.5px;
-    font-weight: 700;
-
-    text-align: left;
-
-    white-space: nowrap;
-}
-
-.marcaciones-table td {
-    padding: 12px 13px;
-
-    vertical-align: middle;
-
-    border-top: 1px solid var(--border);
-
-    color: var(--text);
-
-    font-size: 13.5px;
-
-    line-height: 1.45;
-}
-
-.marcaciones-table tbody tr {
-    transition:
-        background-color 0.16s ease;
-}
-
-.marcaciones-table tbody tr:hover {
-    background: #f8fbfa;
-}
-
-
-/* ==========================================================
-   HORA
-========================================================== */
-
-.marcacion-hora {
-    font-variant-numeric: tabular-nums;
-
-    font-size: 13.5px;
-    font-weight: 600;
-
-    white-space: nowrap;
-}
-
-
-/* ==========================================================
-   TEXTO SECUNDARIO
-========================================================== */
-
-.table-secondary-text {
-    display: block;
-
-    margin-top: 3px;
-
-    color: var(--text-muted);
-
-    font-size: 12px;
-
-    line-height: 1.4;
-}
-
-
-/* ==========================================================
-   ACCIONES
-========================================================== */
-
-.table-actions {
-    display: flex;
-
-    align-items: center;
-
-    gap: 6px;
-
-    flex-wrap: wrap;
-}
-
-.button--small {
-    min-height: 34px;
-
-    padding: 6px 10px;
-
-    border-radius: 7px;
-
-    font-size: 12px;
-}
-
-
-/* ==========================================================
-   FILA ANULADA
-========================================================== */
-
-.row-anulada {
-    opacity: 0.72;
-}
-
-.row-anulada td {
-    background: #f7f8f7;
-}
-
-.row-anulada:hover td {
-    background: #f2f5f3;
-}
-
-
-/* ==========================================================
-   ESTADO VACÍO
-========================================================== */
-
-.table-empty {
-    padding: 42px 24px !important;
-
-    text-align: center !important;
-
-    color: var(--text-muted);
-
-    font-size: 13px;
-}
-
-.empty-state {
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 6px;
-}
-
-.empty-state strong {
-    color: var(--text);
-
-    font-size: 14px;
-}
-
-.empty-state span,
-.empty-state p {
-    color: var(--text-muted);
-
-    font-size: 12.5px;
-}
-
-
-/* ==========================================================
-   FORMULARIOS
-========================================================== */
-
-.form-grid {
-    display: grid;
-
-    gap: 14px;
-}
-
-.form-grid--2 {
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-}
-
-
-/* ==========================================================
-   INFORMACIÓN MANUAL
-========================================================== */
-
-.manual-info {
-    margin-top: 10px;
-
-    padding: 14px 15px;
-
-    border: 1px solid var(--border);
-
-    border-left:
-        3px solid
-        var(--primary);
-
-    border-radius: var(--radius-md);
-
-    background: #f8fbfa;
-}
-
-.manual-info strong {
-    display: block;
-
-    margin-bottom: 4px;
-
-    color: var(--text);
-
-    font-size: 13px;
-}
-
-.manual-info p {
-    margin: 0;
-
-    color: var(--text-muted);
-
-    font-size: 12.5px;
-
-    line-height: 1.55;
-}
-
-
-/* ==========================================================
-   INFORMACIÓN DE ANULACIÓN
-========================================================== */
-
-.anulacion-info {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 4px;
-
-    margin-bottom: 16px;
-
-    padding: 14px 15px;
-
-    background: var(--danger-light);
-
-    border:
-        1px solid
-        rgba(194, 65, 59, 0.16);
-
-    border-left:
-        3px solid
-        var(--danger);
-
-    border-radius: var(--radius-md);
-}
-
-.anulacion-info strong {
-    color: var(--text);
-
-    font-size: 13px;
-}
-
-.anulacion-info span {
-    color: var(--text-muted);
-
-    font-size: 12px;
-
-    line-height: 1.45;
-}
-
-
-/* ==========================================================
-   PAGINACIÓN
-========================================================== */
-
-.pagination-container {
-    display: flex;
-
-    justify-content: center;
-
-    margin-top: 18px;
-}
-
-
-/* ==========================================================
-   LAPTOP
-========================================================== */
-
-@media (max-width: 1300px) {
-
-    .marcaciones-filtros {
-        grid-template-columns:
-            repeat(4, minmax(0, 1fr));
-    }
-
-}
-
-
-/* ==========================================================
-   TABLET
-========================================================== */
-
-@media (max-width: 1000px) {
-
-    .marcaciones-filtros {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-    .marcaciones-table {
-        min-width: 760px;
-    }
-
-}
-
-
-/* ==========================================================
-   MÓVIL
-========================================================== */
-
-@media (max-width: 700px) {
-
-    .page-header__actions {
-        width: 100%;
-
-        flex-direction: column;
-
-        align-items: stretch;
-    }
-
-    .page-header__actions .button {
-        width: 100%;
-
-        min-height: 42px;
-
-        font-size: 13px;
-    }
-
-    .marcaciones-filtros {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
-
-    .marcaciones-filtros .button {
-        width: 100%;
-    }
-
-    .form-grid--2 {
-        grid-template-columns: 1fr;
-    }
-
-    .panel__header {
-        padding: 14px;
-    }
-
-    .marcaciones-table {
-        min-width: 720px;
-    }
-
-}
-
-
-/* ==========================================================
-   MÓVILES PEQUEÑOS
-========================================================== */
-
-@media (max-width: 480px) {
-
-    .panel {
-        border-radius: 10px;
-    }
-
-    .panel__header {
-        padding: 13px;
-    }
-
-    .trabajador-info {
-        min-width: 165px;
-    }
-
-    .trabajador-info__avatar {
-        width: 38px;
-        height: 38px;
-    }
-
-    .trabajador-info strong {
-        font-size: 13px;
-    }
-
-    .marcaciones-table th {
-        font-size: 12px;
-    }
-
-    .marcaciones-table td {
-        font-size: 13px;
-    }
-
-    .manual-info,
-    .anulacion-info {
-        padding: 12px 13px;
-    }
-
+@media(max-width:650px){
+    .marcaciones-header{align-items:stretch;flex-direction:column}
+    .marcaciones-header>.button{width:100%}
+    .marcaciones-now{justify-items:start}
+    .marcaciones-filtros,.manual-filters,.registro-especial__form{grid-template-columns:1fr}
+    .marcaciones-filtros__actions,.registro-especial__motivo,.registro-especial__actions{grid-column:auto}
+    .marcaciones-filtros__actions{display:grid;grid-template-columns:1fr 1fr}
+    .manual-panel__header{align-items:stretch;flex-direction:column}
+    .manual-panel__header .button{width:100%}
+    .registro-especial__actions .button{width:100%}
 }

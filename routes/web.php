@@ -55,6 +55,8 @@ Route::middleware('auth')->group(function () {
 
     // Marcaciones
     Route::get('/marcaciones', [MarcacionController::class, 'index'])->name('marcaciones.index');
+    Route::get('/marcaciones/manual', [MarcacionController::class, 'manual'])->name('marcaciones.manual');
+    Route::post('/marcaciones/manual/{trabajador}', [MarcacionController::class, 'marcarAhora'])->name('marcaciones.marcarAhora');
     Route::post('/marcaciones', [MarcacionController::class, 'store'])->name('marcaciones.store');
     Route::patch('/marcaciones/{marcacion}/anular', [MarcacionController::class, 'anular'])->name('marcaciones.anular');
 
@@ -83,7 +85,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/solicitudes/{solicitud}/revisar', [SolicitudController::class, 'revisar'])->name('solicitudes.revisar');
     Route::get('/solicitudes/{solicitud}/archivo', [SolicitudController::class, 'verArchivo'])->name('solicitudes.archivo.ver');
     Route::get('/solicitudes/{solicitud}/archivo/descargar', [SolicitudController::class, 'descargarArchivo'])->name('solicitudes.archivo.descargar');
-    
+
     // Reportes de avance
     Route::get('/reportesAvance', [ReporteAvanceController::class, 'index'])->name('reportesAvance.index');
     Route::post('/reportesAvance', [ReporteAvanceController::class, 'store'])->name('reportesAvance.store');
