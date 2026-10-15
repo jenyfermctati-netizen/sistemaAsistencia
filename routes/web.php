@@ -4,6 +4,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AsignacionCampoController;
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FeriadoController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\MarcacionController;
@@ -31,9 +32,7 @@ Route::middleware('guest')->group(function () {
 // Rutas autenticadas
 Route::middleware('auth')->group(function () {
     // Dashboard
-    Route::get('/dashboard', function () {
-        return view('dashboard.index');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Áreas
     Route::get('/areas', [AreaController::class, 'index'])->name('areas.index');

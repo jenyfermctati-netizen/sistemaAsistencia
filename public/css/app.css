@@ -103,6 +103,19 @@ p {
         );
 }
 
+.navbar__left > div {
+    min-width: 0;
+}
+
+.navbar__title,
+.navbar__subtitle {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 
 /* ==========================================================
    CABECERA DE PÁGINA
@@ -686,7 +699,7 @@ textarea:focus-visible {
    TABLET / MÓVIL
 ========================================================== */
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
 
     .sidebar {
         width: min(280px, 86vw);
@@ -735,6 +748,14 @@ textarea:focus-visible {
         max-width: 100%;
 
         padding: 20px;
+    }
+
+    .navbar__user-info {
+        display: none;
+    }
+
+    .navbar__right {
+        gap: 8px;
     }
 
 }
@@ -824,6 +845,31 @@ textarea:focus-visible {
         line-height: 1.5;
     }
 
+    .navbar__subtitle {
+        display: none;
+    }
+
+    .navbar__avatar {
+        width: 34px;
+        height: 34px;
+    }
+
+    .navbar__logout-button {
+        width: 40px;
+        min-width: 40px;
+        padding: 0;
+    }
+
+    .navbar__logout-label {
+        display: none;
+    }
+
+    .navbar .navbar__logout-icon {
+        display: inline;
+        font-size: 18px;
+        line-height: 1;
+    }
+
 }
 
 
@@ -852,6 +898,14 @@ textarea:focus-visible {
         font-size: 13px;
     }
 
+    .navbar .navbar__logout-button {
+        width: 38px;
+    }
+
+}
+
+.navbar__logout-icon {
+    display: none;
 }
 /* Actualizaciones parciales de formularios */
 .live-region--loading {

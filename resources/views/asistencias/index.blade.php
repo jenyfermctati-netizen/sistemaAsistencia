@@ -29,20 +29,25 @@
             </h2>
 
             <p class="page-header__description">
-                Consulta y procesa la asistencia diaria utilizando
-                horarios y marcaciones.
+                @if($puedeProcesar)
+                    Consulta y procesa la asistencia diaria utilizando horarios y marcaciones.
+                @else
+                    Consulta la asistencia, las horas trabajadas y las tardanzas del personal.
+                @endif
             </p>
 
         </div>
 
 
-        <button
-            type="button"
-            class="button button--primary"
-            data-modal-open="modalProcesarAsistencia"
-        >
-            Procesar asistencia
-        </button>
+        @if($puedeProcesar)
+            <button
+                type="button"
+                class="button button--primary"
+                data-modal-open="modalProcesarAsistencia"
+            >
+                Procesar asistencia
+            </button>
+        @endif
 
     </div>
 
@@ -642,8 +647,11 @@
                                     </strong>
 
                                     <span>
-                                        Selecciona una fecha y procesa
-                                        la asistencia del personal.
+                                        @if($puedeProcesar)
+                                            Selecciona una fecha y procesa la asistencia del personal.
+                                        @else
+                                            No hay registros disponibles para los filtros seleccionados.
+                                        @endif
                                     </span>
 
                                 </div>
@@ -669,12 +677,13 @@
 
 
 
-    {{-- MODAL PROCESAR --}}
-    <x-modal
-        id="modalProcesarAsistencia"
-        title="Procesar asistencia"
-        size="small"
-    >
+    @if($puedeProcesar)
+        {{-- MODAL PROCESAR --}}
+        <x-modal
+            id="modalProcesarAsistencia"
+            title="Procesar asistencia"
+            size="small"
+        >
 
         <form
             method="POST"
@@ -738,6 +747,7 @@
 
         </form>
 
-    </x-modal>
+        </x-modal>
+    @endif
 
 @endsection
