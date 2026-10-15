@@ -96,6 +96,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/reportesAvance/pendientes/{pendiente}/resolver', [ReporteAvanceController::class, 'resolverPendiente'])->name('reportesAvance.pendientes.resolver');
     Route::patch('/reportesAvance/pendientes/{pendiente}/revisar', [ReporteAvanceController::class, 'revisarPendiente'])
         ->name('reportesAvance.pendientes.revisar');
+    Route::get('/reportesAvance/actividades/{actividad}/archivo', [ReporteAvanceController::class, 'verArchivoActividad'])
+        ->name('reportesAvance.actividades.archivo');
+    Route::get('/reportesAvance/actividades/{actividad}/descargar', [ReporteAvanceController::class, 'descargarArchivoActividad'])
+        ->name('reportesAvance.actividades.descargar');
 
     // Vacaciones
     Route::get('/vacaciones', [VacacionesController::class, 'index'])->name('vacaciones.index');
