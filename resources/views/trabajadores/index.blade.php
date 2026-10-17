@@ -39,32 +39,46 @@
         {{-- FILTROS --}}
         <div class="panel__header">
             <form method="GET" action="{{ route('trabajadores.index') }}" class="trabajadores-filtros">
-                <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control"
-                    placeholder="DNI, nombre, correo o código...">
+                <label class="filter-field">
+                    <span class="filter-field__label">Buscar trabajador</span>
+                    <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control"
+                        placeholder="DNI, nombre, correo o código...">
+                </label>
 
-                <select name="area_id" class="form-select">
-                    <option value="">Todas las áreas</option>
-                    @foreach ($areas as $area)
-                        <option value="{{ $area->id }}" @selected(request('area_id') == $area->id)>
-                            {{ $area->nombre }}
-                        </option>
-                    @endforeach
-                </select>
+                <label class="filter-field">
+                    <span class="filter-field__label">Área</span>
+                    <select name="area_id" class="form-select">
+                        <option value="">Todas las áreas</option>
+                        @foreach ($areas as $area)
+                            <option value="{{ $area->id }}" @selected(request('area_id') == $area->id)>
+                                {{ $area->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </label>
 
-                <select name="tipo_vinculo" class="form-select">
-                    <option value="">Todos los vínculos</option>
-                    <option value="CONTRATADO" @selected(request('tipo_vinculo') === 'CONTRATADO')>Contratado</option>
-                    <option value="LOCADOR" @selected(request('tipo_vinculo') === 'LOCADOR')>Locador</option>
-                </select>
+                <label class="filter-field">
+                    <span class="filter-field__label">Vínculo</span>
+                    <select name="tipo_vinculo" class="form-select">
+                        <option value="">Todos los vínculos</option>
+                        <option value="CONTRATADO" @selected(request('tipo_vinculo') === 'CONTRATADO')>Contratado</option>
+                        <option value="LOCADOR" @selected(request('tipo_vinculo') === 'LOCADOR')>Locador</option>
+                    </select>
+                </label>
 
-                <select name="estado" class="form-select">
-                    <option value="">Todos los estados</option>
-                    <option value="ACTIVO" @selected(request('estado') === 'ACTIVO')>Activo</option>
-                    <option value="INACTIVO" @selected(request('estado') === 'INACTIVO')>Inactivo</option>
-                </select>
+                <label class="filter-field">
+                    <span class="filter-field__label">Estado</span>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="ACTIVO" @selected(request('estado') === 'ACTIVO')>Activo</option>
+                        <option value="INACTIVO" @selected(request('estado') === 'INACTIVO')>Inactivo</option>
+                    </select>
+                </label>
 
-                <button type="submit" class="button button--secondary">Filtrar</button>
-                <a href="{{ route('trabajadores.index') }}" class="button button--secondary">Limpiar</a>
+                <div class="filter-actions">
+                    <button type="submit" class="button button--secondary">Filtrar</button>
+                    <a href="{{ route('trabajadores.index') }}" class="button button--secondary">Limpiar</a>
+                </div>
             </form>
         </div>
 

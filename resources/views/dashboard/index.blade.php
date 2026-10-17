@@ -21,7 +21,7 @@
                 <span class="dashboard-scope__dot" aria-hidden="true"></span>
                 {{ $scopeLabel }}
             </span>
-            <span class="dashboard-date">{{ now()->translatedFormat('d M Y') }}</span>
+            <span class="dashboard-date">{{ now()->locale('es')->translatedFormat('d M Y') }}</span>
         </div>
     </div>
 

@@ -107,6 +107,13 @@ document.addEventListener('DOMContentLoaded', function () {
     function configurarDia(fila) {
         const laborable = fila.querySelector('.dia-laborable').checked;
         const formato12 = selectorFormato.value === '12';
+        const estado = fila.querySelector('.dia-editor__estado');
+
+        fila.classList.toggle('dia-editor--descanso', !laborable);
+
+        if (estado) {
+            estado.textContent = laborable ? 'Laborable' : 'Descanso';
+        }
 
         fila.querySelectorAll('[data-hora-editor]').forEach(function (editor) {
             const campo24 = editor.querySelector('[data-hora-24]');

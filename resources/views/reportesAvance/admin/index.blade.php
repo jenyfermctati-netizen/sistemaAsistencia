@@ -64,6 +64,8 @@
                 <p>
                     @if(request('fecha_desde') || request('fecha_hasta'))
                         Mostrando las actividades correspondientes al periodo seleccionado.
+                    @elseif(request('estado'))
+                        Mostrando todos los reportes que coinciden con el estado seleccionado.
                     @else
                         Mostrando únicamente las actividades registradas hoy.
                     @endif
