@@ -15,11 +15,20 @@ class SolicitudController extends Controller
     public function index(Request $request)
     {
         $usuario = Auth::user();
-        $esAdministrador = $usuario->rol?->nombre === 'ADMINISTRADOR';
+        $rol = strtoupper(trim((string) $usuario->rol?->nombre));
+        $puedeGestionar = in_array($rol, ['ADMINISTRADOR', 'GERENTE'], true);
 
         $query = Solicitud::with(['trabajador.area', 'asistencia', 'revisadoPor']);
 
-        if (!$esAdministrador) {
+        if ($rol === 'GERENTE') {
+            $areaId = $usuario->trabajador?->area_id;
+
+            $areaId
+                ? $query->whereHas('trabajador', fn ($trabajador) =>
+                    $trabajador->where('area_id', $areaId))
+                    ->where('trabajador_id', '!=', $usuario->trabajador_id)
+                : $query->whereRaw('1 = 0');
+        } elseif ($rol !== 'ADMINISTRADOR') {
             if (!$usuario->trabajador_id)
                 $query->whereRaw('1 = 0');
             else
@@ -60,13 +69,13 @@ class SolicitudController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('trabajadores.solicitudes', compact('solicitudes', 'esAdministrador'));
+        return view('trabajadores.solicitudes', compact('solicitudes', 'puedeGestionar'));
     }
 
     public function store(Request $request)
     {
         $usuario = Auth::user();
-        if ($usuario->rol?->nombre === 'ADMINISTRADOR')
+        if (in_array($usuario->rol?->nombre, ['ADMINISTRADOR', 'GERENTE'], true))
             abort(403);
 
         if (!$usuario->trabajador_id) {
@@ -163,7 +172,7 @@ class SolicitudController extends Controller
 
     public function revisar(Request $request, Solicitud $solicitud)
     {
-        $this->verificarAdministrador();
+        $this->verificarSupervisor($solicitud);
 
         if ($solicitud->estado !== 'PENDIENTE') {
             return $this->error($request, 'Esta solicitud ya fue revisada o cancelada.');
@@ -272,10 +281,21 @@ class SolicitudController extends Controller
         abort_unless($usuario && $usuario->trabajador_id === $solicitud->trabajador_id, 403);
     }
 
-    private function verificarAdministrador(): void
+    private function verificarSupervisor(Solicitud $solicitud): void
     {
+        $usuario = Auth::user();
+
+        if ($usuario?->rol?->nombre === 'ADMINISTRADOR') {
+            return;
+        }
+
+        $solicitud->loadMissing('trabajador');
+
         abort_unless(
-            Auth::check() && Auth::user()->rol?->nombre === 'ADMINISTRADOR',
+            $usuario?->rol?->nombre === 'GERENTE'
+                && $usuario->trabajador?->area_id
+                && $solicitud->trabajador?->area_id === $usuario->trabajador->area_id
+                && $solicitud->trabajador_id !== $usuario->trabajador_id,
             403
         );
     }
@@ -283,9 +303,16 @@ class SolicitudController extends Controller
     private function verificarAccesoArchivo(Solicitud $solicitud): void
     {
         $usuario = Auth::user();
+        $solicitud->loadMissing('trabajador');
+
+        $esGerenteDelArea = $usuario?->rol?->nombre === 'GERENTE'
+            && $usuario->trabajador?->area_id
+            && $solicitud->trabajador?->area_id === $usuario->trabajador->area_id;
+
         abort_unless(
             $usuario && (
                 $usuario->rol?->nombre === 'ADMINISTRADOR' ||
+                $esGerenteDelArea ||
                 $usuario->trabajador_id === $solicitud->trabajador_id
             ),
             403

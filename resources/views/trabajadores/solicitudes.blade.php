@@ -2,7 +2,7 @@
 
 @section('title', 'Solicitudes')
 @section('page-title', 'Solicitudes')
-@section('page-subtitle', $esAdministrador ? 'Gestión de solicitudes del personal' : 'Mis solicitudes y justificaciones')
+@section('page-subtitle', $puedeGestionar ? 'Gestión de solicitudes del personal' : 'Mis solicitudes y justificaciones')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/pages/solicitudes.css') }}">
@@ -12,15 +12,14 @@
 
 <div class="solicitudes-page">
 
-    {{-- CABECERA --}}
     <header class="solicitudes-header">
         <div>
             <h2>
-                {{ $esAdministrador ? 'Solicitudes del personal' : 'Mis solicitudes' }}
+                {{ $puedeGestionar ? 'Solicitudes del personal' : 'Mis solicitudes' }}
             </h2>
 
             <p>
-                @if($esAdministrador)
+                @if($puedeGestionar)
                     Revisa permisos, justificaciones, tardanzas y omisiones de marcación.
                 @else
                     Consulta el estado de tus solicitudes o registra una nueva.
@@ -28,7 +27,7 @@
             </p>
         </div>
 
-        @unless($esAdministrador)
+        @unless($puedeGestionar)
             <button type="button"
                 class="button button--primary"
                 data-modal-open="modalCrearSolicitud">
@@ -71,7 +70,7 @@
                     name="buscar"
                     value="{{ request('buscar') }}"
                     class="form-control"
-                    placeholder="{{ $esAdministrador ? 'Trabajador, DNI o motivo...' : 'Tipo o motivo...' }}">
+                    placeholder="{{ $puedeGestionar ? 'Trabajador, DNI o motivo...' : 'Tipo o motivo...' }}">
             </label>
 
             <label class="solicitudes-field">
@@ -131,7 +130,7 @@
             <div class="solicitudes-table-heading">
                 <div>
                     <h3>
-                        {{ $esAdministrador ? 'Solicitudes recibidas' : 'Historial de solicitudes' }}
+                        {{ $puedeGestionar ? 'Solicitudes recibidas' : 'Historial de solicitudes' }}
                     </h3>
 
                     <p>
@@ -235,15 +234,15 @@
 
                                 data-comentario="{{ $solicitud->comentario_revision ?? '' }}"
 
-                                data-revisar-url="{{ $esAdministrador && $solicitud->estado === 'PENDIENTE'
+                                data-revisar-url="{{ $puedeGestionar && $solicitud->estado === 'PENDIENTE'
                                     ? route('solicitudes.revisar', $solicitud)
                                     : '' }}"
 
-                                data-editar-url="{{ !$esAdministrador && $solicitud->estado === 'PENDIENTE'
+                                data-editar-url="{{ !$puedeGestionar && $solicitud->estado === 'PENDIENTE'
                                     ? route('solicitudes.update', $solicitud)
                                     : '' }}"
 
-                                data-cancelar-url="{{ !$esAdministrador && $solicitud->estado === 'PENDIENTE'
+                                data-cancelar-url="{{ !$puedeGestionar && $solicitud->estado === 'PENDIENTE'
                                     ? route('solicitudes.cancelar', $solicitud)
                                     : '' }}">
 
@@ -336,7 +335,7 @@
                                         <strong>No existen solicitudes</strong>
 
                                         <span>
-                                            @if($esAdministrador)
+                                            @if($puedeGestionar)
                                                 No hay solicitudes registradas.
                                             @else
                                                 Todavía no has registrado solicitudes.
@@ -368,7 +367,7 @@
     @include('trabajadores.partials.detalle')
 
     {{-- CREAR SOLICITUD --}}
-    @unless($esAdministrador)
+    @unless($puedeGestionar)
 
         <x-modal id="modalCrearSolicitud"
             title="Nueva solicitud"
@@ -698,7 +697,7 @@
     @endunless
 
     {{-- REVISAR ADMIN --}}
-    @if($esAdministrador)
+    @if($puedeGestionar)
 
         <x-modal id="modalRevisarSolicitud"
             title="Revisar solicitud">

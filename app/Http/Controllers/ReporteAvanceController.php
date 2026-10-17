@@ -23,6 +23,9 @@ class ReporteAvanceController extends Controller
         $esTrabajador = $rol === 'TRABAJADOR';
         $puedeGestionar = $rol === 'ADMINISTRADOR';
         $puedeRevisar = in_array($rol, ['ADMINISTRADOR', 'GERENTE'], true);
+        $areaGerenteId = $rol === 'GERENTE'
+            ? $usuario->trabajador?->area_id
+            : null;
         $pestanaActiva = in_array($request->query('pestana'), ['avances', 'pendientes'], true)
             ? $request->query('pestana')
             : 'avances';
@@ -38,6 +41,12 @@ class ReporteAvanceController extends Controller
 
         if ($esTrabajador) {
             $query->where('trabajador_id', $usuario->trabajador_id);
+        } elseif ($rol === 'GERENTE') {
+            $areaGerenteId
+                ? $query->whereHas('trabajador', fn($trabajador) =>
+                    $trabajador->where('area_id', $areaGerenteId))
+                    ->where('trabajador_id', '!=', $usuario->trabajador_id)
+                : $query->whereRaw('1 = 0');
         }
 
         if ($request->filled('buscar')) {
@@ -61,7 +70,7 @@ class ReporteAvanceController extends Controller
             $query->where('estado', $request->estado);
         }
 
-        if (!$esTrabajador && $request->filled('area_id')) {
+        if ($rol === 'ADMINISTRADOR' && $request->filled('area_id')) {
             $areaId = $request->integer('area_id');
             $query->whereHas('trabajador', fn($trabajador) =>
                 $trabajador->where('area_id', $areaId));
@@ -75,7 +84,12 @@ class ReporteAvanceController extends Controller
             $query->whereDate('fecha_presentacion', '<=', $request->fecha_hasta);
         }
 
-        if (!$esTrabajador && !$request->filled('fecha_desde') && !$request->filled('fecha_hasta')) {
+        if (
+            !$esTrabajador
+            && !$request->filled('estado')
+            && !$request->filled('fecha_desde')
+            && !$request->filled('fecha_hasta')
+        ) {
             $query->whereDate('fecha_presentacion', today());
         }
 
@@ -92,6 +106,9 @@ class ReporteAvanceController extends Controller
 
         $areas = !$esTrabajador
             ? Area::where('estado', true)
+                ->when($rol === 'GERENTE', fn($query) => $areaGerenteId
+                    ? $query->whereKey($areaGerenteId)
+                    : $query->whereRaw('1 = 0'))
                 ->with(['trabajadores' => function ($q) {
                     $q
                         ->where('estado', 'ACTIVO')
@@ -331,6 +348,8 @@ class ReporteAvanceController extends Controller
             in_array($usuario->rol?->nombre, ['ADMINISTRADOR', 'GERENTE'], true),
             403
         );
+
+        $this->autorizarSupervisorDelReporte($reporte);
 
         $data = $request->validate([
             'estado' => ['required', Rule::in(['REVISADO', 'OBSERVADO'])],
@@ -762,15 +781,34 @@ class ReporteAvanceController extends Controller
 
         $actividad->loadMissing('reporte.trabajador');
 
-        $esAdministrador = in_array(
-            $usuario->rol?->nombre,
-            ['ADMINISTRADOR', 'GERENTE'],
-            true
-        );
+        $esAdministrador = $usuario->rol?->nombre === 'ADMINISTRADOR';
+
+        $esGerenteDelArea = $usuario->rol?->nombre === 'GERENTE'
+            && $usuario->trabajador?->area_id
+            && $actividad->reporte?->trabajador?->area_id === $usuario->trabajador->area_id;
 
         $esPropietario = $usuario->trabajador_id &&
             $actividad->reporte?->trabajador_id === $usuario->trabajador_id;
 
-        abort_unless($esAdministrador || $esPropietario, 403);
+        abort_unless($esAdministrador || $esGerenteDelArea || $esPropietario, 403);
+    }
+
+    private function autorizarSupervisorDelReporte(ReporteAvance $reporte): void
+    {
+        $usuario = Auth::user();
+
+        if ($usuario->rol?->nombre === 'ADMINISTRADOR') {
+            return;
+        }
+
+        $reporte->loadMissing('trabajador');
+
+        abort_unless(
+            $usuario->rol?->nombre === 'GERENTE'
+                && $usuario->trabajador?->area_id
+                && $reporte->trabajador?->area_id === $usuario->trabajador->area_id
+                && $reporte->trabajador_id !== $usuario->trabajador_id,
+            403
+        );
     }
 }

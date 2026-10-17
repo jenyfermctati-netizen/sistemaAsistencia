@@ -30,7 +30,7 @@
 
             <p class="page-header__description">
                 @if($puedeProcesar)
-                    Consulta y procesa la asistencia diaria utilizando horarios y marcaciones.
+                    Las marcaciones generan la asistencia automáticamente. Usa el cierre diario solo para completar faltas o recalcular registros.
                 @else
                     Consulta la asistencia, las horas trabajadas y las tardanzas del personal.
                 @endif
@@ -45,7 +45,7 @@
                 class="button button--primary"
                 data-modal-open="modalProcesarAsistencia"
             >
-                Procesar asistencia
+                Cerrar / recalcular día
             </button>
         @endif
 
@@ -129,6 +129,7 @@
                         </option>
 
                         @foreach([
+                            'INCIDENCIAS' => 'Todas las incidencias',
                             'PRESENTE' => 'Presente',
                             'TARDANZA' => 'Tardanza',
                             'FALTA' => 'Falta',
@@ -234,6 +235,7 @@
                         <th>Trabajador</th>
                         <th>Horario</th>
                         <th>Control</th>
+                        <th>Origen</th>
                         <th>Programado</th>
                         <th>Entrada</th>
                         <th>Salida</th>
@@ -262,7 +264,6 @@
                                 </strong>
 
                             </td>
-
 
                             <td>
 
@@ -347,6 +348,26 @@
 
                                 @endif
 
+                            </td>
+
+
+                            <td>
+                                @switch($asistencia->origen_marcacion)
+                                    @case('BIOMETRICO')
+                                        <span class="badge badge--success">Biométrico</span>
+                                        @break
+
+                                    @case('MANUAL')
+                                        <span class="badge badge--warning">Manual</span>
+                                        @break
+
+                                    @case('MIXTO')
+                                        <span class="badge badge--info">Mixto</span>
+                                        @break
+
+                                    @default
+                                        <span class="table-secondary-text">Sin marcación</span>
+                                @endswitch
                             </td>
 
 
@@ -636,7 +657,7 @@
                         <tr>
 
                             <td
-                                colspan="10"
+                                colspan="11"
                                 class="table-empty"
                             >
 
@@ -648,7 +669,7 @@
 
                                     <span>
                                         @if($puedeProcesar)
-                                            Selecciona una fecha y procesa la asistencia del personal.
+                                            Las asistencias aparecerán al recibir marcaciones. Usa el cierre diario para registrar faltas o excepciones sin marcación.
                                         @else
                                             No hay registros disponibles para los filtros seleccionados.
                                         @endif
@@ -681,7 +702,7 @@
         {{-- MODAL PROCESAR --}}
         <x-modal
             id="modalProcesarAsistencia"
-            title="Procesar asistencia"
+            title="Cerrar o recalcular asistencia"
             size="small"
         >
 
@@ -697,7 +718,7 @@
             <div class="form-group">
 
                 <label class="form-label">
-                    Fecha a procesar *
+                    Fecha a cerrar o recalcular *
                 </label>
 
                 <input
@@ -718,9 +739,7 @@
                 </strong>
 
                 <p>
-                    Revisará el horario y las marcaciones de
-                    todos los trabajadores activos para generar
-                    su asistencia correspondiente.
+                    Recalculará la fecha seleccionada para todo el personal activo. Esto completa faltas y excepciones de quienes no tuvieron marcaciones.
                 </p>
 
             </div>
@@ -740,7 +759,7 @@
                     type="submit"
                     class="button button--primary"
                 >
-                    Procesar
+                    Recalcular día
                 </button>
 
             </div>

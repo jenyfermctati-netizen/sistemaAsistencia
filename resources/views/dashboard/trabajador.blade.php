@@ -70,14 +70,26 @@
                     <span class="dashboard-panel__eyebrow">HISTORIAL PERSONAL</span>
                     <h3>Últimos días procesados</h3>
                 </div>
-                <span class="dashboard-text-link">Mes actual</span>
+                <span class="dashboard-text-link">{{ ucfirst($periodoLabel) }}</span>
             </div>
 
             <div class="dashboard-days">
                 @forelse($asistenciasRecientes as $asistencia)
                     <div class="dashboard-day">
-                        <span class="dashboard-day__date"><strong>{{ $asistencia->fecha->format('d') }}</strong><small>{{ $asistencia->fecha->translatedFormat('M') }}</small></span>
-                        <span><strong>{{ ucfirst(strtolower(str_replace('_', ' ', $asistencia->estado))) }}</strong><small>{{ $asistencia->hora_entrada ? substr($asistencia->hora_entrada, 0, 5) : '—' }} a {{ $asistencia->hora_salida ? substr($asistencia->hora_salida, 0, 5) : '—' }}</small></span>
+                        <span class="dashboard-day__date"><strong>{{ $asistencia->fecha->format('d') }}</strong><small>{{ $asistencia->fecha->locale('es')->translatedFormat('M') }}</small></span>
+                        <span>
+                            <strong>{{ ucfirst(strtolower(str_replace('_', ' ', $asistencia->estado))) }}</strong>
+                            <small>
+                                {{ $asistencia->hora_entrada ? substr($asistencia->hora_entrada, 0, 5) : '—' }}
+                                a {{ $asistencia->hora_salida ? substr($asistencia->hora_salida, 0, 5) : '—' }}
+                                · {{ match($asistencia->origen_marcacion) {
+                                    'BIOMETRICO' => 'Biométrico',
+                                    'MANUAL' => 'Manual',
+                                    'MIXTO' => 'Mixto',
+                                    default => 'Sin marcación',
+                                } }}
+                            </small>
+                        </span>
                         <b>{{ intdiv((int) $asistencia->minutos_trabajados, 60) }}h {{ (int) $asistencia->minutos_trabajados % 60 }}m</b>
                     </div>
                 @empty
@@ -95,15 +107,34 @@
             </div>
 
             <div class="dashboard-quick-grid">
-                <a href="{{ route('solicitudes.index') }}" class="dashboard-quick">
+                <a href="{{ route('solicitudes.index', ['estado' => 'PENDIENTE']) }}" class="dashboard-quick">
                     <span>SO</span><strong>Solicitudes</strong><small>{{ $solicitudesPendientes }} pendientes</small>
                 </a>
                 <a href="{{ route('reportesAvance.index') }}" class="dashboard-quick">
-                    <span>RA</span><strong>Avance diario</strong><small>{{ $reporteHoy ? 'Registrado hoy' : 'Falta registrar hoy' }}</small>
+                    <span>RA</span><strong>Avance diario</strong>
+                    <small>
+                        @if(!$reporteHoy)
+                            Falta registrar hoy
+                        @elseif($reporteHoy->estado === 'OBSERVADO')
+                            Observado: requiere corrección
+                        @elseif($reporteHoy->estado === 'REVISADO')
+                            Revisado hoy
+                        @else
+                            Registrado, pendiente de revisión
+                        @endif
+                    </small>
                 </a>
                 @if($puedeSolicitarVacaciones)
                     <a href="{{ route('vacaciones.index') }}" class="dashboard-quick">
-                        <span>VA</span><strong>Vacaciones</strong><small>{{ $vacacionActiva ? ucfirst(strtolower($vacacionActiva->estado)) : 'Sin solicitud activa' }}</small>
+                        <span>VA</span><strong>Vacaciones</strong>
+                        <small>
+                            @if($vacacionActiva)
+                                {{ ucfirst(strtolower($vacacionActiva->estado)) }}
+                                · {{ $vacacionActiva->fecha_inicio->format('d/m/Y') }}
+                            @else
+                                Sin solicitud activa
+                            @endif
+                        </small>
                     </a>
                 @endif
                 <a href="{{ route('reportesAvance.index', ['pestana' => 'pendientes']) }}" class="dashboard-quick">

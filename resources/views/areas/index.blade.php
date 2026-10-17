@@ -24,17 +24,25 @@
     <section class="panel">
         <div class="panel__header">
             <form method="GET" action="{{ route('areas.index') }}" class="areas-filtros">
-                <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control"
-                    placeholder="Buscar área...">
+                <label class="filter-field">
+                    <span class="filter-field__label">Buscar</span>
+                    <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control"
+                        placeholder="Nombre del área...">
+                </label>
 
-                <select name="estado" class="form-select">
-                    <option value="">Todos los estados</option>
-                    <option value="1" @selected(request('estado') === '1')>Activa</option>
-                    <option value="0" @selected(request('estado') === '0')>Inactiva</option>
-                </select>
+                <label class="filter-field">
+                    <span class="filter-field__label">Estado</span>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="1" @selected(request('estado') === '1')>Activa</option>
+                        <option value="0" @selected(request('estado') === '0')>Inactiva</option>
+                    </select>
+                </label>
 
-                <button type="submit" class="button button--secondary">Filtrar</button>
-                <a href="{{ route('areas.index') }}" class="button button--secondary">Limpiar</a>
+                <div class="filter-actions">
+                    <button type="submit" class="button button--secondary">Filtrar</button>
+                    <a href="{{ route('areas.index') }}" class="button button--secondary">Limpiar</a>
+                </div>
             </form>
         </div>
 

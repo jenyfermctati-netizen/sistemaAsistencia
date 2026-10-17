@@ -77,4 +77,20 @@ class Asistencia extends Model
             'asistencia_id'
         );
     }
+
+    public function getOrigenMarcacionAttribute(): ?string
+    {
+        $origenes = collect([
+            $this->marcacionEntrada?->origen,
+            $this->marcacionSalida?->origen,
+        ])->filter()->unique()->values();
+
+        if ($origenes->isEmpty()) {
+            return null;
+        }
+
+        return $origenes->count() > 1
+            ? 'MIXTO'
+            : $origenes->first();
+    }
 }

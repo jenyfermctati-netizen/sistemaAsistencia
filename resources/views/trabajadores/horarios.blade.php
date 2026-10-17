@@ -140,6 +140,9 @@
                                 <input type="checkbox" name="dias[{{ $numero }}][es_laborable]" value="1"
                                     class="dia-laborable" @checked($esLaborable)>
                                 <span>{{ $nombre }}</span>
+                                <span class="dia-editor__estado" aria-hidden="true">
+                                    {{ $esLaborable ? 'Laborable' : 'Descanso' }}
+                                </span>
                             </label>
 
                             @foreach (['entrada' => 'Entrada', 'salida' => 'Salida'] as $tipo => $etiqueta)

@@ -1,27 +1,27 @@
 <section class="dashboard-metrics" aria-label="Resumen del día">
-    <article class="dashboard-metric dashboard-metric--petrol">
+    <a class="dashboard-metric dashboard-metric--petrol" href="{{ route('trabajadores.index') }}" aria-label="Ver trabajadores activos">
         <span class="dashboard-metric__label">Equipo activo</span>
         <strong class="dashboard-metric__value">{{ $metrics['trabajadores'] }}</strong>
         <span class="dashboard-metric__caption">trabajadores en {{ $metrics['areas'] }} áreas</span>
-    </article>
+    </a>
 
-    <article class="dashboard-metric dashboard-metric--blue">
+    <a class="dashboard-metric dashboard-metric--blue" href="{{ route('asistencias.index', ['fecha_desde' => today()->toDateString(), 'fecha_hasta' => today()->toDateString()]) }}" aria-label="Ver asistencias de hoy">
         <span class="dashboard-metric__label">Asistencias de hoy</span>
         <strong class="dashboard-metric__value">{{ $metrics['asistencias'] }}</strong>
         <span class="dashboard-metric__caption">{{ $metrics['puntuales'] }} registros puntuales</span>
-    </article>
+    </a>
 
-    <article class="dashboard-metric dashboard-metric--sand">
+    <a class="dashboard-metric dashboard-metric--sand" href="{{ route('asistencias.index', ['fecha_desde' => today()->toDateString(), 'fecha_hasta' => today()->toDateString(), 'estado' => 'TARDANZA']) }}" aria-label="Ver tardanzas de hoy">
         <span class="dashboard-metric__label">Tardanzas de hoy</span>
         <strong class="dashboard-metric__value">{{ $metrics['tardanzas'] }}</strong>
         <span class="dashboard-metric__caption">requieren seguimiento</span>
-    </article>
+    </a>
 
-    <article class="dashboard-metric dashboard-metric--graphite">
+    <a class="dashboard-metric dashboard-metric--graphite" href="{{ route('marcaciones.index', ['fecha_desde' => today()->toDateString(), 'fecha_hasta' => today()->toDateString(), 'estado' => 'ACTIVA']) }}" aria-label="Ver marcaciones válidas de hoy">
         <span class="dashboard-metric__label">Marcaciones</span>
         <strong class="dashboard-metric__value">{{ $metrics['marcaciones'] }}</strong>
         <span class="dashboard-metric__caption">entradas y salidas válidas</span>
-    </article>
+    </a>
 </section>
 
 <div class="dashboard-columns">
@@ -29,7 +29,7 @@
         <div class="dashboard-panel__header">
             <div>
                 <span class="dashboard-panel__eyebrow">OPERACIÓN POR ÁREA</span>
-                <h3>Avance de asistencia</h3>
+                <h3>Cobertura de asistencia de hoy</h3>
             </div>
             <a class="dashboard-text-link" href="{{ route('asistencias.index') }}">Ver asistencias <span>→</span></a>
         </div>
@@ -44,13 +44,15 @@
                         </div>
                         <span class="dashboard-area__percentage">{{ $area->cobertura }}%</span>
                     </div>
-                    <div class="dashboard-progress" aria-label="{{ $area->cobertura }} por ciento procesado">
+                    <div class="dashboard-progress" aria-label="{{ $area->cobertura }} por ciento de cobertura de asistencia">
                         <span style="width: {{ $area->cobertura }}%"></span>
                     </div>
                     <div class="dashboard-area__details">
-                        <span>{{ $area->asistencias_hoy }} procesadas</span>
-                        <span>{{ $area->incidencias_hoy }} incidencias</span>
-                        <span>{{ $area->sin_procesar }} por procesar</span>
+                        <span>{{ $area->asistencias_hoy }} asistieron</span>
+                        <span>{{ $area->tardanzas_hoy }} tardanzas</span>
+                        <span>{{ $area->sin_asistencia_hoy }} sin asistencia</span>
+                        <span>{{ $area->justificadas_hoy }} justificados</span>
+                        <span>{{ $area->sin_procesar }} pendientes de registrar</span>
                     </div>
                 </article>
             @empty

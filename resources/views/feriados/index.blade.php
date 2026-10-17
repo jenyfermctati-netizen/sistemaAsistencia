@@ -41,38 +41,55 @@
     <section class="panel">
         <div class="panel__header">
             <form method="GET" action="{{ route('feriados.index') }}" class="feriados-filtros">
-                <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control"
-                    placeholder="Nombre o descripción..." aria-label="Buscar feriado">
+                <label class="filter-field">
+                    <span class="filter-field__label">Buscar feriado</span>
+                    <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control"
+                        placeholder="Nombre o descripción...">
+                </label>
 
-                <select name="tipo" class="form-select" aria-label="Tipo de feriado">
-                    <option value="">Todos los tipos</option>
-                    <option value="NACIONAL" @selected(request('tipo') === 'NACIONAL')>Nacional</option>
-                    <option value="REGIONAL" @selected(request('tipo') === 'REGIONAL')>Regional</option>
-                    <option value="LOCAL" @selected(request('tipo') === 'LOCAL')>Local</option>
-                    <option value="INSTITUCIONAL" @selected(request('tipo') === 'INSTITUCIONAL')>Institucional</option>
-                </select>
+                <label class="filter-field">
+                    <span class="filter-field__label">Tipo</span>
+                    <select name="tipo" class="form-select">
+                        <option value="">Todos los tipos</option>
+                        <option value="NACIONAL" @selected(request('tipo') === 'NACIONAL')>Nacional</option>
+                        <option value="REGIONAL" @selected(request('tipo') === 'REGIONAL')>Regional</option>
+                        <option value="LOCAL" @selected(request('tipo') === 'LOCAL')>Local</option>
+                        <option value="INSTITUCIONAL" @selected(request('tipo') === 'INSTITUCIONAL')>Institucional</option>
+                    </select>
+                </label>
 
-                <select name="area_id" class="form-select" aria-label="Área de aplicación">
-                    <option value="">Todas las áreas</option>
-                    <option value="GENERAL" @selected(request('area_id') === 'GENERAL')>General / todas las áreas</option>
-                    @foreach ($areas as $area)
-                        <option value="{{ $area->id }}" @selected(request('area_id') == $area->id)>
-                            {{ $area->nombre }}
-                        </option>
-                    @endforeach
-                </select>
+                <label class="filter-field">
+                    <span class="filter-field__label">Área de aplicación</span>
+                    <select name="area_id" class="form-select">
+                        <option value="">Todas las áreas</option>
+                        <option value="GENERAL" @selected(request('area_id') === 'GENERAL')>General / todas las áreas</option>
+                        @foreach ($areas as $area)
+                            <option value="{{ $area->id }}" @selected(request('area_id') == $area->id)>
+                                {{ $area->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </label>
 
-                <select name="estado" class="form-select" aria-label="Estado del feriado">
-                    <option value="">Todos los estados</option>
-                    <option value="ACTIVO" @selected(request('estado') === 'ACTIVO')>Activos</option>
-                    <option value="INACTIVO" @selected(request('estado') === 'INACTIVO')>Inactivos</option>
-                </select>
+                <label class="filter-field">
+                    <span class="filter-field__label">Estado</span>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="ACTIVO" @selected(request('estado') === 'ACTIVO')>Activos</option>
+                        <option value="INACTIVO" @selected(request('estado') === 'INACTIVO')>Inactivos</option>
+                    </select>
+                </label>
 
-                <input type="number" name="anio" value="{{ request('anio') }}" class="form-control" min="2020"
-                    max="2100" placeholder="Año" aria-label="Año del feriado">
+                <label class="filter-field">
+                    <span class="filter-field__label">Año</span>
+                    <input type="number" name="anio" value="{{ request('anio') }}" class="form-control" min="2020"
+                        max="2100" placeholder="Ej. {{ now()->year }}">
+                </label>
 
-                <button type="submit" class="button button--secondary">Filtrar</button>
-                <a href="{{ route('feriados.index') }}" class="button button--secondary">Limpiar</a>
+                <div class="filter-actions">
+                    <button type="submit" class="button button--secondary">Filtrar</button>
+                    <a href="{{ route('feriados.index') }}" class="button button--secondary">Limpiar</a>
+                </div>
             </form>
         </div>
 

@@ -34,6 +34,13 @@
     text-decoration: none;
 }
 
+.solicitudes-page > *,
+.solicitudes-page [data-live-region="solicitudes"] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
 /* CABECERA */
 
 .solicitudes-header {
@@ -724,21 +731,81 @@
 }
 
 @media (max-width: 700px) {
+    .solicitudes-page {
+        gap: 16px;
+    }
+
     .solicitudes-header {
+        width: 100%;
         align-items: stretch;
+        gap: 13px;
+    }
+
+    .solicitudes-header > div {
+        min-width: 0;
     }
 
     .solicitudes-header > .button {
         width: 100%;
+        min-width: 0;
+        justify-content: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .solicitudes-filter-panel {
+        width: 100%;
+        min-width: 0;
+        padding: 17px;
+        overflow: hidden;
+        border-radius: 17px;
+    }
+
+    .solicitudes-filter-panel__heading {
+        margin-bottom: 16px;
+        padding-bottom: 13px;
+        border-bottom: 1px solid var(--sol-border);
+    }
+
+    .solicitudes-filter-panel__heading h3 {
+        font-size: 17px;
+    }
+
+    .solicitudes-filter-panel__heading p {
+        margin-top: 5px;
+        line-height: 1.5;
     }
 
     .solicitudes-filtros {
+        width: 100%;
+        min-width: 0;
         grid-template-columns: 1fr;
+        gap: 13px;
+    }
+
+    .solicitudes-field {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .solicitudes-page .form-control,
+    .solicitudes-page .form-select {
+        min-height: 47px;
+        border-radius: 11px;
     }
 
     .solicitudes-filtros__actions {
+        width: 100%;
+        min-width: 0;
+        margin-top: 2px;
         display: grid;
         grid-template-columns: 1fr 1fr;
+    }
+
+    .solicitudes-filtros__actions > .button {
+        width: 100%;
+        min-width: 0;
+        justify-content: center;
     }
 
     .form-grid--2,
@@ -761,6 +828,26 @@
 
     .solicitud-document__actions {
         flex-direction: column;
+    }
+}
+
+@media (max-width: 420px) {
+    .solicitudes-page {
+        gap: 14px;
+    }
+
+    .solicitudes-filter-panel {
+        padding: 15px;
+        border-radius: 15px;
+    }
+
+    .solicitudes-filter-panel__heading {
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+    }
+
+    .solicitudes-filtros__actions {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -802,6 +889,262 @@
     .solicitud-detail-actions .button,
     .solicitud-rechazo__actions .button {
         width: 100%;
+    }
+}
+
+/* =========================================================
+   DETALLE DE SOLICITUD - MODAL RESPONSIVE
+   El modal vive fuera de .solicitudes-page, por lo que necesita
+   heredar explícitamente la misma paleta visual del módulo.
+   ========================================================= */
+
+#modalDetalleSolicitud {
+    --sol-primary: var(--primary, #264653);
+    --sol-primary-hover: var(--primary-hover, #1f3a45);
+    --sol-primary-light: var(--primary-light, #e8f1f5);
+    --sol-surface: var(--surface, #fffefc);
+    --sol-subtle: var(--surface-secondary, #f2ede6);
+    --sol-text: var(--text, #495057);
+    --sol-muted: var(--text-muted, #6b7378);
+    --sol-border: var(--border, #d9cdbf);
+}
+
+@media (max-width: 700px) {
+    #modalDetalleSolicitud {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    #modalDetalleSolicitud .modal__content {
+        width: 100%;
+        max-width: 100%;
+        max-height: 92vh;
+        max-height: 92dvh;
+        overflow-x: hidden;
+        border-radius: 18px 18px 0 0;
+    }
+
+    #modalDetalleSolicitud .modal__header {
+        padding: 13px 15px;
+        background: rgba(255, 254, 252, 0.97);
+    }
+
+    #modalDetalleSolicitud .modal__header h2 {
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    #modalDetalleSolicitud .modal__close {
+        width: 34px;
+        height: 34px;
+        min-height: 34px;
+        border-radius: 9px;
+        font-size: 17px;
+    }
+
+    #modalDetalleSolicitud .modal__body {
+        width: 100%;
+        min-width: 0;
+        padding: 12px;
+        overflow-x: hidden;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-layout {
+        width: 100%;
+        min-width: 0;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-info {
+        width: 100%;
+        min-width: 0;
+        gap: 11px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-person {
+        gap: 10px;
+        padding: 3px 2px 11px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-avatar {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+        border-radius: 11px;
+        font-size: 14px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-person > div:last-child {
+        min-width: 0;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-person h3 {
+        overflow-wrap: anywhere;
+        font-size: 13px;
+        line-height: 1.3;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-person span,
+    #modalDetalleSolicitud .solicitud-detail-person small {
+        font-size: 9px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-badges {
+        gap: 6px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-field {
+        min-width: 0;
+        gap: 3px;
+        padding: 9px 10px;
+        border-radius: 9px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-field span,
+    #modalDetalleSolicitud .solicitud-detail-motivo > span,
+    #modalDetalleSolicitud .solicitud-detail-review span {
+        font-size: 7px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-field strong,
+    #modalDetalleSolicitud .solicitud-detail-review strong {
+        overflow-wrap: anywhere;
+        font-size: 10px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-motivo {
+        gap: 5px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-motivo p {
+        min-height: 68px;
+        padding: 10px;
+        border-radius: 9px;
+        font-size: 10.5px;
+        line-height: 1.5;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-review {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 10px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-review__comment {
+        grid-column: 1 / -1;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-actions,
+    #modalDetalleSolicitud .solicitud-rechazo__actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+        width: 100%;
+        padding-top: 3px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-actions > *,
+    #modalDetalleSolicitud .solicitud-rechazo__actions > * {
+        width: 100%;
+        min-width: 0;
+        min-height: 40px;
+        padding-inline: 8px;
+        justify-content: center;
+        font-size: 10px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-actions > :last-child,
+    #modalDetalleSolicitud .solicitud-rechazo__actions > :last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+
+    #modalDetalleSolicitud .solicitud-document {
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+        border-radius: 12px;
+    }
+
+    #modalDetalleSolicitud .solicitud-document__header {
+        padding: 10px 12px;
+    }
+
+    #modalDetalleSolicitud .solicitud-document__header strong {
+        font-size: 11px;
+    }
+
+    #modalDetalleSolicitud .solicitud-document__header span {
+        font-size: 8px;
+    }
+
+    #modalDetalleSolicitud .solicitud-document__empty {
+        flex: 0 0 auto;
+        min-height: 118px;
+        gap: 4px;
+        padding: 16px 12px;
+    }
+
+    #modalDetalleSolicitud .solicitud-document__empty-icon {
+        width: 36px;
+        height: 36px;
+        margin-bottom: 2px;
+        border-radius: 10px;
+        font-size: 17px;
+    }
+
+    #modalDetalleSolicitud .solicitud-document__empty strong {
+        font-size: 10px;
+    }
+
+    #modalDetalleSolicitud .solicitud-document__empty span {
+        max-width: 230px;
+        font-size: 8px;
+    }
+
+    #modalDetalleSolicitud .solicitud-document__preview,
+    #modalDetalleSolicitud .solicitud-document__preview iframe {
+        min-height: 260px;
+    }
+
+    #modalDetalleSolicitud .solicitud-document__actions {
+        flex-direction: row;
+        gap: 7px;
+        padding: 9px;
+    }
+
+    #modalDetalleSolicitud .solicitud-document__actions .button {
+        min-width: 0;
+        min-height: 40px;
+        padding-inline: 7px;
+        justify-content: center;
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    #modalDetalleSolicitud .modal__body {
+        padding: 10px;
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-actions,
+    #modalDetalleSolicitud .solicitud-rechazo__actions {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #modalDetalleSolicitud .solicitud-detail-actions > :last-child,
+    #modalDetalleSolicitud .solicitud-rechazo__actions > :last-child:nth-child(odd) {
+        grid-column: auto;
     }
 }
 

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Iniciar sesión - Control de Asistencias</title>
+    <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/pages/login.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme-natural.css') }}">
 </head>

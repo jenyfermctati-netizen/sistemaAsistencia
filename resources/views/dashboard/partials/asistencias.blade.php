@@ -22,6 +22,7 @@
                 <th>Entrada</th>
                 <th>Salida</th>
                 <th>Horas</th>
+                <th>Origen</th>
                 <th>Estado</th>
             </tr>
         </thead>
@@ -41,6 +42,14 @@
                     <td data-label="Entrada">{{ $asistencia->hora_entrada ? substr($asistencia->hora_entrada, 0, 5) : '—' }}</td>
                     <td data-label="Salida">{{ $asistencia->hora_salida ? substr($asistencia->hora_salida, 0, 5) : '—' }}</td>
                     <td data-label="Horas">{{ intdiv((int) $asistencia->minutos_trabajados, 60) }}h {{ (int) $asistencia->minutos_trabajados % 60 }}m</td>
+                    <td data-label="Origen">
+                        {{ match($asistencia->origen_marcacion) {
+                            'BIOMETRICO' => 'Biométrico',
+                            'MANUAL' => 'Manual',
+                            'MIXTO' => 'Mixto',
+                            default => 'Sin marcación',
+                        } }}
+                    </td>
                     <td data-label="Estado">
                         <span class="dashboard-status dashboard-status--{{ strtolower(str_replace('_', '-', $asistencia->estado)) }}">
                             {{ $etiquetasEstado[$asistencia->estado] ?? ucfirst(strtolower($asistencia->estado)) }}
@@ -48,7 +57,7 @@
                     </td>
                 </tr>
             @empty
-                <tr class="dashboard-table__empty-row"><td colspan="{{ $mostrarArea ? 6 : 5 }}"><div class="dashboard-empty">Todavía no hay asistencias procesadas para hoy.</div></td></tr>
+                <tr class="dashboard-table__empty-row"><td colspan="{{ $mostrarArea ? 7 : 6 }}"><div class="dashboard-empty">Todavía no hay asistencias registradas para hoy.</div></td></tr>
             @endforelse
         </tbody>
     </table>

@@ -1057,3 +1057,249 @@
         flex-direction: column;
     }
 }
+
+/* =========================================================
+   HORARIO GENERAL - EXPERIENCIA MÓVIL
+   ========================================================= */
+
+.dia-editor__estado {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .main-content .horario-general {
+        width: 100%;
+        margin-inline: 0;
+        border-radius: 18px;
+    }
+
+    .horario-general .horario-general__header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px;
+        background: linear-gradient(135deg, rgba(38, 70, 83, 0.06), rgba(175, 203, 222, 0.12));
+    }
+
+    .horario-general__header > div {
+        min-width: 0;
+    }
+
+    .horario-general__header h3 {
+        margin: 0 0 4px;
+        font-size: 17px;
+        line-height: 1.25;
+    }
+
+    .horario-general__header p {
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    .horario-general .horario-general__form {
+        padding: 15px;
+    }
+
+    .horario-general .form-grid--3 {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .horario-general :is(.form-control, .form-select) {
+        width: 100%;
+        min-width: 0;
+        min-height: 46px;
+        border-radius: 11px;
+    }
+
+    .horario-general .form-help-box {
+        margin-top: 16px;
+        padding: 13px 14px;
+        border-left-width: 1px;
+        border-radius: 13px;
+        font-size: 11px;
+        line-height: 1.55;
+    }
+
+    .horario-general .form-help-box strong {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 12px;
+    }
+
+    .horario-general .form-section__heading {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--surface-secondary);
+    }
+
+    .horario-general .form-section__heading > div {
+        min-width: 0;
+        flex: 1 1 190px;
+    }
+
+    .horario-general .form-section__title {
+        margin-bottom: 3px;
+        font-size: 15px;
+    }
+
+    .horario-general .formato-indicador {
+        min-height: 27px;
+        padding: 4px 9px;
+        font-size: 9px;
+        white-space: normal;
+    }
+
+    .horario-general .dias-editor {
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .horario-general .dia-editor {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px 10px;
+        align-items: start;
+        padding: 0 13px 13px;
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 4px 14px rgba(38, 70, 83, 0.05);
+    }
+
+    .horario-general .dia-editor:hover {
+        transform: none;
+    }
+
+    .horario-general .dia-editor__nombre {
+        grid-column: 1 / -1;
+        min-height: 48px;
+        margin: 0 -13px;
+        padding: 10px 13px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(175, 203, 222, 0.17);
+        font-size: 14px;
+        font-weight: 750;
+        cursor: pointer;
+    }
+
+    .horario-general .dia-laborable {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 20px;
+        accent-color: var(--primary);
+    }
+
+    .horario-general .dia-editor__estado {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        margin-left: auto;
+        padding: 3px 8px;
+        border: 1px solid rgba(38, 70, 83, 0.14);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--primary);
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .horario-general .dia-editor > .form-group:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .horario-general .dia-editor .form-group {
+        min-width: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .horario-general .dia-editor .form-label {
+        margin-bottom: 6px;
+        font-size: 10px;
+        font-weight: 750;
+        letter-spacing: 0.035em;
+        text-transform: uppercase;
+    }
+
+    .horario-general .hora-12 {
+        grid-template-columns: minmax(0, 1fr) 62px;
+        gap: 6px;
+    }
+
+    .horario-general .hora-periodo {
+        padding-inline: 7px;
+    }
+
+    .horario-general .dia-editor--descanso {
+        background: rgba(73, 80, 87, 0.035);
+        box-shadow: none;
+    }
+
+    .horario-general .dia-editor--descanso .dia-editor__nombre {
+        background: rgba(217, 205, 191, 0.22);
+    }
+
+    .horario-general .dia-editor--descanso .dia-editor__estado {
+        border-color: rgba(73, 80, 87, 0.12);
+        background: rgba(73, 80, 87, 0.07);
+        color: var(--text-muted);
+    }
+
+    .horario-general .dia-editor--descanso .form-group {
+        opacity: 0.5;
+    }
+
+    .horario-general .horario-general__actions {
+        position: static;
+        inset: auto;
+        z-index: auto;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+        gap: 9px;
+        margin: 20px 0 0;
+        padding: 16px 0 0;
+        border-top: 1px solid var(--border);
+        background: transparent;
+    }
+
+    .horario-general .horario-general__actions .button {
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 380px) {
+    .horario-general .horario-general__form {
+        padding: 12px;
+    }
+
+    .horario-general .dia-editor {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0 11px 11px;
+    }
+
+    .horario-general .dia-editor__nombre {
+        margin-inline: -11px;
+        padding-inline: 11px;
+    }
+
+    .horario-general .dia-editor > .form-group:last-child {
+        grid-column: auto;
+    }
+
+    .horario-general .horario-general__actions {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

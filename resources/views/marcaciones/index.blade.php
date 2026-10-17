@@ -49,35 +49,53 @@
         <div class="panel__header">
 
             <form method="GET" action="{{ route('marcaciones.index') }}" class="marcaciones-filtros">
-                <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control"
-                    placeholder="DNI, trabajador o biométrico..." aria-label="Buscar trabajador">
+                <label class="filter-field">
+                    <span class="filter-field__label">Buscar trabajador</span>
+                    <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control"
+                        placeholder="DNI, trabajador o biométrico...">
+                </label>
 
-                <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="form-control"
-                    aria-label="Fecha desde" title="Fecha desde">
+                <label class="filter-field">
+                    <span class="filter-field__label">Desde</span>
+                    <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="form-control">
+                </label>
 
-                <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="form-control"
-                    aria-label="Fecha hasta" title="Fecha hasta">
+                <label class="filter-field">
+                    <span class="filter-field__label">Hasta</span>
+                    <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="form-control">
+                </label>
 
-                <select name="tipo" class="form-select" aria-label="Tipo de marcación">
-                    <option value="">Todos los tipos</option>
-                    <option value="ENTRADA" @selected(request('tipo') === 'ENTRADA')>Entrada</option>
-                    <option value="SALIDA" @selected(request('tipo') === 'SALIDA')>Salida</option>
-                </select>
+                <label class="filter-field">
+                    <span class="filter-field__label">Tipo</span>
+                    <select name="tipo" class="form-select">
+                        <option value="">Todos los tipos</option>
+                        <option value="ENTRADA" @selected(request('tipo') === 'ENTRADA')>Entrada</option>
+                        <option value="SALIDA" @selected(request('tipo') === 'SALIDA')>Salida</option>
+                    </select>
+                </label>
 
-                <select name="origen" class="form-select" aria-label="Origen de la marcación">
-                    <option value="">Todos los orígenes</option>
-                    <option value="BIOMETRICO" @selected(request('origen') === 'BIOMETRICO')>Biométrico</option>
-                    <option value="MANUAL" @selected(request('origen') === 'MANUAL')>Manual</option>
-                </select>
+                <label class="filter-field">
+                    <span class="filter-field__label">Origen</span>
+                    <select name="origen" class="form-select">
+                        <option value="">Todos los orígenes</option>
+                        <option value="BIOMETRICO" @selected(request('origen') === 'BIOMETRICO')>Biométrico</option>
+                        <option value="MANUAL" @selected(request('origen') === 'MANUAL')>Manual</option>
+                    </select>
+                </label>
 
-                <select name="estado" class="form-select" aria-label="Estado de la marcación">
-                    <option value="">Todos los estados</option>
-                    <option value="ACTIVA" @selected(request('estado') === 'ACTIVA')>Activas</option>
-                    <option value="ANULADA" @selected(request('estado') === 'ANULADA')>Anuladas</option>
-                </select>
+                <label class="filter-field">
+                    <span class="filter-field__label">Estado</span>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="ACTIVA" @selected(request('estado') === 'ACTIVA')>Activas</option>
+                        <option value="ANULADA" @selected(request('estado') === 'ANULADA')>Anuladas</option>
+                    </select>
+                </label>
 
-                <button type="submit" class="button button--secondary">Filtrar</button>
-                <a href="{{ route('marcaciones.index') }}" class="button button--secondary">Limpiar</a>
+                <div class="filter-actions">
+                    <button type="submit" class="button button--secondary">Filtrar</button>
+                    <a href="{{ route('marcaciones.index') }}" class="button button--secondary">Limpiar</a>
+                </div>
 
             </form>
 

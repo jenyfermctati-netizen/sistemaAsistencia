@@ -60,7 +60,7 @@
                 </div>
             </div>
 
-            @if($esAdministrador)
+            @if($puedeGestionar)
                 <form method="POST" id="formDecisionSolicitud"
                     class="solicitud-decision"
                     data-live-form data-live-target="solicitudes"

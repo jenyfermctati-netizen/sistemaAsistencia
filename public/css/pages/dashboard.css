@@ -86,8 +86,19 @@
     border: 1px solid var(--dashboard-sand);
     border-radius: 19px;
     background: #fffefc;
+    color: inherit;
+    text-decoration: none;
     box-shadow: 0 10px 28px rgba(38, 70, 83, .075);
     transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.dashboard-metric[href] {
+    cursor: pointer;
+}
+
+.dashboard-metric[href]:focus-visible {
+    outline: 3px solid rgba(175, 205, 222, .9);
+    outline-offset: 3px;
 }
 
 .dashboard-metric::before {
