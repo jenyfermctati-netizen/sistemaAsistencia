@@ -12,6 +12,7 @@ use App\Http\Controllers\ReporteAvanceController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\TrabajadorController;
 use App\Http\Controllers\VacacionesController;
+use App\Http\Controllers\BiometricoController;
 use Illuminate\Support\Facades\Route;
 
 // Redirección inicial
@@ -115,3 +116,20 @@ Route::middleware('auth')->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
+
+
+//Biometrico
+Route::match(['GET','POST'],'/iclock/cdata',[BiometricoController::class,'cdata']);
+Route::match(['GET','POST'],'/iclock/cdata.aspx',[BiometricoController::class,'cdata']);
+
+Route::match(['GET','POST'],'/iclock/getrequest',[BiometricoController::class,'getRequest']);
+Route::match(['GET','POST'],'/iclock/getrequest.aspx',[BiometricoController::class,'getRequest']);
+
+Route::match(['GET','POST'],'/iclock/devicecmd',[BiometricoController::class,'deviceCmd']);
+Route::match(['GET','POST'],'/iclock/devicecmd.aspx',[BiometricoController::class,'deviceCmd']);
+
+Route::match(['GET','POST'],'/iclock/registry',[BiometricoController::class,'registry']);
+Route::match(['GET','POST'],'/iclock/registry.aspx',[BiometricoController::class,'registry']);
+
+Route::match(['GET','POST'],'/iclock/ping',[BiometricoController::class,'ping']);
+Route::match(['GET','POST'],'/iclock/ping.aspx',[BiometricoController::class,'ping']);
