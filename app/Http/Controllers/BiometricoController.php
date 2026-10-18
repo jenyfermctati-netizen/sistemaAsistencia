@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DispositivoBiometrico;
 use App\Models\Marcacion;
 use App\Models\Trabajador;
 use App\Services\AsistenciaService;
@@ -11,13 +12,16 @@ use Illuminate\Support\Facades\Log;
 
 class BiometricoController extends Controller
 {
-    public function __construct(private readonly AsistenciaService $asistenciaService)
-    {
-    }
+    public function __construct(
+        private readonly AsistenciaService $asistenciaService
+    ) {}
 
     public function cdata(Request $request)
     {
         $sn = $this->validarDispositivo($request);
+
+        $this->registrarConexion($sn, $request->ip());
+
         $table = strtoupper(trim((string) $request->query('table')));
 
         if ($request->isMethod('get')) {
@@ -55,6 +59,7 @@ class BiometricoController extends Controller
     {
         $sn = $this->validarDispositivo($request);
 
+        $this->registrarConexion($sn, $request->ip());
         Log::debug('SENSEFACE POLLING', [
             'sn' => $sn,
             'ip' => $request->ip(),
@@ -67,6 +72,7 @@ class BiometricoController extends Controller
     {
         $sn = $this->validarDispositivo($request);
 
+        $this->registrarConexion($sn, $request->ip());
         Log::info('SENSEFACE DEVICECMD', [
             'sn' => $sn,
             'query' => $request->query(),
@@ -79,6 +85,8 @@ class BiometricoController extends Controller
     public function registry(Request $request)
     {
         $sn = $this->validarDispositivo($request);
+
+        $this->registrarConexion($sn, $request->ip());
 
         Log::info('SENSEFACE REGISTRY', [
             'sn' => $sn,
@@ -208,6 +216,8 @@ class BiometricoController extends Controller
                     'anulada' => false,
                 ]);
 
+                $this->registrarUltimaMarcacion($sn, $fechaHora);
+
                 $this->asistenciaService->procesarTrabajador(
                     $trabajador,
                     $fechaHora->copy()->startOfDay()
@@ -286,10 +296,8 @@ class BiometricoController extends Controller
         return null;
     }
 
-    private function determinarTipo(
-        int $trabajadorId,
-        Carbon $fechaHora
-    ): string {
+    private function determinarTipo(int $trabajadorId, Carbon $fechaHora): string
+    {
         $tieneMarcacion = Marcacion::where(
             'trabajador_id',
             $trabajadorId
@@ -355,5 +363,25 @@ class BiometricoController extends Controller
                 'text/plain; charset=UTF-8'
             )
             ->header('Server', 'zkfpid/2.0');
+    }
+
+    private function registrarConexion(string $sn, ?string $ip): void
+    {
+        DispositivoBiometrico::updateOrCreate(
+            ['serial' => $sn],
+            [
+                'nombre' => 'SenseFace Principal',
+                'modelo' => 'SenseFace 2A',
+                'ultima_ip' => $ip,
+                'ultima_conexion' => now(),
+            ]
+        );
+    }
+
+    private function registrarUltimaMarcacion(string $sn, Carbon $fechaHora): void
+    {
+        DispositivoBiometrico::where('serial', $sn)->update([
+            'ultima_marcacion' => $fechaHora,
+        ]);
     }
 }
