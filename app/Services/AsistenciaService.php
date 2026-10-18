@@ -20,34 +20,71 @@ class AsistenciaService
         $fecha = $fecha->copy()->startOfDay();
         $fechaTexto = $fecha->toDateString();
 
-        $asignacion = TrabajadorHorario::with('horario.dias')
+        $asignacion = TrabajadorHorario::with(
+            'horario.dias'
+        )
             ->where('trabajador_id', $trabajador->id)
-            ->whereDate('fecha_inicio', '<=', $fechaTexto)
+            ->where('estado', true)
+            ->whereDate(
+                'fecha_inicio',
+                '<=',
+                $fechaTexto
+            )
             ->where(function ($query) use ($fechaTexto) {
-                $query->whereNull('fecha_fin')
-                    ->orWhereDate('fecha_fin', '>=', $fechaTexto);
+                $query
+                    ->whereNull('fecha_fin')
+                    ->orWhereDate(
+                        'fecha_fin',
+                        '>=',
+                        $fechaTexto
+                    );
             })
             ->orderByDesc('fecha_inicio')
             ->first();
 
         $horario = $asignacion?->horario;
-        $diaHorario = $horario?->dias?->firstWhere('dia_semana', $fecha->isoWeekday());
-        $marcaciones = Marcacion::where('trabajador_id', $trabajador->id)
+
+        $diaHorario = $horario?->dias?->firstWhere(
+            'dia_semana',
+            $fecha->isoWeekday()
+        );
+
+        $marcaciones = Marcacion::where(
+            'trabajador_id',
+            $trabajador->id
+        )
             ->whereDate('fecha_hora', $fechaTexto)
             ->where('anulada', false)
             ->orderBy('fecha_hora')
             ->get();
-        $entrada = $marcaciones->where('tipo', 'ENTRADA')->first();
-        $salida = $marcaciones->where('tipo', 'SALIDA')->last();
-        $minutosTrabajados = $this->calcularMinutosTrabajados($entrada, $salida);
 
-        $feriado = Feriado::whereDate('fecha', $fechaTexto)
+        $entrada = $marcaciones
+            ->where('tipo', 'ENTRADA')
+            ->first();
+
+        $salida = $marcaciones
+            ->where('tipo', 'SALIDA')
+            ->last();
+
+        $minutosTrabajados = $this
+            ->calcularMinutosTrabajados(
+                $entrada,
+                $salida
+            );
+
+        $feriado = Feriado::whereDate(
+            'fecha',
+            $fechaTexto
+        )
             ->where('estado', true)
             ->where(function ($query) use ($trabajador) {
                 $query->whereNull('area_id');
 
                 if ($trabajador->area_id) {
-                    $query->orWhere('area_id', $trabajador->area_id);
+                    $query->orWhere(
+                        'area_id',
+                        $trabajador->area_id
+                    );
                 }
             })
             ->orderByRaw('area_id IS NULL ASC')
@@ -63,7 +100,10 @@ class AsistenciaService
                 $horario?->id,
                 $diaHorario?->hora_entrada,
                 $diaHorario?->hora_salida,
-                (int) ($diaHorario?->tolerancia_minutos ?? 0),
+                (int) (
+                    $diaHorario?->tolerancia_minutos
+                        ?? 0
+                ),
                 $entrada,
                 $salida,
                 $minutosTrabajados
@@ -72,35 +112,67 @@ class AsistenciaService
             return;
         }
 
-        $vacacion = Vacaciones::where('trabajador_id', $trabajador->id)
-            ->whereIn('estado', ['APROBADA', 'PROGRAMADA', 'EN_CURSO', 'GOZADA'])
-            ->whereDate('fecha_inicio', '<=', $fechaTexto)
-            ->whereDate('fecha_fin', '>=', $fechaTexto)
-            ->first();
+        if (strtoupper(trim((string) $trabajador->tipo_vinculo)) === 'CONTRATADO') {
+            $vacacion = Vacaciones::where(
+                'trabajador_id',
+                $trabajador->id
+            )
+                ->whereIn('estado', [
+                    'APROBADA',
+                    'PROGRAMADA',
+                    'EN_CURSO',
+                    'GOZADA',
+                ])
+                ->whereDate(
+                    'fecha_inicio',
+                    '<=',
+                    $fechaTexto
+                )
+                ->whereDate(
+                    'fecha_fin',
+                    '>=',
+                    $fechaTexto
+                )
+                ->first();
 
-        if ($vacacion) {
-            $this->guardarExcepcion(
-                $trabajador,
-                $fecha,
-                'VACACIONES',
-                'Trabajador dentro de su periodo de vacaciones aprobado.',
-                $asignacion,
-                $horario?->id,
-                $diaHorario?->hora_entrada,
-                $diaHorario?->hora_salida,
-                (int) ($diaHorario?->tolerancia_minutos ?? 0),
-                $entrada,
-                $salida,
-                $minutosTrabajados
-            );
+            if ($vacacion) {
+                $this->guardarExcepcion(
+                    $trabajador,
+                    $fecha,
+                    'VACACIONES',
+                    'Trabajador dentro de su periodo de vacaciones aprobado.',
+                    $asignacion,
+                    $horario?->id,
+                    $diaHorario?->hora_entrada,
+                    $diaHorario?->hora_salida,
+                    (int) (
+                        $diaHorario?->tolerancia_minutos
+                            ?? 0
+                    ),
+                    $entrada,
+                    $salida,
+                    $minutosTrabajados
+                );
 
-            return;
+                return;
+            }
         }
 
-        $campo = AsignacionCampo::where('trabajador_id', $trabajador->id)
+        $campo = AsignacionCampo::where(
+            'trabajador_id',
+            $trabajador->id
+        )
             ->where('estado', '!=', 'CANCELADA')
-            ->whereDate('fecha_inicio', '<=', $fechaTexto)
-            ->whereDate('fecha_fin', '>=', $fechaTexto)
+            ->whereDate(
+                'fecha_inicio',
+                '<=',
+                $fechaTexto
+            )
+            ->whereDate(
+                'fecha_fin',
+                '>=',
+                $fechaTexto
+            )
             ->first();
 
         if ($campo) {
@@ -114,12 +186,20 @@ class AsistenciaService
                 $trabajador,
                 $fecha,
                 'CAMPO',
-                Str::limit($detalle.'. Actividad: '.$campo->actividad, 450),
+                Str::limit(
+                    $detalle
+                        . '. Actividad: '
+                        . $campo->actividad,
+                    450
+                ),
                 $asignacion,
                 $horario?->id,
                 $diaHorario?->hora_entrada,
                 $diaHorario?->hora_salida,
-                (int) ($diaHorario?->tolerancia_minutos ?? 0),
+                (int) (
+                    $diaHorario?->tolerancia_minutos
+                        ?? 0
+                ),
                 $entrada,
                 $salida,
                 $minutosTrabajados
@@ -128,25 +208,53 @@ class AsistenciaService
             return;
         }
 
-        $solicitud = Solicitud::where('trabajador_id', $trabajador->id)
+        $solicitud = Solicitud::where(
+            'trabajador_id',
+            $trabajador->id
+        )
             ->where('estado', 'APROBADA')
-            ->whereDate('fecha_inicio', '<=', $fechaTexto)
+            ->whereDate(
+                'fecha_inicio',
+                '<=',
+                $fechaTexto
+            )
             ->where(function ($query) use ($fechaTexto) {
-                $query->where(function ($sinFechaFin) use ($fechaTexto) {
-                    $sinFechaFin->whereNull('fecha_fin')
-                        ->whereDate('fecha_inicio', $fechaTexto);
-                })->orWhereDate('fecha_fin', '>=', $fechaTexto);
+                $query
+                    ->where(function (
+                        $sinFechaFin
+                    ) use ($fechaTexto) {
+                        $sinFechaFin
+                            ->whereNull('fecha_fin')
+                            ->whereDate(
+                                'fecha_inicio',
+                                $fechaTexto
+                            );
+                    })
+                    ->orWhereDate(
+                        'fecha_fin',
+                        '>=',
+                        $fechaTexto
+                    );
             })
-            ->orderByRaw("CASE WHEN tipo = 'PERMISO' THEN 0 ELSE 1 END")
+            ->orderByRaw(
+                "CASE WHEN tipo = 'PERMISO' THEN 0 ELSE 1 END"
+            )
             ->orderByDesc('fecha_revision')
             ->first();
 
         if ($solicitud) {
-            $estado = $solicitud->tipo === 'PERMISO' ? 'PERMISO' : 'JUSTIFICADO';
-            $observacion = "Solicitud aprobada ({$solicitud->tipo})";
+            $estado = $solicitud->tipo === 'PERMISO'
+                ? 'PERMISO'
+                : 'JUSTIFICADO';
+
+            $observacion =
+                "Solicitud aprobada ({$solicitud->tipo})";
 
             if ($solicitud->motivo) {
-                $observacion .= ': '.Str::limit($solicitud->motivo, 350);
+                $observacion .= ': ' . Str::limit(
+                    $solicitud->motivo,
+                    350
+                );
             }
 
             $this->guardarExcepcion(
@@ -158,7 +266,10 @@ class AsistenciaService
                 $horario?->id,
                 $diaHorario?->hora_entrada,
                 $diaHorario?->hora_salida,
-                (int) ($diaHorario?->tolerancia_minutos ?? 0),
+                (int) (
+                    $diaHorario?->tolerancia_minutos
+                        ?? 0
+                ),
                 $entrada,
                 $salida,
                 $minutosTrabajados
@@ -198,10 +309,15 @@ class AsistenciaService
         }
 
         if ($asignacion->tipo_control === 'REFERENCIAL') {
-            $estado = (!$entrada && !$salida) ? 'SIN_REGISTRO' : 'PRESENTE';
+            $estado = (!$entrada && !$salida)
+                ? 'SIN_REGISTRO'
+                : 'PRESENTE';
+
             $observacion = match (true) {
-                !$entrada && !$salida => 'No existen marcaciones para este día. Control referencial.',
-                !$entrada || !$salida => 'Marcación incompleta. Control referencial.',
+                !$entrada && !$salida =>
+                    'No existen marcaciones para este día. Control referencial.',
+                !$entrada || !$salida =>
+                    'Marcación incompleta. Control referencial.',
                 default => null,
             };
 
@@ -256,17 +372,34 @@ class AsistenciaService
             return;
         }
 
-        $horaEntrada = Carbon::parse($entrada->fecha_hora);
-        $horaProgramada = Carbon::parse($fechaTexto.' '.$diaHorario->hora_entrada);
-        $horaLimite = $horaProgramada->copy()->addMinutes($diaHorario->tolerancia_minutos);
-        $minutosTardanza = $horaEntrada->gt($horaLimite)
-            ? $horaLimite->diffInMinutes($horaEntrada)
-            : 0;
+        $horaEntrada = Carbon::parse(
+            $entrada->fecha_hora
+        );
+
+        $horaProgramada = Carbon::parse(
+            $fechaTexto . ' '
+            . $diaHorario->hora_entrada
+        );
+
+        $horaLimite = $horaProgramada
+            ->copy()
+            ->addMinutes(
+                $diaHorario->tolerancia_minutos
+            );
+
+        $minutosTardanza = $horaEntrada
+            ->gt($horaLimite)
+                ? $horaLimite->diffInMinutes(
+                    $horaEntrada
+                )
+                : 0;
 
         $this->guardarAsistencia(
             trabajador: $trabajador,
             fecha: $fecha,
-            estado: $minutosTardanza > 0 ? 'TARDANZA' : 'PRESENTE',
+            estado: $minutosTardanza > 0
+                ? 'TARDANZA'
+                : 'PRESENTE',
             horarioId: $horario->id,
             tipoControl: 'OBLIGATORIO',
             horaProgramadaEntrada: $diaHorario->hora_entrada,
@@ -276,7 +409,9 @@ class AsistenciaService
             salida: $salida,
             minutosTrabajados: $minutosTrabajados,
             minutosTardanza: $minutosTardanza,
-            observacion: $salida ? null : 'No existe marcación de salida.'
+            observacion: $salida
+                ? null
+                : 'No existe marcación de salida.'
         );
     }
 
@@ -317,10 +452,13 @@ class AsistenciaService
         }
 
         $horaEntrada = Carbon::parse($entrada->fecha_hora);
+
         $horaSalida = Carbon::parse($salida->fecha_hora);
 
         return $horaSalida->gt($horaEntrada)
-            ? $horaEntrada->diffInMinutes($horaSalida)
+            ? $horaEntrada->diffInMinutes(
+                $horaSalida
+            )
             : 0;
     }
 
@@ -339,12 +477,19 @@ class AsistenciaService
         int $minutosTardanza = 0,
         ?string $observacion = null
     ): void {
-        $asistencia = Asistencia::where('trabajador_id', $trabajador->id)
-            ->whereDate('fecha', $fecha->toDateString())
-            ->first() ?? new Asistencia([
-                'trabajador_id' => $trabajador->id,
-                'fecha' => $fecha->toDateString(),
-            ]);
+        $asistencia = Asistencia::where(
+            'trabajador_id',
+            $trabajador->id
+        )
+            ->whereDate(
+                'fecha',
+                $fecha->toDateString()
+            )
+            ->first()
+                ?? new Asistencia([
+                    'trabajador_id' => $trabajador->id,
+                    'fecha' => $fecha->toDateString(),
+                ]);
 
         $asistencia->fill([
             'horario_id' => $horarioId,
@@ -362,6 +507,7 @@ class AsistenciaService
             'observacion' => $observacion,
             'procesado_en' => now(),
         ]);
+
         $asistencia->save();
     }
 }
