@@ -10,6 +10,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FeriadoController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\MarcacionController;
+use App\Http\Controllers\NewPasswordController;
+use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\PasswordResetLinkController;
 use App\Http\Controllers\ReporteAvanceController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\TrabajadorController;
@@ -29,10 +32,26 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+    Route::get('/olvide-contrasena', [PasswordResetLinkController::class, 'create'])
+        ->name('password.request');
+    Route::post('/olvide-contrasena', [PasswordResetLinkController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('password.email');
+    Route::get('/restablecer-contrasena/{token}', [NewPasswordController::class, 'create'])
+        ->name('password.reset');
+    Route::post('/restablecer-contrasena', [NewPasswordController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('password.store');
 });
 
 // Rutas autenticadas
 Route::middleware('auth')->group(function () {
+    Route::get('/mi-cuenta/contrasena', [PasswordController::class, 'edit'])
+        ->name('password.edit');
+    Route::put('/mi-cuenta/contrasena', [PasswordController::class, 'update'])
+        ->middleware('throttle:5,1')
+        ->name('password.update');
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -116,7 +135,7 @@ Route::middleware('auth')->group(function () {
 
     // Biometrico
     Route::get('/biometrico', [BiometricoEstadoController::class, 'index'])->name('biometrico.index');
-    
+
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

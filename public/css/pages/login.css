@@ -265,6 +265,16 @@ button {
     line-height: 1.45;
 }
 
+.login-alert--success {
+    color: #166534;
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.login-alert--success .login-alert__icon {
+    background: #15803d;
+}
+
 .login-alert__icon {
     width: 20px;
     height: 20px;
@@ -394,6 +404,30 @@ button {
     gap: 18px;
     color: var(--login-muted);
     font-size: 12px;
+}
+
+.login-options a,
+.login-back-link {
+    color: var(--login-primary-dark);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.login-options a:hover,
+.login-back-link:hover {
+    text-decoration: underline;
+}
+
+.login-card__actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.login-form__help {
+    margin: -4px 0 0;
+    color: var(--login-muted);
+    font-size: 12px;
+    line-height: 1.5;
 }
 
 .remember-option {

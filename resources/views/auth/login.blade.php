@@ -66,6 +66,13 @@
                         <p>Inicia sesión con tu cuenta para continuar.</p>
                     </header>
 
+                    @if (session('status'))
+                        <div class="login-alert login-alert--success" role="status">
+                            <span class="login-alert__icon" aria-hidden="true">✓</span>
+                            <div><p>{{ session('status') }}</p></div>
+                        </div>
+                    @endif
+
                     @if ($errors->any())
                         <div class="login-alert" role="alert">
                             <span class="login-alert__icon" aria-hidden="true">!</span>
@@ -123,7 +130,7 @@
                                 <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
                                 <span>Recordarme</span>
                             </label>
-                            <span>Acceso exclusivo para personal autorizado</span>
+                            <a href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
                         </div>
 
                         <button type="submit" class="login-submit">
