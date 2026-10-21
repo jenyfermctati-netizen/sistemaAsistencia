@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BiometricoController;
 use App\Http\Controllers\BiometricoEstadoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ConsultaDniController;
 use App\Http\Controllers\FeriadoController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\MarcacionController;
@@ -62,6 +63,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/areas/{area}/estado', [AreaController::class, 'cambiarEstado'])->name('areas.estado');
 
     // Trabajadores
+    Route::post('/trabajadores/consultar-dni', [ConsultaDniController::class, 'consultar'])
+        ->middleware('throttle:20,1')
+        ->name('trabajadores.consultar-dni');
     Route::get('/trabajadores', [TrabajadorController::class, 'index'])->name('trabajadores.index');
     Route::post('/trabajadores', [TrabajadorController::class, 'store'])->name('trabajadores.store');
     Route::put('/trabajadores/{trabajador}', [TrabajadorController::class, 'update'])->name('trabajadores.update');

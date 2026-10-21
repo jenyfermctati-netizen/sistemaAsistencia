@@ -6,6 +6,76 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Consulta de DNI al registrar un trabajador (API Perú desde Laravel).
+    const formCrear = document.getElementById('formCrearTrabajador');
+    if (formCrear) {
+        const dniInput = document.getElementById('crearDni');
+        const nombresInput = document.getElementById('crearNombres');
+        const apellidosInput = document.getElementById('crearApellidos');
+        const btnConsultar = document.getElementById('btnConsultarDni');
+        const mensajeConsulta = document.getElementById('mensajeConsultaDni');
+        let controllerConsulta = null;
+
+        function mostrarMensaje(texto, error = false) {
+            mensajeConsulta.textContent = texto;
+            mensajeConsulta.style.color = error ? '#b91c1c' : '';
+        }
+
+        dniInput.addEventListener('input', function () {
+            dniInput.value = dniInput.value.replace(/\D/g, '').slice(0, 8);
+            controllerConsulta?.abort();
+            btnConsultar.disabled = false;
+            mostrarMensaje('');
+        });
+
+        btnConsultar.addEventListener('click', async function () {
+            const dni = dniInput.value.trim();
+            if (!/^\d{8}$/.test(dni)) {
+                mostrarMensaje('Ingrese un DNI válido de 8 dígitos.', true);
+                dniInput.focus();
+                return;
+            }
+
+            controllerConsulta?.abort();
+            controllerConsulta = new AbortController();
+            const currentController = controllerConsulta;
+            btnConsultar.disabled = true;
+            mostrarMensaje('Consultando DNI...');
+
+            try {
+                const csrf = formCrear.querySelector('input[name="_token"]')?.value;
+                const response = await fetch(formCrear.dataset.consultaDniUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrf ?? '',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ dni }),
+                    signal: currentController.signal,
+                });
+                const resultado = await response.json();
+                if (!response.ok || !resultado.success) {
+                    throw new Error(resultado.message || 'No se pudo consultar el DNI.');
+                }
+                if (dniInput.value !== dni) return;
+                nombresInput.value = resultado.data.nombres || '';
+                apellidosInput.value = resultado.data.apellidos || '';
+                mostrarMensaje('Datos encontrados. Verifique los nombres y apellidos.');
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    mostrarMensaje(error.message || 'Error de conexión. Complete los datos manualmente.', true);
+                }
+            } finally {
+                if (controllerConsulta === currentController) {
+                    btnConsultar.disabled = false;
+                    controllerConsulta = null;
+                }
+            }
+        });
+    }
+
     // Editar trabajador
     const formEditar = document.getElementById('formEditarTrabajador');
 

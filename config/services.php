@@ -32,4 +32,12 @@ return [
     'senseface' => [
         'serial' => env('BIOMETRICO_SENSEFACE_SN'),
     ],
+    
+   'decolecta' => [
+    'token' => env('DECOLECTA_TOKEN'),
+    'url' => env(
+        'DECOLECTA_URL',
+        'https://api.decolecta.com'
+    ),
+],
 ];
