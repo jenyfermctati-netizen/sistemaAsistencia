@@ -21,19 +21,9 @@ class BiometricoController extends Controller
     public function cdata(Request $request)
     {
         $sn = $this->validarDispositivo($request);
-
         $this->registrarConexion($sn, $request->ip());
 
-        $table = strtoupper(trim((string) $request->query('table')));
-
-        if ($request->isMethod('get')) {
-            if ($request->query('options') === 'all') {
-                return $this->opciones($sn);
-            }
-
-            return $this->texto('OK');
-        }
-
+        $table = strtoupper(trim((string) $request->query('table', '')));
         $body = trim($request->getContent());
 
         Log::info('SENSEFACE CDATA', [
@@ -43,21 +33,34 @@ class BiometricoController extends Controller
             'body' => $body,
         ]);
 
+        if ($request->isMethod('GET')) {
+            return $this->texto($this->opcionesDispositivo($sn));
+        }
+
         if ($table === 'ATTLOG') {
             return $this->procesarAttlog($sn, $body);
         }
 
-        if (in_array($table, ['USERINFO', 'OPERLOG'], true)) {
+        if ($table === 'USERINFO') {
             $this->procesarUsuariosDispositivo($sn, $body);
+
             return $this->texto('OK');
         }
 
-        if (in_array($table, ['OPTIONS', 'OPERLOG', 'USERINFO', 'USER'], true)) {
-            Log::info("SENSEFACE {$table}", [
+        if ($table === 'OPERLOG') {
+            Log::info('SENSEFACE OPERLOG', [
                 'sn' => $sn,
                 'body' => $body,
             ]);
+
+            return $this->texto('OK');
         }
+
+        Log::debug('SENSEFACE CDATA SIN PROCESADOR', [
+            'sn' => $sn,
+            'table' => $table,
+            'body' => $body,
+        ]);
 
         return $this->texto('OK');
     }
@@ -480,10 +483,9 @@ class BiometricoController extends Controller
 
     private function parsearUsuarioBiometrico(string $linea): ?array
     {
-        if (
-            !str_starts_with(strtoupper($linea), 'USER') &&
-            !preg_match('/\bPIN=/i', $linea)
-        ) {
+        $linea = trim($linea);
+
+        if (!preg_match('/^USER(?:\s|\t)/i', $linea)) {
             return null;
         }
 
@@ -497,12 +499,23 @@ class BiometricoController extends Controller
             $nombre
         );
 
-        preg_match('/\b(?:Pri|Privilege)=([^\s\t]+)/i', $linea, $privilegio);
-        preg_match('/\bCard=([^\s\t]+)/i', $linea, $tarjeta);
+        preg_match(
+            '/\b(?:Pri|Privilege)=([^\s\t]+)/i',
+            $linea,
+            $privilegio
+        );
+
+        preg_match(
+            '/\bCard=([^\s\t]+)/i',
+            $linea,
+            $tarjeta
+        );
 
         return [
             'pin' => trim($pin[1]),
-            'nombre' => isset($nombre[1]) ? trim($nombre[1]) : null,
+            'nombre' => isset($nombre[1])
+                ? trim($nombre[1])
+                : null,
             'privilegio' => $privilegio[1] ?? null,
             'tarjeta' => $tarjeta[1] ?? null,
         ];
