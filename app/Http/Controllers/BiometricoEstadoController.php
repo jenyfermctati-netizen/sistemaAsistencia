@@ -8,6 +8,7 @@ use App\Models\BiometricoUsuario;
 use App\Models\BiometricoComando;
 use App\Services\BiometricoSyncService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class BiometricoEstadoController extends Controller
 {
