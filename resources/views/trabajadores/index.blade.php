@@ -196,7 +196,7 @@
 
     {{-- MODAL CREAR TRABAJADOR --}}
     <x-modal id="modalCrearTrabajador" title="Nuevo trabajador" size="large">
-        <form method="POST" action="{{ route('trabajadores.store') }}" class="form">
+        <form method="POST" action="{{ route('trabajadores.store') }}" class="form" id="formCrearTrabajador" data-consulta-dni-url="{{ route('trabajadores.consultar-dni') }}">
             @csrf
 
             {{-- DATOS PERSONALES --}}
@@ -205,8 +205,14 @@
                 <div class="form-grid form-grid--2">
                     <div class="form-group">
                         <label class="form-label">DNI *</label>
-                        <input type="text" name="dni" value="{{ old('dni') }}" class="form-control"
-                            maxlength="15" required>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input type="text" id="crearDni" name="dni" value="{{ old('dni') }}"
+                                class="form-control" maxlength="8" minlength="8" inputmode="numeric"
+                                pattern="[0-9]{8}" autocomplete="off" style="min-width:0;flex:1" required>
+                            <button type="button" id="btnConsultarDni" class="button button--secondary"
+                                style="white-space:nowrap">Buscar DNI</button>
+                        </div>
+                        <small id="mensajeConsultaDni" class="form-help" role="status" aria-live="polite"></small>
                         @error('dni')
                             <small class="form-error">{{ $message }}</small>
                         @enderror
@@ -223,7 +229,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Nombres *</label>
-                        <input type="text" name="nombres" value="{{ old('nombres') }}" class="form-control"
+                        <input type="text" id="crearNombres" name="nombres" value="{{ old('nombres') }}" class="form-control"
                             maxlength="100" required>
                         @error('nombres')
                             <small class="form-error">{{ $message }}</small>
@@ -232,7 +238,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Apellidos *</label>
-                        <input type="text" name="apellidos" value="{{ old('apellidos') }}" class="form-control"
+                        <input type="text" id="crearApellidos" name="apellidos" value="{{ old('apellidos') }}" class="form-control"
                             maxlength="100" required>
                         @error('apellidos')
                             <small class="form-error">{{ $message }}</small>
