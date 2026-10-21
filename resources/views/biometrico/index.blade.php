@@ -94,6 +94,21 @@
                                 Comparar trabajadores
                             </button>
                         </form>
+                        @if($pendientes > 0)
+    <form method="POST"
+        action="{{ route('biometrico.usuarios.sincronizar-pendientes', $dispositivo) }}"
+        onsubmit="return confirm('¿Deseas enviar los {{ $pendientes }} trabajadores pendientes al biométrico? Los usuarios que ya existen no serán modificados.');">
+        @csrf
+
+        <button
+            class="button button--sync-all"
+            type="submit"
+            {{ !$conectado ? 'disabled' : '' }}
+        >
+            Sincronizar pendientes ({{ $pendientes }})
+        </button>
+    </form>
+@endif
                     </div>
                 </div>
 

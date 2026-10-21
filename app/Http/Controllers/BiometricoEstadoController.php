@@ -137,4 +137,47 @@ class BiometricoEstadoController extends Controller
             );
         }
     }
+
+    public function sincronizarPendientes(DispositivoBiometrico $dispositivo)
+    {
+        $this->verificarAdministrador();
+
+        if (!$dispositivo->esta_conectado) {
+            return back()->with(
+                'error',
+                'El dispositivo biométrico no está conectado.'
+            );
+        }
+
+        try {
+            $resultado = $this
+                ->biometricoSyncService
+                ->sincronizarPendientes($dispositivo);
+
+            if ($resultado['total'] === 0) {
+                return back()->with(
+                    'success',
+                    'No hay trabajadores pendientes de sincronización.'
+                );
+            }
+
+            return back()->with(
+                'success',
+                'Sincronización preparada. '
+                    . 'Nuevos comandos: ' . $resultado['creados']
+                    . ', ya en cola: ' . $resultado['existentes']
+                    . ', errores: ' . $resultado['errores'] . '.'
+            );
+        } catch (\Throwable $e) {
+            \Log::error('Error sincronizando pendientes SenseFace', [
+                'dispositivo_id' => $dispositivo->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with(
+                'error',
+                'No se pudo preparar la sincronización de los trabajadores pendientes.'
+            );
+        }
+    }
 }

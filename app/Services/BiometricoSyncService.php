@@ -281,4 +281,49 @@ class BiometricoSyncService
 
         return mb_substr(trim($nombre), 0, 50);
     }
+
+    public function sincronizarPendientes(
+        DispositivoBiometrico $dispositivo
+    ): array {
+        $usuarios = BiometricoUsuario::with('trabajador')
+            ->where('dispositivo_id', $dispositivo->id)
+            ->where('estado', 'PENDIENTE')
+            ->whereNotNull('trabajador_id')
+            ->get();
+
+        $creados = 0;
+        $existentes = 0;
+        $errores = 0;
+
+        foreach ($usuarios as $usuario) {
+            try {
+                $comando = $this->sincronizarUsuario(
+                    $dispositivo,
+                    $usuario
+                );
+
+                if ($comando->wasRecentlyCreated) {
+                    $creados++;
+                } else {
+                    $existentes++;
+                }
+            } catch (\Throwable $e) {
+                $errores++;
+
+                \Log::error('Error preparando sincronización masiva SenseFace', [
+                    'dispositivo_id' => $dispositivo->id,
+                    'usuario_id' => $usuario->id,
+                    'pin' => $usuario->pin,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return [
+            'creados' => $creados,
+            'existentes' => $existentes,
+            'errores' => $errores,
+            'total' => $usuarios->count(),
+        ];
+    }
 }

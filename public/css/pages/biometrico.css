@@ -298,3 +298,14 @@
         width: 100%;
     }
 }
+
+.button--sync-all {
+    background: #28708c;
+    border-color: #28708c;
+    color: #fff;
+}
+
+.button--sync-all:hover {
+    background: #225f77;
+    border-color: #225f77;
+}

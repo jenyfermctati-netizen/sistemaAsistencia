@@ -145,6 +145,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/biometrico/{dispositivo}/reconciliar', [BiometricoEstadoController::class, 'reconciliar'])
         ->name('biometrico.usuarios.reconciliar');
     Route::post('/biometrico/{dispositivo}/usuarios/{usuario}/sincronizar', [BiometricoEstadoController::class, 'sincronizarUsuario'])->name('biometrico.usuarios.sincronizar');
+    Route::post('/biometrico/{dispositivo}/usuarios/sincronizar-pendientes', [BiometricoEstadoController::class, 'sincronizarPendientes'])->name('biometrico.usuarios.sincronizar-pendientes');
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
