@@ -136,6 +136,11 @@ Route::middleware('auth')->group(function () {
     // Biometrico
     Route::get('/biometrico', [BiometricoEstadoController::class, 'index'])->name('biometrico.index');
 
+    Route::post('/biometrico/{dispositivo}/consultar-usuarios', [BiometricoEstadoController::class, 'consultarUsuarios'])
+        ->name('biometrico.usuarios.consultar');
+    Route::post('/biometrico/{dispositivo}/reconciliar', [BiometricoEstadoController::class, 'reconciliar'])
+        ->name('biometrico.usuarios.reconciliar');
+
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

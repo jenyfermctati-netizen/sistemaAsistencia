@@ -6,6 +6,7 @@ use App\Models\DispositivoBiometrico;
 use App\Models\Marcacion;
 use App\Models\Trabajador;
 use App\Services\AsistenciaService;
+use App\Services\BiometricoSyncService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +14,8 @@ use Illuminate\Support\Facades\Log;
 class BiometricoController extends Controller
 {
     public function __construct(
-        private readonly AsistenciaService $asistenciaService
+        private readonly AsistenciaService $asistenciaService,
+        private readonly BiometricoSyncService $biometricoSyncService,
     ) {}
 
     public function cdata(Request $request)
@@ -45,6 +47,11 @@ class BiometricoController extends Controller
             return $this->procesarAttlog($sn, $body);
         }
 
+        if (in_array($table, ['USERINFO', 'OPERLOG'], true)) {
+            $this->procesarUsuariosDispositivo($sn, $body);
+            return $this->texto('OK');
+        }
+
         if (in_array($table, ['OPTIONS', 'OPERLOG', 'USERINFO', 'USER'], true)) {
             Log::info("SENSEFACE {$table}", [
                 'sn' => $sn,
@@ -58,26 +65,78 @@ class BiometricoController extends Controller
     public function getRequest(Request $request)
     {
         $sn = $this->validarDispositivo($request);
-
         $this->registrarConexion($sn, $request->ip());
-        Log::debug('SENSEFACE POLLING', [
+
+        $dispositivo = DispositivoBiometrico::where('serial', $sn)->first();
+
+        if (!$dispositivo)
+            return $this->texto('OK');
+
+        $comando = $this->biometricoSyncService->siguienteComando($dispositivo);
+
+        if (!$comando)
+            return $this->texto('OK');
+
+        Log::info('SENSEFACE COMANDO ENVIADO', [
             'sn' => $sn,
-            'ip' => $request->ip(),
+            'id' => $comando->id,
+            'tipo' => $comando->tipo,
+            'comando' => $comando->comando,
         ]);
 
-        return $this->texto('OK');
+        return $this->texto(
+            "C:{$comando->id}:{$comando->comando}\n"
+        );
     }
 
     public function deviceCmd(Request $request)
     {
         $sn = $this->validarDispositivo($request);
-
         $this->registrarConexion($sn, $request->ip());
+
+        $dispositivo = DispositivoBiometrico::where('serial', $sn)->first();
+
+        if (!$dispositivo)
+            return $this->texto('OK');
+
+        $contenido = trim($request->getContent());
+
         Log::info('SENSEFACE DEVICECMD', [
             'sn' => $sn,
             'query' => $request->query(),
-            'body' => $request->getContent(),
+            'body' => $contenido,
         ]);
+
+        $lineas = $contenido !== ''
+            ? preg_split('/\r\n|\r|\n/', $contenido)
+            : [''];
+
+        foreach ($lineas as $linea) {
+            parse_str($linea, $datos);
+
+            $id = (int) (
+                $datos['ID']
+                    ?? $datos['CmdID']
+                    ?? $request->query('ID')
+                    ?? $request->query('CmdID')
+                    ?? 0
+            );
+
+            $codigo = (int) (
+                $datos['Return']
+                    ?? $request->query('Return')
+                    ?? -999
+            );
+
+            if ($id > 0) {
+                $this->biometricoSyncService->registrarRespuesta(
+                    $dispositivo,
+                    $id,
+                    $codigo,
+                    $linea !== '' ? $linea : http_build_query($request->query())
+                );
+            }
+        }
 
         return $this->texto('OK');
     }
@@ -383,5 +442,69 @@ class BiometricoController extends Controller
         DispositivoBiometrico::where('serial', $sn)->update([
             'ultima_marcacion' => $fechaHora,
         ]);
+    }
+
+    private function procesarUsuariosDispositivo(string $sn, string $body): void
+    {
+        $dispositivo = DispositivoBiometrico::where('serial', $sn)->first();
+
+        if (!$dispositivo || trim($body) === '')
+            return;
+
+        foreach (preg_split('/\r\n|\r|\n/', $body) as $linea) {
+            $linea = trim($linea);
+
+            if ($linea === '')
+                continue;
+
+            $usuario = $this->parsearUsuarioBiometrico($linea);
+
+            if (!$usuario)
+                continue;
+
+            $this->biometricoSyncService->registrarUsuario(
+                $dispositivo,
+                $usuario['pin'],
+                $usuario['nombre'],
+                $usuario['privilegio'],
+                $usuario['tarjeta']
+            );
+
+            Log::info('SENSEFACE USUARIO RECIBIDO', [
+                'sn' => $sn,
+                'pin' => $usuario['pin'],
+                'nombre' => $usuario['nombre'],
+            ]);
+        }
+    }
+
+    private function parsearUsuarioBiometrico(string $linea): ?array
+    {
+        if (
+            !str_starts_with(strtoupper($linea), 'USER') &&
+            !preg_match('/\bPIN=/i', $linea)
+        ) {
+            return null;
+        }
+
+        if (!preg_match('/\bPIN=([^\s\t]+)/i', $linea, $pin)) {
+            return null;
+        }
+
+        preg_match(
+            '/\bName=(.*?)(?=\s+(?:Pri|Privilege|Passwd|Card|Grp|TZ|Verify)=|$)/i',
+            $linea,
+            $nombre
+        );
+
+        preg_match('/\b(?:Pri|Privilege)=([^\s\t]+)/i', $linea, $privilegio);
+        preg_match('/\bCard=([^\s\t]+)/i', $linea, $tarjeta);
+
+        return [
+            'pin' => trim($pin[1]),
+            'nombre' => isset($nombre[1]) ? trim($nombre[1]) : null,
+            'privilegio' => $privilegio[1] ?? null,
+            'tarjeta' => $tarjeta[1] ?? null,
+        ];
     }
 }
