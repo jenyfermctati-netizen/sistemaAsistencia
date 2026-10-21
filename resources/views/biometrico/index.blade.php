@@ -71,6 +71,69 @@
                     @endif
                 </div>
             </section>
+            <section class="panel biometric-sync">
+    <div class="biometric-sync__header">
+        <div>
+            <h2>Sincronización de trabajadores</h2>
+            <p>Consulta y compara los usuarios existentes en el SenseFace sin eliminarlos ni modificarlos.</p>
+        </div>
+
+        @if($dispositivos->first())
+            <div class="biometric-sync__actions">
+                <form method="POST" action="{{ route('biometrico.usuarios.consultar',$dispositivos->first()) }}">
+                    @csrf
+                    <button class="button" type="submit">Consultar SenseFace</button>
+                </form>
+
+                <form method="POST" action="{{ route('biometrico.usuarios.reconciliar',$dispositivos->first()) }}">
+                    @csrf
+                    <button class="button button--secondary" type="submit">Comparar trabajadores</button>
+                </form>
+            </div>
+        @endif
+    </div>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>PIN</th>
+                    <th>Usuario en SenseFace</th>
+                    <th>Trabajador en sistema</th>
+                    <th>Estado</th>
+                    <th>Última verificación</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($usuarios as $usuario)
+                    <tr>
+                        <td>{{ $usuario->pin }}</td>
+                        <td>{{ $usuario->nombre_dispositivo ?: '—' }}</td>
+                        <td>
+                            @if($usuario->trabajador)
+                                {{ $usuario->trabajador->nombres }} {{ $usuario->trabajador->apellidos }}
+                            @else
+                                —
+                            @endif
+                        </td>
+                        <td>
+                            <span class="badge">
+                                {{ str_replace('_',' ',$usuario->estado) }}
+                            </span>
+                        </td>
+                        <td>
+                            {{ $usuario->ultima_verificacion?->format('d/m/Y H:i:s') ?? '—' }}
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5">Todavía no se ha consultado el inventario del SenseFace.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</section>
         @empty
             <div class="panel empty-state">
                 <h3>No se ha detectado ningún dispositivo</h3>
