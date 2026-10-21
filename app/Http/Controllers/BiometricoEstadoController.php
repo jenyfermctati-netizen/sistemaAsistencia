@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BiometricoComando;
+use App\Models\BiometricoUsuario;
 use App\Models\DispositivoBiometrico;
 use App\Models\Marcacion;
-use App\Models\BiometricoUsuario;
-use App\Models\BiometricoComando;
 use App\Services\BiometricoSyncService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BiometricoEstadoController extends Controller
 {
@@ -94,5 +94,47 @@ class BiometricoEstadoController extends Controller
     private function verificarAdministrador(): void
     {
         abort_unless(Auth::check() && Auth::user()->rol?->nombre === 'ADMINISTRADOR', 403);
+    }
+
+    public function sincronizarUsuario(DispositivoBiometrico $dispositivo, BiometricoUsuario $usuario)
+    {
+        $this->verificarAdministrador();
+
+        if (!$dispositivo->esta_conectado) {
+            return back()->with(
+                'error',
+                'El dispositivo biométrico no está conectado.'
+            );
+        }
+
+        try {
+            $comando = $this->biometricoSyncService->sincronizarUsuario(
+                $dispositivo,
+                $usuario
+            );
+
+            return back()->with(
+                'success',
+                $comando->wasRecentlyCreated
+                    ? 'Trabajador enviado a la cola de sincronización.'
+                    : 'Este trabajador ya tiene una sincronización pendiente.'
+            );
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->with(
+                'error',
+                collect($e->errors())->flatten()->first()
+            );
+        } catch (\Throwable $e) {
+            \Log::error('Error sincronizando usuario SenseFace', [
+                'dispositivo_id' => $dispositivo->id,
+                'usuario_id' => $usuario->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with(
+                'error',
+                'No se pudo preparar la sincronización.'
+            );
+        }
     }
 }

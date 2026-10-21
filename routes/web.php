@@ -6,8 +6,8 @@ use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BiometricoController;
 use App\Http\Controllers\BiometricoEstadoController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ConsultaDniController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FeriadoController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\MarcacionController;
@@ -144,7 +144,7 @@ Route::middleware('auth')->group(function () {
         ->name('biometrico.usuarios.consultar');
     Route::post('/biometrico/{dispositivo}/reconciliar', [BiometricoEstadoController::class, 'reconciliar'])
         ->name('biometrico.usuarios.reconciliar');
-
+    Route::post('/biometrico/{dispositivo}/usuarios/{usuario}/sincronizar', [BiometricoEstadoController::class, 'sincronizarUsuario'])->name('biometrico.usuarios.sincronizar');
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

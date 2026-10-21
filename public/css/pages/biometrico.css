@@ -1,43 +1,37 @@
 .biometrico-page {
     display: flex;
     flex-direction: column;
-    gap: 22px
+    gap: 22px;
 }
-
 .page-header h1 {
     margin: 0;
     color: var(--text-primary, #1f2937);
-    font-size: 28px
+    font-size: 28px;
 }
-
 .page-header p {
     margin: 6px 0 0;
-    color: var(--text-secondary, #6b7280)
+    color: var(--text-secondary, #6b7280);
 }
-
 .biometrico-card {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 18px;
     padding: 24px;
-    box-shadow: 0 8px 30px rgba(15, 23, 42, .05)
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
 }
-
 .biometrico-card__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
     padding-bottom: 22px;
-    border-bottom: 1px solid #edf0f2
+    border-bottom: 1px solid #edf0f2;
 }
-
-.biometrico-card__header>div {
+.biometrico-card__header > div {
     display: flex;
     align-items: center;
-    gap: 15px
+    gap: 15px;
 }
-
 .biometrico-device-icon {
     display: grid;
     place-items: center;
@@ -46,20 +40,17 @@
     border-radius: 14px;
     background: #e9f3f7;
     color: #28708c;
-    font-weight: 700
+    font-weight: 700;
 }
-
 .biometrico-card h2 {
     margin: 0 0 4px;
     font-size: 19px;
-    color: #1f2937
+    color: #1f2937;
 }
-
 .biometrico-card p {
     margin: 0;
-    color: #7b8491
+    color: #7b8491;
 }
-
 .estado-badge {
     display: inline-flex;
     align-items: center;
@@ -67,39 +58,33 @@
     padding: 8px 13px;
     border-radius: 999px;
     font-size: 13px;
-    font-weight: 700
+    font-weight: 700;
 }
-
 .estado-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: currentColor
+    background: currentColor;
 }
-
 .estado-badge.conectado {
     background: #eaf7ef;
-    color: #287b4b
+    color: #287b4b;
 }
-
 .estado-badge.desconectado {
     background: #fbecec;
-    color: #a83d3d
+    color: #a83d3d;
 }
-
 .biometrico-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 18px;
-    padding: 24px 0
+    padding: 24px 0;
 }
-
 .biometrico-data {
     padding: 15px;
     border-radius: 12px;
-    background: #f7f8f8
+    background: #f7f8f8;
 }
-
 .biometrico-data span,
 .ultima-marcacion span {
     display: block;
@@ -107,70 +92,209 @@
     color: #7a8490;
     font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: .04em
+    letter-spacing: 0.04em;
 }
-
 .biometrico-data strong {
     color: #29323b;
     font-size: 14px;
-    word-break: break-word
+    word-break: break-word;
 }
-
 .biometrico-footer {
     padding-top: 18px;
     border-top: 1px solid #edf0f2;
-    font-size: 14px
+    font-size: 14px;
 }
-
 .biometrico-ok {
-    color: #287b4b
+    color: #287b4b;
 }
-
 .biometrico-warning {
-    color: #9a5c25
+    color: #9a5c25;
 }
-
+.biometric-sync {
+    padding: 24px;
+}
+.biometric-sync__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 18px;
+}
+.biometric-sync__header h2 {
+    margin: 0 0 5px;
+    color: #1f2937;
+    font-size: 19px;
+}
+.biometric-sync__header p {
+    margin: 0;
+    color: #7b8491;
+}
+.biometric-sync__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.biometric-sync__actions form {
+    margin: 0;
+}
+.biometric-sync__summary {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 14px;
+    color: #667085;
+    font-size: 13px;
+}
+.biometric-sync__summary strong {
+    color: #1f2937;
+}
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #6b7280;
+    background: #f8fafb;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+.table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid #edf0f2;
+    color: #374151;
+    vertical-align: middle;
+}
+.table tbody tr:hover {
+    background: #fafbfc;
+}
+.sync-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.sync-ok {
+    background: #eaf7ef;
+    color: #287b4b;
+}
+.sync-pending {
+    background: #fff5df;
+    color: #9a671b;
+}
+.sync-device {
+    background: #edf3f7;
+    color: #496574;
+}
+.sync-error {
+    background: #fbecec;
+    color: #a83d3d;
+}
+.button--sync {
+    padding: 7px 12px;
+    font-size: 12px;
+}
+.button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.action-done {
+    font-size: 12px;
+    font-weight: 600;
+    color: #287b4b;
+}
+.action-muted {
+    font-size: 12px;
+    color: #7b8491;
+}
+.action-error {
+    font-size: 12px;
+    font-weight: 600;
+    color: #a83d3d;
+}
+.table-empty {
+    text-align: center;
+    padding: 30px !important;
+    color: #7b8491 !important;
+}
+.biometric-sync__notice {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #fff8e8;
+    color: #8a6424;
+    font-size: 13px;
+}
 .ultima-marcacion {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     gap: 20px;
-    padding: 20px
+    padding: 20px;
 }
-
 .ultima-marcacion strong {
-    color: #27313a
+    color: #27313a;
 }
-
 .empty-state {
     text-align: center;
-    padding: 40px
+    padding: 40px;
 }
-
 .empty-state h3 {
-    margin-top: 0
+    margin-top: 0;
 }
-
 .empty-state p {
-    color: #7b8491
+    color: #7b8491;
 }
-
-@media(max-width:900px) {
+.alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+.alert-success {
+    background: #eaf7ef;
+    color: #287b4b;
+}
+.alert-danger {
+    background: #fbecec;
+    color: #a83d3d;
+}
+@media (max-width: 900px) {
     .biometrico-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr))
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
     .ultima-marcacion {
-        grid-template-columns: 1fr
+        grid-template-columns: 1fr;
+    }
+    .biometric-sync__header {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
-
-@media(max-width:600px) {
+@media (max-width: 600px) {
     .biometrico-card__header {
         align-items: flex-start;
-        flex-direction: column
+        flex-direction: column;
     }
-
     .biometrico-grid {
-        grid-template-columns: 1fr
+        grid-template-columns: 1fr;
+    }
+    .biometric-sync__actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .biometric-sync__actions form,
+    .biometric-sync__actions .button {
+        width: 100%;
     }
 }
