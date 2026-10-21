@@ -10,14 +10,16 @@
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/theme-natural.css') }}">
     <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/ui-modern.css') }}">
 </head>
 
 <body>
+    <a class="skip-link" href="#mainContent">Ir al contenido principal</a>
     <div class="app">
         @include('partials.sidebar')
         <div class="app__content">
             @include('partials.navbar')
-            <main class="main-content">
+            <main class="main-content" id="mainContent" tabindex="-1">
                 <x-alert />
                 @yield('content')
             </main>

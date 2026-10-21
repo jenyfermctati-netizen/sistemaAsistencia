@@ -782,6 +782,18 @@
     background: #fafcfb;
 }
 
+.ra-worker-pending__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.ra-worker-pending__actions form {
+    margin: 0;
+}
+
 .ra-worker-pending__origin,
 .ra-worker-pending__finished {
     display: grid;
@@ -1129,6 +1141,12 @@
     .ra-worker-pending__footer form,
     .ra-worker-pending__footer .button {
         width: 100%;
+    }
+
+    .ra-worker-pending__actions {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
     }
 
     .ra-worker .form-section__header {

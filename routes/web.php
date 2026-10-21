@@ -6,8 +6,8 @@ use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BiometricoController;
 use App\Http\Controllers\BiometricoEstadoController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ConsultaDniController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FeriadoController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\MarcacionController;
@@ -15,6 +15,7 @@ use App\Http\Controllers\NewPasswordController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PasswordResetLinkController;
 use App\Http\Controllers\ReporteAvanceController;
+use App\Http\Controllers\ReporteControlController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\TrabajadorController;
 use App\Http\Controllers\VacacionesController;
@@ -121,6 +122,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/reportesAvance/pendientes', [ReporteAvanceController::class, 'storePendiente'])->name('reportesAvance.pendientes.store');
     Route::post('/reportesAvance/pendientes/registrar', [ReporteAvanceController::class, 'storePendienteTrabajador'])
         ->name('reportesAvance.pendientes.trabajador.store');
+    Route::put('/reportesAvance/pendientes/{pendiente}', [ReporteAvanceController::class, 'actualizarPendienteTrabajador'])
+        ->name('reportesAvance.pendientes.update');
     Route::patch('/reportesAvance/pendientes/{pendiente}/resolver', [ReporteAvanceController::class, 'resolverPendiente'])->name('reportesAvance.pendientes.resolver');
     Route::patch('/reportesAvance/pendientes/{pendiente}/revisar', [ReporteAvanceController::class, 'revisarPendiente'])
         ->name('reportesAvance.pendientes.revisar');
@@ -128,6 +131,12 @@ Route::middleware('auth')->group(function () {
         ->name('reportesAvance.actividades.archivo');
     Route::get('/reportesAvance/actividades/{actividad}/descargar', [ReporteAvanceController::class, 'descargarArchivoActividad'])
         ->name('reportesAvance.actividades.descargar');
+
+    // Exportaciones del reporte consolidado mostrado en el dashboard
+    Route::get('/dashboard/reporte-control/pdf', [ReporteControlController::class, 'pdf'])
+        ->name('dashboard.reporteControl.pdf');
+    Route::get('/dashboard/reporte-control/excel', [ReporteControlController::class, 'excel'])
+        ->name('dashboard.reporteControl.excel');
 
     // Vacaciones
     Route::get('/vacaciones', [VacacionesController::class, 'index'])->name('vacaciones.index');

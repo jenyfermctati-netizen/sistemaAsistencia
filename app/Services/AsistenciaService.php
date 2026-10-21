@@ -58,17 +58,51 @@ class AsistenciaService
             ->orderBy('fecha_hora')
             ->get();
 
-        $entrada = $marcaciones
+        $entradas = $marcaciones
             ->where('tipo', 'ENTRADA')
-            ->first();
+            ->values();
 
-        $salida = $marcaciones
+        $salidas = $marcaciones
             ->where('tipo', 'SALIDA')
-            ->last();
+            ->values();
+
+        $entrada = $entradas->get(0);
+        $usaHorarioPartido = filled($diaHorario?->hora_salida_refrigerio)
+            && filled($diaHorario?->hora_retorno_refrigerio);
+        $esJornadaCompleta = $usaHorarioPartido
+            && $asignacion?->tipo_control === 'OBLIGATORIO';
+
+        $salidaRefrigerio = $esJornadaCompleta ? $salidas->get(0) : null;
+        $retornoRefrigerio = $esJornadaCompleta ? $entradas->get(1) : null;
+        $salida = $esJornadaCompleta ? $salidas->get(1) : $salidas->last();
+
+        $horaProgramadaEntrada = $diaHorario?->hora_entrada;
+        $horaProgramadaSalidaRefrigerio = $esJornadaCompleta
+            ? $diaHorario?->hora_salida_refrigerio
+            : null;
+        $horaProgramadaRetornoRefrigerio = $esJornadaCompleta
+            ? $diaHorario?->hora_retorno_refrigerio
+            : null;
+        $horaProgramadaSalida = $diaHorario?->hora_salida;
+
+        if ($usaHorarioPartido && ! $esJornadaCompleta) {
+            $primeraMarca = $marcaciones->first();
+            $esTurnoTarde = $primeraMarca
+                && $primeraMarca->fecha_hora->format('H:i:s') >= $diaHorario->hora_retorno_refrigerio;
+
+            $horaProgramadaEntrada = $esTurnoTarde
+                ? $diaHorario->hora_retorno_refrigerio
+                : $diaHorario->hora_entrada;
+            $horaProgramadaSalida = $esTurnoTarde
+                ? $diaHorario->hora_salida
+                : $diaHorario->hora_salida_refrigerio;
+        }
 
         $minutosTrabajados = $this
             ->calcularMinutosTrabajados(
                 $entrada,
+                $salidaRefrigerio,
+                $retornoRefrigerio,
                 $salida
             );
 
@@ -98,13 +132,17 @@ class AsistenciaService
                 "Feriado: {$feriado->nombre}.",
                 $asignacion,
                 $horario?->id,
-                $diaHorario?->hora_entrada,
-                $diaHorario?->hora_salida,
+                $horaProgramadaEntrada,
+                $horaProgramadaSalidaRefrigerio,
+                $horaProgramadaRetornoRefrigerio,
+                $horaProgramadaSalida,
                 (int) (
                     $diaHorario?->tolerancia_minutos
                         ?? 0
                 ),
                 $entrada,
+                $salidaRefrigerio,
+                $retornoRefrigerio,
                 $salida,
                 $minutosTrabajados
             );
@@ -143,13 +181,17 @@ class AsistenciaService
                     'Trabajador dentro de su periodo de vacaciones aprobado.',
                     $asignacion,
                     $horario?->id,
-                    $diaHorario?->hora_entrada,
-                    $diaHorario?->hora_salida,
+                    $horaProgramadaEntrada,
+                    $horaProgramadaSalidaRefrigerio,
+                    $horaProgramadaRetornoRefrigerio,
+                    $horaProgramadaSalida,
                     (int) (
                         $diaHorario?->tolerancia_minutos
                             ?? 0
                     ),
                     $entrada,
+                    $salidaRefrigerio,
+                    $retornoRefrigerio,
                     $salida,
                     $minutosTrabajados
                 );
@@ -188,19 +230,23 @@ class AsistenciaService
                 'CAMPO',
                 Str::limit(
                     $detalle
-                        . '. Actividad: '
-                        . $campo->actividad,
+                        .'. Actividad: '
+                        .$campo->actividad,
                     450
                 ),
                 $asignacion,
                 $horario?->id,
-                $diaHorario?->hora_entrada,
-                $diaHorario?->hora_salida,
+                $horaProgramadaEntrada,
+                $horaProgramadaSalidaRefrigerio,
+                $horaProgramadaRetornoRefrigerio,
+                $horaProgramadaSalida,
                 (int) (
                     $diaHorario?->tolerancia_minutos
                         ?? 0
                 ),
                 $entrada,
+                $salidaRefrigerio,
+                $retornoRefrigerio,
                 $salida,
                 $minutosTrabajados
             );
@@ -251,7 +297,7 @@ class AsistenciaService
                 "Solicitud aprobada ({$solicitud->tipo})";
 
             if ($solicitud->motivo) {
-                $observacion .= ': ' . Str::limit(
+                $observacion .= ': '.Str::limit(
                     $solicitud->motivo,
                     350
                 );
@@ -264,13 +310,17 @@ class AsistenciaService
                 $observacion,
                 $asignacion,
                 $horario?->id,
-                $diaHorario?->hora_entrada,
-                $diaHorario?->hora_salida,
+                $horaProgramadaEntrada,
+                $horaProgramadaSalidaRefrigerio,
+                $horaProgramadaRetornoRefrigerio,
+                $horaProgramadaSalida,
                 (int) (
                     $diaHorario?->tolerancia_minutos
                         ?? 0
                 ),
                 $entrada,
+                $salidaRefrigerio,
+                $retornoRefrigerio,
                 $salida,
                 $minutosTrabajados
             );
@@ -278,7 +328,7 @@ class AsistenciaService
             return;
         }
 
-        if (!$asignacion) {
+        if (! $asignacion) {
             $this->guardarAsistencia(
                 trabajador: $trabajador,
                 fecha: $fecha,
@@ -292,7 +342,7 @@ class AsistenciaService
             return;
         }
 
-        if (!$diaHorario || !$diaHorario->es_laborable) {
+        if (! $diaHorario || ! $diaHorario->es_laborable) {
             $this->guardarAsistencia(
                 trabajador: $trabajador,
                 fecha: $fecha,
@@ -309,15 +359,13 @@ class AsistenciaService
         }
 
         if ($asignacion->tipo_control === 'REFERENCIAL') {
-            $estado = (!$entrada && !$salida)
+            $estado = $marcaciones->isEmpty()
                 ? 'SIN_REGISTRO'
                 : 'PRESENTE';
 
             $observacion = match (true) {
-                !$entrada && !$salida =>
-                    'No existen marcaciones para este día. Control referencial.',
-                !$entrada || !$salida =>
-                    'Marcación incompleta. Control referencial.',
+                $marcaciones->isEmpty() => 'No existen marcaciones para este día. Control referencial.',
+                ! $entrada || ! $salida => 'Marcación incompleta. Control referencial.',
                 default => null,
             };
 
@@ -327,9 +375,11 @@ class AsistenciaService
                 estado: $estado,
                 horarioId: $horario->id,
                 tipoControl: 'REFERENCIAL',
-                horaProgramadaEntrada: $diaHorario->hora_entrada,
-                horaProgramadaSalida: $diaHorario->hora_salida,
-                tolerancia: $diaHorario->tolerancia_minutos,
+                horaProgramadaEntrada: $horaProgramadaEntrada,
+                horaProgramadaSalida: $horaProgramadaSalida,
+                tolerancia: $horaProgramadaEntrada === $diaHorario->hora_entrada
+                    ? $diaHorario->tolerancia_minutos
+                    : 0,
                 entrada: $entrada,
                 salida: $salida,
                 minutosTrabajados: $minutosTrabajados,
@@ -339,15 +389,17 @@ class AsistenciaService
             return;
         }
 
-        if (!$entrada && !$salida) {
+        if ($marcaciones->isEmpty()) {
             $this->guardarAsistencia(
                 trabajador: $trabajador,
                 fecha: $fecha,
                 estado: 'FALTA',
                 horarioId: $horario->id,
                 tipoControl: 'OBLIGATORIO',
-                horaProgramadaEntrada: $diaHorario->hora_entrada,
-                horaProgramadaSalida: $diaHorario->hora_salida,
+                horaProgramadaEntrada: $horaProgramadaEntrada,
+                horaProgramadaSalidaRefrigerio: $horaProgramadaSalidaRefrigerio,
+                horaProgramadaRetornoRefrigerio: $horaProgramadaRetornoRefrigerio,
+                horaProgramadaSalida: $horaProgramadaSalida,
                 tolerancia: $diaHorario->tolerancia_minutos,
                 observacion: 'No existen marcaciones de entrada ni salida.'
             );
@@ -355,16 +407,20 @@ class AsistenciaService
             return;
         }
 
-        if (!$entrada) {
+        if (! $entrada) {
             $this->guardarAsistencia(
                 trabajador: $trabajador,
                 fecha: $fecha,
                 estado: 'SIN_REGISTRO',
                 horarioId: $horario->id,
                 tipoControl: 'OBLIGATORIO',
-                horaProgramadaEntrada: $diaHorario->hora_entrada,
-                horaProgramadaSalida: $diaHorario->hora_salida,
+                horaProgramadaEntrada: $horaProgramadaEntrada,
+                horaProgramadaSalidaRefrigerio: $horaProgramadaSalidaRefrigerio,
+                horaProgramadaRetornoRefrigerio: $horaProgramadaRetornoRefrigerio,
+                horaProgramadaSalida: $horaProgramadaSalida,
                 tolerancia: $diaHorario->tolerancia_minutos,
+                salidaRefrigerio: $salidaRefrigerio,
+                retornoRefrigerio: $retornoRefrigerio,
                 salida: $salida,
                 observacion: 'Existe salida, pero no existe marcación de entrada.'
             );
@@ -377,8 +433,8 @@ class AsistenciaService
         );
 
         $horaProgramada = Carbon::parse(
-            $fechaTexto . ' '
-            . $diaHorario->hora_entrada
+            $fechaTexto.' '
+            .$horaProgramadaEntrada
         );
 
         $horaLimite = $horaProgramada
@@ -394,6 +450,34 @@ class AsistenciaService
                 )
                 : 0;
 
+        if ($esJornadaCompleta && $retornoRefrigerio) {
+            $retornoProgramado = Carbon::parse(
+                $fechaTexto.' '.$horaProgramadaRetornoRefrigerio
+            );
+
+            if ($retornoRefrigerio->fecha_hora->gt($retornoProgramado)) {
+                $minutosTardanza += $retornoProgramado->diffInMinutes(
+                    $retornoRefrigerio->fecha_hora
+                );
+            }
+        }
+
+        $marcasFaltantes = collect();
+
+        if ($esJornadaCompleta) {
+            if (! $salidaRefrigerio) {
+                $marcasFaltantes->push('salida a refrigerio');
+            }
+
+            if (! $retornoRefrigerio) {
+                $marcasFaltantes->push('retorno de refrigerio');
+            }
+        }
+
+        if (! $salida) {
+            $marcasFaltantes->push('salida final');
+        }
+
         $this->guardarAsistencia(
             trabajador: $trabajador,
             fecha: $fecha,
@@ -402,16 +486,20 @@ class AsistenciaService
                 : 'PRESENTE',
             horarioId: $horario->id,
             tipoControl: 'OBLIGATORIO',
-            horaProgramadaEntrada: $diaHorario->hora_entrada,
-            horaProgramadaSalida: $diaHorario->hora_salida,
+            horaProgramadaEntrada: $horaProgramadaEntrada,
+            horaProgramadaSalidaRefrigerio: $horaProgramadaSalidaRefrigerio,
+            horaProgramadaRetornoRefrigerio: $horaProgramadaRetornoRefrigerio,
+            horaProgramadaSalida: $horaProgramadaSalida,
             tolerancia: $diaHorario->tolerancia_minutos,
             entrada: $entrada,
+            salidaRefrigerio: $salidaRefrigerio,
+            retornoRefrigerio: $retornoRefrigerio,
             salida: $salida,
             minutosTrabajados: $minutosTrabajados,
             minutosTardanza: $minutosTardanza,
-            observacion: $salida
+            observacion: $marcasFaltantes->isEmpty()
                 ? null
-                : 'No existe marcación de salida.'
+                : 'Falta marcar: '.$marcasFaltantes->join(', ').'.'
         );
     }
 
@@ -423,9 +511,13 @@ class AsistenciaService
         ?TrabajadorHorario $asignacion,
         ?int $horarioId,
         ?string $horaProgramadaEntrada,
+        ?string $horaProgramadaSalidaRefrigerio,
+        ?string $horaProgramadaRetornoRefrigerio,
         ?string $horaProgramadaSalida,
         int $tolerancia,
         ?Marcacion $entrada,
+        ?Marcacion $salidaRefrigerio,
+        ?Marcacion $retornoRefrigerio,
         ?Marcacion $salida,
         int $minutosTrabajados
     ): void {
@@ -436,30 +528,36 @@ class AsistenciaService
             horarioId: $horarioId,
             tipoControl: $asignacion?->tipo_control,
             horaProgramadaEntrada: $horaProgramadaEntrada,
+            horaProgramadaSalidaRefrigerio: $horaProgramadaSalidaRefrigerio,
+            horaProgramadaRetornoRefrigerio: $horaProgramadaRetornoRefrigerio,
             horaProgramadaSalida: $horaProgramadaSalida,
             tolerancia: $tolerancia,
             entrada: $entrada,
+            salidaRefrigerio: $salidaRefrigerio,
+            retornoRefrigerio: $retornoRefrigerio,
             salida: $salida,
             minutosTrabajados: $minutosTrabajados,
             observacion: $observacion
         );
     }
 
-    private function calcularMinutosTrabajados(?Marcacion $entrada, ?Marcacion $salida): int
+    private function calcularMinutosTrabajados(
+        ?Marcacion $entrada,
+        ?Marcacion $salidaRefrigerio,
+        ?Marcacion $retornoRefrigerio,
+        ?Marcacion $salida
+    ): int {
+        return $this->minutosEntre($entrada, $salidaRefrigerio ?? $salida)
+            + $this->minutosEntre($retornoRefrigerio, $salida);
+    }
+
+    private function minutosEntre(?Marcacion $entrada, ?Marcacion $salida): int
     {
-        if (!$entrada || !$salida) {
+        if (! $entrada || ! $salida || ! $salida->fecha_hora->gt($entrada->fecha_hora)) {
             return 0;
         }
 
-        $horaEntrada = Carbon::parse($entrada->fecha_hora);
-
-        $horaSalida = Carbon::parse($salida->fecha_hora);
-
-        return $horaSalida->gt($horaEntrada)
-            ? $horaEntrada->diffInMinutes(
-                $horaSalida
-            )
-            : 0;
+        return $entrada->fecha_hora->diffInMinutes($salida->fecha_hora);
     }
 
     private function guardarAsistencia(
@@ -469,9 +567,13 @@ class AsistenciaService
         ?int $horarioId = null,
         ?string $tipoControl = null,
         ?string $horaProgramadaEntrada = null,
+        ?string $horaProgramadaSalidaRefrigerio = null,
+        ?string $horaProgramadaRetornoRefrigerio = null,
         ?string $horaProgramadaSalida = null,
         int $tolerancia = 0,
         ?Marcacion $entrada = null,
+        ?Marcacion $salidaRefrigerio = null,
+        ?Marcacion $retornoRefrigerio = null,
         ?Marcacion $salida = null,
         int $minutosTrabajados = 0,
         int $minutosTardanza = 0,
@@ -495,11 +597,17 @@ class AsistenciaService
             'horario_id' => $horarioId,
             'tipo_control_aplicado' => $tipoControl,
             'hora_programada_entrada' => $horaProgramadaEntrada,
+            'hora_programada_salida_refrigerio' => $horaProgramadaSalidaRefrigerio,
+            'hora_programada_retorno_refrigerio' => $horaProgramadaRetornoRefrigerio,
             'hora_programada_salida' => $horaProgramadaSalida,
             'tolerancia_aplicada' => $tolerancia,
             'marcacion_entrada_id' => $entrada?->id,
+            'marcacion_salida_refrigerio_id' => $salidaRefrigerio?->id,
+            'marcacion_retorno_refrigerio_id' => $retornoRefrigerio?->id,
             'marcacion_salida_id' => $salida?->id,
             'hora_entrada' => $entrada?->fecha_hora?->format('H:i:s'),
+            'hora_salida_refrigerio' => $salidaRefrigerio?->fecha_hora?->format('H:i:s'),
+            'hora_retorno_refrigerio' => $retornoRefrigerio?->fecha_hora?->format('H:i:s'),
             'hora_salida' => $salida?->fecha_hora?->format('H:i:s'),
             'minutos_trabajados' => $minutosTrabajados,
             'minutos_tardanza' => $minutosTardanza,

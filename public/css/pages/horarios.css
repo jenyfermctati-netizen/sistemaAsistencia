@@ -528,6 +528,24 @@
 
 @media (max-width: 800px) {
 
+    .main-content > .page-header {
+        min-height: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        padding: 24px 21px;
+        border-radius: 21px;
+    }
+
+    .main-content > .page-header > div:first-child {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .main-content > .page-header .page-header__description {
+        max-width: 100%;
+    }
+
     .page-header__actions {
         width: 100%;
 
@@ -934,7 +952,7 @@
    ========================================================= */
 
 .horario-general {
-    max-width: 1180px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
@@ -993,7 +1011,23 @@
 }
 
 .horario-general .dia-editor {
-    grid-template-columns: 140px minmax(180px, 1fr) minmax(180px, 1fr) 125px;
+    grid-template-columns: 165px repeat(4, minmax(130px, 1fr)) 105px;
+}
+
+.dia-editor__config {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.tipo-jornada {
+    min-width: 0;
+    font-size: 11px;
+}
+
+.hora-editor--no-aplica {
+    opacity: .45;
 }
 
 .hora-editor {
@@ -1066,7 +1100,7 @@
     display: none;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
     .main-content .horario-general {
         width: 100%;
         margin-inline: 0;
@@ -1178,13 +1212,16 @@
         transform: none;
     }
 
-    .horario-general .dia-editor__nombre {
+    .horario-general .dia-editor__config {
         grid-column: 1 / -1;
-        min-height: 48px;
         margin: 0 -13px;
-        padding: 10px 13px;
+        padding: 10px 13px 12px;
         border-bottom: 1px solid var(--border);
         background: rgba(175, 203, 222, 0.17);
+    }
+
+    .horario-general .dia-editor__nombre {
+        min-height: 28px;
         font-size: 14px;
         font-weight: 750;
         cursor: pointer;
@@ -1222,6 +1259,16 @@
         transition: opacity 0.2s ease;
     }
 
+    .horario-general .hora-editor--no-aplica {
+        display: none;
+    }
+
+    .horario-general .dia-editor--descanso > .hora-editor,
+    .horario-general .dia-editor--descanso > .form-group:last-child,
+    .horario-general .dia-editor--descanso .tipo-jornada {
+        display: none;
+    }
+
     .horario-general .dia-editor .form-label {
         margin-bottom: 6px;
         font-size: 10px;
@@ -1244,7 +1291,7 @@
         box-shadow: none;
     }
 
-    .horario-general .dia-editor--descanso .dia-editor__nombre {
+    .horario-general .dia-editor--descanso .dia-editor__config {
         background: rgba(217, 205, 191, 0.22);
     }
 
@@ -1286,20 +1333,25 @@
     }
 
     .horario-general .dia-editor {
-        grid-template-columns: minmax(0, 1fr);
         padding: 0 11px 11px;
     }
 
-    .horario-general .dia-editor__nombre {
+    .horario-general .dia-editor__config {
         margin-inline: -11px;
         padding-inline: 11px;
     }
 
-    .horario-general .dia-editor > .form-group:last-child {
-        grid-column: auto;
-    }
-
     .horario-general .horario-general__actions {
         grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 300px) {
+    .horario-general .dia-editor {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .horario-general .dia-editor > .form-group:last-child {
+        grid-column: auto;
     }
 }

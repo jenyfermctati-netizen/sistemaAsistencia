@@ -9,26 +9,82 @@ use App\Models\PendienteAvance;
 use App\Models\ReporteAvance;
 use App\Models\Solicitud;
 use App\Models\Trabajador;
-use App\Models\Vacaciones;
 use App\Models\User;
+use App\Models\Vacaciones;
+use App\Services\ReporteControlService;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request, ReporteControlService $reporteControlService)
     {
         /** @var User $usuario */
         $usuario = Auth::user()->loadMissing(['rol', 'trabajador.area']);
         $rol = strtoupper(trim((string) $usuario->rol?->nombre));
 
-        return match ($rol) {
-            'ADMINISTRADOR' => view('dashboard.index', $this->datosAdministrador($usuario)),
-            'GERENTE' => view('dashboard.index', $this->datosGerente($usuario)),
-            'TRABAJADOR' => view('dashboard.index', $this->datosTrabajador($usuario)),
+        $datos = match ($rol) {
+            'ADMINISTRADOR' => $this->datosAdministrador($usuario),
+            'GERENTE' => $this->datosGerente($usuario),
+            'TRABAJADOR' => $this->datosTrabajador($usuario),
             default => abort(403, 'Tu cuenta no tiene un rol habilitado para acceder al inicio.'),
         };
+
+        $datos['reporteControl'] = $this->puedeVerReporteControl($usuario, $rol)
+            ? $this->datosReporteControl($request, $usuario, $reporteControlService)
+            : null;
+
+        return view('dashboard.index', $datos);
+    }
+
+    private function puedeVerReporteControl(User $usuario, string $rol): bool
+    {
+        if ($rol === 'ADMINISTRADOR') {
+            return true;
+        }
+
+        if ($rol === 'GERENTE') {
+            return true;
+        }
+
+        return $rol === 'TRABAJADOR'
+            && (bool) $usuario->trabajador?->esEncargadoDeSuArea();
+    }
+
+    private function datosReporteControl(
+        Request $request,
+        User $usuario,
+        ReporteControlService $reporteControlService
+    ): array {
+        $filtros = $request->validate([
+            'reporte_desde' => ['nullable', 'date'],
+            'reporte_hasta' => ['nullable', 'date', 'after_or_equal:reporte_desde'],
+            'reporte_area_id' => ['nullable', 'integer', 'exists:areas,id'],
+        ]);
+
+        $desde = isset($filtros['reporte_desde'])
+            ? Carbon::parse($filtros['reporte_desde'])->startOfDay()
+            : today()->startOfWeek();
+        $hasta = isset($filtros['reporte_hasta'])
+            ? Carbon::parse($filtros['reporte_hasta'])->startOfDay()
+            : today()->endOfWeek()->startOfDay();
+
+        if ($desde->diffInDays($hasta) > 31) {
+            throw ValidationException::withMessages([
+                'reporte_hasta' => 'El periodo del reporte no puede superar 31 días.',
+            ]);
+        }
+
+        return $reporteControlService->generar(
+            $usuario,
+            $desde,
+            $hasta,
+            isset($filtros['reporte_area_id']) ? (int) $filtros['reporte_area_id'] : null
+        );
     }
 
     private function datosAdministrador(User $usuario): array
@@ -36,8 +92,7 @@ class DashboardController extends Controller
         $hoy = today();
         $registrosHoy = Asistencia::query()
             ->whereDate('fecha', $hoy)
-            ->whereHas('trabajador', fn (Builder $query) =>
-                $query->where('estado', 'ACTIVO'));
+            ->whereHas('trabajador', fn (Builder $query) => $query->where('estado', 'ACTIVO'));
 
         return [
             'dashboardView' => 'dashboard.administrador',
@@ -58,8 +113,7 @@ class DashboardController extends Controller
                 'marcaciones' => Marcacion::query()
                     ->whereDate('fecha_hora', $hoy)
                     ->where('anulada', false)
-                    ->whereHas('trabajador', fn (Builder $query) =>
-                        $query->where('estado', 'ACTIVO'))
+                    ->whereHas('trabajador', fn (Builder $query) => $query->where('estado', 'ACTIVO'))
                     ->count(),
             ],
             'alerts' => [
@@ -75,11 +129,12 @@ class DashboardController extends Controller
             'asistenciasRecientes' => Asistencia::with([
                 'trabajador.area',
                 'marcacionEntrada',
+                'marcacionSalidaRefrigerio',
+                'marcacionRetornoRefrigerio',
                 'marcacionSalida',
             ])
                 ->whereDate('fecha', $hoy)
-                ->whereHas('trabajador', fn (Builder $query) =>
-                    $query->where('estado', 'ACTIVO'))
+                ->whereHas('trabajador', fn (Builder $query) => $query->where('estado', 'ACTIVO'))
                 ->latest('procesado_en')
                 ->limit(6)
                 ->get(),
@@ -91,7 +146,7 @@ class DashboardController extends Controller
         $hoy = today();
         $area = $usuario->trabajador?->area;
 
-        if (!$area?->estado) {
+        if (! $area?->estado) {
             $area = null;
         }
 
@@ -100,8 +155,7 @@ class DashboardController extends Controller
         $trabajadores = Trabajador::query()->where('estado', 'ACTIVO');
         $registrosAsistencia = Asistencia::query()
             ->whereDate('fecha', $hoy)
-            ->whereHas('trabajador', fn (Builder $query) =>
-                $query->where('estado', 'ACTIVO'));
+            ->whereHas('trabajador', fn (Builder $query) => $query->where('estado', 'ACTIVO'));
         $solicitudes = Solicitud::query()->where('estado', 'PENDIENTE');
         $reportes = ReporteAvance::query()->where('estado', 'PENDIENTE');
 
@@ -130,11 +184,12 @@ class DashboardController extends Controller
         $asistenciasRecientes = Asistencia::with([
             'trabajador.area',
             'marcacionEntrada',
+            'marcacionSalidaRefrigerio',
+            'marcacionRetornoRefrigerio',
             'marcacionSalida',
         ])
             ->whereDate('fecha', $hoy)
-            ->whereHas('trabajador', fn (Builder $query) =>
-                $query->where('estado', 'ACTIVO'));
+            ->whereHas('trabajador', fn (Builder $query) => $query->where('estado', 'ACTIVO'));
 
         if ($areaId) {
             $this->filtrarPorAreaTrabajador($asistenciasRecientes, $areaId);
@@ -203,10 +258,11 @@ class DashboardController extends Controller
             'pendientesArea' => 0,
             'asistenciasRecientes' => collect(),
             'puedeSolicitarVacaciones' => false,
+            'esEncargadoArea' => false,
             'periodoLabel' => $hoy->locale('es')->translatedFormat('F Y'),
         ];
 
-        if (!$trabajador) {
+        if (! $trabajador) {
             return $datos;
         }
 
@@ -250,17 +306,18 @@ class DashboardController extends Controller
                     $query->where('area_id', $trabajador->area_id)
                         ->orWhere(function (Builder $legado) use ($trabajador) {
                             $legado->whereNull('area_id')
-                                ->whereHas('reporte.trabajador', fn (Builder $trabajadorQuery) =>
-                                    $trabajadorQuery->where('area_id', $trabajador->area_id));
+                                ->whereHas('reporte.trabajador', fn (Builder $trabajadorQuery) => $trabajadorQuery->where('area_id', $trabajador->area_id));
                         });
                 })
                 ->count();
         }
 
         $datos['asistenciasRecientes'] = Asistencia::with([
-                'marcacionEntrada',
-                'marcacionSalida',
-            ])
+            'marcacionEntrada',
+            'marcacionSalidaRefrigerio',
+            'marcacionRetornoRefrigerio',
+            'marcacionSalida',
+        ])
             ->where('trabajador_id', $trabajador->id)
             ->whereYear('fecha', $hoy->year)
             ->whereMonth('fecha', $hoy->month)
@@ -269,6 +326,7 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
         $datos['puedeSolicitarVacaciones'] = $trabajador->tipo_vinculo === 'CONTRATADO';
+        $datos['esEncargadoArea'] = $trabajador->esEncargadoDeSuArea();
 
         return $datos;
     }
@@ -279,8 +337,7 @@ class DashboardController extends Controller
             ->where('estado', true)
             ->when($areaId, fn (Builder $query) => $query->whereKey($areaId))
             ->withCount([
-                'trabajadores as trabajadores_activos' => fn (Builder $query) =>
-                    $query->where('estado', 'ACTIVO'),
+                'trabajadores as trabajadores_activos' => fn (Builder $query) => $query->where('estado', 'ACTIVO'),
             ])
             ->orderBy('nombre')
             ->get();
@@ -340,8 +397,7 @@ class DashboardController extends Controller
 
     private function filtrarPorAreaTrabajador(Builder $query, int $areaId): void
     {
-        $query->whereHas('trabajador', fn (Builder $trabajador) =>
-            $trabajador->where('area_id', $areaId));
+        $query->whereHas('trabajador', fn (Builder $trabajador) => $trabajador->where('area_id', $areaId));
     }
 
     private function filtrarPendientesPorArea(Builder $query, int $areaId): void
@@ -350,8 +406,7 @@ class DashboardController extends Controller
             $area->where('area_id', $areaId)
                 ->orWhere(function (Builder $legado) use ($areaId) {
                     $legado->whereNull('area_id')
-                        ->whereHas('reporte.trabajador', fn (Builder $trabajador) =>
-                            $trabajador->where('area_id', $areaId));
+                        ->whereHas('reporte.trabajador', fn (Builder $trabajador) => $trabajador->where('area_id', $areaId));
                 });
         });
     }

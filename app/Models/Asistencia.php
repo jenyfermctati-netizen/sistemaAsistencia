@@ -17,11 +17,17 @@ class Asistencia extends Model
         'fecha',
         'tipo_control_aplicado',
         'hora_programada_entrada',
+        'hora_programada_salida_refrigerio',
+        'hora_programada_retorno_refrigerio',
         'hora_programada_salida',
         'tolerancia_aplicada',
         'marcacion_entrada_id',
+        'marcacion_salida_refrigerio_id',
+        'marcacion_retorno_refrigerio_id',
         'marcacion_salida_id',
         'hora_entrada',
+        'hora_salida_refrigerio',
+        'hora_retorno_refrigerio',
         'hora_salida',
         'minutos_trabajados',
         'minutos_tardanza',
@@ -70,6 +76,22 @@ class Asistencia extends Model
         );
     }
 
+    public function marcacionSalidaRefrigerio()
+    {
+        return $this->belongsTo(
+            Marcacion::class,
+            'marcacion_salida_refrigerio_id'
+        );
+    }
+
+    public function marcacionRetornoRefrigerio()
+    {
+        return $this->belongsTo(
+            Marcacion::class,
+            'marcacion_retorno_refrigerio_id'
+        );
+    }
+
     public function solicitudes()
     {
         return $this->hasMany(
@@ -82,6 +104,8 @@ class Asistencia extends Model
     {
         $origenes = collect([
             $this->marcacionEntrada?->origen,
+            $this->marcacionSalidaRefrigerio?->origen,
+            $this->marcacionRetornoRefrigerio?->origen,
             $this->marcacionSalida?->origen,
         ])->filter()->unique()->values();
 

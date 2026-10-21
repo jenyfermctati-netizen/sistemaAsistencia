@@ -93,6 +93,20 @@ button {
     pointer-events: none;
 }
 
+.login-hero.login-hero--login {
+    justify-content: flex-end;
+    background-image:
+        linear-gradient(180deg, rgba(3, 29, 43, 0.14) 0%, rgba(3, 29, 43, 0.18) 40%, rgba(3, 31, 40, 0.92) 100%),
+        linear-gradient(90deg, rgba(3, 30, 43, 0.36), rgba(3, 30, 43, 0.02)),
+        url('../../images/auth/login-office.png');
+}
+
+.login-hero--login::after {
+    background:
+        radial-gradient(circle at 88% 10%, rgba(140, 243, 239, 0.14), transparent 27%),
+        linear-gradient(145deg, rgba(10, 65, 79, 0.16), transparent 50%);
+}
+
 .login-hero__brand {
     width: fit-content;
     max-width: 245px;
@@ -117,6 +131,12 @@ button {
     padding-block: 50px;
 }
 
+.login-hero--login .login-hero__copy {
+    max-width: 540px;
+    margin: 0 0 clamp(72px, 11vh, 118px);
+    padding: 0;
+}
+
 .login-hero__eyebrow,
 .login-card__eyebrow {
     display: inline-block;
@@ -126,6 +146,28 @@ button {
     font-weight: 800;
     letter-spacing: 0.16em;
     text-transform: uppercase;
+}
+
+.login-hero--login .login-hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 18px;
+    padding: 6px 10px;
+    border: 1px solid rgba(201, 255, 250, 0.22);
+    border-radius: 999px;
+    background: rgba(4, 47, 57, 0.32);
+    color: #c9fffa;
+    backdrop-filter: blur(10px);
+}
+
+.login-hero--login .login-hero__eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #64e6dc;
+    box-shadow: 0 0 0 4px rgba(100, 230, 220, 0.13);
 }
 
 .login-hero__copy h1 {
@@ -139,6 +181,13 @@ button {
     text-wrap: balance;
 }
 
+.login-hero--login .login-hero__copy h1 {
+    max-width: 520px;
+    margin-bottom: 18px;
+    font-size: clamp(38px, 3.4vw, 52px);
+    line-height: 1.08;
+}
+
 .login-hero__copy p {
     max-width: 470px;
     margin: 0;
@@ -147,43 +196,10 @@ button {
     line-height: 1.55;
 }
 
-.login-features {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-}
-
-.login-feature {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    color: rgba(255, 255, 255, 0.94);
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.4;
-    text-align: center;
-}
-
-.login-feature__icon {
-    width: 44px;
-    height: 44px;
-    display: grid;
-    place-items: center;
-    border: 1px solid rgba(153, 246, 228, 0.48);
-    border-radius: 13px;
-    background: rgba(11, 80, 87, 0.34);
-    backdrop-filter: blur(8px);
-}
-
-.login-feature__icon svg {
-    width: 27px;
-    height: 27px;
-    stroke: #c9fffa;
-    stroke-width: 1.7;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+.login-hero--login .login-hero__copy p {
+    max-width: 460px;
+    font-size: clamp(16px, 1.2vw, 18px);
+    line-height: 1.6;
 }
 
 .login-panel {
@@ -575,6 +591,8 @@ input:focus-visible {
         font-size: clamp(36px, 4.8vw, 50px);
     }
 
+    .login-hero--login .login-hero__copy h1 { font-size: clamp(34px, 4.4vw, 46px); }
+
     .login-panel {
         padding: 36px;
     }
@@ -633,17 +651,23 @@ input:focus-visible {
         padding: 0;
     }
 
+    .login-hero--login .login-hero__copy {
+        margin: auto 0 0;
+    }
+
     .login-hero__copy h1 {
         max-width: 520px;
         margin-bottom: 6px;
         font-size: clamp(27px, 5.2vw, 34px);
     }
 
-    .login-hero__copy p {
-        display: none;
+    .login-hero--login .login-hero__copy h1 {
+        max-width: 520px;
+        margin-bottom: 6px;
+        font-size: clamp(27px, 5.2vw, 34px);
     }
 
-    .login-features {
+    .login-hero__copy p {
         display: none;
     }
 
@@ -718,11 +742,21 @@ input:focus-visible {
         display: none;
     }
 
+    .login-hero--login .login-hero__eyebrow {
+        display: none;
+    }
+
     .login-hero__copy {
         margin-top: auto;
     }
 
     .login-hero__copy h1 {
+        max-width: 380px;
+        margin-bottom: 0;
+        font-size: clamp(23px, 7vw, 29px);
+    }
+
+    .login-hero--login .login-hero__copy h1 {
         max-width: 380px;
         margin-bottom: 0;
         font-size: clamp(23px, 7vw, 29px);
@@ -770,18 +804,23 @@ input:focus-visible {
         padding-block: 24px;
     }
 
+    .login-hero--login .login-hero__copy {
+        margin-bottom: clamp(22px, 4vh, 38px);
+        padding-block: 0;
+    }
+
     .login-hero__copy h1 {
+        margin-bottom: 10px;
+        font-size: clamp(32px, 4vw, 46px);
+    }
+
+    .login-hero--login .login-hero__copy h1 {
         margin-bottom: 10px;
         font-size: clamp(32px, 4vw, 46px);
     }
 
     .login-hero__copy p {
         font-size: 16px;
-    }
-
-    .login-feature__icon {
-        width: 38px;
-        height: 38px;
     }
 
     .login-panel {
@@ -822,8 +861,7 @@ input:focus-visible {
 
 @media (min-width: 861px) and (max-height: 560px) {
     .login-security,
-    .login-divider,
-    .login-features {
+    .login-divider {
         display: none;
     }
 }

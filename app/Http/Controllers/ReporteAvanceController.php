@@ -21,11 +21,18 @@ class ReporteAvanceController extends Controller
         $usuario = Auth::user();
         $rol = $usuario->rol?->nombre;
         $esTrabajador = $rol === 'TRABAJADOR';
+        $esEncargadoArea = $esTrabajador
+            && (bool) $usuario->trabajador?->esEncargadoDeSuArea();
+        $vistaEquipo = $esEncargadoArea && $request->query('vista') === 'equipo';
+        $esVistaPersonal = $esTrabajador && ! $vistaEquipo;
         $puedeGestionar = $rol === 'ADMINISTRADOR';
         $puedeRevisar = in_array($rol, ['ADMINISTRADOR', 'GERENTE'], true);
-        $areaGerenteId = $rol === 'GERENTE'
-            ? $usuario->trabajador?->area_id
-            : null;
+        $areaSupervisorId = match (true) {
+            $rol === 'GERENTE' => $usuario->trabajador?->area_id,
+            $vistaEquipo => $usuario->trabajador?->area_id,
+            default => null,
+        };
+        $parametrosVista = $vistaEquipo ? ['vista' => 'equipo'] : [];
         $pestanaActiva = in_array($request->query('pestana'), ['avances', 'pendientes'], true)
             ? $request->query('pestana')
             : 'avances';
@@ -39,12 +46,11 @@ class ReporteAvanceController extends Controller
             'pendientes.area',
         ]);
 
-        if ($esTrabajador) {
+        if ($esVistaPersonal) {
             $query->where('trabajador_id', $usuario->trabajador_id);
-        } elseif ($rol === 'GERENTE') {
-            $areaGerenteId
-                ? $query->whereHas('trabajador', fn($trabajador) =>
-                    $trabajador->where('area_id', $areaGerenteId))
+        } elseif ($rol === 'GERENTE' || $vistaEquipo) {
+            $areaSupervisorId
+                ? $query->whereHas('trabajador', fn ($trabajador) => $trabajador->where('area_id', $areaSupervisorId))
                     ->where('trabajador_id', '!=', $usuario->trabajador_id)
                 : $query->whereRaw('1 = 0');
         }
@@ -57,8 +63,7 @@ class ReporteAvanceController extends Controller
                         ->where('nombres', 'like', "%{$buscar}%")
                         ->orWhere('apellidos', 'like', "%{$buscar}%")
                         ->orWhere('dni', 'like', "%{$buscar}%");
-                })->orWhereHas('actividades', fn($actividad) =>
-                        $actividad->where('descripcion', 'like', "%{$buscar}%"))->orWhereHas('pendientes', function ($pendiente) use ($buscar) {
+                })->orWhereHas('actividades', fn ($actividad) => $actividad->where('descripcion', 'like', "%{$buscar}%"))->orWhereHas('pendientes', function ($pendiente) use ($buscar) {
                     $pendiente
                         ->where('descripcion', 'like', "%{$buscar}%")
                         ->orWhere('detalle', 'like', "%{$buscar}%");
@@ -72,8 +77,7 @@ class ReporteAvanceController extends Controller
 
         if ($rol === 'ADMINISTRADOR' && $request->filled('area_id')) {
             $areaId = $request->integer('area_id');
-            $query->whereHas('trabajador', fn($trabajador) =>
-                $trabajador->where('area_id', $areaId));
+            $query->whereHas('trabajador', fn ($trabajador) => $trabajador->where('area_id', $areaId));
         }
 
         if ($request->filled('fecha_desde')) {
@@ -85,10 +89,10 @@ class ReporteAvanceController extends Controller
         }
 
         if (
-            !$esTrabajador
-            && !$request->filled('estado')
-            && !$request->filled('fecha_desde')
-            && !$request->filled('fecha_hasta')
+            ! $esVistaPersonal
+            && ! $request->filled('estado')
+            && ! $request->filled('fecha_desde')
+            && ! $request->filled('fecha_hasta')
         ) {
             $query->whereDate('fecha_presentacion', today());
         }
@@ -100,18 +104,19 @@ class ReporteAvanceController extends Controller
          * Administración necesita la colección completa para agrupar:
          * Área > Trabajador > Reportes.
          */
-        $reportes = $esTrabajador
+        $reportes = $esVistaPersonal
             ? $query->paginate(10)->withQueryString()
             : $query->get();
 
-        $areas = !$esTrabajador
+        $areas = ! $esVistaPersonal
             ? Area::where('estado', true)
-                ->when($rol === 'GERENTE', fn($query) => $areaGerenteId
-                    ? $query->whereKey($areaGerenteId)
+                ->when($rol === 'GERENTE' || $vistaEquipo, fn ($query) => $areaSupervisorId
+                    ? $query->whereKey($areaSupervisorId)
                     : $query->whereRaw('1 = 0'))
-                ->with(['trabajadores' => function ($q) {
+                ->with(['trabajadores' => function ($q) use ($vistaEquipo, $usuario) {
                     $q
                         ->where('estado', 'ACTIVO')
+                        ->when($vistaEquipo, fn ($trabajadores) => $trabajadores->where('id', '!=', $usuario->trabajador_id))
                         ->orderBy('apellidos')
                         ->orderBy('nombres');
                 }])
@@ -131,10 +136,10 @@ class ReporteAvanceController extends Controller
                 ->orWhere('estado_revision', 'POR_REVISAR');
         });
 
-        if (!$puedeGestionar) {
+        if (! $puedeGestionar) {
             $areaId = $usuario->trabajador?->area_id;
 
-            if (!$areaId) {
+            if (! $areaId) {
                 $pendientesQuery->whereRaw('1 = 0');
             } else {
                 $pendientesQuery->where(function ($q) use ($areaId) {
@@ -143,8 +148,7 @@ class ReporteAvanceController extends Controller
                         ->orWhere(function ($legado) use ($areaId) {
                             $legado
                                 ->whereNull('area_id')
-                                ->whereHas('reporte.trabajador', fn($trabajador) =>
-                                    $trabajador->where('area_id', $areaId));
+                                ->whereHas('reporte.trabajador', fn ($trabajador) => $trabajador->where('area_id', $areaId));
                         });
                 });
             }
@@ -156,8 +160,7 @@ class ReporteAvanceController extends Controller
                     ->orWhere(function ($legado) use ($areaId) {
                         $legado
                             ->whereNull('area_id')
-                            ->whereHas('reporte.trabajador', fn($trabajador) =>
-                                $trabajador->where('area_id', $areaId));
+                            ->whereHas('reporte.trabajador', fn ($trabajador) => $trabajador->where('area_id', $areaId));
                     });
             });
         }
@@ -175,7 +178,7 @@ class ReporteAvanceController extends Controller
                 ->first()
             : null;
 
-        $vista = $esTrabajador
+        $vista = $esVistaPersonal
             ? 'reportesAvance.trabajador.index'
             : 'reportesAvance.admin.index';
 
@@ -187,7 +190,10 @@ class ReporteAvanceController extends Controller
             'puedeGestionar',
             'puedeRevisar',
             'pestanaActiva',
-            'pendientesPorRevisar'
+            'pendientesPorRevisar',
+            'esEncargadoArea',
+            'vistaEquipo',
+            'parametrosVista'
         ));
     }
 
@@ -195,13 +201,13 @@ class ReporteAvanceController extends Controller
     {
         $usuario = Auth::user();
 
-        if (!$usuario->trabajador_id) {
+        if (! $usuario->trabajador_id) {
             return back()->with('error', 'Este usuario no está asociado a un trabajador.');
         }
 
         if (ReporteAvance::where('trabajador_id', $usuario->trabajador_id)
-                ->whereDate('fecha_presentacion', today())
-                ->exists()) {
+            ->whereDate('fecha_presentacion', today())
+            ->exists()) {
             return back()->with('error', 'Ya registraste tu reporte de avance de hoy.');
         }
 
@@ -230,8 +236,8 @@ class ReporteAvanceController extends Controller
         }
 
         if (ReporteAvance::where('trabajador_id', $trabajador->id)
-                ->whereDate('fecha_presentacion', today())
-                ->exists()) {
+            ->whereDate('fecha_presentacion', today())
+            ->exists()) {
             return back()->with(
                 'error',
                 "{$trabajador->nombres} {$trabajador->apellidos} ya tiene un reporte registrado hoy."
@@ -268,7 +274,7 @@ class ReporteAvanceController extends Controller
         $data = $this->validarReporte($request);
 
         DB::transaction(function () use ($request, $data, $reporte) {
-            $this->sincronizarActividades($request, $reporte, $data['actividades']);
+            $this->sincronizarActividades($request, $reporte, $data['actividades'] ?? []);
             $this->sincronizarPendientes($reporte, $data['pendientes'] ?? []);
 
             if ($reporte->estado === 'OBSERVADO') {
@@ -296,7 +302,7 @@ class ReporteAvanceController extends Controller
             403
         );
 
-        if (!$reporte->fecha_presentacion?->isToday()) {
+        if (! $reporte->fecha_presentacion?->isToday()) {
             return back()->with('error', 'Solo puedes agregar avances al reporte del día actual.');
         }
 
@@ -389,7 +395,7 @@ class ReporteAvanceController extends Controller
             'descripcion.required' => 'Describe la tarea pendiente.',
         ]);
 
-        if (!Area::whereKey($data['area_id'])->where('estado', true)->exists()) {
+        if (! Area::whereKey($data['area_id'])->where('estado', true)->exists()) {
             return back()->withErrors([
                 'area_id' => 'El área seleccionada no está activa.',
             ], 'pendienteArea')->withInput();
@@ -422,7 +428,7 @@ class ReporteAvanceController extends Controller
             403
         );
 
-        if (!$trabajador->area()->where('estado', true)->exists()) {
+        if (! $trabajador->area()->where('estado', true)->exists()) {
             return back()->with('error', 'Tu área no se encuentra activa.');
         }
 
@@ -454,7 +460,7 @@ class ReporteAvanceController extends Controller
     {
         $usuario = Auth::user();
 
-        if (!$usuario->trabajador_id || !$usuario->trabajador?->area_id) {
+        if (! $usuario->trabajador_id || ! $usuario->trabajador?->area_id) {
             abort(403);
         }
 
@@ -489,6 +495,63 @@ class ReporteAvanceController extends Controller
         return redirect()
             ->route('reportesAvance.index', ['pestana' => 'pendientes'])
             ->with('success', 'Pendiente marcado como finalizado y enviado al administrador para revisión.');
+    }
+
+    public function actualizarPendienteTrabajador(Request $request, PendienteAvance $pendiente)
+    {
+        $usuario = Auth::user();
+
+        abort_unless(
+            $usuario->rol?->nombre === 'TRABAJADOR' &&
+                $usuario->trabajador_id &&
+                $usuario->trabajador?->area_id,
+            403
+        );
+
+        $pendiente->load('reporte.trabajador', 'area');
+
+        $areaPendiente = $pendiente->area_id
+            ?? $pendiente->reporte?->trabajador?->area_id;
+
+        abort_unless(
+            $areaPendiente === $usuario->trabajador->area_id,
+            403
+        );
+
+        if (
+            $pendiente->estado === 'RESUELTO' ||
+            $pendiente->estado_revision === 'POR_REVISAR'
+        ) {
+            return back()->with(
+                'error',
+                'El pendiente ya fue enviado para revisión y no puede editarse.'
+            );
+        }
+
+        $data = $request->validateWithBag('editarPendiente', [
+            'descripcion' => ['required', 'string', 'max:500'],
+            'detalle' => ['nullable', 'string', 'max:2000'],
+            'ruta_archivos' => ['nullable', 'string', 'max:500'],
+        ], [
+            'descripcion.required' => 'Describe la actividad pendiente.',
+        ]);
+
+        $pendiente->update([
+            'descripcion' => $data['descripcion'],
+            'detalle' => $data['detalle'] ?? null,
+            'ruta_archivos' => $data['ruta_archivos'] ?? null,
+            'estado' => 'PENDIENTE',
+            'estado_revision' => null,
+            'observacion_revision' => null,
+            'revisado_por' => null,
+            'fecha_revision' => null,
+            'resuelto_por' => null,
+            'fecha_resolucion' => null,
+        ]);
+
+        return redirect()
+            ->route('reportesAvance.index', ['pestana' => 'pendientes'])
+            ->with('success', 'Pendiente actualizado correctamente. Ya puedes marcarlo como finalizado.');
     }
 
     public function revisarPendiente(Request $request, PendienteAvance $pendiente)
@@ -564,7 +627,7 @@ class ReporteAvanceController extends Controller
     private function validarReporte(Request $request, ?string $errorBag = null): array
     {
         $reglas = [
-            'actividades' => ['required', 'array', 'min:1'],
+            'actividades' => ['nullable', 'array'],
             'actividades.*.id' => ['nullable', 'integer', 'exists:actividades_reporte,id'],
             'actividades.*.descripcion' => ['required', 'string', 'max:500'],
             'actividades.*.archivo' => [
@@ -581,8 +644,6 @@ class ReporteAvanceController extends Controller
         ];
 
         $mensajes = [
-            'actividades.required' => 'Debes registrar al menos una actividad realizada.',
-            'actividades.min' => 'Debes registrar al menos una actividad realizada.',
             'actividades.*.descripcion.required' => 'Cada actividad debe tener una descripción.',
             'actividades.*.archivo.max' => 'Cada archivo debe pesar como máximo 5 MB.',
             'pendientes.*.descripcion.required' => 'Cada pendiente debe tener una descripción.',
@@ -618,7 +679,7 @@ class ReporteAvanceController extends Controller
                 'estado' => 'PENDIENTE',
             ]);
 
-            foreach ($data['actividades'] as $indice => $actividad) {
+            foreach ($data['actividades'] ?? [] as $indice => $actividad) {
                 $archivo = $request->file("actividades.{$indice}.archivo");
 
                 $reporte->actividades()->create([
@@ -657,7 +718,7 @@ class ReporteAvanceController extends Controller
         $ids = collect($actividades)
             ->pluck('id')
             ->filter()
-            ->map(fn($id) => (int) $id);
+            ->map(fn ($id) => (int) $id);
 
         $reporte
             ->actividades()
@@ -709,7 +770,7 @@ class ReporteAvanceController extends Controller
         $ids = collect($pendientes)
             ->pluck('id')
             ->filter()
-            ->map(fn($id) => (int) $id);
+            ->map(fn ($id) => (int) $id);
 
         $reporte
             ->pendientes()
@@ -748,7 +809,7 @@ class ReporteAvanceController extends Controller
     {
         $this->autorizarArchivoActividad($actividad);
 
-        if (!$actividad->archivo || !Storage::disk('public')->exists($actividad->archivo)) {
+        if (! $actividad->archivo || ! Storage::disk('public')->exists($actividad->archivo)) {
             abort(404, 'El archivo no se encuentra disponible.');
         }
 
@@ -757,7 +818,7 @@ class ReporteAvanceController extends Controller
 
         return response()->file($ruta, [
             'Content-Type' => $mime,
-            'Content-Disposition' => 'inline; filename="' . basename($actividad->archivo) . '"',
+            'Content-Disposition' => 'inline; filename="'.basename($actividad->archivo).'"',
         ]);
     }
 
@@ -765,7 +826,7 @@ class ReporteAvanceController extends Controller
     {
         $this->autorizarArchivoActividad($actividad);
 
-        if (!$actividad->archivo || !Storage::disk('public')->exists($actividad->archivo)) {
+        if (! $actividad->archivo || ! Storage::disk('public')->exists($actividad->archivo)) {
             abort(404, 'El archivo no se encuentra disponible.');
         }
 
@@ -787,10 +848,17 @@ class ReporteAvanceController extends Controller
             && $usuario->trabajador?->area_id
             && $actividad->reporte?->trabajador?->area_id === $usuario->trabajador->area_id;
 
+        $esEncargadoDelArea = $usuario->rol?->nombre === 'TRABAJADOR'
+            && $usuario->trabajador?->esEncargadoDeSuArea()
+            && $actividad->reporte?->trabajador?->area_id === $usuario->trabajador->area_id;
+
         $esPropietario = $usuario->trabajador_id &&
             $actividad->reporte?->trabajador_id === $usuario->trabajador_id;
 
-        abort_unless($esAdministrador || $esGerenteDelArea || $esPropietario, 403);
+        abort_unless(
+            $esAdministrador || $esGerenteDelArea || $esEncargadoDelArea || $esPropietario,
+            403
+        );
     }
 
     private function autorizarSupervisorDelReporte(ReporteAvance $reporte): void

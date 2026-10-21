@@ -96,15 +96,18 @@
 
             <div class="form-help-box">
                 <strong>Un solo horario para toda la empresa.</strong>
-                Al guardar, esta configuración queda vinculada automáticamente a cada trabajador activo. Los
-                contratados mantienen control obligatorio y los locadores control referencial.
+                Al guardar, esta configuración queda vinculada automáticamente a cada trabajador activo. El personal
+                contratado registra cuatro marcas: entrada, salida a refrigerio, retorno y salida final. El personal
+                con control referencial registra dos marcas; el sistema reconoce si corresponden al turno de mañana o
+                al turno de tarde según la hora de entrada. Cada día puede configurarse como jornada completa o
+                media jornada.
             </div>
 
             <div class="form-section">
                 <div class="form-section__heading">
                     <div>
                         <h3 class="form-section__title">Configuración semanal</h3>
-                        <p class="table-secondary-text">Marca los días laborables e indica entrada, salida y tolerancia.</p>
+                        <p class="table-secondary-text">Elige jornada completa o media jornada para cada día.</p>
                     </div>
                     <span class="formato-indicador" id="formatoIndicador"></span>
                 </div>
@@ -119,35 +122,60 @@
                             ) === '1';
                             $entrada = old(
                                 "dias.$numero.hora_entrada",
-                                $dia?->hora_entrada ? substr($dia->hora_entrada, 0, 5) : ($numero <= 6 ? '08:00' : ''),
+                                $dia?->hora_entrada ? substr($dia->hora_entrada, 0, 5) : ($numero <= 6 ? '08:20' : ''),
                             );
-                            $salidaPredeterminada = $numero === 6 ? '13:00' : ($numero <= 5 ? '17:00' : '');
+                            $salidaRefrigerio = old(
+                                "dias.$numero.hora_salida_refrigerio",
+                                $dia?->hora_salida_refrigerio ? substr($dia->hora_salida_refrigerio, 0, 5) : ($numero <= 5 ? '13:00' : ''),
+                            );
+                            $retornoRefrigerio = old(
+                                "dias.$numero.hora_retorno_refrigerio",
+                                $dia?->hora_retorno_refrigerio ? substr($dia->hora_retorno_refrigerio, 0, 5) : ($numero <= 5 ? '14:00' : ''),
+                            );
+                            $salidaPredeterminada = $numero <= 5 ? '19:00' : ($numero === 6 ? '13:00' : '');
                             $salida = old(
                                 "dias.$numero.hora_salida",
                                 $dia?->hora_salida ? substr($dia->hora_salida, 0, 5) : $salidaPredeterminada,
                             );
                             $tolerancia = old(
                                 "dias.$numero.tolerancia_minutos",
-                                $dia?->tolerancia_minutos ?? 0,
+                                $dia?->tolerancia_minutos ?? 20,
                             );
+                            $tipoJornadaPredeterminado = $numero === 6 ? 'MEDIA' : 'COMPLETA';
+                            $tipoJornadaGuardado = $dia
+                                ? ($dia->hora_salida_refrigerio && $dia->hora_retorno_refrigerio ? 'COMPLETA' : 'MEDIA')
+                                : $tipoJornadaPredeterminado;
+                            $tipoJornada = old("dias.$numero.tipo_jornada", $tipoJornadaGuardado);
                         @endphp
 
                         <div class="dia-editor" data-dia="{{ $numero }}">
                             <input type="hidden" name="dias[{{ $numero }}][dia_semana]" value="{{ $numero }}">
                             <input type="hidden" name="dias[{{ $numero }}][es_laborable]" value="0">
 
-                            <label class="dia-editor__nombre">
-                                <input type="checkbox" name="dias[{{ $numero }}][es_laborable]" value="1"
-                                    class="dia-laborable" @checked($esLaborable)>
-                                <span>{{ $nombre }}</span>
-                                <span class="dia-editor__estado" aria-hidden="true">
-                                    {{ $esLaborable ? 'Laborable' : 'Descanso' }}
-                                </span>
-                            </label>
+                            <div class="dia-editor__config">
+                                <label class="dia-editor__nombre">
+                                    <input type="checkbox" name="dias[{{ $numero }}][es_laborable]" value="1"
+                                        class="dia-laborable" @checked($esLaborable)>
+                                    <span>{{ $nombre }}</span>
+                                    <span class="dia-editor__estado" aria-hidden="true">
+                                        {{ $esLaborable ? ($tipoJornada === 'MEDIA' ? 'Media jornada' : 'Completa') : 'Descanso' }}
+                                    </span>
+                                </label>
 
-                            @foreach (['entrada' => 'Entrada', 'salida' => 'Salida'] as $tipo => $etiqueta)
-                                @php($hora = $tipo === 'entrada' ? $entrada : $salida)
-                                <div class="form-group hora-editor" data-hora-editor>
+                                <select name="dias[{{ $numero }}][tipo_jornada]" class="form-select tipo-jornada"
+                                    data-tipo-jornada aria-label="Tipo de jornada del {{ strtolower($nombre) }}">
+                                    <option value="COMPLETA" @selected($tipoJornada === 'COMPLETA')>Jornada completa</option>
+                                    <option value="MEDIA" @selected($tipoJornada === 'MEDIA')>Media jornada</option>
+                                </select>
+                            </div>
+
+                            @foreach ([
+                                'entrada' => ['Entrada', $entrada],
+                                'salida_refrigerio' => ['Salida a refrigerio', $salidaRefrigerio],
+                                'retorno_refrigerio' => ['Retorno', $retornoRefrigerio],
+                                'salida' => ['Salida final', $salida],
+                            ] as $tipo => [$etiqueta, $hora])
+                                <div class="form-group hora-editor" data-hora-editor data-hora-tipo="{{ $tipo }}">
                                     <label class="form-label">{{ $etiqueta }}</label>
                                     <input type="hidden" name="dias[{{ $numero }}][hora_{{ $tipo }}]"
                                         value="{{ $hora }}" class="hora-normalizada" data-hora-normalizada>

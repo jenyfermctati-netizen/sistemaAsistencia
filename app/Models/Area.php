@@ -27,6 +27,16 @@ class Area extends Model
         return $this->hasMany(Trabajador::class, 'area_id');
     }
 
+    public function encargaturas()
+    {
+        return $this->hasMany(AreaEncargado::class, 'area_id');
+    }
+
+    public function encargaturasActivas()
+    {
+        return $this->encargaturas()->vigentes();
+    }
+
     public function pendientesAvance()
     {
         return $this->hasMany(PendienteAvance::class, 'area_id');

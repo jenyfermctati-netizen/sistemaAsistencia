@@ -17,6 +17,11 @@ document.addEventListener(
                 'sidebarOverlay'
             );
 
+        const sidebarClose =
+            sidebar?.querySelector(
+                '[data-sidebar-close]'
+            );
+
         const profileMenu =
             document.querySelector(
                 '[data-profile-menu]'
@@ -33,18 +38,27 @@ document.addEventListener(
             );
 
 
+        function setSidebarOpen(isOpen) {
+
+            if (!sidebar || !overlay) {
+                return;
+            }
+
+            sidebar.classList.toggle('open', isOpen);
+            sidebar.classList.toggle('is-open', isOpen);
+            overlay.classList.toggle('active', isOpen);
+            overlay.classList.toggle('is-visible', isOpen);
+            document.body.classList.toggle('sidebar-visible', isOpen);
+            toggle?.setAttribute('aria-expanded', String(isOpen));
+            toggle?.setAttribute('aria-label', isOpen ? 'Cerrar menú principal' : 'Abrir menú principal');
+
+        }
+
+
         toggle?.addEventListener(
             'click',
             function () {
-
-                sidebar.classList.toggle(
-                    'open'
-                );
-
-                overlay.classList.toggle(
-                    'active'
-                );
-
+                setSidebarOpen(!sidebar?.classList.contains('open'));
             }
         );
 
@@ -53,14 +67,28 @@ document.addEventListener(
             'click',
             function () {
 
-                sidebar.classList.remove(
-                    'open'
-                );
+                setSidebarOpen(false);
 
-                overlay.classList.remove(
-                    'active'
-                );
+            }
+        );
 
+
+        sidebarClose?.addEventListener(
+            'click',
+            function () {
+                setSidebarOpen(false);
+                toggle?.focus();
+            }
+        );
+
+
+        sidebar?.querySelectorAll('a').forEach(
+            function (link) {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth <= 1100) {
+                        setSidebarOpen(false);
+                    }
+                });
             }
         );
 
@@ -120,12 +148,16 @@ document.addEventListener(
             'keydown',
             function (event) {
 
-                if (
-                    event.key === 'Escape' &&
-                    profileMenuTrigger?.getAttribute('aria-expanded') === 'true'
-                ) {
-                    setProfileMenuOpen(false);
-                    profileMenuTrigger.focus();
+                if (event.key === 'Escape') {
+                    if (profileMenuTrigger?.getAttribute('aria-expanded') === 'true') {
+                        setProfileMenuOpen(false);
+                        profileMenuTrigger.focus();
+                    }
+
+                    if (sidebar?.classList.contains('open')) {
+                        setSidebarOpen(false);
+                        toggle?.focus();
+                    }
                 }
 
             }

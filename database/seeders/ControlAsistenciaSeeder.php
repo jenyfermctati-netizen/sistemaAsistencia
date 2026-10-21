@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class ControlAsistenciaSeeder extends Seeder
 {
@@ -85,25 +84,40 @@ class ControlAsistenciaSeeder extends Seeder
                 'horario_id' => $horarioId,
                 'dia_semana' => $dia,
                 'es_laborable' => true,
-                'hora_entrada' => '08:00:00',
-                'hora_salida' => '13:00:00',
-                'tolerancia_minutos' => 0,
+                'hora_entrada' => '08:20:00',
+                'hora_salida_refrigerio' => '13:00:00',
+                'hora_retorno_refrigerio' => '14:00:00',
+                'hora_salida' => '19:00:00',
+                'tolerancia_minutos' => 20,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
         }
 
-        foreach ([6, 7] as $dia) {
-            DB::table('horario_dias')->insert([
-                'horario_id' => $horarioId,
-                'dia_semana' => $dia,
-                'es_laborable' => false,
-                'hora_entrada' => null,
-                'hora_salida' => null,
-                'tolerancia_minutos' => 0,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        DB::table('horario_dias')->insert([
+            'horario_id' => $horarioId,
+            'dia_semana' => 6,
+            'es_laborable' => true,
+            'hora_entrada' => '08:20:00',
+            'hora_salida_refrigerio' => null,
+            'hora_retorno_refrigerio' => null,
+            'hora_salida' => '13:00:00',
+            'tolerancia_minutos' => 20,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('horario_dias')->insert([
+            'horario_id' => $horarioId,
+            'dia_semana' => 7,
+            'es_laborable' => false,
+            'hora_entrada' => null,
+            'hora_salida_refrigerio' => null,
+            'hora_retorno_refrigerio' => null,
+            'hora_salida' => null,
+            'tolerancia_minutos' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

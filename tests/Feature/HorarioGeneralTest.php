@@ -37,6 +37,14 @@ class HorarioGeneralTest extends TestCase
             'estado' => true,
         ]);
         $this->assertDatabaseCount('horario_dias', 7);
+        $this->assertDatabaseHas('horario_dias', [
+            'dia_semana' => 6,
+            'es_laborable' => true,
+            'hora_entrada' => '08:20',
+            'hora_salida_refrigerio' => null,
+            'hora_retorno_refrigerio' => null,
+            'hora_salida' => '13:00',
+        ]);
 
         $horario = Horario::firstOrFail();
 
@@ -64,6 +72,8 @@ class HorarioGeneralTest extends TestCase
         $horario = Horario::firstOrFail();
         $datos = $this->datosHorario('24');
         $datos['dias'][1]['hora_entrada'] = '09:15';
+        $datos['dias'][1]['hora_salida_refrigerio'] = '13:00';
+        $datos['dias'][1]['hora_retorno_refrigerio'] = '14:00';
         $datos['dias'][1]['hora_salida'] = '18:45';
 
         $response = $this
@@ -83,6 +93,8 @@ class HorarioGeneralTest extends TestCase
             'horario_id' => $horario->id,
             'dia_semana' => 1,
             'hora_entrada' => '09:15',
+            'hora_salida_refrigerio' => '13:00',
+            'hora_retorno_refrigerio' => '14:00',
             'hora_salida' => '18:45',
         ]);
 
@@ -92,6 +104,49 @@ class HorarioGeneralTest extends TestCase
             ->assertSee('value="09:15"', false)
             ->assertSee('value="18:45"', false)
             ->assertSee('value="24" selected', false);
+    }
+
+    public function test_permite_cambiar_el_sabado_de_jornada_completa_a_media_jornada(): void
+    {
+        $administrador = $this->crearAdministrador();
+        $datosCompletos = $this->datosHorario('24');
+        $datosCompletos['dias'][6] = [
+            'dia_semana' => 6,
+            'es_laborable' => '1',
+            'tipo_jornada' => 'COMPLETA',
+            'hora_entrada' => '08:20',
+            'hora_salida_refrigerio' => '13:00',
+            'hora_retorno_refrigerio' => '14:00',
+            'hora_salida' => '19:00',
+            'tolerancia_minutos' => 20,
+        ];
+
+        $this->actingAs($administrador)
+            ->post(route('trabajadores.horarios.store'), $datosCompletos)
+            ->assertRedirect(route('trabajadores.horarios'));
+
+        $horario = Horario::firstOrFail();
+
+        $this->actingAs($administrador)
+            ->put(route('trabajadores.horarios.update', $horario), $this->datosHorario('24'))
+            ->assertRedirect(route('trabajadores.horarios'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('horario_dias', [
+            'horario_id' => $horario->id,
+            'dia_semana' => 6,
+            'es_laborable' => true,
+            'hora_entrada' => '08:20',
+            'hora_salida_refrigerio' => null,
+            'hora_retorno_refrigerio' => null,
+            'hora_salida' => '13:00',
+        ]);
+
+        $this->actingAs($administrador)
+            ->get(route('trabajadores.horarios'))
+            ->assertOk()
+            ->assertSee('Tipo de jornada del sábado')
+            ->assertSee('value="MEDIA" selected', false);
     }
 
     public function test_un_nuevo_trabajador_recibe_el_horario_general_automaticamente(): void
@@ -136,12 +191,16 @@ class HorarioGeneralTest extends TestCase
 
         foreach (range(1, 7) as $dia) {
             $laborable = $dia <= 6;
+            $jornadaCompleta = $dia <= 5;
             $dias[$dia] = [
                 'dia_semana' => $dia,
                 'es_laborable' => $laborable ? '1' : '0',
-                'hora_entrada' => $laborable ? '08:00' : null,
-                'hora_salida' => $laborable ? ($dia === 6 ? '13:00' : '17:00') : null,
-                'tolerancia_minutos' => 10,
+                'tipo_jornada' => $jornadaCompleta ? 'COMPLETA' : 'MEDIA',
+                'hora_entrada' => $laborable ? '08:20' : null,
+                'hora_salida_refrigerio' => $jornadaCompleta ? '13:00' : null,
+                'hora_retorno_refrigerio' => $jornadaCompleta ? '14:00' : null,
+                'hora_salida' => $laborable ? ($jornadaCompleta ? '19:00' : '13:00') : null,
+                'tolerancia_minutos' => 20,
             ];
         }
 

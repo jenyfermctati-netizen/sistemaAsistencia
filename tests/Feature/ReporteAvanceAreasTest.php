@@ -100,6 +100,23 @@ class ReporteAvanceAreasTest extends TestCase
         }
     }
 
+    public function test_trabajador_puede_registrar_el_reporte_del_dia_sin_actividades(): void
+    {
+        $area = Area::create(['nombre' => 'Administración', 'estado' => true]);
+        [$usuario, $trabajador] = $this->crearTrabajador($area, '70000021');
+
+        $this->actingAs($usuario)
+            ->post(route('reportesAvance.store'))
+            ->assertRedirect(route('reportesAvance.index'))
+            ->assertSessionHas('success');
+
+        $reporte = ReporteAvance::where('trabajador_id', $trabajador->id)->firstOrFail();
+
+        $this->assertSame('PENDIENTE', $reporte->estado);
+        $this->assertCount(0, $reporte->actividades);
+        $this->assertCount(0, $reporte->pendientes);
+    }
+
     public function test_administrador_registra_el_avance_de_un_trabajador_desde_el_modulo_de_personal(): void
     {
         $area = Area::create(['nombre' => 'Operaciones', 'estado' => true]);
@@ -374,6 +391,69 @@ class ReporteAvanceAreasTest extends TestCase
             ->assertSee('Completar integración del módulo RRHH')
             ->assertSee('70000012')
             ->assertSee('Aprobar como completado');
+    }
+
+    public function test_otro_trabajador_del_area_puede_editar_un_pendiente_antes_de_finalizarlo(): void
+    {
+        $area = Area::create(['nombre' => 'Proyectos', 'estado' => true]);
+        $otraArea = Area::create(['nombre' => 'Finanzas', 'estado' => true]);
+        [$usuarioCreador] = $this->crearTrabajador($area, '70000022');
+        [$usuarioEjecutor, $trabajadorEjecutor] = $this->crearTrabajador($area, '70000023');
+        [$usuarioExterno] = $this->crearTrabajador($otraArea, '70000024');
+
+        $pendiente = PendienteAvance::create([
+            'area_id' => $area->id,
+            'creado_por' => $usuarioCreador->id,
+            'origen' => 'TRABAJADOR',
+            'descripcion' => 'Preparar expediente',
+            'estado' => 'PENDIENTE',
+        ]);
+
+        $this->actingAs($usuarioEjecutor)
+            ->get(route('reportesAvance.index', ['pestana' => 'pendientes']))
+            ->assertOk()
+            ->assertSee('Editar pendiente')
+            ->assertSee(route('reportesAvance.pendientes.update', $pendiente));
+
+        $this->actingAs($usuarioEjecutor)
+            ->put(route('reportesAvance.pendientes.update', $pendiente), [
+                'descripcion' => 'Preparar y validar expediente',
+                'detalle' => 'Se agregó la validación final antes de entregar.',
+                'ruta_archivos' => '\\Servidor\Proyectos\Expediente',
+            ])
+            ->assertRedirect(route('reportesAvance.index', ['pestana' => 'pendientes']))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('pendientes_avance', [
+            'id' => $pendiente->id,
+            'descripcion' => 'Preparar y validar expediente',
+            'detalle' => 'Se agregó la validación final antes de entregar.',
+            'estado' => 'PENDIENTE',
+            'estado_revision' => null,
+        ]);
+
+        $this->actingAs($usuarioExterno)
+            ->put(route('reportesAvance.pendientes.update', $pendiente), [
+                'descripcion' => 'Cambio no autorizado',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('pendientes_avance', [
+            'id' => $pendiente->id,
+            'descripcion' => 'Cambio no autorizado',
+        ]);
+
+        $this->actingAs($usuarioEjecutor)
+            ->patch(route('reportesAvance.pendientes.resolver', $pendiente))
+            ->assertRedirect(route('reportesAvance.index', ['pestana' => 'pendientes']));
+
+        $this->assertDatabaseHas('pendientes_avance', [
+            'id' => $pendiente->id,
+            'descripcion' => 'Preparar y validar expediente',
+            'estado' => 'RESUELTO',
+            'estado_revision' => 'POR_REVISAR',
+            'resuelto_por' => $trabajadorEjecutor->id,
+        ]);
     }
 
     public function test_pendiente_es_visible_y_resoluble_por_el_area_pero_no_por_otra_area(): void
