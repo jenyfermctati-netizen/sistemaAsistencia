@@ -43,11 +43,12 @@ class BiometricoController extends Controller
 
         if ($table === 'USERINFO') {
             $this->procesarUsuariosDispositivo($sn, $body);
-
             return $this->texto('OK');
         }
 
         if ($table === 'OPERLOG') {
+            $this->procesarUsuariosDispositivo($sn, $body);
+
             Log::info('SENSEFACE OPERLOG', [
                 'sn' => $sn,
                 'body' => $body,
@@ -499,23 +500,12 @@ class BiometricoController extends Controller
             $nombre
         );
 
-        preg_match(
-            '/\b(?:Pri|Privilege)=([^\s\t]+)/i',
-            $linea,
-            $privilegio
-        );
-
-        preg_match(
-            '/\bCard=([^\s\t]+)/i',
-            $linea,
-            $tarjeta
-        );
+        preg_match('/\b(?:Pri|Privilege)=([^\s\t]+)/i', $linea, $privilegio);
+        preg_match('/\bCard=([^\s\t]+)/i', $linea, $tarjeta);
 
         return [
             'pin' => trim($pin[1]),
-            'nombre' => isset($nombre[1])
-                ? trim($nombre[1])
-                : null,
+            'nombre' => isset($nombre[1]) ? trim($nombre[1]) : null,
             'privilegio' => $privilegio[1] ?? null,
             'tarjeta' => $tarjeta[1] ?? null,
         ];
