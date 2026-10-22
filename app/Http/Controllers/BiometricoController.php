@@ -263,9 +263,21 @@ class BiometricoController extends Controller
                 }
 
                 $tipo = $this->determinarTipo(
-                    $trabajador->id,
+                    $trabajador,
                     $fechaHora
                 );
+
+                if (!$tipo) {
+                    Log::warning('ATTLOG marcaciones del día ya completadas', [
+                        'sn' => $sn,
+                        'pin' => $datos['pin'],
+                        'trabajador_id' => $trabajador->id,
+                        'fecha_hora' => $fechaHora->format('Y-m-d H:i:s'),
+                    ]);
+
+                    $procesadas++;
+                    continue;
+                }
 
                 Marcacion::create([
                     'trabajador_id' => $trabajador->id,
@@ -350,15 +362,32 @@ class BiometricoController extends Controller
         return null;
     }
 
-    private function determinarTipo(int $trabajadorId, Carbon $fechaHora): string
+    private function determinarTipo(Trabajador $trabajador, Carbon $fechaHora): ?string
     {
-        $cantidadMarcaciones = Marcacion::where(
-            'trabajador_id',
-            $trabajadorId
-        )
+        $trabajador->loadMissing('horarioActual.horario.dias');
+
+        $marcaciones = Marcacion::where('trabajador_id', $trabajador->id)
             ->whereDate('fecha_hora', $fechaHora->toDateString())
             ->where('anulada', false)
-            ->count();
+            ->orderBy('fecha_hora')
+            ->get();
+
+        $diaHorario = $trabajador->horarioActual?->horario?->dias?->firstWhere(
+            'dia_semana',
+            $fechaHora->isoWeekday()
+        );
+
+        $esJornadaCompleta =
+            $trabajador->horarioActual?->tipo_control === 'OBLIGATORIO' &&
+            filled($diaHorario?->hora_salida_refrigerio) &&
+            filled($diaHorario?->hora_retorno_refrigerio);
+
+        $totalEsperado = $esJornadaCompleta ? 4 : 2;
+        $cantidadMarcaciones = $marcaciones->count();
+
+        if ($cantidadMarcaciones >= $totalEsperado) {
+            return null;
+        }
 
         return $cantidadMarcaciones % 2 === 0
             ? 'ENTRADA'
