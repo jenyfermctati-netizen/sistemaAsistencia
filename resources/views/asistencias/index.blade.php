@@ -237,8 +237,10 @@
                         <th>Control</th>
                         <th>Origen</th>
                         <th>Programado</th>
-                        <th>Entrada</th>
-                        <th>Salida</th>
+                        <th>Entrada mañana</th>
+                        <th>Salida refrigerio</th>
+                        <th>Retorno / entrada tarde</th>
+                        <th>Salida final</th>
                         <th>Trabajado</th>
                         <th>Tardanza</th>
                         <th>Estado</th>
@@ -394,6 +396,13 @@
                                             -
                                         </span>
 
+                                        @if($asistencia->hora_programada_salida_refrigerio)
+                                            <span>{{ substr($asistencia->hora_programada_salida_refrigerio, 0, 5) }}</span>
+                                            <span>/</span>
+                                            <span>{{ substr($asistencia->hora_programada_retorno_refrigerio, 0, 5) }}</span>
+                                            <span>-</span>
+                                        @endif
+
                                         <span>
                                             {{
                                                 substr(
@@ -419,6 +428,40 @@
                                 @else
 
                                     -
+
+                                @endif
+
+                            </td>
+
+
+                            <td>
+
+                                @if($asistencia->hora_salida_refrigerio)
+
+                                    <strong class="hora-marcacion">
+                                        {{ substr($asistencia->hora_salida_refrigerio, 0, 5) }}
+                                    </strong>
+
+                                @else
+
+                                    <span class="sin-marcacion">—</span>
+
+                                @endif
+
+                            </td>
+
+
+                            <td>
+
+                                @if($asistencia->hora_retorno_refrigerio)
+
+                                    <strong class="hora-marcacion">
+                                        {{ substr($asistencia->hora_retorno_refrigerio, 0, 5) }}
+                                    </strong>
+
+                                @else
+
+                                    <span class="sin-marcacion">—</span>
 
                                 @endif
 
@@ -657,7 +700,7 @@
                         <tr>
 
                             <td
-                                colspan="11"
+                                colspan="13"
                                 class="table-empty"
                             >
 

@@ -22,7 +22,7 @@
         <div class="ra-worker__hero-copy">
             <span class="ra-worker__eyebrow">Bitácora de trabajo</span>
             <h2>Mi actividad diaria</h2>
-            <p>Registra lo realizado durante el día y consulta el historial de tus avances.</p>
+            <p>Registra tu jornada, aunque no tengas actividades, y consulta el historial de tus avances.</p>
         </div>
 
         @if($puedeCrear)
@@ -152,7 +152,7 @@
                 <div class="ra-today__empty">
                     <div>
                         <strong>Aún no registraste tu reporte de hoy</strong>
-                        <span>Registra las actividades realizadas durante la jornada.</span>
+                        <span>Puedes registrar el día aunque no tengas actividades para agregar.</span>
                     </div>
 
                     @if($puedeCrear)
@@ -465,15 +465,27 @@
 
                             @elseif($pendiente->estado !== 'RESUELTO')
 
-                                <form method="POST"
-                                    action="{{ route('reportesAvance.pendientes.resolver', $pendiente) }}">
-                                    @csrf
-                                    @method('PATCH')
-
-                                    <button type="submit" class="button button--primary button--small">
-                                        Marcar como finalizado
+                                <div class="ra-worker-pending__actions">
+                                    <button type="button"
+                                        class="button button--secondary button--small"
+                                        data-editar-pendiente
+                                        data-url="{{ route('reportesAvance.pendientes.update', $pendiente) }}"
+                                        data-descripcion="{{ $pendiente->descripcion }}"
+                                        data-detalle="{{ $pendiente->detalle }}"
+                                        data-ruta-archivos="{{ $pendiente->ruta_archivos }}">
+                                        Editar pendiente
                                     </button>
-                                </form>
+
+                                    <form method="POST"
+                                        action="{{ route('reportesAvance.pendientes.resolver', $pendiente) }}">
+                                        @csrf
+                                        @method('PATCH')
+
+                                        <button type="submit" class="button button--primary button--small">
+                                            Marcar como finalizado
+                                        </button>
+                                    </form>
+                                </div>
 
                             @endif
 
@@ -547,7 +559,7 @@
                     <div class="form-section__header">
                         <div>
                             <h4>Actividades realizadas</h4>
-                            <p>Agrega cada actividad que realizaste durante el día.</p>
+                            <p>Es opcional. Puedes guardar el reporte aunque hoy no tengas actividades para registrar.</p>
                         </div>
 
                         <button type="button"
@@ -558,37 +570,37 @@
                     </div>
 
                     <div id="actividadesContainer" class="items-dinamicos">
+                        @foreach(old('actividades', []) as $indice => $actividadAnterior)
+                            <div class="item-dinamico actividad-form-item">
+                                <div class="item-dinamico__header">
+                                    <strong class="item-titulo">Actividad {{ $indice + 1 }}</strong>
+                                    <button type="button" class="item-eliminar" data-eliminar-item>Eliminar</button>
+                                </div>
 
-                        <div class="item-dinamico actividad-form-item">
+                                <input type="hidden" data-campo="id">
 
-                            <div class="item-dinamico__header">
-                                <strong>Actividad 1</strong>
+                                <div class="form-group">
+                                    <label class="form-label">¿Qué realizaste? *</label>
+                                    <input type="text" name="actividades[{{ $indice }}][descripcion]"
+                                        data-campo="descripcion"
+                                        value="{{ $actividadAnterior['descripcion'] ?? '' }}"
+                                        class="form-control" maxlength="500"
+                                        placeholder="Ej. Elaboré la cotización para el cliente ABC" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Archivo o imagen de sustento</label>
+                                    <input type="file" name="actividades[{{ $indice }}][archivo]"
+                                        data-campo="archivo" class="form-control"
+                                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                                    <small class="form-help">Opcional · máximo 5 MB.</small>
+                                </div>
                             </div>
+                        @endforeach
+                    </div>
 
-                            <div class="form-group">
-                                <label class="form-label">¿Qué realizaste? *</label>
-
-                                <input type="text"
-                                    name="actividades[0][descripcion]"
-                                    class="form-control"
-                                    maxlength="500"
-                                    placeholder="Ej. Elaboré la cotización para el cliente ABC"
-                                    required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Archivo o imagen de sustento</label>
-
-                                <input type="file"
-                                    name="actividades[0][archivo]"
-                                    class="form-control"
-                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
-
-                                <small class="form-help">Opcional · máximo 5 MB.</small>
-                            </div>
-
-                        </div>
-
+                    <div class="sin-pendientes" id="sinActividades">
+                        Sin actividades agregadas. Puedes guardar el reporte así o agregar una actividad.
                     </div>
 
                 </div>
@@ -667,6 +679,10 @@
 
                 <div id="editarActividadesContainer" class="items-dinamicos"></div>
 
+                <div class="sin-pendientes" id="sinActividadesEditar">
+                    Este reporte no tiene actividades. Puedes dejarlo así o agregar una.
+                </div>
+
             </div>
 
             <div class="form-section form-section--pendientes">
@@ -698,6 +714,54 @@
                 </button>
             </div>
 
+        </form>
+
+    </x-modal>
+
+    {{-- EDITAR PENDIENTE DEL ÁREA --}}
+    <x-modal id="modalEditarPendiente" title="Editar actividad pendiente" size="medium">
+
+        <form method="POST" id="formEditarPendiente" class="form">
+            @csrf
+            @method('PUT')
+
+            @if($errors->editarPendiente->any())
+                <div class="live-form-errors" role="alert">
+                    <strong>Revisa los datos del pendiente:</strong>
+                    <ul>
+                        @foreach($errors->editarPendiente->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <p class="form-help">
+                Cualquier trabajador de esta área puede completar la información antes de enviarla a revisión.
+            </p>
+
+            <div class="form-group">
+                <label for="editarPendienteDescripcion" class="form-label">Actividad pendiente *</label>
+                <input type="text" id="editarPendienteDescripcion" name="descripcion"
+                    class="form-control" maxlength="500" required>
+            </div>
+
+            <div class="form-group">
+                <label for="editarPendienteDetalle" class="form-label">Detalle</label>
+                <textarea id="editarPendienteDetalle" name="detalle" class="form-textarea"
+                    rows="4" maxlength="2000"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="editarPendienteRuta" class="form-label">Ruta o ubicación de archivos</label>
+                <input type="text" id="editarPendienteRuta" name="ruta_archivos"
+                    class="form-control" maxlength="500">
+            </div>
+
+            <div class="modal__actions">
+                <button type="button" class="button button--secondary" data-modal-close>Cancelar</button>
+                <button type="submit" class="button button--primary">Guardar cambios</button>
+            </div>
         </form>
 
     </x-modal>

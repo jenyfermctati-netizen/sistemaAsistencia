@@ -108,23 +108,35 @@ document.addEventListener('DOMContentLoaded', function () {
         const laborable = fila.querySelector('.dia-laborable').checked;
         const formato12 = selectorFormato.value === '12';
         const estado = fila.querySelector('.dia-editor__estado');
+        const selectorJornada = fila.querySelector('[data-tipo-jornada]');
+        const esMediaJornada = selectorJornada?.value === 'MEDIA';
 
         fila.classList.toggle('dia-editor--descanso', !laborable);
 
         if (estado) {
-            estado.textContent = laborable ? 'Laborable' : 'Descanso';
+            estado.textContent = laborable
+                ? (esMediaJornada ? 'Media jornada' : 'Completa')
+                : 'Descanso';
+        }
+
+        if (selectorJornada) {
+            selectorJornada.disabled = !laborable;
         }
 
         fila.querySelectorAll('[data-hora-editor]').forEach(function (editor) {
             const campo24 = editor.querySelector('[data-hora-24]');
             const campo12 = editor.querySelector('[data-hora-12-texto]');
             const periodo = editor.querySelector('[data-hora-periodo]');
+            const esHoraRefrigerio = ['salida_refrigerio', 'retorno_refrigerio']
+                .includes(editor.dataset.horaTipo);
+            const habilitado = laborable && !(esMediaJornada && esHoraRefrigerio);
 
-            campo24.disabled = !laborable || formato12;
-            campo12.disabled = !laborable || !formato12;
-            periodo.disabled = !laborable || !formato12;
-            campo24.required = laborable && !formato12;
-            campo12.required = laborable && formato12;
+            editor.classList.toggle('hora-editor--no-aplica', laborable && esMediaJornada && esHoraRefrigerio);
+            campo24.disabled = !habilitado || formato12;
+            campo12.disabled = !habilitado || !formato12;
+            periodo.disabled = !habilitado || !formato12;
+            campo24.required = habilitado && !formato12;
+            campo12.required = habilitado && formato12;
         });
 
         const tolerancia = fila.querySelector('.tolerancia');
@@ -176,6 +188,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    form.querySelectorAll('[data-tipo-jornada]').forEach(function (selector) {
+        selector.addEventListener('change', function () {
+            configurarDia(selector.closest('.dia-editor'));
+        });
+    });
+
     selectorFormato.addEventListener('change', aplicarFormato);
 
     form.addEventListener('submit', function (event) {
@@ -187,6 +205,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             fila.querySelectorAll('[data-hora-editor]').forEach(function (editor) {
+                const campoActivo = selectorFormato.value === '12'
+                    ? editor.querySelector('[data-hora-12-texto]')
+                    : editor.querySelector('[data-hora-24]');
+
+                if (campoActivo.disabled) {
+                    return;
+                }
+
                 if (selectorFormato.value === '12') {
                     valido = sincronizarDesde12(editor) && valido;
                 } else {

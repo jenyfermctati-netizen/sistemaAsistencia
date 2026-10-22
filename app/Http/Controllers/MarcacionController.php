@@ -88,7 +88,10 @@ class MarcacionController extends Controller
     {
         $this->verificarAdministrador();
 
-        $trabajadores = Trabajador::with('area')
+        $trabajadores = Trabajador::with([
+            'area',
+            'horarioActual.horario.dias',
+        ])
             ->where('estado', 'ACTIVO')
             ->when(
                 $request->filled('buscar'),
@@ -117,7 +120,7 @@ class MarcacionController extends Controller
             )
             ->when(
                 $request->filled('area_id'),
-                fn($q) => $q->where(
+                fn ($q) => $q->where(
                     'area_id',
                     $request->area_id
                 )
@@ -162,6 +165,8 @@ class MarcacionController extends Controller
             'El trabajador no está activo.'
         );
 
+        $trabajador->load('horarioActual.horario.dias');
+
         $marcaciones = Marcacion::where(
             'trabajador_id',
             $trabajador->id
@@ -171,22 +176,27 @@ class MarcacionController extends Controller
             ->orderBy('fecha_hora')
             ->get();
 
-        $tieneEntrada = $marcaciones
-            ->contains('tipo', 'ENTRADA');
+        $diaHorario = $trabajador->horarioActual?->horario?->dias?->firstWhere(
+            'dia_semana',
+            today()->isoWeekday()
+        );
+        $esJornadaCompleta = $trabajador->horarioActual?->tipo_control === 'OBLIGATORIO'
+            && filled($diaHorario?->hora_salida_refrigerio)
+            && filled($diaHorario?->hora_retorno_refrigerio);
+        $totalEsperado = $esJornadaCompleta ? 4 : 2;
+        $numeroMarca = $marcaciones->count();
 
-        $tieneSalida = $marcaciones
-            ->contains('tipo', 'SALIDA');
-
-        if ($tieneEntrada && $tieneSalida) {
+        if ($numeroMarca >= $totalEsperado) {
             return $this->error(
                 $request,
-                'El trabajador ya tiene entrada y salida registradas hoy.'
+                'El trabajador ya completó las marcaciones requeridas para hoy.'
             );
         }
 
-        $tipo = $tieneEntrada
-            ? 'SALIDA'
-            : 'ENTRADA';
+        $tipo = $numeroMarca % 2 === 0 ? 'ENTRADA' : 'SALIDA';
+        $etiqueta = $esJornadaCompleta
+            ? ['entrada de la mañana', 'salida a refrigerio', 'retorno del refrigerio', 'salida final'][$numeroMarca]
+            : ['entrada', 'salida'][$numeroMarca];
 
         $marcacion = Marcacion::create([
             'trabajador_id' => $trabajador->id,
@@ -194,8 +204,7 @@ class MarcacionController extends Controller
             'tipo' => $tipo,
             'origen' => 'MANUAL',
             'registrado_por' => Auth::id(),
-            'motivo_manual' =>
-                'Marcación manual rápida registrada desde el panel administrativo.',
+            'motivo_manual' => 'Marcación manual rápida registrada desde el panel administrativo.',
             'anulada' => false,
         ]);
 
@@ -204,9 +213,7 @@ class MarcacionController extends Controller
             $marcacion->fecha_hora
         );
 
-        $mensaje = $tipo === 'ENTRADA'
-            ? 'Entrada registrada correctamente.'
-            : 'Salida registrada correctamente.';
+        $mensaje = ucfirst($etiqueta).' registrada correctamente.';
 
         return $this->respuesta(
             $request,
@@ -238,14 +245,10 @@ class MarcacionController extends Controller
                 'max:500',
             ],
         ], [
-            'trabajador_id.required' =>
-                'Selecciona un trabajador.',
-            'fecha_hora.required' =>
-                'Ingresa la fecha y hora.',
-            'tipo.required' =>
-                'Selecciona el tipo de marcación.',
-            'motivo_manual.required' =>
-                'Debes indicar el motivo del registro especial.',
+            'trabajador_id.required' => 'Selecciona un trabajador.',
+            'fecha_hora.required' => 'Ingresa la fecha y hora.',
+            'tipo.required' => 'Selecciona el tipo de marcación.',
+            'motivo_manual.required' => 'Debes indicar el motivo del registro especial.',
         ]);
 
         $trabajador = Trabajador::findOrFail(
@@ -292,15 +295,13 @@ class MarcacionController extends Controller
                 'max:500',
             ],
         ], [
-            'motivo_anulacion.required' =>
-                'Debes indicar el motivo de la anulación.',
+            'motivo_anulacion.required' => 'Debes indicar el motivo de la anulación.',
         ]);
 
         $marcacion->update([
             'anulada' => true,
             'anulada_por' => Auth::id(),
-            'motivo_anulacion' =>
-                $data['motivo_anulacion'],
+            'motivo_anulacion' => $data['motivo_anulacion'],
             'fecha_anulacion' => now(),
         ]);
 

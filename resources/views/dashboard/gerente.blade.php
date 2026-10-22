@@ -102,3 +102,7 @@
 
     @include('dashboard.partials.asistencias', ['asistencias' => $asistenciasRecientes, 'mostrarArea' => !$areaVinculada])
 </section>
+
+@if($reporteControl)
+    @include('dashboard.partials.reporte-control', ['reporte' => $reporteControl])
+@endif

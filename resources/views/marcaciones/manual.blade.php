@@ -36,7 +36,7 @@
         <div class="manual-panel__header">
             <div>
                 <h3>Trabajadores</h3>
-                <p>Marca la entrada o salida según el estado actual del trabajador.</p>
+                <p>Los contratados registran cuatro marcas. El personal de turno variable registra entrada y salida.</p>
             </div>
 
             <button type="button" class="button button--secondary" id="toggleRegistroEspecial">
@@ -114,8 +114,10 @@
                     <tr>
                         <th>Trabajador</th>
                         <th>Área</th>
-                        <th>Entrada</th>
-                        <th>Salida</th>
+                        <th>Entrada mañana</th>
+                        <th>Salida refrigerio</th>
+                        <th>Retorno / entrada tarde</th>
+                        <th>Salida final</th>
                         <th>Estado de hoy</th>
                         <th>Acción</th>
                     </tr>
@@ -125,9 +127,20 @@
                     @forelse($trabajadores as $trabajador)
                         @php
                             $marcas = $marcacionesHoy->get($trabajador->id,collect());
-                            $entrada = $marcas->firstWhere('tipo','ENTRADA');
-                            $salida = $marcas->firstWhere('tipo','SALIDA');
-                            $completo = $entrada && $salida;
+                            $diaHorario = $trabajador->horarioActual?->horario?->dias?->firstWhere('dia_semana', today()->isoWeekday());
+                            $esJornadaCompleta = $trabajador->horarioActual?->tipo_control === 'OBLIGATORIO'
+                                && filled($diaHorario?->hora_salida_refrigerio)
+                                && filled($diaHorario?->hora_retorno_refrigerio);
+                            $totalEsperado = $esJornadaCompleta ? 4 : 2;
+                            $entrada = $marcas->get(0);
+                            $salidaRefrigerio = $esJornadaCompleta ? $marcas->get(1) : null;
+                            $retorno = $esJornadaCompleta ? $marcas->get(2) : ($marcas->get(0)?->fecha_hora?->format('H:i') >= '14:00' ? $marcas->get(0) : null);
+                            $salida = $esJornadaCompleta ? $marcas->get(3) : $marcas->get(1);
+                            $entradaManana = !$esJornadaCompleta && $retorno ? null : $entrada;
+                            $completo = $marcas->count() >= $totalEsperado;
+                            $siguienteMarca = $esJornadaCompleta
+                                ? ['Entrada mañana', 'Salida a refrigerio', 'Retorno del refrigerio', 'Salida final'][$marcas->count()] ?? null
+                                : ['Entrada', 'Salida'][$marcas->count()] ?? null;
                         @endphp
 
                         <tr>
@@ -144,8 +157,24 @@
                             <td>{{ $trabajador->area?->nombre ?? 'Sin área' }}</td>
 
                             <td>
-                                @if($entrada)
-                                    <strong class="manual-time">{{ $entrada->fecha_hora?->format('H:i:s') }}</strong>
+                                @if($entradaManana)
+                                    <strong class="manual-time">{{ $entradaManana->fecha_hora?->format('H:i:s') }}</strong>
+                                @else
+                                    <span class="manual-empty">--:--</span>
+                                @endif
+                            </td>
+
+                            <td>
+                                @if($salidaRefrigerio)
+                                    <strong class="manual-time">{{ $salidaRefrigerio->fecha_hora?->format('H:i:s') }}</strong>
+                                @else
+                                    <span class="manual-empty">--:--</span>
+                                @endif
+                            </td>
+
+                            <td>
+                                @if($retorno)
+                                    <strong class="manual-time">{{ $retorno->fecha_hora?->format('H:i:s') }}</strong>
                                 @else
                                     <span class="manual-empty">--:--</span>
                                 @endif
@@ -162,7 +191,7 @@
                             <td>
                                 @if($completo)
                                     <span class="badge badge--success">Completo</span>
-                                @elseif($entrada)
+                                @elseif($marcas->isNotEmpty())
                                     <span class="badge badge--warning">En jornada</span>
                                 @else
                                     <span class="badge badge--neutral">Sin marcar</span>
@@ -175,11 +204,11 @@
                                 @else
                                     <form method="POST" action="{{ route('marcaciones.marcarAhora',$trabajador) }}"
                                         data-marcar-asistencia data-trabajador="{{ $trabajador->nombres }} {{ $trabajador->apellidos }}"
-                                        data-tipo="{{ $entrada ? 'SALIDA' : 'ENTRADA' }}">
+                                        data-tipo="{{ $marcas->count() % 2 === 0 ? 'ENTRADA' : 'SALIDA' }}">
                                         @csrf
 
-                                        <button type="submit" class="button {{ $entrada ? 'button--secondary' : 'button--primary' }} button--small">
-                                            {{ $entrada ? 'Marcar salida' : 'Marcar entrada' }}
+                                        <button type="submit" class="button {{ $marcas->isNotEmpty() ? 'button--secondary' : 'button--primary' }} button--small">
+                                            Marcar {{ strtolower($siguienteMarca) }}
                                         </button>
                                     </form>
                                 @endif
@@ -187,7 +216,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6">
+                            <td colspan="8">
                                 <div class="empty-state">
                                     <strong>No se encontraron trabajadores</strong>
                                     <span>Modifica los filtros de búsqueda.</span>

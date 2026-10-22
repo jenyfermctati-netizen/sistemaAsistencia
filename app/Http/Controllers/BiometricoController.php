@@ -352,15 +352,17 @@ class BiometricoController extends Controller
 
     private function determinarTipo(int $trabajadorId, Carbon $fechaHora): string
     {
-        $tieneMarcacion = Marcacion::where(
+        $cantidadMarcaciones = Marcacion::where(
             'trabajador_id',
             $trabajadorId
         )
             ->whereDate('fecha_hora', $fechaHora->toDateString())
             ->where('anulada', false)
-            ->exists();
+            ->count();
 
-        return $tieneMarcacion ? 'SALIDA' : 'ENTRADA';
+        return $cantidadMarcaciones % 2 === 0
+            ? 'ENTRADA'
+            : 'SALIDA';
     }
 
     private function procesarUsuariosDispositivo(string $sn, string $body): void

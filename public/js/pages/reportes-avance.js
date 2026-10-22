@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const pendientesAdicionalesContainer = document.getElementById('pendientesAdicionalesContainer');
     const editarActividadesContainer = document.getElementById('editarActividadesContainer');
     const editarPendientesContainer = document.getElementById('editarPendientesContainer');
+    const sinActividades = document.getElementById('sinActividades');
+    const sinActividadesEditar = document.getElementById('sinActividadesEditar');
 
     const agregarActividad = document.getElementById('agregarActividad');
     const agregarPendiente = document.getElementById('agregarPendiente');
@@ -20,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const agregarPendienteEditar = document.getElementById('agregarPendienteEditar');
 
     const formEditar = document.getElementById('formEditarReporte');
+    const formEditarPendiente = document.getElementById('formEditarPendiente');
     const formRevisar = document.getElementById('formRevisarReporte');
     const formObservarPendiente = document.getElementById('formObservarPendiente');
 
@@ -77,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (tipo === 'pendiente') actualizarNombresPendiente(container);
 
             actualizarEstadoSinPendientes();
+            actualizarEstadoSinActividades();
         });
     }
 
@@ -106,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
         configurarEliminar(item, container, 'actividad');
         container.appendChild(fragmento);
         actualizarNombresActividad(container);
+        actualizarEstadoSinActividades();
     }
 
     function crearPendiente(container, datos = null) {
@@ -141,6 +146,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const sinPendientesAdicionales = document.getElementById('sinPendientesAdicionales');
         if (sinPendientesAdicionales && pendientesAdicionalesContainer) {
             sinPendientesAdicionales.style.display = pendientesAdicionalesContainer.children.length ? 'none' : 'block';
+        }
+    }
+
+    function actualizarEstadoSinActividades() {
+        if (sinActividades && actividadesContainer) {
+            sinActividades.style.display = actividadesContainer.children.length ? 'none' : 'block';
+        }
+
+        if (sinActividadesEditar && editarActividadesContainer) {
+            sinActividadesEditar.style.display = editarActividadesContainer.children.length ? 'none' : 'block';
         }
     }
 
@@ -217,11 +232,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     crearPendiente(editarPendientesContainer, pendiente);
                 });
 
-            if (!reporte.actividades.length) {
-                crearActividad(editarActividadesContainer);
-            }
+            actualizarEstadoSinActividades();
 
             window.AppModal.open('modalEditarReporte');
+        });
+    });
+
+    document.querySelectorAll('[data-editar-pendiente]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            if (!formEditarPendiente) return;
+
+            formEditarPendiente.action = button.dataset.url;
+
+            const descripcion = document.getElementById('editarPendienteDescripcion');
+            const detalle = document.getElementById('editarPendienteDetalle');
+            const ruta = document.getElementById('editarPendienteRuta');
+
+            if (descripcion) descripcion.value = button.dataset.descripcion ?? '';
+            if (detalle) detalle.value = button.dataset.detalle ?? '';
+            if (ruta) ruta.value = button.dataset.rutaArchivos ?? '';
+
+            window.AppModal.open('modalEditarPendiente');
         });
     });
 
@@ -357,4 +388,5 @@ document.addEventListener('DOMContentLoaded', function () {
     actualizarNombresActividad(actividadesAdicionalesContainer);
     actualizarNombresPendiente(pendientesAdicionalesContainer);
     actualizarEstadoSinPendientes();
+    actualizarEstadoSinActividades();
 });

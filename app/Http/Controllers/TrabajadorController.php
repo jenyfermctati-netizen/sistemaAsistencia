@@ -3,15 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Area;
+use App\Models\AreaEncargado;
 use App\Models\Horario;
 use App\Models\Rol;
 use App\Models\Trabajador;
 use App\Models\User;
 use App\Services\HorarioEmpresaService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class TrabajadorController extends Controller
 {
@@ -24,9 +28,12 @@ class TrabajadorController extends Controller
      */
     public function index(Request $request)
     {
+        $this->autorizarAdministrador();
+
         $query = Trabajador::with([
             'area',
             'user.rol',
+            'encargaturasActivas',
         ])->withExists([
             'reportesAvance as reporte_hoy' => function ($reporte) {
                 $reporte->whereDate('fecha_presentacion', today());
@@ -85,6 +92,8 @@ class TrabajadorController extends Controller
      */
     public function store(Request $request)
     {
+        $this->autorizarAdministrador();
+
         $data = $request->validate([
             'area_id' => [
                 'required',
@@ -149,6 +158,10 @@ class TrabajadorController extends Controller
                 'required',
                 'exists:roles,id',
             ],
+            'encargado_area' => [
+                'sometimes',
+                'boolean',
+            ],
             'password' => [
                 'required',
                 'string',
@@ -156,6 +169,8 @@ class TrabajadorController extends Controller
                 'confirmed',
             ],
         ]);
+
+        $this->validarDesignacionEncargado($data);
 
         DB::transaction(function () use ($data) {
             $trabajador = Trabajador::create([
@@ -183,6 +198,11 @@ class TrabajadorController extends Controller
                 'estado' => $trabajador->estado === 'ACTIVO',
             ]);
 
+            $this->sincronizarEncargatura(
+                $trabajador,
+                (bool) ($data['encargado_area'] ?? false)
+            );
+
             $horario = Horario::where('estado', true)->orderBy('id')->first();
 
             if ($trabajador->estado === 'ACTIVO' && $horario) {
@@ -207,6 +227,8 @@ class TrabajadorController extends Controller
      */
     public function update(Request $request, Trabajador $trabajador)
     {
+        $this->autorizarAdministrador();
+
         $usuario = $trabajador->user;
 
         $data = $request->validate([
@@ -282,6 +304,10 @@ class TrabajadorController extends Controller
                 'required',
                 'exists:roles,id',
             ],
+            'encargado_area' => [
+                'sometimes',
+                'boolean',
+            ],
             'password' => [
                 'nullable',
                 'string',
@@ -289,6 +315,8 @@ class TrabajadorController extends Controller
                 'confirmed',
             ],
         ]);
+
+        $this->validarDesignacionEncargado($data);
 
         DB::transaction(function () use (
             $trabajador,
@@ -338,6 +366,11 @@ class TrabajadorController extends Controller
 
             $usuarioActual->save();
 
+            $this->sincronizarEncargatura(
+                $trabajador,
+                (bool) ($data['encargado_area'] ?? false)
+            );
+
             $horario = Horario::where('estado', true)->orderBy('id')->first();
 
             if ($trabajador->estado === 'ACTIVO' && $horario) {
@@ -358,6 +391,8 @@ class TrabajadorController extends Controller
      */
     public function cambiarEstado(Trabajador $trabajador)
     {
+        $this->autorizarAdministrador();
+
         DB::transaction(function () use ($trabajador) {
             $nuevoEstado = $trabajador->estado === 'ACTIVO'
                 ? 'INACTIVO'
@@ -379,6 +414,10 @@ class TrabajadorController extends Controller
                 if ($horario) {
                     $this->horarioEmpresaService->asignar($trabajador, $horario, now()->startOfDay());
                 }
+            } else {
+                $this->cerrarEncargaturas(
+                    AreaEncargado::vigentes()->where('trabajador_id', $trabajador->id)
+                );
             }
         });
 
@@ -388,5 +427,75 @@ class TrabajadorController extends Controller
                 'success',
                 'Estado del trabajador actualizado correctamente.'
             );
+    }
+
+    private function validarDesignacionEncargado(array $data): void
+    {
+        if (! ($data['encargado_area'] ?? false)) {
+            return;
+        }
+
+        $rol = Rol::find($data['rol_id']);
+
+        if (strtoupper(trim((string) $rol?->nombre)) !== 'TRABAJADOR') {
+            throw ValidationException::withMessages([
+                'encargado_area' => 'La designación de encargado solo está disponible para el rol TRABAJADOR.',
+            ]);
+        }
+
+        if ($data['estado'] !== 'ACTIVO') {
+            throw ValidationException::withMessages([
+                'encargado_area' => 'El encargado del área debe ser un trabajador activo.',
+            ]);
+        }
+    }
+
+    private function sincronizarEncargatura(Trabajador $trabajador, bool $esEncargado): void
+    {
+        $encargaturasDelTrabajador = AreaEncargado::vigentes()
+            ->where('trabajador_id', $trabajador->id);
+
+        if (! $esEncargado) {
+            $this->cerrarEncargaturas($encargaturasDelTrabajador);
+
+            return;
+        }
+
+        $this->cerrarEncargaturas(
+            AreaEncargado::vigentes()
+                ->where('area_id', $trabajador->area_id)
+                ->where('trabajador_id', '!=', $trabajador->id)
+        );
+
+        $this->cerrarEncargaturas(
+            (clone $encargaturasDelTrabajador)->where('area_id', '!=', $trabajador->area_id)
+        );
+
+        if (! (clone $encargaturasDelTrabajador)
+            ->where('area_id', $trabajador->area_id)
+            ->exists()) {
+            AreaEncargado::create([
+                'area_id' => $trabajador->area_id,
+                'trabajador_id' => $trabajador->id,
+                'fecha_inicio' => today(),
+                'estado' => true,
+            ]);
+        }
+    }
+
+    private function cerrarEncargaturas(Builder $query): void
+    {
+        $query->update([
+            'estado' => false,
+            'fecha_fin' => today(),
+        ]);
+    }
+
+    private function autorizarAdministrador(): void
+    {
+        abort_unless(
+            Auth::check() && Auth::user()->rol?->nombre === 'ADMINISTRADOR',
+            403
+        );
     }
 }

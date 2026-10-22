@@ -118,7 +118,14 @@
                             </td>
                             <td>{{ $trabajador->cargo ?? '-' }}</td>
                             <td>{{ $trabajador->user?->email ?? '-' }}</td>
-                            <td>{{ $trabajador->user?->rol?->nombre ?? '-' }}</td>
+                            <td>
+                                {{ $trabajador->user?->rol?->nombre ?? '-' }}
+                                @if ($trabajador->esEncargadoDeSuArea())
+                                    <div class="table-secondary-text">
+                                        <span class="badge badge--info">Encargado de área</span>
+                                    </div>
+                                @endif
+                            </td>
                             <td>
                                 @if ($trabajador->estado === 'ACTIVO')
                                     <span class="badge badge--success">Activo</span>
@@ -161,7 +168,8 @@
                                         data-fecha-fin="{{ $trabajador->fecha_fin?->format('Y-m-d') }}"
                                         data-estado="{{ $trabajador->estado }}"
                                         data-email="{{ $trabajador->user?->email }}"
-                                        data-rol-id="{{ $trabajador->user?->rol_id }}">
+                                        data-rol-id="{{ $trabajador->user?->rol_id }}"
+                                        data-encargado-area="{{ $trabajador->esEncargadoDeSuArea() ? '1' : '0' }}">
                                         Editar
                                     </button>
 
@@ -299,7 +307,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Estado *</label>
-                        <select name="estado" class="form-select" required>
+                        <select id="crearEstado" name="estado" class="form-select" required>
                             <option value="ACTIVO" @selected(old('estado', 'ACTIVO') === 'ACTIVO')>Activo</option>
                             <option value="INACTIVO" @selected(old('estado') === 'INACTIVO')>Inactivo</option>
                         </select>
@@ -342,10 +350,10 @@
 
                     <div class="form-group">
                         <label class="form-label">Rol *</label>
-                        <select name="rol_id" class="form-select" required>
+                        <select id="crearRol" name="rol_id" class="form-select" required>
                             <option value="">Seleccione</option>
                             @foreach ($roles as $rol)
-                                <option value="{{ $rol->id }}" @selected(old('rol_id') == $rol->id)>
+                                <option value="{{ $rol->id }}" data-role-nombre="{{ strtoupper(trim($rol->nombre)) }}" @selected(old('rol_id') == $rol->id)>
                                     {{ $rol->nombre }}
                                 </option>
                             @endforeach
@@ -355,7 +363,18 @@
                         @enderror
                     </div>
 
-                    <div></div>
+                    <div class="form-group">
+                        <input type="hidden" name="encargado_area" value="0">
+                        <div class="form-check">
+                            <input id="crearEncargadoArea" type="checkbox" name="encargado_area" value="1"
+                                @checked(old('encargado_area'))>
+                            <label for="crearEncargadoArea">Designar como encargado de su área</label>
+                        </div>
+                        <small class="form-help">Solo aplica al rol Trabajador. Al designarlo, reemplazará al encargado vigente de esa área.</small>
+                        @error('encargado_area')
+                            <small class="form-error">{{ $message }}</small>
+                        @enderror
+                    </div>
 
                     <div class="form-group">
                         <label class="form-label">Contraseña *</label>
@@ -483,9 +502,18 @@
                         <label class="form-label">Rol *</label>
                         <select id="editarRol" name="rol_id" class="form-select" required>
                             @foreach ($roles as $rol)
-                                <option value="{{ $rol->id }}">{{ $rol->nombre }}</option>
+                                <option value="{{ $rol->id }}" data-role-nombre="{{ strtoupper(trim($rol->nombre)) }}">{{ $rol->nombre }}</option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="hidden" name="encargado_area" value="0">
+                        <div class="form-check">
+                            <input id="editarEncargadoArea" type="checkbox" name="encargado_area" value="1">
+                            <label for="editarEncargadoArea">Designar como encargado de su área</label>
+                        </div>
+                        <small class="form-help">Podrá consultar los avances de los demás trabajadores de su área.</small>
                     </div>
 
                     <div class="form-group">

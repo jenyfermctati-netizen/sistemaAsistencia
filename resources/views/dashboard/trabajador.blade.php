@@ -25,7 +25,11 @@
             <p>
                 @if($asistenciaHoy)
                     Entrada {{ $asistenciaHoy->hora_entrada ? substr($asistenciaHoy->hora_entrada, 0, 5) : 'sin registrar' }}
-                    · Salida {{ $asistenciaHoy->hora_salida ? substr($asistenciaHoy->hora_salida, 0, 5) : 'pendiente' }}
+                    @if($asistenciaHoy->hora_programada_salida_refrigerio)
+                        · Refrigerio {{ $asistenciaHoy->hora_salida_refrigerio ? substr($asistenciaHoy->hora_salida_refrigerio, 0, 5) : 'pendiente' }}
+                        · Retorno {{ $asistenciaHoy->hora_retorno_refrigerio ? substr($asistenciaHoy->hora_retorno_refrigerio, 0, 5) : 'pendiente' }}
+                    @endif
+                    · Salida final {{ $asistenciaHoy->hora_salida ? substr($asistenciaHoy->hora_salida, 0, 5) : 'pendiente' }}
                 @else
                     La asistencia de hoy todavía no ha sido procesada.
                 @endif
@@ -81,6 +85,10 @@
                             <strong>{{ ucfirst(strtolower(str_replace('_', ' ', $asistencia->estado))) }}</strong>
                             <small>
                                 {{ $asistencia->hora_entrada ? substr($asistencia->hora_entrada, 0, 5) : '—' }}
+                                @if($asistencia->hora_programada_salida_refrigerio)
+                                    · {{ $asistencia->hora_salida_refrigerio ? substr($asistencia->hora_salida_refrigerio, 0, 5) : '—' }}
+                                    / {{ $asistencia->hora_retorno_refrigerio ? substr($asistencia->hora_retorno_refrigerio, 0, 5) : '—' }}
+                                @endif
                                 a {{ $asistencia->hora_salida ? substr($asistencia->hora_salida, 0, 5) : '—' }}
                                 · {{ match($asistencia->origen_marcacion) {
                                     'BIOMETRICO' => 'Biométrico',
@@ -140,7 +148,16 @@
                 <a href="{{ route('reportesAvance.index', ['pestana' => 'pendientes']) }}" class="dashboard-quick">
                     <span>PE</span><strong>Pendientes del área</strong><small>{{ $pendientesArea }} abiertos</small>
                 </a>
+                @if($esEncargadoArea)
+                    <a href="{{ route('reportesAvance.index', ['vista' => 'equipo', 'pestana' => 'avances']) }}" class="dashboard-quick">
+                        <span>EA</span><strong>Avances de mi área</strong><small>Seguimiento del equipo</small>
+                    </a>
+                @endif
             </div>
         </aside>
     </div>
+
+    @if($reporteControl)
+        @include('dashboard.partials.reporte-control', ['reporte' => $reporteControl])
+    @endif
 @endif

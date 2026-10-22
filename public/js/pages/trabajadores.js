@@ -79,6 +79,37 @@ document.addEventListener('DOMContentLoaded', function () {
     // Editar trabajador
     const formEditar = document.getElementById('formEditarTrabajador');
 
+    function configurarDesignacion(rol, estado, checkbox) {
+        if (!rol || !estado || !checkbox) return;
+
+        const nombreRol = rol.selectedOptions[0]?.dataset.roleNombre ?? '';
+        const habilitado = nombreRol === 'TRABAJADOR' && estado.value === 'ACTIVO';
+
+        checkbox.disabled = !habilitado;
+        if (!habilitado) checkbox.checked = false;
+    }
+
+    const crearRol = document.getElementById('crearRol');
+    const crearEstado = document.getElementById('crearEstado');
+    const crearEncargado = document.getElementById('crearEncargadoArea');
+
+    [crearRol, crearEstado].forEach(function (campo) {
+        campo?.addEventListener('change', function () {
+            configurarDesignacion(crearRol, crearEstado, crearEncargado);
+        });
+    });
+    configurarDesignacion(crearRol, crearEstado, crearEncargado);
+
+    const editarRol = document.getElementById('editarRol');
+    const editarEstado = document.getElementById('editarEstado');
+    const editarEncargado = document.getElementById('editarEncargadoArea');
+
+    [editarRol, editarEstado].forEach(function (campo) {
+        campo?.addEventListener('change', function () {
+            configurarDesignacion(editarRol, editarEstado, editarEncargado);
+        });
+    });
+
     document.querySelectorAll('[data-editar-trabajador]').forEach(function (button) {
         button.addEventListener('click', function () {
             formEditar.action = button.dataset.updateUrl;
@@ -96,6 +127,8 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('editarEstado').value = button.dataset.estado ?? 'ACTIVO';
             document.getElementById('editarEmail').value = button.dataset.email ?? '';
             document.getElementById('editarRol').value = button.dataset.rolId ?? '';
+            editarEncargado.checked = button.dataset.encargadoArea === '1';
+            configurarDesignacion(editarRol, editarEstado, editarEncargado);
 
             window.AppModal.open('modalEditarTrabajador');
         });

@@ -14,44 +14,11 @@
 <body class="guest">
     <main class="login-page">
         <div class="login-shell">
-            <section class="login-hero" aria-label="Sistema de Control de Asistencias">
-                <div class="login-hero__brand">
-                    <img src="{{ asset('images/auth/connext-logo.png') }}" alt="Connext Ingeniería, Tecnología y Desarrollo">
-                </div>
-
+            <section class="login-hero login-hero--login" aria-label="Sistema de Control de Asistencias">
                 <div class="login-hero__copy">
                     <span class="login-hero__eyebrow">Gestión interna</span>
-                    <h1>Sistema de Control de Asistencias</h1>
-                    <p>Gestión eficiente del personal y seguimiento en tiempo real.</p>
-                </div>
-
-                <div class="login-features" aria-label="Características del sistema">
-                    <div class="login-feature">
-                        <span class="login-feature__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M12 2.8a7 7 0 0 0-7 7v2.1M12 2.8a7 7 0 0 1 7 7v2.1M8 10a4 4 0 0 1 8 0v3.1M6.3 15.2c.6-1.4.7-3.4.7-5.2a5 5 0 0 1 10 0c0 4.7-1.2 8.5-3.2 11M10 21.2c1.3-2.4 2-6 2-10.7M3.8 15.8c.8-1.6 1.2-3.4 1.2-5.8" />
-                            </svg>
-                        </span>
-                        <span>Registro seguro<br>de asistencias</span>
-                    </div>
-
-                    <div class="login-feature">
-                        <span class="login-feature__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M4 20V11h4v9H4Zm6 0V5h4v15h-4Zm6 0V2h4v18h-4Z" />
-                            </svg>
-                        </span>
-                        <span>Control y reportes<br>en tiempo real</span>
-                    </div>
-
-                    <div class="login-feature">
-                        <span class="login-feature__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M16 20v-1.8c0-2-1.8-3.7-4-3.7H7c-2.2 0-4 1.7-4 3.7V20M9.5 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm7.2 3.8c2.4.5 4.3 1.9 4.3 3.9V20M16 4.2a3.5 3.5 0 0 1 0 6.6" />
-                            </svg>
-                        </span>
-                        <span>Gestión centralizada<br>de trabajadores</span>
-                    </div>
+                    <h1>Tu equipo, siempre al día.</h1>
+                    <p>Asistencia, horarios y avances en un solo lugar.</p>
                 </div>
             </section>
 

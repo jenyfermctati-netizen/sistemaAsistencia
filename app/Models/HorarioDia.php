@@ -16,6 +16,8 @@ class HorarioDia extends Model
         'dia_semana',
         'es_laborable',
         'hora_entrada',
+        'hora_salida_refrigerio',
+        'hora_retorno_refrigerio',
         'hora_salida',
         'tolerancia_minutos',
     ];

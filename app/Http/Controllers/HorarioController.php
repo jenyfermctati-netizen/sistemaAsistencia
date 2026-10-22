@@ -99,7 +99,10 @@ class HorarioController extends Controller
             'dias' => ['required', 'array', 'size:7'],
             'dias.*.dia_semana' => ['required', 'integer', 'between:1,7'],
             'dias.*.es_laborable' => ['nullable'],
+            'dias.*.tipo_jornada' => ['nullable', Rule::in(['COMPLETA', 'MEDIA'])],
             'dias.*.hora_entrada' => ['nullable', 'date_format:H:i'],
+            'dias.*.hora_salida_refrigerio' => ['nullable', 'date_format:H:i'],
+            'dias.*.hora_retorno_refrigerio' => ['nullable', 'date_format:H:i'],
             'dias.*.hora_salida' => ['nullable', 'date_format:H:i'],
             'dias.*.tolerancia_minutos' => ['nullable', 'integer', 'min:0', 'max:180'],
         ], [
@@ -121,16 +124,39 @@ class HorarioController extends Controller
         foreach ($dias as $dia) {
             $esLaborable = isset($dia['es_laborable'])
                 && (string) $dia['es_laborable'] === '1';
+            $esJornadaCompleta = ($dia['tipo_jornada'] ?? 'COMPLETA') === 'COMPLETA';
 
-            if ($esLaborable && (empty($dia['hora_entrada']) || empty($dia['hora_salida']))) {
+            if ($esLaborable && (
+                empty($dia['hora_entrada'])
+                || empty($dia['hora_salida'])
+            )) {
                 throw ValidationException::withMessages([
-                    'dias' => 'Los dias laborables deben tener hora de entrada y salida.',
+                    'dias' => 'Los días laborables deben tener una hora de entrada y una hora de salida.',
                 ]);
             }
 
-            if ($esLaborable && $dia['hora_salida'] <= $dia['hora_entrada']) {
+            if ($esLaborable && $esJornadaCompleta && (
+                empty($dia['hora_salida_refrigerio'])
+                || empty($dia['hora_retorno_refrigerio'])
+            )) {
                 throw ValidationException::withMessages([
-                    'dias' => 'La hora de salida debe ser posterior a la hora de entrada.',
+                    'dias' => 'Las jornadas completas deben tener salida a refrigerio y hora de retorno.',
+                ]);
+            }
+
+            if ($esLaborable && $esJornadaCompleta && ! (
+                $dia['hora_entrada'] < $dia['hora_salida_refrigerio']
+                && $dia['hora_salida_refrigerio'] < $dia['hora_retorno_refrigerio']
+                && $dia['hora_retorno_refrigerio'] < $dia['hora_salida']
+            )) {
+                throw ValidationException::withMessages([
+                    'dias' => 'Las horas deben mantener el orden: entrada, salida a refrigerio, retorno y salida final.',
+                ]);
+            }
+
+            if ($esLaborable && ! $esJornadaCompleta && $dia['hora_entrada'] >= $dia['hora_salida']) {
+                throw ValidationException::withMessages([
+                    'dias' => 'En una media jornada, la salida debe ser posterior a la entrada.',
                 ]);
             }
 
@@ -139,6 +165,12 @@ class HorarioController extends Controller
                 [
                     'es_laborable' => $esLaborable,
                     'hora_entrada' => $esLaborable ? $dia['hora_entrada'] : null,
+                    'hora_salida_refrigerio' => $esLaborable && $esJornadaCompleta
+                        ? $dia['hora_salida_refrigerio']
+                        : null,
+                    'hora_retorno_refrigerio' => $esLaborable && $esJornadaCompleta
+                        ? $dia['hora_retorno_refrigerio']
+                        : null,
                     'hora_salida' => $esLaborable ? $dia['hora_salida'] : null,
                     'tolerancia_minutos' => $esLaborable
                         ? ($dia['tolerancia_minutos'] ?? 0)

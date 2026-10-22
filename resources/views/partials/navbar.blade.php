@@ -1,7 +1,10 @@
 <header class="navbar">
     <div class="navbar__left">
-        <button type="button" id="sidebarToggle" class="navbar__menu-button">
-            ☰
+        <button type="button" id="sidebarToggle" class="navbar__menu-button" aria-label="Abrir menú principal"
+            aria-controls="sidebar" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
         </button>
 
         <div>
@@ -75,7 +78,7 @@
                     <div class="profile-menu__actions">
                         <a href="{{ route('password.edit') }}" class="profile-menu__action">
                             <span class="profile-menu__action-icon" aria-hidden="true">⚿</span>
-                            <span>Cambiar o restablecer contraseña</span>
+                            <span>Cambiar contraseña</span>
                         </a>
 
                         <form method="POST" action="{{ route('logout') }}">

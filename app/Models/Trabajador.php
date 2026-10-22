@@ -38,6 +38,31 @@ class Trabajador extends Model
         return $this->belongsTo(Area::class, 'area_id');
     }
 
+    public function encargaturas()
+    {
+        return $this->hasMany(AreaEncargado::class, 'trabajador_id');
+    }
+
+    public function encargaturasActivas()
+    {
+        return $this->encargaturas()->vigentes();
+    }
+
+    public function esEncargadoDeSuArea(): bool
+    {
+        if (! $this->area_id || $this->estado !== 'ACTIVO') {
+            return false;
+        }
+
+        if ($this->relationLoaded('encargaturasActivas')) {
+            return $this->encargaturasActivas->contains('area_id', $this->area_id);
+        }
+
+        return $this->encargaturasActivas()
+            ->where('area_id', $this->area_id)
+            ->exists();
+    }
+
     public function user()
     {
         return $this->hasOne(User::class, 'trabajador_id');

@@ -19,8 +19,10 @@
             <tr>
                 <th>Trabajador</th>
                 @if($mostrarArea)<th>Área</th>@endif
-                <th>Entrada</th>
-                <th>Salida</th>
+                <th>Entrada mañana</th>
+                <th>Salida refrigerio</th>
+                <th>Retorno / entrada tarde</th>
+                <th>Salida final</th>
                 <th>Horas</th>
                 <th>Origen</th>
                 <th>Estado</th>
@@ -39,8 +41,10 @@
                         </span>
                     </td>
                     @if($mostrarArea)<td data-label="Área">{{ $asistencia->trabajador?->area?->nombre ?? 'Sin área' }}</td>@endif
-                    <td data-label="Entrada">{{ $asistencia->hora_entrada ? substr($asistencia->hora_entrada, 0, 5) : '—' }}</td>
-                    <td data-label="Salida">{{ $asistencia->hora_salida ? substr($asistencia->hora_salida, 0, 5) : '—' }}</td>
+                    <td data-label="Entrada mañana">{{ $asistencia->hora_entrada ? substr($asistencia->hora_entrada, 0, 5) : '—' }}</td>
+                    <td data-label="Salida refrigerio">{{ $asistencia->hora_salida_refrigerio ? substr($asistencia->hora_salida_refrigerio, 0, 5) : '—' }}</td>
+                    <td data-label="Retorno / entrada tarde">{{ $asistencia->hora_retorno_refrigerio ? substr($asistencia->hora_retorno_refrigerio, 0, 5) : '—' }}</td>
+                    <td data-label="Salida final">{{ $asistencia->hora_salida ? substr($asistencia->hora_salida, 0, 5) : '—' }}</td>
                     <td data-label="Horas">{{ intdiv((int) $asistencia->minutos_trabajados, 60) }}h {{ (int) $asistencia->minutos_trabajados % 60 }}m</td>
                     <td data-label="Origen">
                         {{ match($asistencia->origen_marcacion) {
@@ -57,7 +61,7 @@
                     </td>
                 </tr>
             @empty
-                <tr class="dashboard-table__empty-row"><td colspan="{{ $mostrarArea ? 7 : 6 }}"><div class="dashboard-empty">Todavía no hay asistencias registradas para hoy.</div></td></tr>
+                <tr class="dashboard-table__empty-row"><td colspan="{{ $mostrarArea ? 9 : 8 }}"><div class="dashboard-empty">Todavía no hay asistencias registradas para hoy.</div></td></tr>
             @endforelse
         </tbody>
     </table>

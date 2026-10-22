@@ -14,8 +14,12 @@
     {{-- CABECERA --}}
     <header class="ra-admin__header">
         <div>
-            <h2>Reportes de avance</h2>
-            <p>Consulta las actividades realizadas por el personal y supervisa los pendientes de cada área.</p>
+            <h2>{{ $vistaEquipo ? 'Avances de mi área' : 'Reportes de avance' }}</h2>
+            <p>
+                {{ $vistaEquipo
+                    ? 'Consulta las actividades registradas por los trabajadores de tu área.'
+                    : 'Consulta las actividades realizadas por el personal y supervisa los pendientes de cada área.' }}
+            </p>
         </div>
 
         @if($puedeGestionar)
@@ -37,13 +41,13 @@
 
     {{-- PESTAÑAS --}}
     <nav class="ra-nav" aria-label="Secciones de reportes">
-        <a href="{{ route('reportesAvance.index', ['pestana' => 'avances']) }}"
+        <a href="{{ route('reportesAvance.index', array_merge($parametrosVista, ['pestana' => 'avances'])) }}"
             class="ra-nav__item {{ $pestanaActiva === 'avances' ? 'is-active' : '' }}">
             <span aria-hidden="true">▤</span>
             Reportes por área
         </a>
 
-        <a href="{{ route('reportesAvance.index', ['pestana' => 'pendientes']) }}"
+        <a href="{{ route('reportesAvance.index', array_merge($parametrosVista, ['pestana' => 'pendientes'])) }}"
             class="ra-nav__item {{ $pestanaActiva === 'pendientes' ? 'is-active' : '' }}">
             <span aria-hidden="true">◷</span>
             Pendientes
@@ -74,6 +78,9 @@
 
             <form method="GET" action="{{ route('reportesAvance.index') }}" class="ra-filters">
                 <input type="hidden" name="pestana" value="avances">
+                @if($vistaEquipo)
+                    <input type="hidden" name="vista" value="equipo">
+                @endif
 
                 <label class="ra-field ra-field--search">
                     <span>Buscar</span>
@@ -119,7 +126,7 @@
                         Filtrar
                     </button>
 
-                    <a href="{{ route('reportesAvance.index', ['pestana' => 'avances']) }}"
+                    <a href="{{ route('reportesAvance.index', array_merge($parametrosVista, ['pestana' => 'avances'])) }}"
                         class="ra-btn ra-btn--outline">
                         Hoy
                     </a>
@@ -449,6 +456,9 @@
                 action="{{ route('reportesAvance.index') }}">
 
                 <input type="hidden" name="pestana" value="pendientes">
+                @if($vistaEquipo)
+                    <input type="hidden" name="vista" value="equipo">
+                @endif
 
                 <label class="ra-field">
                     <span>Área responsable</span>
@@ -473,7 +483,7 @@
                         Filtrar
                     </button>
 
-                    <a href="{{ route('reportesAvance.index', ['pestana' => 'pendientes']) }}"
+                    <a href="{{ route('reportesAvance.index', array_merge($parametrosVista, ['pestana' => 'pendientes'])) }}"
                         class="ra-btn ra-btn--outline">
                         Limpiar
                     </a>

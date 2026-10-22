@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class AsistenciaController extends Controller
 {
-    public function __construct(private readonly AsistenciaService $asistenciaService)
-    {
-    }
+    public function __construct(private readonly AsistenciaService $asistenciaService) {}
 
     public function index(Request $request)
     {
@@ -25,6 +23,8 @@ class AsistenciaController extends Controller
             'trabajador.area',
             'horario',
             'marcacionEntrada',
+            'marcacionSalidaRefrigerio',
+            'marcacionRetornoRefrigerio',
             'marcacionSalida',
         ]);
 
@@ -32,8 +32,7 @@ class AsistenciaController extends Controller
             $areaId = Auth::user()?->trabajador?->area_id;
 
             $areaId
-                ? $query->whereHas('trabajador', fn ($trabajador) =>
-                    $trabajador->where('area_id', $areaId))
+                ? $query->whereHas('trabajador', fn ($trabajador) => $trabajador->where('area_id', $areaId))
                 : $query->whereRaw('1 = 0');
         }
 
