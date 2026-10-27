@@ -15,6 +15,20 @@ use Illuminate\Support\Str;
 
 class AsistenciaService
 {
+    public function procesarFecha(Carbon $fecha): int
+    {
+        $procesados = 0;
+
+        Trabajador::where('estado', 'ACTIVO')
+            ->orderBy('id')
+            ->eachById(function (Trabajador $trabajador) use ($fecha, &$procesados) {
+                $this->procesarTrabajador($trabajador, $fecha);
+                $procesados++;
+            });
+
+        return $procesados;
+    }
+
     public function procesarTrabajador(Trabajador $trabajador, Carbon $fecha): void
     {
         $fecha = $fecha->copy()->startOfDay();
@@ -75,6 +89,9 @@ class AsistenciaService
         $salidaRefrigerio = $esJornadaCompleta ? $salidas->get(0) : null;
         $retornoRefrigerio = $esJornadaCompleta ? $entradas->get(1) : null;
         $salida = $esJornadaCompleta ? $salidas->get(1) : $salidas->last();
+        $retornoRefrigerioEstimado = false;
+        $salidaEstimada = false;
+        $salidaReinterpretada = false;
 
         $horaProgramadaEntrada = $diaHorario?->hora_entrada;
         $horaProgramadaSalidaRefrigerio = $esJornadaCompleta
@@ -358,16 +375,123 @@ class AsistenciaService
             return;
         }
 
+        if ($fecha->lt(today())) {
+            if (
+                $esJornadaCompleta
+                && ! $salida
+                && $retornoRefrigerio
+                && $this->pareceSalidaFinal(
+                    $retornoRefrigerio,
+                    $fecha,
+                    $horaProgramadaRetornoRefrigerio,
+                    $horaProgramadaSalida
+                )
+            ) {
+                $salida = $retornoRefrigerio;
+                $retornoRefrigerio = null;
+                $salidaReinterpretada = true;
+            }
+
+            if (
+                $esJornadaCompleta
+                && $entrada
+                && $salidaRefrigerio
+                && ! $retornoRefrigerio
+                && $horaProgramadaRetornoRefrigerio
+            ) {
+                $retornoProgramado = $this->crearMarcacionEstimada(
+                    $fecha,
+                    $horaProgramadaRetornoRefrigerio,
+                    'ENTRADA'
+                );
+
+                if ($retornoProgramado->fecha_hora->gt($salidaRefrigerio->fecha_hora)) {
+                    $retornoRefrigerio = $retornoProgramado;
+                    $retornoRefrigerioEstimado = true;
+                }
+            }
+
+            if (
+                $esJornadaCompleta
+                && $entrada
+                && $salidaRefrigerio
+                && $retornoRefrigerio
+                && ! $salida
+                && $horaProgramadaSalida
+            ) {
+                $salidaProgramada = $this->crearMarcacionEstimada(
+                    $fecha,
+                    $horaProgramadaSalida,
+                    'SALIDA'
+                );
+
+                if ($salidaProgramada->fecha_hora->gt($retornoRefrigerio->fecha_hora)) {
+                    $salida = $salidaProgramada;
+                    $salidaEstimada = true;
+                }
+            }
+
+            if (
+                ! $esJornadaCompleta
+                && $entrada
+                && ! $salida
+                && $horaProgramadaSalida
+            ) {
+                $salidaProgramada = $this->crearMarcacionEstimada(
+                    $fecha,
+                    $horaProgramadaSalida,
+                    'SALIDA'
+                );
+
+                if ($salidaProgramada->fecha_hora->gt($entrada->fecha_hora)) {
+                    $salida = $salidaProgramada;
+                    $salidaEstimada = true;
+                }
+            }
+
+            $minutosTrabajados = $this->calcularMinutosTrabajados(
+                $entrada,
+                $salidaRefrigerio,
+                $retornoRefrigerio,
+                $salida
+            );
+        }
+
+        $ajustesCierre = collect();
+
+        if ($retornoRefrigerioEstimado) {
+            $ajustesCierre->push(
+                'Retorno de refrigerio asumido automáticamente según el horario ('
+                .substr((string) $horaProgramadaRetornoRefrigerio, 0, 5).').'
+            );
+        }
+
+        if ($salidaEstimada) {
+            $ajustesCierre->push(
+                'Salida final asumida automáticamente según el horario ('
+                .substr((string) $horaProgramadaSalida, 0, 5).').'
+            );
+        }
+
+        if ($salidaReinterpretada) {
+            $ajustesCierre->push(
+                'La última marcación fue interpretada como salida final durante el cierre.'
+            );
+        }
+
         if ($asignacion->tipo_control === 'REFERENCIAL') {
             $estado = $marcaciones->isEmpty()
                 ? 'SIN_REGISTRO'
                 : 'PRESENTE';
 
-            $observacion = match (true) {
+            $observacionBase = match (true) {
                 $marcaciones->isEmpty() => 'No existen marcaciones para este día. Control referencial.',
                 ! $entrada || ! $salida => 'Marcación incompleta. Control referencial.',
                 default => null,
             };
+            $observacion = $ajustesCierre->isNotEmpty()
+                ? $ajustesCierre->join(' ')
+                : $observacionBase;
 
             $this->guardarAsistencia(
                 trabajador: $trabajador,
@@ -383,6 +507,7 @@ class AsistenciaService
                 entrada: $entrada,
                 salida: $salida,
                 minutosTrabajados: $minutosTrabajados,
+                salidaEstimada: $salidaEstimada,
                 observacion: $observacion
             );
 
@@ -497,9 +622,18 @@ class AsistenciaService
             salida: $salida,
             minutosTrabajados: $minutosTrabajados,
             minutosTardanza: $minutosTardanza,
-            observacion: $marcasFaltantes->isEmpty()
+            retornoRefrigerioEstimado: $retornoRefrigerioEstimado,
+            salidaEstimada: $salidaEstimada,
+            observacion: $marcasFaltantes->isEmpty() && $ajustesCierre->isEmpty()
                 ? null
-                : 'Falta marcar: '.$marcasFaltantes->join(', ').'.'
+                : collect([
+                    $marcasFaltantes->isEmpty()
+                        ? null
+                        : 'Falta marcar: '.$marcasFaltantes->join(', ').'.',
+                    $ajustesCierre->isEmpty()
+                        ? null
+                        : $ajustesCierre->join(' '),
+                ])->filter()->join(' ')
         );
     }
 
@@ -560,6 +694,41 @@ class AsistenciaService
         return $entrada->fecha_hora->diffInMinutes($salida->fecha_hora);
     }
 
+    private function crearMarcacionEstimada(
+        Carbon $fecha,
+        string $hora,
+        string $tipo
+    ): Marcacion {
+        $marcacion = new Marcacion;
+        $marcacion->fecha_hora = Carbon::parse(
+            $fecha->toDateString().' '.$hora
+        );
+        $marcacion->tipo = $tipo;
+
+        return $marcacion;
+    }
+
+    private function pareceSalidaFinal(
+        Marcacion $marcacion,
+        Carbon $fecha,
+        ?string $horaRetorno,
+        ?string $horaSalida
+    ): bool {
+        if (! $horaRetorno || ! $horaSalida) {
+            return false;
+        }
+
+        $retornoProgramado = Carbon::parse(
+            $fecha->toDateString().' '.$horaRetorno
+        );
+        $salidaProgramada = Carbon::parse(
+            $fecha->toDateString().' '.$horaSalida
+        );
+
+        return abs($marcacion->fecha_hora->diffInSeconds($salidaProgramada))
+            < abs($marcacion->fecha_hora->diffInSeconds($retornoProgramado));
+    }
+
     private function guardarAsistencia(
         Trabajador $trabajador,
         Carbon $fecha,
@@ -577,6 +746,8 @@ class AsistenciaService
         ?Marcacion $salida = null,
         int $minutosTrabajados = 0,
         int $minutosTardanza = 0,
+        bool $retornoRefrigerioEstimado = false,
+        bool $salidaEstimada = false,
         ?string $observacion = null
     ): void {
         $asistencia = Asistencia::where(
@@ -608,12 +779,17 @@ class AsistenciaService
             'hora_entrada' => $entrada?->fecha_hora?->format('H:i:s'),
             'hora_salida_refrigerio' => $salidaRefrigerio?->fecha_hora?->format('H:i:s'),
             'hora_retorno_refrigerio' => $retornoRefrigerio?->fecha_hora?->format('H:i:s'),
+            'retorno_refrigerio_estimado' => $retornoRefrigerioEstimado,
             'hora_salida' => $salida?->fecha_hora?->format('H:i:s'),
+            'salida_estimada' => $salidaEstimada,
             'minutos_trabajados' => $minutosTrabajados,
             'minutos_tardanza' => $minutosTardanza,
             'estado' => $estado,
             'observacion' => $observacion,
             'procesado_en' => now(),
+            'cerrada_en' => $fecha->lt(today())
+                ? ($asistencia->cerrada_en ?? now())
+                : null,
         ]);
 
         $asistencia->save();

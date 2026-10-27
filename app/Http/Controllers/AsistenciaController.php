@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asistencia;
-use App\Models\Trabajador;
 use App\Services\AsistenciaService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class AsistenciaController extends Controller
 {
@@ -81,22 +79,14 @@ class AsistenciaController extends Controller
         ]);
 
         $fecha = Carbon::parse($data['fecha'])->startOfDay();
-        $trabajadores = Trabajador::where('estado', 'ACTIVO')->get();
-        $procesados = 0;
-
-        DB::transaction(function () use ($trabajadores, $fecha, &$procesados) {
-            foreach ($trabajadores as $trabajador) {
-                $this->asistenciaService->procesarTrabajador($trabajador, $fecha);
-                $procesados++;
-            }
-        });
+        $procesados = $this->asistenciaService->procesarFecha($fecha);
 
         return redirect()
             ->route('asistencias.index', [
                 'fecha_desde' => $fecha->toDateString(),
                 'fecha_hasta' => $fecha->toDateString(),
             ])
-            ->with('success', "Se recalcularon {$procesados} asistencias para el cierre del día.");
+            ->with('success', "Se reprocesaron {$procesados} asistencias para la fecha seleccionada.");
     }
 
     private function verificarAdministrador(): void

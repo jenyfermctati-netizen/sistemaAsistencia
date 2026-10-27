@@ -28,17 +28,23 @@ class Asistencia extends Model
         'hora_entrada',
         'hora_salida_refrigerio',
         'hora_retorno_refrigerio',
+        'retorno_refrigerio_estimado',
         'hora_salida',
+        'salida_estimada',
         'minutos_trabajados',
         'minutos_tardanza',
         'estado',
         'observacion',
         'procesado_en',
+        'cerrada_en',
     ];
 
     protected $casts = [
         'fecha' => 'date',
         'procesado_en' => 'datetime',
+        'cerrada_en' => 'datetime',
+        'retorno_refrigerio_estimado' => 'boolean',
+        'salida_estimada' => 'boolean',
         'tolerancia_aplicada' => 'integer',
         'minutos_trabajados' => 'integer',
         'minutos_tardanza' => 'integer',
