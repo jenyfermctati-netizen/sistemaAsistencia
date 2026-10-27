@@ -166,7 +166,121 @@
 ========================================================== */
 
 .pagination-container {
+    width: 100%;
+
     margin-top: 18px;
+}
+
+.pagination-container > nav {
+    width: 100%;
+}
+
+/* Laravel entrega dos variantes: móvil y escritorio. Sin Tailwind ambas
+   quedan visibles, por eso se controla su presentación desde esta página. */
+.pagination-container > nav > div:first-child {
+    display: none;
+}
+
+.pagination-container > nav > div:last-child {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+}
+
+.pagination-container > nav > div:last-child p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.pagination-container > nav > div:last-child p span {
+    color: var(--text);
+
+    font-weight: 700;
+}
+
+.pagination-container > nav > div:last-child > div:last-child > span {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 4px;
+}
+
+.pagination-container > nav > div:last-child > div:last-child > span > a,
+.pagination-container > nav > div:last-child > div:last-child > span > span > span {
+    min-width: 34px;
+    height: 34px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    padding: 0 10px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: var(--surface);
+    color: var(--text-muted);
+
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+
+    transition:
+        color var(--transition-fast),
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.pagination-container > nav > div:last-child > div:last-child > span > a:hover {
+    border-color: var(--primary);
+
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.pagination-container > nav > div:last-child > div:last-child > span > a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.pagination-container > nav > div:last-child > div:last-child > span > span[aria-current="page"] > span {
+    border-color: var(--primary);
+
+    background: var(--primary);
+    color: var(--text-inverse);
+
+    box-shadow: 0 3px 8px rgba(15, 118, 110, 0.18);
+}
+
+.pagination-container > nav > div:last-child > div:last-child > span > span[aria-disabled="true"] > span {
+    background: var(--surface-secondary);
+    color: var(--text-soft);
+
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.pagination-container svg {
+    width: 16px !important;
+    height: 16px !important;
+
+    display: block;
+
+    flex: 0 0 16px;
 }
 
 
@@ -193,6 +307,55 @@
 
     .asistencias-filtros__actions {
         grid-column: auto;
+    }
+
+    .pagination-container > nav > div:first-child {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 10px;
+    }
+
+    .pagination-container > nav > div:first-child > a,
+    .pagination-container > nav > div:first-child > span {
+        min-height: 36px;
+
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 0 14px;
+
+        border: 1px solid var(--border);
+        border-radius: 8px;
+
+        background: var(--surface);
+        color: var(--text-muted);
+
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .pagination-container > nav > div:first-child > a:hover {
+        border-color: var(--primary);
+
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .pagination-container > nav > div:first-child > span {
+        background: var(--surface-secondary);
+        color: var(--text-soft);
+
+        opacity: 0.7;
+    }
+
+    .pagination-container > nav > div:last-child {
+        display: none;
     }
 
 }
