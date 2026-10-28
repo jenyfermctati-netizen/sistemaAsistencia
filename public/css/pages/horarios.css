@@ -86,7 +86,7 @@
 .horario-card:hover {
     transform: translateY(-3px);
 
-    border-color: rgba(59, 130, 246, 0.25);
+    border-color: rgba(43, 111, 247, 0.25);
 
     box-shadow:
         0 8px 16px rgba(15, 23, 42, 0.06),
@@ -109,7 +109,7 @@
     background: linear-gradient(
         90deg,
         #2563eb,
-        #3b82f6,
+        #2b6ff7,
         #60a5fa
     );
 }
@@ -294,16 +294,16 @@
 }
 
 .dia-editor:hover {
-    border-color: rgba(59, 130, 246, 0.25);
+    border-color: rgba(43, 111, 247, 0.25);
 
     box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
 }
 
 .dia-editor:focus-within {
-    border-color: #3b82f6;
+    border-color: #2b6ff7;
 
     box-shadow:
-        0 0 0 3px rgba(59, 130, 246, 0.10);
+        0 0 0 3px rgba(43, 111, 247, 0.10);
 }
 
 .dia-editor__nombre {
@@ -356,7 +356,7 @@
     background: var(--surface-secondary);
 
     border: 1px solid var(--border);
-    border-left: 3px solid #3b82f6;
+    border-left: 3px solid #2b6ff7;
 
     border-radius: 10px;
 
@@ -492,10 +492,10 @@
 
     outline: none;
 
-    border-color: #3b82f6;
+    border-color: #2b6ff7;
 
     box-shadow:
-        0 0 0 3px rgba(59, 130, 246, 0.10);
+        0 0 0 3px rgba(43, 111, 247, 0.10);
 }
 
 

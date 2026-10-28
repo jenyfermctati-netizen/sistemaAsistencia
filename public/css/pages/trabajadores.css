@@ -70,8 +70,8 @@
 .trabajadores-filtros input:focus,
 .trabajadores-filtros select:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    border-color: #2b6ff7;
+    box-shadow: 0 0 0 2px rgba(43, 111, 247, 0.1);
 }
 
 /* =========================================================
@@ -225,7 +225,7 @@
 }
 
 .badge--primary {
-    color: #1d4ed8;
+    color: #245ee0;
     background: #dbeafe;
 }
 
@@ -291,7 +291,7 @@
 
     border-radius: 3px;
 
-    background: #3b82f6;
+    background: #2b6ff7;
 }
 
 .form-grid {
@@ -345,9 +345,9 @@
 .form-grid textarea:focus {
     outline: none;
 
-    border-color: #3b82f6;
+    border-color: #2b6ff7;
 
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 2px rgba(43, 111, 247, 0.1);
 }
 
 /* =========================================================
@@ -798,8 +798,8 @@
     font-size: 13px;
 }
 .trabajadores-panel .trabajadores-filtros :is(input, select):focus {
-    border-color: #f89d52;
-    box-shadow: 0 0 0 3px rgba(248, 157, 82, 0.19);
+    border-color: #00c4cc;
+    box-shadow: 0 0 0 3px rgba(0, 196, 204, 0.19);
     outline: 0;
 }
 .trabajadores-panel .filter-actions {
@@ -810,8 +810,8 @@
     min-height: 42px;
 }
 .trabajadores-panel .filter-actions .button--primary {
-    background: #f89d52;
-    border-color: #f89d52;
+    background: #00c4cc;
+    border-color: #00c4cc;
     color: #111;
 }
 .trabajadores-panel .table-container {
@@ -1057,10 +1057,10 @@
 }
 .trabajadores-panel .tw-detalle-trigger:hover {
     background: #ffe8d2;
-    border-color: #f89d52;
+    border-color: #00c4cc;
 }
 .trabajadores-panel .tw-detalle-trigger:focus-visible {
-    outline: 3px solid #f89d52;
+    outline: 3px solid #00c4cc;
     outline-offset: 2px;
 }
 .trabajadores-panel dialog.tw-modal {
@@ -1191,3 +1191,14 @@
         padding: 17px;
     }
 }
+
+/* Modal luminoso de trabajadores. */
+.trabajadores-panel .tw-modal__header {
+    background:linear-gradient(115deg,#e5fbff,#e9f0ff 55%,#f1e8ff);
+    border-bottom:1px solid #d9e6f5;
+    color:#25223c;
+}
+.trabajadores-panel .tw-modal__header h3 { color:#25223c; }
+.trabajadores-panel .tw-modal__header p { color:#656b86; }
+.trabajadores-panel .tw-modal__eyebrow { color:#245fd0; }
+.trabajadores-panel .tw-modal__close { background:#fff; border-color:#d3ddf2; color:#364674; }

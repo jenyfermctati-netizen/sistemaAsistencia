@@ -1,9 +1,9 @@
 .dashboard-page {
-    --dashboard-petrol: #264653;
-    --dashboard-blue: #afcdde;
-    --dashboard-sand: #d9cdbf;
-    --dashboard-ivory: #faf8f4;
-    --dashboard-graphite: #495057;
+    --dashboard-petrol: #1d315a;
+    --dashboard-blue: #b6eaf4;
+    --dashboard-sand: #dce4f1;
+    --dashboard-ivory: #f5f7ff;
+    --dashboard-graphite: #343650;
     display: grid;
     gap: 22px;
     width: 100%;
@@ -64,7 +64,7 @@
     margin-right: 8px;
     border-radius: 50%;
     background: var(--palette-smoke-blue);
-    box-shadow: 0 0 0 4px rgba(175, 205, 222, .15);
+    box-shadow: 0 0 0 4px rgba(0, 196, 204, .15);
 }
 
 .dashboard-metrics {
@@ -85,7 +85,7 @@
     overflow: hidden;
     border: 1px solid var(--dashboard-sand);
     border-radius: 19px;
-    background: #fffefc;
+    background: #ffffff;
     color: inherit;
     text-decoration: none;
     box-shadow: 0 10px 28px rgba(38, 70, 83, .075);
@@ -97,7 +97,7 @@
 }
 
 .dashboard-metric[href]:focus-visible {
-    outline: 3px solid rgba(175, 205, 222, .9);
+    outline: 3px solid rgba(0, 196, 204, .9);
     outline-offset: 3px;
 }
 
@@ -129,14 +129,14 @@
 .dashboard-metric--blue::before { background: var(--dashboard-blue); }
 .dashboard-metric--sand::before { background: #b99e7d; }
 .dashboard-metric--graphite::before { background: var(--dashboard-graphite); }
-.dashboard-metric--blue::after { background: rgba(175, 205, 222, .20); }
+.dashboard-metric--blue::after { background: rgba(0, 196, 204, .20); }
 .dashboard-metric--sand::after { background: rgba(217, 205, 191, .22); }
 .dashboard-metric--graphite::after { background: rgba(73, 80, 87, .06); }
 
 .dashboard-metric__label {
     position: relative;
     z-index: 1;
-    color: #6b7378;
+    color: #666783;
     font-size: 10.5px;
     font-weight: 850;
     letter-spacing: .09em;
@@ -175,7 +175,7 @@
     padding: 23px;
     border: 1px solid var(--dashboard-sand);
     border-radius: 21px;
-    background: #fffefc;
+    background: #ffffff;
     box-shadow: 0 12px 32px rgba(38, 70, 83, .075);
     overflow: hidden;
 }
@@ -440,7 +440,7 @@
     overflow: hidden;
     border: 1px solid #cbdde5;
     border-radius: 20px;
-    background: linear-gradient(120deg, #edf5f7 0%, #fffefc 72%);
+    background: linear-gradient(120deg, #edf5f7 0%, #ffffff 72%);
     box-shadow: 0 12px 30px rgba(38, 70, 83, .075);
 }
 
@@ -594,7 +594,7 @@
 }
 
 .dashboard-report__filters label span {
-    color: #6b7378;
+    color: #666783;
     font-size: 9px;
     font-weight: 850;
     letter-spacing: .08em;

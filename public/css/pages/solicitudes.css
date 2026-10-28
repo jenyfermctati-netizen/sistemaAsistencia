@@ -1,7 +1,7 @@
 .solicitudes-page {
-    --sol-primary: var(--primary, #0f766e);
-    --sol-primary-hover: var(--primary-hover, #0d665f);
-    --sol-primary-light: var(--primary-light, #e7f6f3);
+    --sol-primary: var(--primary, #00aeb8);
+    --sol-primary-hover: var(--primary-hover, #008d99);
+    --sol-primary-light: var(--primary-light, #e3fbfc);
     --sol-surface: var(--surface, #fff);
     --sol-subtle: var(--surface-secondary, #f4f6f5);
     --sol-text: var(--text, #17211f);
@@ -326,7 +326,7 @@
 
 .solicitud-tipo--permiso {
     background: #eef2ff;
-    color: #4338ca;
+    color: #7d2ae8;
 }
 
 .solicitud-tipo--tardanza {
@@ -341,7 +341,7 @@
 
 .solicitud-tipo--omision-marcacion {
     background: #f0fdfa;
-    color: #0f766e;
+    color: #00aeb8;
 }
 
 /* ESTADOS */
@@ -899,14 +899,14 @@
    ========================================================= */
 
 #modalDetalleSolicitud {
-    --sol-primary: var(--primary, #264653);
-    --sol-primary-hover: var(--primary-hover, #1f3a45);
-    --sol-primary-light: var(--primary-light, #e8f1f5);
-    --sol-surface: var(--surface, #fffefc);
-    --sol-subtle: var(--surface-secondary, #f2ede6);
-    --sol-text: var(--text, #495057);
-    --sol-muted: var(--text-muted, #6b7378);
-    --sol-border: var(--border, #d9cdbf);
+    --sol-primary: var(--primary, #1d315a);
+    --sol-primary-hover: var(--primary-hover, #172b55);
+    --sol-primary-light: var(--primary-light, #e9f7ff);
+    --sol-surface: var(--surface, #ffffff);
+    --sol-subtle: var(--surface-secondary, #eff3fb);
+    --sol-text: var(--text, #343650);
+    --sol-muted: var(--text-muted, #666783);
+    --sol-border: var(--border, #dce4f1);
 }
 
 @media (max-width: 700px) {

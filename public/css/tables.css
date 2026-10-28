@@ -1,338 +1,761 @@
 /* ==========================================================
-   CONTENEDOR DE TABLA
+   CAPA RESPONSIVE GLOBAL
+   Se carga al final para unificar el comportamiento de todos
+   los módulos sin modificar su identidad visual.
 ========================================================== */
 
-.table-container {
-    width: 100%;
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    min-width: 320px;
+}
+
+/* Etiquetas semánticas para los filtros heredados. En escritorio se
+   mantienen disponibles para lectores de pantalla y aparecen en móvil. */
+.filter-field {
+    display: grid;
+    min-width: 0;
+}
+
+.filter-field__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+.filter-actions {
+    display: contents;
+}
+
+.app,
+.app__content,
+.main-content,
+.main-content > *,
+.main-content [data-live-region],
+.panel,
+.panel > *,
+.page-header > *,
+.navbar__left,
+.navbar__right {
+    min-width: 0;
     max-width: 100%;
+}
 
-    overflow-x: auto;
-    overflow-y: hidden;
+.main-content {
+    overflow-x: hidden;
+    overflow-x: clip;
+}
 
-    background: var(--surface);
+.main-content :is(input, select, textarea, button) {
+    max-width: 100%;
+}
 
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius-lg);
-
-    box-shadow: var(--shadow-sm);
-
+.table-container,
+.solicitudes-table-wrap,
+.pagination-container {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     -webkit-overflow-scrolling: touch;
 }
 
-
-/* ==========================================================
-   TABLA
-========================================================== */
-
-.table {
+:is(
+    .areas-filtros,
+    .trabajadores-filtros,
+    .feriados-filtros,
+    .marcaciones-filtros,
+    .asistencias-filtros,
+    .solicitudes-filtros,
+    .vacaciones-filtros,
+    .campo-filtros,
+    .horarios-filtros,
+    .ra-filters,
+    .ra-history-filters
+) {
     width: 100%;
-
-    border-collapse: collapse;
-
-    background: var(--surface);
-
-    color: var(--text);
-
-    table-layout: auto;
+    min-width: 0;
+    max-width: 100%;
 }
 
+:is(
+    .areas-filtros,
+    .trabajadores-filtros,
+    .feriados-filtros,
+    .marcaciones-filtros,
+    .asistencias-filtros,
+    .solicitudes-filtros,
+    .vacaciones-filtros,
+    .campo-filtros,
+    .horarios-filtros,
+    .ra-filters,
+    .ra-history-filters
+) > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+:is(
+    .campo-grid,
+    .vacaciones-grid,
+    .horarios-grid,
+    .dashboard-page,
+    .ra-admin,
+    .ra-worker,
+    .solicitudes-page
+) > * {
+    min-width: 0;
+    max-width: 100%;
+}
 
 /* ==========================================================
-   ENCABEZADOS Y CELDAS
+   TABLET Y PORTÁTIL COMPACTO
 ========================================================== */
 
-.table th,
-.table td {
-    padding: 12px 14px;
-
-    border-bottom: 1px solid var(--border);
-
-    text-align: left;
-
-    vertical-align: middle;
-
-    overflow-wrap: break-word;
-
-    word-break: normal;
-}
-
-
-/* ==========================================================
-   ENCABEZADOS
-========================================================== */
-
-.table th {
-    background: var(--surface-secondary);
-
-    color: var(--text-muted);
-
-    font-size: 12.5px;
-    font-weight: 700;
-
-    line-height: 1.4;
-
-    letter-spacing: 0.02em;
-
-    white-space: nowrap;
-}
-
-
-/* ==========================================================
-   CELDAS
-========================================================== */
-
-.table td {
-    color: var(--text);
-
-    font-size: 13.5px;
-
-    line-height: 1.5;
-}
-
-
-/* ==========================================================
-   FILAS
-========================================================== */
-
-.table tbody tr {
-    transition:
-        background-color 0.16s ease,
-        box-shadow 0.16s ease;
-}
-
-.table tbody tr:hover {
-    background: #f7fbf9;
-}
-
-
-/* ==========================================================
-   ÚLTIMA FILA
-========================================================== */
-
-.table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-
-/* ==========================================================
-   TEXTO SECUNDARIO
-========================================================== */
-
-.table-secondary-text {
-    display: block;
-
-    margin-top: 3px;
-
-    color: var(--text-muted);
-
-    font-size: 12px;
-
-    line-height: 1.4;
-}
-
-
-/* ==========================================================
-   ACCIONES
-========================================================== */
-
-.table-actions {
-    display: flex;
-
-    align-items: center;
-
-    gap: 6px;
-
-    flex-wrap: wrap;
-}
-
-
-/* ==========================================================
-   ESTADO VACÍO
-========================================================== */
-
-.table-empty {
-    padding: 40px 20px !important;
-
-    text-align: center !important;
-
-    color: var(--text-muted);
-
-    font-size: 13px;
-
-    line-height: 1.5;
-}
-
-
-/* ==========================================================
-   COLUMNAS NUMÉRICAS
-========================================================== */
-
-.table-number {
-    font-variant-numeric: tabular-nums;
-
-    white-space: nowrap;
-}
-
-
-/* ==========================================================
-   COLUMNAS CENTRADAS
-========================================================== */
-
-.table-center {
-    text-align: center !important;
-}
-
-
-/* ==========================================================
-   COLUMNAS A LA DERECHA
-========================================================== */
-
-.table-right {
-    text-align: right !important;
-}
-
-
-/* ==========================================================
-   FILA DESTACADA
-========================================================== */
-
-.table-row--highlight {
-    background: var(--primary-light);
-}
-
-
-/* ==========================================================
-   FILA DESACTIVADA
-========================================================== */
-
-.table-row--muted {
-    opacity: 0.72;
-}
-
-.table-row--muted td {
-    background: var(--surface-secondary);
-}
-
-
-/* ==========================================================
-   SCROLL HORIZONTAL
-========================================================== */
-
-.table-container::-webkit-scrollbar {
-    height: 7px;
-}
-
-.table-container::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-    background: rgba(102, 115, 111, 0.28);
-
-    border-radius: 999px;
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(102, 115, 111, 0.45);
-}
-
-
-/* ==========================================================
-   LAPTOP / TABLET
-========================================================== */
-
-@media (max-width: 1000px) {
-
-    .table th,
-    .table td {
-        padding: 11px 12px;
+@media (max-width: 1100px) {
+    .app__content {
+        width: 100%;
+        margin-left: 0;
     }
 
-    .table th {
-        font-size: 12px;
+    .main-content {
+        width: 100%;
+        padding: clamp(16px, 2.4vw, 22px);
     }
 
-    .table td {
-        font-size: 13px;
+    .page-header {
+        width: 100%;
+        gap: 16px;
     }
 
+    .page-header__actions {
+        min-width: 0;
+        max-width: 100%;
+        flex-wrap: wrap;
+    }
 }
 
+@media (max-width: 900px) {
+    :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .solicitudes-filtros,
+        .vacaciones-filtros,
+        .campo-filtros,
+        .horarios-filtros,
+        .ra-filters,
+        .ra-history-filters
+    ) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    :is(
+        .asistencias-filtros__actions,
+        .solicitudes-filtros__actions,
+        .vacaciones-filtros__actions,
+        .campo-filtros__actions,
+        .ra-filters__actions,
+        .ra-history-filters__actions
+    ) {
+        grid-column: 1 / -1;
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+
+    .sincronizar-feriados {
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+}
 
 /* ==========================================================
-   TABLET PEQUEÑA
+   CELULAR
 ========================================================== */
 
-@media (max-width: 750px) {
-
-    .table-container {
-        border-radius: 10px;
+@media (max-width: 700px) {
+    .main-content {
+        padding: 16px 14px;
     }
 
-    .table th,
-    .table td {
-        padding: 10px 11px;
+    .navbar {
+        width: 100%;
+        min-width: 0;
+        padding: 9px 12px;
+        gap: 9px;
     }
 
-    .table th {
-        font-size: 12px;
+    .navbar__left {
+        flex: 1 1 auto;
+        overflow: hidden;
     }
 
-    .table td {
-        font-size: 13px;
+    .navbar__right {
+        flex: 0 0 auto;
+        gap: 6px;
+    }
+
+    .navbar__title,
+    .navbar__subtitle {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .page-header,
+    .main-content > .page-header {
+        min-height: 0;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 14px;
+        padding: 23px 20px;
+        border-radius: 20px;
+    }
+
+    .page-header__content,
+    .page-header > div:first-child {
+        min-width: 0;
+    }
+
+    .page-header__title {
+        font-size: clamp(22px, 7vw, 27px);
+        overflow-wrap: anywhere;
+    }
+
+    .page-header__description {
+        max-width: 100%;
+        line-height: 1.55;
+        overflow-wrap: anywhere;
+    }
+
+    .page-header__actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .page-header__actions > *,
+    .page-header__actions .button {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        justify-content: center;
+    }
+
+    .panel,
+    .dashboard-card,
+    .solicitud-card,
+    .vacacion-card,
+    .campo-card,
+    .horario-card {
+        min-width: 0;
+        max-width: 100%;
+        border-radius: 17px;
+    }
+
+    .panel__header {
+        min-width: 0;
+        padding: 15px;
+    }
+
+    :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .solicitudes-filtros,
+        .vacaciones-filtros,
+        .campo-filtros,
+        .horarios-filtros,
+        .ra-filters,
+        .ra-history-filters
+    ) {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    :is(
+        .asistencias-filtros__actions,
+        .solicitudes-filtros__actions,
+        .vacaciones-filtros__actions,
+        .campo-filtros__actions,
+        .ra-filters__actions,
+        .ra-history-filters__actions
+    ) {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    :is(
+        .asistencias-filtros__actions,
+        .solicitudes-filtros__actions,
+        .vacaciones-filtros__actions,
+        .campo-filtros__actions,
+        .ra-filters__actions,
+        .ra-history-filters__actions
+    ) > * {
+        width: 100%;
+        min-width: 0;
+        justify-content: center;
+    }
+
+    .form-grid,
+    .form-grid--2,
+    .form-grid--3,
+    .solicitud-detail-grid,
+    .solicitud-detail-review {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group,
+    .form-group--full {
+        min-width: 0;
+        grid-column: auto;
+    }
+
+    :is(.campo-grid, .vacaciones-grid, .horarios-grid) {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    :is(.campo-card__header, .vacacion-card__header) {
+        flex-wrap: wrap;
+    }
+
+    .table-container,
+    .solicitudes-table-wrap {
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
     }
 
     .table-actions {
-        gap: 5px;
+        align-items: stretch;
     }
 
-}
-
-
-/* ==========================================================
-   MÓVIL
-========================================================== */
-
-@media (max-width: 600px) {
-
-    .table th,
-    .table td {
-        padding: 9px 10px;
+    .pagination-container {
+        overflow-x: auto;
+        padding-bottom: 4px;
     }
 
-    .table th {
-        font-size: 11.5px;
+    .modal {
+        padding: 0;
     }
 
-    .table td {
-        font-size: 12.5px;
+    .modal__content {
+        width: 100%;
+        max-width: 100%;
+        max-height: 92vh;
+        max-height: 92dvh;
     }
 
-    .table-secondary-text {
-        font-size: 11.5px;
+    /* ======================================================
+       FILTROS MÓVILES UNIFICADOS
+    ====================================================== */
+
+    :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .solicitudes-filtros,
+        .vacaciones-filtros,
+        .campo-filtros,
+        .horarios-filtros,
+        .asignacion-masiva__filtros,
+        .ra-filters,
+        .ra-history-filters
+    ) {
+        width: 100%;
+        min-width: 0;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        align-items: end;
     }
 
-}
-
-
-/* ==========================================================
-   MÓVILES PEQUEÑOS
-========================================================== */
-
-@media (max-width: 420px) {
-
-    .table th,
-    .table td {
-        padding: 8px 9px;
+    .panel__header:has(> :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .horarios-filtros
+    )) {
+        padding: 12px;
+        background: linear-gradient(180deg, var(--surface), rgba(175, 203, 222, 0.08));
     }
 
-    .table th {
-        font-size: 11px;
+    .panel > :is(.vacaciones-filtros, .campo-filtros) {
+        padding: 12px;
     }
 
-    .table td {
+    .solicitudes-filter-panel,
+    .ra-filter-panel {
+        padding: 12px;
+        border-radius: 14px;
+    }
+
+    .panel__header > :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .horarios-filtros
+    )::before,
+    .panel > :is(.vacaciones-filtros, .campo-filtros)::before {
+        content: "Filtros";
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        min-height: 22px;
+        padding-bottom: 7px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text);
         font-size: 12px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
     }
 
+    :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .solicitudes-filtros,
+        .vacaciones-filtros,
+        .campo-filtros,
+        .horarios-filtros,
+        .asignacion-masiva__filtros,
+        .ra-filters,
+        .ra-history-filters
+    ) > :is(.filter-field, .form-group, .solicitudes-field, .ra-field) {
+        min-width: 0;
+        max-width: 100%;
+        margin: 0;
+        gap: 4px;
+    }
+
+    :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros
+    ) > .filter-field:first-of-type,
+    :is(.asistencias-filtros, .vacaciones-filtros, .campo-filtros) > .form-group:first-of-type,
+    .solicitudes-filtros > .solicitudes-field--search,
+    :is(.ra-filters, .ra-history-filters) > .ra-field--search {
+        grid-column: 1 / -1;
+    }
+
+    .filter-field__label {
+        position: static;
+        width: auto;
+        height: auto;
+        padding: 0;
+        margin: 0;
+        overflow: visible;
+        clip: auto;
+        clip-path: none;
+        white-space: normal;
+    }
+
+    :is(
+        .filter-field__label,
+        .asistencias-filtros .form-label,
+        .vacaciones-filtros .form-label,
+        .campo-filtros .form-label,
+        .horarios-filtros .form-label,
+        .asignacion-masiva__filtros .form-label,
+        .solicitudes-field > span,
+        .ra-field > span
+    ) {
+        color: var(--text-muted);
+        font-size: 8px;
+        font-weight: 800;
+        line-height: 1.25;
+        letter-spacing: 0.055em;
+        text-transform: uppercase;
+    }
+
+    :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .solicitudes-filtros,
+        .vacaciones-filtros,
+        .campo-filtros,
+        .horarios-filtros,
+        .asignacion-masiva__filtros,
+        .ra-filters,
+        .ra-history-filters
+    ) :is(input:not([type="hidden"]), select) {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        min-height: 40px;
+        padding: 7px 9px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background-color: var(--surface);
+        color: var(--text);
+        font-size: 11px;
+        line-height: 1.3;
+        box-shadow: 0 1px 2px rgba(38, 70, 83, 0.025);
+    }
+
+    :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .solicitudes-filtros,
+        .vacaciones-filtros,
+        .campo-filtros,
+        .horarios-filtros,
+        .asignacion-masiva__filtros,
+        .ra-filters,
+        .ra-history-filters
+    ) :is(input:not([type="hidden"]), select):focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(175, 203, 222, 0.28);
+    }
+
+    :is(
+        .filter-actions,
+        .asistencias-filtros__actions,
+        .solicitudes-filtros__actions,
+        .vacaciones-filtros__actions,
+        .campo-filtros__actions,
+        .ra-filters__actions,
+        .ra-history-filters__actions
+    ) {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        width: 100%;
+        min-width: 0;
+        margin-top: 1px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+    }
+
+    :is(
+        .filter-actions,
+        .asistencias-filtros__actions,
+        .solicitudes-filtros__actions,
+        .vacaciones-filtros__actions,
+        .campo-filtros__actions,
+        .ra-filters__actions,
+        .ra-history-filters__actions
+    ) > * {
+        width: 100%;
+        min-width: 0;
+        min-height: 40px;
+        padding-inline: 8px;
+        justify-content: center;
+        border-radius: 9px;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    .solicitudes-filter-panel__heading {
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+
+    .solicitudes-filter-panel__heading h3 {
+        font-size: 14px;
+    }
+
+    .solicitudes-filter-panel__heading p {
+        margin-top: 3px;
+        font-size: 9px;
+        line-height: 1.4;
+    }
+
+    :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .solicitudes-filtros,
+        .vacaciones-filtros,
+        .campo-filtros,
+        .horarios-filtros,
+        .ra-filters,
+        .ra-history-filters
+    ) button[type="submit"] {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 5px 13px rgba(38, 70, 83, 0.13);
+    }
 }
+
+/* ==========================================================
+   CELULAR PEQUEÑO
+========================================================== */
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 13px 11px;
+    }
+
+    .page-header,
+    .main-content > .page-header {
+        padding: 21px 17px;
+        border-radius: 18px;
+    }
+
+    .page-header__actions {
+        grid-template-columns: 1fr;
+    }
+
+    .page-header__actions > *,
+    .page-header__actions .button {
+        min-height: 44px;
+    }
+
+    :is(
+        .filter-actions,
+        .asistencias-filtros__actions,
+        .solicitudes-filtros__actions,
+        .vacaciones-filtros__actions,
+        .campo-filtros__actions,
+        .ra-filters__actions,
+        .ra-history-filters__actions
+    ) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    :is(.panel__header, .campo-filtros) {
+        padding: 13px;
+    }
+
+    :is(
+        .button,
+        button,
+        input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+        select
+    ) {
+        min-height: 42px;
+    }
+
+    .alert {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .sincronizar-feriados,
+    .sincronizar-feriados__campo,
+    .sincronizar-feriados__campo input {
+        width: 100%;
+    }
+}
+
+@media (max-width: 430px) {
+    .areas-filtros > .filter-field:last-of-type,
+    .trabajadores-filtros > .filter-field:last-of-type,
+    .marcaciones-filtros > .filter-field:last-of-type,
+    .solicitudes-filtros > .solicitudes-field:last-of-type,
+    .campo-filtros > .form-group:last-of-type,
+    .vacaciones-filtros:has(input[name="buscar"]) > .form-group:last-of-type,
+    .asignacion-masiva__filtros > .form-group:last-of-type,
+    .ra-filters:not(.ra-filters--short) > .ra-field:nth-of-type(2),
+    .ra-history-filters > .ra-field:nth-of-type(2),
+    .ra-filters--short > .ra-field {
+        grid-column: 1 / -1;
+    }
+
+    .panel__header:has(> :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .horarios-filtros
+    )),
+    .panel > :is(.vacaciones-filtros, .campo-filtros),
+    .solicitudes-filter-panel,
+    .ra-filter-panel {
+        padding: 10px;
+    }
+
+    :is(
+        .areas-filtros,
+        .trabajadores-filtros,
+        .feriados-filtros,
+        .marcaciones-filtros,
+        .asistencias-filtros,
+        .solicitudes-filtros,
+        .vacaciones-filtros,
+        .campo-filtros,
+        .horarios-filtros,
+        .asignacion-masiva__filtros,
+        .ra-filters,
+        .ra-history-filters
+    ) :is(input:not([type="hidden"]), select) {
+        min-height: 38px;
+        padding: 6px 8px;
+        font-size: 10.5px;
+    }
+
+    :is(
+        .filter-actions,
+        .asistencias-filtros__actions,
+        .solicitudes-filtros__actions,
+        .vacaciones-filtros__actions,
+        .campo-filtros__actions,
+        .ra-filters__actions,
+        .ra-history-filters__actions
+    ) > * {
+        min-height: 38px;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .button,
+    .sidebar__item,
+    .navbar__menu-button,
+    .navbar__logout-button,
+    .modal__close {
+        min-height: 44px;
+    }
+
+    :is(
+        .filter-actions,
+        .asistencias-filtros__actions,
+        .solicitudes-filtros__actions,
+        .vacaciones-filtros__actions,
+        .campo-filtros__actions,
+        .ra-filters__actions,
+        .ra-history-filters__actions
+    ) .button {
+        min-height: 40px;
+    }
+}
+

@@ -1,13 +1,13 @@
 .ra-worker {
-    --rw-primary: var(--primary, #264653);
-    --rw-primary-hover: var(--primary-hover, #1f3a45);
-    --rw-primary-light: var(--primary-light, #e8f1f5);
-    --rw-bg: var(--background, #faf8f4);
-    --rw-surface: var(--surface, #fffefc);
-    --rw-subtle: var(--surface-secondary, #f2ede6);
-    --rw-text: var(--text, #495057);
-    --rw-muted: var(--text-muted, #6b7378);
-    --rw-border: var(--border, #d9cdbf);
+    --rw-primary: var(--primary, #1d315a);
+    --rw-primary-hover: var(--primary-hover, #172b55);
+    --rw-primary-light: var(--primary-light, #e9f7ff);
+    --rw-bg: var(--background, #f5f7ff);
+    --rw-surface: var(--surface, #ffffff);
+    --rw-subtle: var(--surface-secondary, #eff3fb);
+    --rw-text: var(--text, #343650);
+    --rw-muted: var(--text-muted, #666783);
+    --rw-border: var(--border, #dce4f1);
     --rw-success: #15803d;
     --rw-warning: #9a6700;
     --rw-danger: #b42318;
@@ -49,7 +49,7 @@
 }
 
 .ra-worker :focus-visible {
-    outline: 2px solid var(--accent, #afcdde);
+    outline: 2px solid var(--accent, #b6eaf4);
     outline-offset: 2px;
 }
 
@@ -67,8 +67,8 @@
     padding: clamp(26px,4vw,40px);
     border-radius: 25px;
     background:
-        radial-gradient(circle at 90% 15%, rgba(175,205,222,.24), transparent 27%),
-        linear-gradient(135deg,#264653,#315d6e 56%,#477588);
+        radial-gradient(circle at 90% 15%, rgba(0, 196, 204,.24), transparent 27%),
+        linear-gradient(135deg,#1d315a,#315d6e 56%,#477588);
     color: #fff;
     box-shadow: 0 22px 52px rgba(38,70,83,.2);
 }
@@ -108,11 +108,11 @@
     content: "";
     width: 20px;
     height: 1px;
-    background: #afcdde;
+    background: #b6eaf4;
 }
 
 .ra-worker__hero h2 {
-    color: #faf8f4;
+    color: #f5f7ff;
     font-size: clamp(27px,3vw,38px);
     line-height: 1.1;
     letter-spacing: -.035em;
@@ -133,7 +133,7 @@
 .ra-worker__hero .button--primary {
     border-color: #fff;
     background: #fff;
-    color: #264653;
+    color: #1d315a;
     box-shadow: 0 12px 26px rgba(0,0,0,.16);
 }
 
@@ -366,7 +366,7 @@
 }
 
 .ra-status--success {
-    background: #e8f1f5;
+    background: #e9f7ff;
     color: var(--rw-success);
 }
 
@@ -381,13 +381,13 @@
 }
 
 .ra-status--info {
-    background: #eef5f8;
+    background: #eef7ff;
     color: var(--rw-info);
 }
 
 .ra-status--neutral {
-    background: #f2ede6;
-    color: #6b7378;
+    background: #eff3fb;
+    color: #666783;
 }
 
 /* OBSERVACIONES */
