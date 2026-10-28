@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/pages/login.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme-natural.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/theme-itrafic.css') }}">
 </head>
 
 <body class="guest">

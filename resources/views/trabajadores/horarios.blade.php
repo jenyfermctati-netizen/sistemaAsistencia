@@ -97,10 +97,9 @@
             <div class="form-help-box">
                 <strong>Un solo horario para toda la empresa.</strong>
                 Al guardar, esta configuración queda vinculada automáticamente a cada trabajador activo. El personal
-                contratado registra cuatro marcas: entrada, salida a refrigerio, retorno y salida final. El personal
-                con control referencial registra dos marcas; el sistema reconoce si corresponden al turno de mañana o
-                al turno de tarde según la hora de entrada. Cada día puede configurarse como jornada completa o
-                media jornada.
+                contratado registra entrada, salida a refrigerio, retorno y salida final. El personal con control
+                referencial puede registrar un solo turno o mañana y tarde; el sistema interpreta cada marca según la
+                hora configurada. Cada día puede establecerse como jornada completa o media jornada.
             </div>
 
             <div class="form-section">
@@ -223,3 +222,4 @@
 @push('scripts')
     <script src="{{ asset('js/pages/horarios.js') }}"></script>
 @endpush
+

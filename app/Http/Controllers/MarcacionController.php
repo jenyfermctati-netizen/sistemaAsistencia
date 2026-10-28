@@ -6,6 +6,7 @@ use App\Models\Area;
 use App\Models\Marcacion;
 use App\Models\Trabajador;
 use App\Services\AsistenciaService;
+use App\Services\ClasificadorMarcacionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,8 @@ use Illuminate\Validation\Rule;
 class MarcacionController extends Controller
 {
     public function __construct(
-        private readonly AsistenciaService $asistenciaService
+        private readonly AsistenciaService $asistenciaService,
+        private readonly ClasificadorMarcacionService $clasificadorMarcacionService
     ) {}
 
     public function index(Request $request)
@@ -139,6 +141,20 @@ class MarcacionController extends Controller
             ->get()
             ->groupBy('trabajador_id');
 
+        $clasificacionesHoy = $trabajadores->mapWithKeys(function (Trabajador $trabajador) use ($marcacionesHoy) {
+            $diaHorario = $trabajador->horarioActual?->horario?->dias?->firstWhere(
+                'dia_semana',
+                today()->isoWeekday()
+            );
+
+            return [
+                $trabajador->id => $this->clasificadorMarcacionService->clasificar(
+                    $marcacionesHoy->get($trabajador->id, collect()),
+                    $diaHorario
+                ),
+            ];
+        });
+
         $areas = Area::where('estado', true)
             ->orderBy('nombre')
             ->get();
@@ -148,6 +164,7 @@ class MarcacionController extends Controller
             compact(
                 'trabajadores',
                 'marcacionesHoy',
+                'clasificacionesHoy',
                 'areas'
             )
         );
@@ -165,43 +182,21 @@ class MarcacionController extends Controller
             'El trabajador no está activo.'
         );
 
-        $trabajador->load('horarioActual.horario.dias');
+        $fechaHora = now();
+        $clasificacion = $this->clasificadorMarcacionService
+            ->clasificarNuevaMarcacion($trabajador, $fechaHora);
 
-        $marcaciones = Marcacion::where(
-            'trabajador_id',
-            $trabajador->id
-        )
-            ->whereDate('fecha_hora', today())
-            ->where('anulada', false)
-            ->orderBy('fecha_hora')
-            ->get();
-
-        $diaHorario = $trabajador->horarioActual?->horario?->dias?->firstWhere(
-            'dia_semana',
-            today()->isoWeekday()
-        );
-        $esJornadaCompleta = $trabajador->horarioActual?->tipo_control === 'OBLIGATORIO'
-            && filled($diaHorario?->hora_salida_refrigerio)
-            && filled($diaHorario?->hora_retorno_refrigerio);
-        $totalEsperado = $esJornadaCompleta ? 4 : 2;
-        $numeroMarca = $marcaciones->count();
-
-        if ($numeroMarca >= $totalEsperado) {
+        if (! $clasificacion) {
             return $this->error(
                 $request,
                 'El trabajador ya completó las marcaciones requeridas para hoy.'
             );
         }
 
-        $tipo = $numeroMarca % 2 === 0 ? 'ENTRADA' : 'SALIDA';
-        $etiqueta = $esJornadaCompleta
-            ? ['entrada de la mañana', 'salida a refrigerio', 'retorno del refrigerio', 'salida final'][$numeroMarca]
-            : ['entrada', 'salida'][$numeroMarca];
-
         $marcacion = Marcacion::create([
             'trabajador_id' => $trabajador->id,
-            'fecha_hora' => now(),
-            'tipo' => $tipo,
+            'fecha_hora' => $fechaHora,
+            'tipo' => $clasificacion['tipo'],
             'origen' => 'MANUAL',
             'registrado_por' => Auth::id(),
             'motivo_manual' => 'Marcación manual rápida registrada desde el panel administrativo.',
@@ -213,7 +208,7 @@ class MarcacionController extends Controller
             $marcacion->fecha_hora
         );
 
-        $mensaje = ucfirst($etiqueta).' registrada correctamente.';
+        $mensaje = ucfirst($clasificacion['etiqueta']).' registrada correctamente.';
 
         return $this->respuesta(
             $request,

@@ -6,6 +6,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/pages/asistencias.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/pages/asistencias-modern.css') }}">
 @endpush
 
 @section('content')
@@ -31,7 +32,7 @@
     </div>
 
     {{-- FILTROS --}}
-    <section class="panel">
+    <section class="panel asistencias-panel">
         <div class="panel__header">
             <form method="GET" action="{{ route('asistencias.index') }}" class="asistencias-filtros">
                 <div class="form-group">
@@ -84,7 +85,7 @@
                 </div>
 
                 <div class="asistencias-filtros__actions">
-                    <button type="submit" class="button button--secondary">Filtrar</button>
+                    <button type="submit" class="button button--primary">Filtrar</button>
                     <a href="{{ route('asistencias.index') }}" class="button button--secondary">Limpiar</a>
                 </div>
             </form>
@@ -92,7 +93,7 @@
 
         {{-- TABLA --}}
         <div class="table-container">
-            <table class="table">
+            <table class="table asistencias-table">
                 <thead>
                     <tr>
                         <th>Fecha</th>
@@ -108,11 +109,12 @@
                         <th>Trabajado</th>
                         <th>Tardanza</th>
                         <th>Estado</th>
+                        <th>Detalle</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($asistencias as $asistencia)
-                        <tr>
+                        <tr class="asistencia-row">
                             <td>
                                 <strong>{{ $asistencia->fecha?->format('d/m/Y') }}</strong>
                             </td>
@@ -263,10 +265,13 @@
                                     <div class="asistencia-observacion">{{ $asistencia->observacion }}</div>
                                 @endif
                             </td>
+                            <td class="asistencia-action-cell">
+                                <button type="button" class="asistencia-detail-button" data-asistencia-detail>Ver detalle <span aria-hidden="true">⌄</span></button>
+                            </td>
                         </tr>
                         @empty
                             <tr>
-                                <td colspan="13" class="table-empty">
+                                <td colspan="14" class="table-empty">
                                     <div class="empty-state">
                                         <strong>No existen asistencias procesadas</strong>
                                         <span>
@@ -285,6 +290,17 @@
                 </table>
             </div>
         </section>
+
+        <dialog id="asistenciaDetalleDialog" class="asistencia-detail-dialog" aria-labelledby="asistenciaDetalleTitulo">
+            <div class="asistencia-detail-dialog__header">
+                <div>
+                    <span>CONTROL DE ASISTENCIA</span>
+                    <h3 id="asistenciaDetalleTitulo">Detalle del registro</h3>
+                </div>
+                <button type="button" data-asistencia-close aria-label="Cerrar detalle">×</button>
+            </div>
+            <div class="asistencia-detail-dialog__body" id="asistenciaDetalleContenido"></div>
+        </dialog>
 
         <div class="pagination-container">
             {{ $asistencias->links() }}
@@ -314,3 +330,37 @@
             </x-modal>
         @endif
     @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('click', function (event) {
+        const dialog = document.getElementById('asistenciaDetalleDialog');
+        if (!dialog) return;
+        const trigger = event.target.closest('[data-asistencia-detail]');
+        if (trigger) {
+            const row = trigger.closest('tr');
+            const headings = Array.from(row.closest('table').querySelectorAll('thead th'));
+            const cells = Array.from(row.children);
+            const content = document.getElementById('asistenciaDetalleContenido');
+            content.replaceChildren();
+            const title = document.getElementById('asistenciaDetalleTitulo');
+            title.textContent = row.querySelector('.asistencia-trabajador strong')?.textContent.trim() || 'Detalle del registro';
+            cells.forEach((cell, index) => {
+                if (index === cells.length - 1 || index === 1) return;
+                const item = document.createElement('div');
+                item.className = 'asistencia-detail-dialog__item';
+                const label = document.createElement('span');
+                label.textContent = headings[index]?.textContent.trim() || 'Dato';
+                const value = document.createElement('div');
+                Array.from(cell.childNodes).forEach(node => value.appendChild(node.cloneNode(true)));
+                item.append(label, value);
+                content.appendChild(item);
+            });
+            dialog.showModal();
+        }
+        if (event.target.closest('[data-asistencia-close]')) dialog.close();
+        if (event.target === dialog) dialog.close();
+    });
+</script>
+@endpush
+

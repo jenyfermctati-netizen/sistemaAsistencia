@@ -35,7 +35,7 @@
     </div>
 
     {{-- PANEL PRINCIPAL --}}
-    <section class="panel">
+    <section class="panel trabajadores-panel">
         {{-- FILTROS --}}
         <div class="panel__header">
             <form method="GET" action="{{ route('trabajadores.index') }}" class="trabajadores-filtros">
@@ -76,7 +76,7 @@
                 </label>
 
                 <div class="filter-actions">
-                    <button type="submit" class="button button--secondary">Filtrar</button>
+                    <button type="submit" class="button button--primary">Filtrar</button>
                     <a href="{{ route('trabajadores.index') }}" class="button button--secondary">Limpiar</a>
                 </div>
             </form>
@@ -84,7 +84,7 @@
 
         {{-- TABLA --}}
         <div class="table-container">
-            <table class="table">
+            <table class="table trabajadores-table">
                 <thead>
                     <tr>
                         <th>DNI</th>
@@ -100,25 +100,26 @@
                 </thead>
                 <tbody>
                     @forelse($trabajadores as $trabajador)
-                        <tr>
-                            <td>{{ $trabajador->dni }}</td>
-                            <td>
+                        <tr class="trabajadores-row">
+                            <td class="tw-dni" data-label="DNI">{{ $trabajador->dni }}</td>
+                            <td class="tw-nombre" data-label="Trabajador">
                                 <strong>{{ $trabajador->nombres }} {{ $trabajador->apellidos }}</strong>
+                                <div class="tw-documento">DNI: {{ $trabajador->dni }}</div>
                                 @if ($trabajador->codigo_biometrico)
                                     <div class="table-secondary-text">Biométrico: {{ $trabajador->codigo_biometrico }}
                                     </div>
                                 @endif
                             </td>
-                            <td>{{ $trabajador->area?->nombre ?? '-' }}</td>
-                            <td>
+                            <td class="tw-area" data-label="Área">{{ $trabajador->area?->nombre ?? '-' }}</td>
+                            <td class="tw-vinculo" data-label="Vínculo">
                                 <span
                                     class="badge {{ $trabajador->tipo_vinculo === 'CONTRATADO' ? 'badge--primary' : 'badge--info' }}">
                                     {{ $trabajador->tipo_vinculo }}
                                 </span>
                             </td>
-                            <td>{{ $trabajador->cargo ?? '-' }}</td>
-                            <td>{{ $trabajador->user?->email ?? '-' }}</td>
-                            <td>
+                            <td class="tw-cargo" data-label="Cargo">{{ $trabajador->cargo ?? '-' }}</td>
+                            <td class="tw-correo" data-label="Correo">{{ $trabajador->user?->email ?? '-' }}</td>
+                            <td class="tw-rol" data-label="Rol">
                                 {{ $trabajador->user?->rol?->nombre ?? '-' }}
                                 @if ($trabajador->esEncargadoDeSuArea())
                                     <div class="table-secondary-text">
@@ -126,14 +127,34 @@
                                     </div>
                                 @endif
                             </td>
-                            <td>
+                            <td class="tw-estado" data-label="Estado">
                                 @if ($trabajador->estado === 'ACTIVO')
                                     <span class="badge badge--success">Activo</span>
                                 @else
                                     <span class="badge badge--danger">Inactivo</span>
                                 @endif
                             </td>
-                            <td class="trabajador-actions-cell">
+                            <td class="trabajador-actions-cell tw-acciones" data-label="Acciones">
+                                <button type="button" class="tw-detalle-trigger" data-tw-modal-open>Ver detalle <span aria-hidden="true">⌄</span></button>
+                                <dialog class="tw-modal" aria-label="Detalle del trabajador">
+                                    <div class="tw-modal__header">
+                                        <div>
+                                            <span class="tw-modal__eyebrow">FICHA DEL PERSONAL</span>
+                                            <h3>{{ $trabajador->nombres }} {{ $trabajador->apellidos }}</h3>
+                                            <p>DNI: {{ $trabajador->dni }} · {{ $trabajador->area?->nombre ?? 'Sin área' }}</p>
+                                        </div>
+                                        <button type="button" class="tw-modal__close" data-tw-modal-close aria-label="Cerrar detalle">×</button>
+                                    </div>
+                                    <div class="tw-detalle__contenido">
+                                        <div><span>Cargo</span><strong>{{ $trabajador->cargo ?? '-' }}</strong></div>
+                                        <div><span>Correo</span><strong>{{ $trabajador->user?->email ?? '-' }}</strong></div>
+                                        <div><span>Rol</span><strong>{{ $trabajador->user?->rol?->nombre ?? '-' }}</strong></div>
+                                        <div><span>Vínculo</span><strong>{{ $trabajador->tipo_vinculo }}</strong></div>
+                                        @if ($trabajador->esEncargadoDeSuArea())
+                                            <div class="tw-detalle__encargado">Encargado de área</div>
+                                        @endif
+                                    </div>
+                                    <div class="tw-modal__actions-label">Acciones disponibles</div>
                                 <div class="table-actions trabajador-actions">
                                     @if ($trabajador->reporte_hoy)
                                         <a href="{{ route('reportesAvance.index', ['buscar' => $trabajador->dni]) }}"
@@ -183,6 +204,7 @@
                                         {{ $trabajador->estado === 'ACTIVO' ? 'Desactivar' : 'Activar' }}
                                     </button>
                                 </div>
+                                </dialog>
                             </td>
                         </tr>
                     @empty
@@ -557,4 +579,20 @@
 
 @push('scripts')
     <script src="{{ asset('js/pages/trabajadores.js') }}"></script>
+    <script>
+        document.addEventListener('click', function (event) {
+            const opener = event.target.closest('[data-tw-modal-open]');
+            if (opener) {
+                const dialog = opener.parentElement.querySelector('.tw-modal');
+                if (dialog && !dialog.open) dialog.showModal();
+                return;
+            }
+            const closer = event.target.closest('[data-tw-modal-close]');
+            if (closer) {
+                closer.closest('dialog')?.close();
+                return;
+            }
+            if (event.target.matches('dialog.tw-modal')) event.target.close();
+        });
+    </script>
 @endpush

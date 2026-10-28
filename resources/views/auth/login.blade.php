@@ -9,16 +9,49 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/pages/login.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme-natural.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/theme-itrafic.css') }}">
 </head>
 
 <body class="guest">
     <main class="login-page">
         <div class="login-shell">
             <section class="login-hero login-hero--login" aria-label="Sistema de Control de Asistencias">
+                <div class="login-hero__brandline">
+                    <span class="login-hero__mark" aria-hidden="true">CA</span>
+                    <span class="login-hero__brandcopy">
+                        <strong>Control de Asistencia</strong>
+                        <small>Gestión de personal</small>
+                    </span>
+                </div>
+
                 <div class="login-hero__copy">
-                    <span class="login-hero__eyebrow">Gestión interna</span>
+                    <span class="login-hero__eyebrow">Sistema de gestión</span>
                     <h1>Tu equipo, siempre al día.</h1>
                     <p>Asistencia, horarios y avances en un solo lugar.</p>
+
+                    <div class="login-hero__highlights" aria-label="Funciones principales">
+                        <div class="login-hero__highlight">
+                            <span>01</span>
+                            <div>
+                                <strong>Asistencia</strong>
+                                <small>Registro diario</small>
+                            </div>
+                        </div>
+                        <div class="login-hero__highlight">
+                            <span>02</span>
+                            <div>
+                                <strong>Horarios</strong>
+                                <small>Jornadas claras</small>
+                            </div>
+                        </div>
+                        <div class="login-hero__highlight">
+                            <span>03</span>
+                            <div>
+                                <strong>Reportes</strong>
+                                <small>Seguimiento ágil</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -27,9 +60,14 @@
                     <img class="login-card__logo" src="{{ asset('images/auth/connext-logo.png') }}"
                         alt="Connext Ingeniería, Tecnología y Desarrollo">
 
+                    <div class="login-card__status">
+                        <span aria-hidden="true"></span>
+                        Acceso para personal autorizado
+                    </div>
+
                     <header class="login-card__header">
                         <span class="login-card__eyebrow">Portal de colaboradores</span>
-                        <h2>Bienvenido</h2>
+                        <h2>Bienvenido de nuevo</h2>
                         <p>Inicia sesión con tu cuenta para continuar.</p>
                     </header>
 

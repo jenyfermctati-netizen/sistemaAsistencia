@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ asset('css/theme-natural.css') }}">
     <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
     <link rel="stylesheet" href="{{ asset('css/ui-modern.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/theme-itrafic.css') }}">
 </head>
 
 <body>

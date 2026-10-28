@@ -15,6 +15,10 @@ use Illuminate\Support\Str;
 
 class AsistenciaService
 {
+    public function __construct(
+        private readonly ClasificadorMarcacionService $clasificadorMarcacionService
+    ) {}
+
     public function procesarFecha(Carbon $fecha): int
     {
         $procesados = 0;
@@ -72,37 +76,61 @@ class AsistenciaService
             ->orderBy('fecha_hora')
             ->get();
 
-        $entradas = $marcaciones
-            ->where('tipo', 'ENTRADA')
-            ->values();
-
-        $salidas = $marcaciones
-            ->where('tipo', 'SALIDA')
-            ->values();
-
-        $entrada = $entradas->get(0);
         $usaHorarioPartido = filled($diaHorario?->hora_salida_refrigerio)
             && filled($diaHorario?->hora_retorno_refrigerio);
-        $esJornadaCompleta = $usaHorarioPartido
+        $requiereJornadaCompleta = $usaHorarioPartido
             && $asignacion?->tipo_control === 'OBLIGATORIO';
+        $registraJornadaPartida = $usaHorarioPartido
+            && ($requiereJornadaCompleta || $marcaciones->count() >= 3);
 
-        $salidaRefrigerio = $esJornadaCompleta ? $salidas->get(0) : null;
-        $retornoRefrigerio = $esJornadaCompleta ? $entradas->get(1) : null;
-        $salida = $esJornadaCompleta ? $salidas->get(1) : $salidas->last();
+        if ($usaHorarioPartido) {
+            $momentos = $this->clasificadorMarcacionService->clasificar(
+                $marcaciones,
+                $diaHorario
+            );
+            $entradaClasificada = $momentos[ClasificadorMarcacionService::ENTRADA_MANANA] ?? null;
+            $salidaRefrigerioClasificada = $momentos[ClasificadorMarcacionService::SALIDA_REFRIGERIO] ?? null;
+            $retornoClasificado = $momentos[ClasificadorMarcacionService::RETORNO_REFRIGERIO] ?? null;
+            $salidaClasificada = $momentos[ClasificadorMarcacionService::SALIDA_FINAL] ?? null;
+        } else {
+            $entradas = $marcaciones->where('tipo', 'ENTRADA')->values();
+            $salidas = $marcaciones->where('tipo', 'SALIDA')->values();
+            $entradaClasificada = $entradas->first();
+            $salidaRefrigerioClasificada = null;
+            $retornoClasificado = null;
+            $salidaClasificada = $salidas->last();
+        }
+
+        if ($registraJornadaPartida) {
+            $entrada = $entradaClasificada;
+            $salidaRefrigerio = $salidaRefrigerioClasificada;
+            $retornoRefrigerio = $retornoClasificado;
+            $salida = $salidaClasificada;
+        } elseif ($usaHorarioPartido && $asignacion?->tipo_control === 'REFERENCIAL') {
+            $entrada = $marcaciones->first();
+            $salidaRefrigerio = null;
+            $retornoRefrigerio = null;
+            $salida = $marcaciones->count() >= 2 ? $marcaciones->last() : null;
+        } else {
+            $entrada = $entradaClasificada;
+            $salidaRefrigerio = null;
+            $retornoRefrigerio = null;
+            $salida = $salidaClasificada;
+        }
         $retornoRefrigerioEstimado = false;
         $salidaEstimada = false;
         $salidaReinterpretada = false;
 
         $horaProgramadaEntrada = $diaHorario?->hora_entrada;
-        $horaProgramadaSalidaRefrigerio = $esJornadaCompleta
+        $horaProgramadaSalidaRefrigerio = $registraJornadaPartida
             ? $diaHorario?->hora_salida_refrigerio
             : null;
-        $horaProgramadaRetornoRefrigerio = $esJornadaCompleta
+        $horaProgramadaRetornoRefrigerio = $registraJornadaPartida
             ? $diaHorario?->hora_retorno_refrigerio
             : null;
         $horaProgramadaSalida = $diaHorario?->hora_salida;
 
-        if ($usaHorarioPartido && ! $esJornadaCompleta) {
+        if ($usaHorarioPartido && ! $registraJornadaPartida) {
             $primeraMarca = $marcaciones->first();
             $esTurnoTarde = $primeraMarca
                 && $primeraMarca->fecha_hora->format('H:i:s') >= $diaHorario->hora_retorno_refrigerio;
@@ -377,7 +405,7 @@ class AsistenciaService
 
         if ($fecha->lt(today())) {
             if (
-                $esJornadaCompleta
+                $requiereJornadaCompleta
                 && ! $salida
                 && $retornoRefrigerio
                 && $this->pareceSalidaFinal(
@@ -393,7 +421,7 @@ class AsistenciaService
             }
 
             if (
-                $esJornadaCompleta
+                $requiereJornadaCompleta
                 && $entrada
                 && $salidaRefrigerio
                 && ! $retornoRefrigerio
@@ -412,7 +440,7 @@ class AsistenciaService
             }
 
             if (
-                $esJornadaCompleta
+                $requiereJornadaCompleta
                 && $entrada
                 && $salidaRefrigerio
                 && $retornoRefrigerio
@@ -432,7 +460,7 @@ class AsistenciaService
             }
 
             if (
-                ! $esJornadaCompleta
+                ! $requiereJornadaCompleta
                 && $entrada
                 && ! $salida
                 && $horaProgramadaSalida
@@ -448,6 +476,10 @@ class AsistenciaService
                     $salidaEstimada = true;
                 }
             }
+
+            $salidaReinterpretada = $salida
+                && $salida->exists
+                && $salida->tipo !== 'SALIDA';
 
             $minutosTrabajados = $this->calcularMinutosTrabajados(
                 $entrada,
@@ -484,14 +516,33 @@ class AsistenciaService
                 ? 'SIN_REGISTRO'
                 : 'PRESENTE';
 
+            $marcasFaltantesReferenciales = collect();
+
+            if ($registraJornadaPartida) {
+                if (! $salidaRefrigerio) {
+                    $marcasFaltantesReferenciales->push('salida a refrigerio');
+                }
+
+                if (! $retornoRefrigerio) {
+                    $marcasFaltantesReferenciales->push('retorno / entrada de la tarde');
+                }
+            }
+
+            if ($entrada && ! $salida) {
+                $marcasFaltantesReferenciales->push('salida final');
+            }
+
             $observacionBase = match (true) {
                 $marcaciones->isEmpty() => 'No existen marcaciones para este día. Control referencial.',
+                $marcasFaltantesReferenciales->isNotEmpty() => 'Falta marcar: '
+                    .$marcasFaltantesReferenciales->join(', ').'. Control referencial.',
                 ! $entrada || ! $salida => 'Marcación incompleta. Control referencial.',
                 default => null,
             };
-            $observacion = $ajustesCierre->isNotEmpty()
-                ? $ajustesCierre->join(' ')
-                : $observacionBase;
+            $observacion = collect([
+                $observacionBase,
+                $ajustesCierre->isNotEmpty() ? $ajustesCierre->join(' ') : null,
+            ])->filter()->join(' ') ?: null;
 
             $this->guardarAsistencia(
                 trabajador: $trabajador,
@@ -500,13 +551,18 @@ class AsistenciaService
                 horarioId: $horario->id,
                 tipoControl: 'REFERENCIAL',
                 horaProgramadaEntrada: $horaProgramadaEntrada,
+                horaProgramadaSalidaRefrigerio: $horaProgramadaSalidaRefrigerio,
+                horaProgramadaRetornoRefrigerio: $horaProgramadaRetornoRefrigerio,
                 horaProgramadaSalida: $horaProgramadaSalida,
                 tolerancia: $horaProgramadaEntrada === $diaHorario->hora_entrada
                     ? $diaHorario->tolerancia_minutos
                     : 0,
                 entrada: $entrada,
+                salidaRefrigerio: $salidaRefrigerio,
+                retornoRefrigerio: $retornoRefrigerio,
                 salida: $salida,
                 minutosTrabajados: $minutosTrabajados,
+                retornoRefrigerioEstimado: $retornoRefrigerioEstimado,
                 salidaEstimada: $salidaEstimada,
                 observacion: $observacion
             );
@@ -575,7 +631,7 @@ class AsistenciaService
                 )
                 : 0;
 
-        if ($esJornadaCompleta && $retornoRefrigerio) {
+        if ($requiereJornadaCompleta && $retornoRefrigerio) {
             $retornoProgramado = Carbon::parse(
                 $fechaTexto.' '.$horaProgramadaRetornoRefrigerio
             );
@@ -589,7 +645,7 @@ class AsistenciaService
 
         $marcasFaltantes = collect();
 
-        if ($esJornadaCompleta) {
+        if ($requiereJornadaCompleta) {
             if (! $salidaRefrigerio) {
                 $marcasFaltantes->push('salida a refrigerio');
             }
@@ -681,8 +737,12 @@ class AsistenciaService
         ?Marcacion $retornoRefrigerio,
         ?Marcacion $salida
     ): int {
-        return $this->minutosEntre($entrada, $salidaRefrigerio ?? $salida)
-            + $this->minutosEntre($retornoRefrigerio, $salida);
+        if ($salidaRefrigerio || $retornoRefrigerio) {
+            return $this->minutosEntre($entrada, $salidaRefrigerio)
+                + $this->minutosEntre($retornoRefrigerio, $salida);
+        }
+
+        return $this->minutosEntre($entrada, $salida);
     }
 
     private function minutosEntre(?Marcacion $entrada, ?Marcacion $salida): int

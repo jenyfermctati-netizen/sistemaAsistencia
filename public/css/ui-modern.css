@@ -1,9 +1,3 @@
-/* ==========================================================
-   INTERFAZ MODERNA
-   Capa final y transversal: mejora la presentación sin alterar
-   la estructura ni el comportamiento de los módulos.
-========================================================== */
-
 :root {
     --sidebar-width: 248px;
     --navbar-height: 64px;
@@ -327,7 +321,6 @@ body.sidebar-visible {
     color: var(--text);
 }
 
-/* Superficies, controles y tablas */
 :is(
     .panel,
     .solicitudes-filter-panel,

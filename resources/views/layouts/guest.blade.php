@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/theme-natural.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/theme-itrafic.css') }}">
 </head>
 <body class="guest">
     <main class="guest__content">

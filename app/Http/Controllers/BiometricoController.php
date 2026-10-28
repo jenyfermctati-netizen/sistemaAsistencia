@@ -7,6 +7,7 @@ use App\Models\Marcacion;
 use App\Models\Trabajador;
 use App\Services\AsistenciaService;
 use App\Services\BiometricoSyncService;
+use App\Services\ClasificadorMarcacionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +16,8 @@ class BiometricoController extends Controller
 {
     public function __construct(
         private readonly AsistenciaService $asistenciaService,
-        private readonly BiometricoSyncService $biometricoSyncService
+        private readonly BiometricoSyncService $biometricoSyncService,
+        private readonly ClasificadorMarcacionService $clasificadorMarcacionService
     ) {}
 
     public function cdata(Request $request)
@@ -43,6 +45,7 @@ class BiometricoController extends Controller
 
         if ($table === 'USERINFO') {
             $this->procesarUsuariosDispositivo($sn, $body);
+
             return $this->texto('OK');
         }
 
@@ -72,13 +75,13 @@ class BiometricoController extends Controller
 
         $dispositivo = DispositivoBiometrico::where('serial', $sn)->first();
 
-        if (!$dispositivo) {
+        if (! $dispositivo) {
             return $this->texto('OK');
         }
 
         $comando = $this->biometricoSyncService->siguienteComando($dispositivo);
 
-        if (!$comando) {
+        if (! $comando) {
             return $this->texto('OK');
         }
 
@@ -99,7 +102,7 @@ class BiometricoController extends Controller
 
         $dispositivo = DispositivoBiometrico::where('serial', $sn)->first();
 
-        if (!$dispositivo) {
+        if (! $dispositivo) {
             return $this->texto('OK');
         }
 
@@ -187,11 +190,12 @@ class BiometricoController extends Controller
             try {
                 $datos = $this->parsearAttlog($linea);
 
-                if (!$datos) {
+                if (! $datos) {
                     Log::warning('ATTLOG formato no reconocido', [
                         'sn' => $sn,
                         'linea' => $linea,
                     ]);
+
                     continue;
                 }
 
@@ -200,12 +204,13 @@ class BiometricoController extends Controller
                     $datos['pin']
                 )->first();
 
-                if (!$trabajador) {
+                if (! $trabajador) {
                     Log::warning('ATTLOG trabajador no encontrado', [
                         'sn' => $sn,
                         'pin' => $datos['pin'],
                         'fecha_hora' => $datos['fecha_hora'],
                     ]);
+
                     continue;
                 }
 
@@ -213,11 +218,11 @@ class BiometricoController extends Controller
 
                 $eventoExternoId = hash(
                     'sha256',
-                    $sn . '|'
-                        . $datos['pin'] . '|'
-                        . $fechaHora->format('Y-m-d H:i:s') . '|'
-                        . $datos['estado'] . '|'
-                        . ($datos['verificacion'] ?? '')
+                    $sn.'|'
+                        .$datos['pin'].'|'
+                        .$fechaHora->format('Y-m-d H:i:s').'|'
+                        .$datos['estado'].'|'
+                        .($datos['verificacion'] ?? '')
                 );
 
                 $duplicada = Marcacion::where(
@@ -237,6 +242,7 @@ class BiometricoController extends Controller
                     );
 
                     $procesadas++;
+
                     continue;
                 }
 
@@ -259,6 +265,7 @@ class BiometricoController extends Controller
                     ]);
 
                     $procesadas++;
+
                     continue;
                 }
 
@@ -267,7 +274,7 @@ class BiometricoController extends Controller
                     $fechaHora
                 );
 
-                if (!$tipo) {
+                if (! $tipo) {
                     Log::warning('ATTLOG marcaciones del día ya completadas', [
                         'sn' => $sn,
                         'pin' => $datos['pin'],
@@ -276,6 +283,7 @@ class BiometricoController extends Controller
                     ]);
 
                     $procesadas++;
+
                     continue;
                 }
 
@@ -364,41 +372,16 @@ class BiometricoController extends Controller
 
     private function determinarTipo(Trabajador $trabajador, Carbon $fechaHora): ?string
     {
-        $trabajador->loadMissing('horarioActual.horario.dias');
-
-        $marcaciones = Marcacion::where('trabajador_id', $trabajador->id)
-            ->whereDate('fecha_hora', $fechaHora->toDateString())
-            ->where('anulada', false)
-            ->orderBy('fecha_hora')
-            ->get();
-
-        $diaHorario = $trabajador->horarioActual?->horario?->dias?->firstWhere(
-            'dia_semana',
-            $fechaHora->isoWeekday()
-        );
-
-        $esJornadaCompleta =
-            $trabajador->horarioActual?->tipo_control === 'OBLIGATORIO' &&
-            filled($diaHorario?->hora_salida_refrigerio) &&
-            filled($diaHorario?->hora_retorno_refrigerio);
-
-        $totalEsperado = $esJornadaCompleta ? 4 : 2;
-        $cantidadMarcaciones = $marcaciones->count();
-
-        if ($cantidadMarcaciones >= $totalEsperado) {
-            return null;
-        }
-
-        return $cantidadMarcaciones % 2 === 0
-            ? 'ENTRADA'
-            : 'SALIDA';
+        return $this->clasificadorMarcacionService
+            ->clasificarNuevaMarcacion($trabajador, $fechaHora)['tipo']
+            ?? null;
     }
 
     private function procesarUsuariosDispositivo(string $sn, string $body): void
     {
         $dispositivo = DispositivoBiometrico::where('serial', $sn)->first();
 
-        if (!$dispositivo || trim($body) === '') {
+        if (! $dispositivo || trim($body) === '') {
             return;
         }
 
@@ -411,7 +394,7 @@ class BiometricoController extends Controller
 
             $usuario = $this->parsearUsuarioBiometrico($linea);
 
-            if (!$usuario) {
+            if (! $usuario) {
                 continue;
             }
 
@@ -435,11 +418,11 @@ class BiometricoController extends Controller
     {
         $linea = trim($linea);
 
-        if (!preg_match('/^USER(?:\s|\t)/i', $linea)) {
+        if (! preg_match('/^USER(?:\s|\t)/i', $linea)) {
             return null;
         }
 
-        if (!preg_match('/\bPIN=([^\s\t]+)/i', $linea, $pin)) {
+        if (! preg_match('/\bPIN=([^\s\t]+)/i', $linea, $pin)) {
             return null;
         }
 
@@ -482,7 +465,7 @@ class BiometricoController extends Controller
         if (
             $serialPermitido === '' ||
             $sn === '' ||
-            !hash_equals($serialPermitido, $sn)
+            ! hash_equals($serialPermitido, $sn)
         ) {
             Log::warning('SENSEFACE dispositivo no autorizado', [
                 'sn' => $sn ?: null,
@@ -540,9 +523,9 @@ class BiometricoController extends Controller
         }
 
         return substr($body, 0, $limite)
-            . '... [CONTENIDO OMITIDO - '
-            . strlen($body)
-            . ' bytes]';
+            .'... [CONTENIDO OMITIDO - '
+            .strlen($body)
+            .' bytes]';
     }
 
     private function texto(string $contenido)

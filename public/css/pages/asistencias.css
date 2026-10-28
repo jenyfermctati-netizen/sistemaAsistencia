@@ -1,361 +1,114 @@
-.asistencias-filtros {
-    display: grid;
-
-    grid-template-columns:
-        minmax(220px, 1.3fr)
-        150px
-        150px
-        170px
-        160px;
-
-    gap: 12px;
-
+/* Asistencias · complemento visual del tema Itrafic. Cargar tras asistencias.css. */
+.asistencias-panel {
+    overflow: hidden;
+    border: 1px solid #e0dbd4;
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 12px 32px rgba(28,25,23,.07);
+}
+.asistencias-panel .panel__header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #e7ded4;
+    background: linear-gradient(110deg,#fff7ed,#fff 72%);
+}
+.asistencias-panel .asistencias-filtros {
+    grid-template-columns: minmax(180px,1.4fr) repeat(4,minmax(125px,1fr));
+    gap: 11px;
     align-items: end;
 }
-
-
-.asistencias-filtros__actions {
-    grid-column: 1 / -1;
-
-    display: flex;
-
-    justify-content: flex-end;
-
-    gap: 8px;
+.asistencias-panel .asistencias-filtros .form-group { min-width: 0; }
+.asistencias-panel .asistencias-filtros .form-label { color:#584b40; font-size:12px; font-weight:700; }
+.asistencias-panel .asistencias-filtros :is(.form-control,.form-select) {
+    min-width:0;
+    width:100%;
+    min-height:42px;
+    border:1px solid #dfd6cc;
+    border-radius:9px;
+    background:#fff;
+    font-size:13px;
 }
-
-
-/* ==========================================================
-   TRABAJADOR
-========================================================== */
-
-.asistencia-trabajador {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 2px;
+.asistencias-panel .asistencias-filtros :is(.form-control,.form-select):focus {
+    border-color:#f89d52;
+    outline:0;
+    box-shadow:0 0 0 3px rgba(248,157,82,.18);
 }
-
-
-.asistencia-trabajador strong {
-    font-size: 13px;
+.asistencias-panel .asistencias-filtros__actions { grid-column:1/-1; justify-content:flex-end; }
+.asistencias-panel .asistencias-filtros__actions .button { min-height:40px; }
+.asistencias-panel .asistencias-filtros__actions .button--primary { background:#f89d52; border-color:#f89d52; color:#111; }
+.asistencias-panel .table-container { padding:0 14px 14px; overflow-x:auto; }
+.asistencias-panel .asistencias-table { width:100%; min-width:0; table-layout:auto; border-collapse:collapse; }
+.asistencias-panel .asistencias-table th { padding:13px 11px; background:#f3f0ec; color:#625b54; font-size:11px; text-transform:uppercase; letter-spacing:.035em; }
+.asistencias-panel .asistencias-table td { padding:14px 11px; border-bottom:1px solid #ebe4dc; font-size:12px; vertical-align:middle; }
+.asistencias-panel .asistencias-table tbody tr:hover { background:#fff9f1; }
+.asistencias-panel .asistencias-table th:nth-child(n+3):nth-child(-n+10),
+.asistencias-panel .asistencias-table td:nth-child(n+3):nth-child(-n+10) { display:none; }
+.asistencias-panel .asistencias-table .asistencia-trabajador strong { color:#251e19; font-size:13px; line-height:1.3; }
+.asistencias-panel .asistencias-table th:nth-child(1) { width:14%; }
+.asistencias-panel .asistencias-table th:nth-child(2) { width:37%; }
+.asistencias-panel .asistencias-table th:nth-child(11) { width:13%; }
+.asistencias-panel .asistencias-table th:nth-child(12) { width:12%; }
+.asistencias-panel .asistencias-table th:nth-child(13) { width:12%; }
+.asistencias-panel .asistencias-table th:nth-child(14) { width:12%; }
+.asistencias-panel .asistencia-detail-button {
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; min-height:38px; padding:8px 10px;
+    border:1px solid #f0d4bb; border-radius:9px;
+    background:#fff2e5; color:#87491f; font:inherit; font-size:12px; font-weight:700; white-space:nowrap; cursor:pointer;
 }
-
-
-.asistencia-trabajador span,
-.asistencia-trabajador small {
-    color: var(--text-muted);
-
-    font-size: 11px;
+.asistencias-panel .asistencia-detail-button:hover { background:#ffe7cf; border-color:#f89d52; }
+.asistencias-panel .asistencia-detail-button:focus-visible { outline:3px solid #f89d52; outline-offset:2px; }
+.asistencia-detail-dialog {
+    position:fixed; inset:0; box-sizing:border-box;
+    width:min(610px,calc(100vw - 28px)); max-width:610px;
+    max-height:min(88dvh,820px); margin:auto; padding:0;
+    overflow:auto; border:1px solid #ded5cb; border-radius:18px;
+    background:#fff; color:#1b1917; box-shadow:0 28px 70px rgba(0,0,0,.25);
 }
-
-.horario-programado {
-    display: flex;
-
-    align-items: center;
-
-    gap: 4px;
-
-    font-weight: 600;
-
-    font-variant-numeric: tabular-nums;
+.asistencia-detail-dialog:not([open]) { display:none; }
+.asistencia-detail-dialog::backdrop { background:rgba(12,11,10,.62); backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px); }
+.asistencia-detail-dialog__header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:20px; background:linear-gradient(120deg,#201813,#453126); color:#fff; }
+.asistencia-detail-dialog__header span { color:#ffba7c; font-size:10px; font-weight:800; letter-spacing:.1em; }
+.asistencia-detail-dialog__header h3 { margin:5px 0 0; color:#fff; font-size:18px; line-height:1.25; }
+.asistencia-detail-dialog__header button { flex:0 0 34px; width:34px; height:34px; border:1px solid rgba(255,255,255,.25); border-radius:9px; background:rgba(255,255,255,.11); color:white; font-size:24px; cursor:pointer; }
+.asistencia-detail-dialog__body { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding:20px; }
+.asistencia-detail-dialog__item { min-width:0; padding:11px; border:1px solid #eee5dc; border-radius:10px; background:#fcfaf8; }
+.asistencia-detail-dialog__item > span { display:block; margin-bottom:5px; color:#81756b; font-size:11px; font-weight:700; }
+.asistencia-detail-dialog__item > div { color:#28201c; font-size:13px; overflow-wrap:anywhere; }
+.asistencia-detail-dialog__item :is(.horario-programado,.hora-marcacion) { font-variant-numeric:tabular-nums; }
+@media (max-width:1200px) {
+    .asistencias-panel .asistencias-filtros { grid-template-columns:repeat(3,minmax(0,1fr)); }
 }
-
-.hora-marcacion {
-    font-variant-numeric: tabular-nums;
-}
-
-.sin-marcacion {
-    color: var(--text-soft);
-
-    font-size: 18px;
-}
-
-.tardanza-minutos {
-    display: inline-flex;
-
-    padding: 5px 8px;
-
-    border-radius: 7px;
-
-    background: var(--warning-light);
-
-    color: var(--warning);
-
-    font-size: 11px;
-
-    font-weight: 700;
-}
-
-.asistencia-observacion {
-    max-width: 190px;
-
-    margin-top: 5px;
-
-    color: var(--text-muted);
-
-    font-size: 10px;
-
-    line-height: 1.35;
-}
-
-.procesar-info {
-    margin-top: 10px;
-
-    padding: 14px;
-
-    background: var(--surface-secondary);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius-md);
-}
-
-.procesar-info strong {
-    display: block;
-
-    margin-bottom: 5px;
-
-    font-size: 12px;
-}
-
-
-.procesar-info p {
-    margin: 0;
-
-    color: var(--text-muted);
-
-    font-size: 11px;
-
-    line-height: 1.6;
-}
-
-
-/* ==========================================================
-   ESTADO VACÍO
-========================================================== */
-
-.table-empty {
-    padding: 45px !important;
-
-    text-align: center !important;
-}
-
-
-.empty-state {
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 5px;
-
-    color: var(--text-muted);
-}
-
-
-.empty-state strong {
-    color: var(--text);
-}
-
-
-/* ==========================================================
-   PAGINACIÓN
-========================================================== */
-
-.pagination-container {
-    width: 100%;
-
-    margin-top: 18px;
-}
-
-.pagination-container > nav {
-    width: 100%;
-}
-
-/* Laravel entrega dos variantes: móvil y escritorio. Sin Tailwind ambas
-   quedan visibles, por eso se controla su presentación desde esta página. */
-.pagination-container > nav > div:first-child {
-    display: none;
-}
-
-.pagination-container > nav > div:last-child {
-    display: flex;
-
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 16px;
-}
-
-.pagination-container > nav > div:last-child p {
-    margin: 0;
-
-    color: var(--text-muted);
-
-    font-size: 12px;
-    line-height: 1.4;
-}
-
-.pagination-container > nav > div:last-child p span {
-    color: var(--text);
-
-    font-weight: 700;
-}
-
-.pagination-container > nav > div:last-child > div:last-child > span {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 4px;
-}
-
-.pagination-container > nav > div:last-child > div:last-child > span > a,
-.pagination-container > nav > div:last-child > div:last-child > span > span > span {
-    min-width: 34px;
-    height: 34px;
-
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    box-sizing: border-box;
-
-    padding: 0 10px;
-
-    border: 1px solid var(--border);
-    border-radius: 8px;
-
-    background: var(--surface);
-    color: var(--text-muted);
-
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1;
-    text-decoration: none;
-
-    transition:
-        color var(--transition-fast),
-        background-color var(--transition-fast),
-        border-color var(--transition-fast),
-        box-shadow var(--transition-fast);
-}
-
-.pagination-container > nav > div:last-child > div:last-child > span > a:hover {
-    border-color: var(--primary);
-
-    background: var(--primary-light);
-    color: var(--primary);
-}
-
-.pagination-container > nav > div:last-child > div:last-child > span > a:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
-
-.pagination-container > nav > div:last-child > div:last-child > span > span[aria-current="page"] > span {
-    border-color: var(--primary);
-
-    background: var(--primary);
-    color: var(--text-inverse);
-
-    box-shadow: 0 3px 8px rgba(15, 118, 110, 0.18);
-}
-
-.pagination-container > nav > div:last-child > div:last-child > span > span[aria-disabled="true"] > span {
-    background: var(--surface-secondary);
-    color: var(--text-soft);
-
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.pagination-container svg {
-    width: 16px !important;
-    height: 16px !important;
-
-    display: block;
-
-    flex: 0 0 16px;
-}
-
-
-/* ==========================================================
-   RESPONSIVE
-========================================================== */
-
-@media (max-width: 1200px) {
-
-    .asistencias-filtros {
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+@media (max-width:750px) {
+    .asistencias-panel .panel__header { padding:13px; }
+    .asistencias-panel .asistencias-filtros { grid-template-columns:minmax(0,1fr); gap:10px; }
+    .asistencias-panel .asistencias-filtros__actions { grid-column:1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .asistencias-panel .table-container { padding:10px; overflow:visible; background:#f7f3ee; }
+    .asistencias-panel .asistencias-table { display:block; min-width:0; background:transparent; }
+    .asistencias-panel .asistencias-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+    .asistencias-panel .asistencias-table tbody { display:grid; gap:10px; }
+    .asistencias-panel .asistencias-table tbody tr:not(.asistencia-row),
+    .asistencias-panel .asistencias-table tbody tr:not(.asistencia-row) td { display:block; width:100%; }
+    .asistencias-panel .asistencias-table tr.asistencia-row {
+        display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+        align-content:start; gap:9px 10px; padding:13px;
+        border:1px solid #e5dcd2; border-radius:12px; background:#fff;
+        box-shadow:0 3px 12px rgba(28,25,23,.04);
     }
-
+    .asistencias-panel .asistencias-row > td { border:0; }
+    .asistencias-panel .asistencia-row > td { display:block; min-width:0; width:auto; padding:0; border:0; }
+    .asistencias-panel .asistencia-row > td:nth-child(n+3):nth-child(-n+10) { display:none; }
+    .asistencias-panel .asistencia-row > td:nth-child(2) { grid-column:1/-1; grid-row:1; }
+    .asistencias-panel .asistencia-row > td:nth-child(1) { grid-column:1; grid-row:2; color:#716a63; font-size:11px; }
+    .asistencias-panel .asistencia-row > td:nth-child(13) { grid-column:2; grid-row:2; text-align:right; }
+    .asistencias-panel .asistencia-row > td:nth-child(11) { grid-column:1; grid-row:3; }
+    .asistencias-panel .asistencia-row > td:nth-child(12) { grid-column:2; grid-row:3; text-align:right; }
+    .asistencias-panel .asistencia-row > td:nth-child(11)::before,
+    .asistencias-panel .asistencia-row > td:nth-child(12)::before { display:block; margin-bottom:3px; content:'Trabajado'; color:#81756b; font-size:10px; }
+    .asistencias-panel .asistencia-row > td:nth-child(12)::before { content:'Tardanza'; }
+    .asistencias-panel .asistencia-row > td:nth-child(14) { grid-column:1/-1; grid-row:4; padding-top:7px; border-top:1px solid #eee6dd; }
+    .asistencias-panel .asistencia-detail-button { min-height:35px; background:#f4f0eb; color:#312b25; }
+    .asistencias-panel .asistencia-trabajador strong { font-size:14px; }
+    .asistencia-detail-dialog__header { padding:17px; }
+    .asistencia-detail-dialog__body { gap:9px; padding:14px; }
 }
-
-
-@media (max-width: 750px) {
-
-    .asistencias-filtros {
-        grid-template-columns: 1fr;
-    }
-
-
-    .asistencias-filtros__actions {
-        grid-column: auto;
-    }
-
-    .pagination-container > nav > div:first-child {
-        display: flex;
-
-        align-items: center;
-        justify-content: space-between;
-
-        gap: 10px;
-    }
-
-    .pagination-container > nav > div:first-child > a,
-    .pagination-container > nav > div:first-child > span {
-        min-height: 36px;
-
-        display: inline-flex;
-
-        align-items: center;
-        justify-content: center;
-
-        padding: 0 14px;
-
-        border: 1px solid var(--border);
-        border-radius: 8px;
-
-        background: var(--surface);
-        color: var(--text-muted);
-
-        font-size: 12px;
-        font-weight: 700;
-        text-decoration: none;
-    }
-
-    .pagination-container > nav > div:first-child > a:hover {
-        border-color: var(--primary);
-
-        background: var(--primary-light);
-        color: var(--primary);
-    }
-
-    .pagination-container > nav > div:first-child > span {
-        background: var(--surface-secondary);
-        color: var(--text-soft);
-
-        opacity: 0.7;
-    }
-
-    .pagination-container > nav > div:last-child {
-        display: none;
-    }
-
-}
+@media (max-width:390px) { .asistencia-detail-dialog__body { grid-template-columns:minmax(0,1fr); } }
