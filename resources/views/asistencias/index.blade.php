@@ -26,7 +26,7 @@
 
         @if ($puedeProcesar)
             <button type="button" class="button button--primary" data-modal-open="modalProcesarAsistencia">
-                Reprocesar día
+                <x-ui-icon name="sync" /> <span>Reprocesar día</span>
             </button>
         @endif
     </div>
@@ -85,8 +85,8 @@
                 </div>
 
                 <div class="asistencias-filtros__actions">
-                    <button type="submit" class="button button--primary">Filtrar</button>
-                    <a href="{{ route('asistencias.index') }}" class="button button--secondary">Limpiar</a>
+                    <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>
+                    <a href="{{ route('asistencias.index') }}" class="button button--secondary"><x-ui-icon name="reset" /> Restablecer</a>
                 </div>
             </form>
         </div>
@@ -115,10 +115,10 @@
                 <tbody>
                     @forelse($asistencias as $asistencia)
                         <tr class="asistencia-row">
-                            <td>
+                            <td data-label="Fecha">
                                 <strong>{{ $asistencia->fecha?->format('d/m/Y') }}</strong>
                             </td>
-                            <td>
+                            <td data-label="Trabajador">
                                 <div class="asistencia-trabajador">
                                     <strong>{{ $asistencia->trabajador?->nombres }}
                                         {{ $asistencia->trabajador?->apellidos }}</strong>
@@ -126,8 +126,8 @@
                                     <small>{{ $asistencia->trabajador?->area?->nombre ?? '-' }}</small>
                                 </div>
                             </td>
-                            <td>{{ $asistencia->horario?->nombre ?? '-' }}</td>
-                            <td>
+                            <td data-label="Horario">{{ $asistencia->horario?->nombre ?? '-' }}</td>
+                            <td data-label="Control">
                                 @if ($asistencia->tipo_control_aplicado === 'OBLIGATORIO')
                                     <span class="badge badge--primary">Obligatorio</span>
                                 @elseif($asistencia->tipo_control_aplicado === 'REFERENCIAL')
@@ -136,7 +136,7 @@
                                     <span class="table-secondary-text">-</span>
                                 @endif
                             </td>
-                            <td>
+                            <td data-label="Origen">
                                 @switch($asistencia->origen_marcacion)
                                     @case('BIOMETRICO')
                                         <span class="badge badge--success">Biométrico</span>
@@ -154,7 +154,7 @@
                                         <span class="table-secondary-text">Sin marcación</span>
                                 @endswitch
                             </td>
-                            <td>
+                            <td data-label="Programado">
                                 @if ($asistencia->hora_programada_entrada)
                                     <div class="horario-programado">
                                         <span>{{ substr($asistencia->hora_programada_entrada, 0, 5) }}</span>
@@ -173,14 +173,14 @@
                                     -
                                 @endif
                             </td>
-                            <td>
+                            <td data-label="Entrada">
                                 @if ($asistencia->hora_entrada)
                                     <strong class="hora-marcacion">{{ substr($asistencia->hora_entrada, 0, 5) }}</strong>
                                 @else
                                     <span class="sin-marcacion">—</span>
                                 @endif
                             </td>
-                            <td>
+                            <td data-label="Salida a refrigerio">
                                 @if ($asistencia->hora_salida_refrigerio)
                                     <strong
                                         class="hora-marcacion">{{ substr($asistencia->hora_salida_refrigerio, 0, 5) }}</strong>
@@ -188,7 +188,7 @@
                                     <span class="sin-marcacion">—</span>
                                 @endif
                             </td>
-                            <td>
+                            <td data-label="Retorno">
                                 @if ($asistencia->hora_retorno_refrigerio)
                                     <strong
                                         class="hora-marcacion">{{ substr($asistencia->hora_retorno_refrigerio, 0, 5) }}</strong>
@@ -199,7 +199,7 @@
                                     <span class="sin-marcacion">—</span>
                                 @endif
                             </td>
-                            <td>
+                            <td data-label="Salida final">
                                 @if ($asistencia->hora_salida)
                                     <strong class="hora-marcacion">{{ substr($asistencia->hora_salida, 0, 5) }}</strong>
                                     @if ($asistencia->salida_estimada)
@@ -209,7 +209,7 @@
                                     <span class="sin-marcacion">—</span>
                                 @endif
                             </td>
-                            <td>
+                            <td data-label="Trabajado">
                                 @php
                                     $horas = intdiv($asistencia->minutos_trabajados, 60);
                                     $minutos = $asistencia->minutos_trabajados % 60;
@@ -220,14 +220,14 @@
                                     -
                                 @endif
                             </td>
-                            <td>
+                            <td data-label="Tardanza">
                                 @if ($asistencia->minutos_tardanza > 0)
                                     <span class="tardanza-minutos">{{ $asistencia->minutos_tardanza }} min</span>
                                 @else
                                     <span class="table-secondary-text">0 min</span>
                                 @endif
                             </td>
-                            <td>
+                            <td data-label="Estado">
                                 @switch($asistencia->estado)
                                     @case('PRESENTE')
                                         <span class="badge badge--success">Presente</span>
@@ -265,8 +265,10 @@
                                     <div class="asistencia-observacion">{{ $asistencia->observacion }}</div>
                                 @endif
                             </td>
-                            <td class="asistencia-action-cell">
-                                <button type="button" class="asistencia-detail-button" data-asistencia-detail>Ver detalle <span aria-hidden="true">⌄</span></button>
+                            <td class="asistencia-action-cell" data-label="Detalle">
+                                <button type="button" class="icon-button" data-asistencia-detail
+                                    aria-label="Ver detalle de asistencia de {{ $asistencia->trabajador?->nombres }} {{ $asistencia->trabajador?->apellidos }}"
+                                    data-tooltip="Ver detalle"><x-ui-icon name="eye" /></button>
                             </td>
                         </tr>
                         @empty

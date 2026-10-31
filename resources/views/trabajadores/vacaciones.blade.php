@@ -49,7 +49,7 @@
         @unless ($esAdministrador)
             <div class="page-header__actions">
                 <button type="button" class="button button--primary" data-modal-open="modalCrearVacaciones">
-                    + Solicitar vacaciones
+                    <x-ui-icon name="plus" /> Solicitar vacaciones
                 </button>
             </div>
         @endunless
@@ -91,8 +91,8 @@
             </div>
 
             <div class="vacaciones-filtros__actions">
-                <button type="submit" class="button button--secondary">Filtrar</button>
-                <a href="{{ route('vacaciones.index') }}" class="button button--secondary">Limpiar</a>
+                <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>
+                <a href="{{ route('vacaciones.index') }}" class="button button--secondary"><x-ui-icon name="reset" /> Restablecer</a>
             </div>
         </form>
     </section>

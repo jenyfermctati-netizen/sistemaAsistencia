@@ -44,7 +44,7 @@
 
         <div class="page-header__actions">
             <button type="button" class="button button--primary" data-modal-open="modalCrearAsignacion">
-                + Nueva asignación
+                <x-ui-icon name="plus" /> Nueva asignación
             </button>
         </div>
     </div>
@@ -87,8 +87,8 @@
             </div>
 
             <div class="campo-filtros__actions">
-                <button type="submit" class="button button--secondary">Filtrar</button>
-                <a href="{{ route('asignaciones-campo.index') }}" class="button button--secondary">Limpiar</a>
+                <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>
+                <a href="{{ route('asignaciones-campo.index') }}" class="button button--secondary"><x-ui-icon name="reset" /> Restablecer</a>
             </div>
         </form>
     </section>

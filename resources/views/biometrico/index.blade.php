@@ -1,12 +1,14 @@
 @extends('layouts.app')
 
 @section('title', 'Dispositivo biométrico')
+@section('page-title', 'Biométrico')
+@section('page-subtitle', 'Conectividad y sincronización del dispositivo')
 
 @section('content')
     <div class="biometrico-page">
         <div class="page-header">
             <div>
-                <h1>Dispositivo biométrico</h1>
+                <h2 class="page-header__title">Dispositivo biométrico</h2>
                 <p>Estado de comunicación y sincronización del sistema de control de asistencia.</p>
             </div>
         </div>
@@ -84,14 +86,14 @@
                         <form method="POST" action="{{ route('biometrico.usuarios.consultar', $dispositivo) }}">
                             @csrf
                             <button class="button" type="submit" {{ !$conectado ? 'disabled' : '' }}>
-                                Consultar SenseFace
+                                <x-ui-icon name="sync" /> Consultar SenseFace
                             </button>
                         </form>
 
                         <form method="POST" action="{{ route('biometrico.usuarios.reconciliar', $dispositivo) }}">
                             @csrf
                             <button class="button button--secondary" type="submit">
-                                Comparar trabajadores
+                                <x-ui-icon name="users" /> Comparar trabajadores
                             </button>
                         </form>
                         @if($pendientes > 0)
@@ -105,7 +107,7 @@
             type="submit"
             {{ !$conectado ? 'disabled' : '' }}
         >
-            Sincronizar pendientes ({{ $pendientes }})
+            <x-ui-icon name="sync" /> Sincronizar pendientes ({{ $pendientes }})
         </button>
     </form>
 @endif
@@ -145,11 +147,11 @@
                                 @endphp
 
                                 <tr>
-                                    <td>{{ $usuario->pin }}</td>
+                                    <td data-label="PIN">{{ $usuario->pin }}</td>
 
-                                    <td>{{ $usuario->nombre_dispositivo ?: '—' }}</td>
+                                    <td data-label="Usuario en SenseFace">{{ $usuario->nombre_dispositivo ?: '—' }}</td>
 
-                                    <td>
+                                    <td data-label="Trabajador en sistema">
                                         @if($usuario->trabajador)
                                             {{ $usuario->trabajador->nombres }} {{ $usuario->trabajador->apellidos }}
                                         @else
@@ -157,17 +159,17 @@
                                         @endif
                                     </td>
 
-                                    <td>
+                                    <td data-label="Estado">
                                         <span class="sync-badge {{ $claseEstado }}">
                                             {{ str_replace('_', ' ', $usuario->estado) }}
                                         </span>
                                     </td>
 
-                                    <td>
+                                    <td data-label="Última verificación">
                                         {{ $usuario->ultima_verificacion?->format('d/m/Y H:i:s') ?? '—' }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Acción">
                                         @if($usuario->estado === 'PENDIENTE' && $usuario->trabajador)
                                             <form method="POST"
                                                 action="{{ route('biometrico.usuarios.sincronizar', [$dispositivo, $usuario]) }}"
@@ -177,7 +179,7 @@
                                                 <button type="submit"
                                                     class="button button--sync"
                                                     {{ !$conectado ? 'disabled' : '' }}>
-                                                    Sincronizar
+                                                    <x-ui-icon name="sync" /> Sincronizar
                                                 </button>
                                             </form>
                                         @elseif($usuario->estado === 'SINCRONIZADO')
@@ -212,8 +214,9 @@
             </section>
         @empty
             <div class="panel empty-state">
+                <span class="empty-state__icon"><x-ui-icon name="fingerprint" /></span>
                 <h3>No se ha detectado ningún dispositivo</h3>
-                <p>El dispositivo aparecerá automáticamente cuando se comunique nuevamente con el servidor.</p>
+                <p>Comprueba la red y la alimentación del SenseFace. Aparecerá aquí cuando vuelva a comunicarse con el servidor.</p>
             </div>
         @endforelse
 

@@ -18,7 +18,7 @@
         </div>
 
         <a href="{{ route('marcaciones.manual') }}" class="button button--primary">
-            + Registrar asistencia manual
+            <x-ui-icon name="plus" /> <span>Registrar asistencia manual</span>
         </a>
     </header>
 
@@ -101,8 +101,8 @@
                 @endif
 
                 <div class="marcaciones-filtros__actions">
-                    <button type="submit" class="button button--primary">Filtrar</button>
-                    <a href="{{ route('marcaciones.index') }}" class="button button--secondary">Limpiar</a>
+                    <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>
+                    <a href="{{ route('marcaciones.index') }}" class="button button--secondary"><x-ui-icon name="reset" /> Restablecer</a>
                 </div>
             </form>
 
@@ -184,7 +184,7 @@
                                 <td class="marcacion-cell--acciones">
                                     <details class="marcacion-detalle" data-mc-details="marcacion-{{ $marcacion->getKey() }}">
                                         <summary class="marcacion-detalle__toggle">
-                                            <span>Ver detalle</span><span class="mc-chevron" aria-hidden="true"></span>
+                                            <x-ui-icon name="eye" /><span>Ver detalle</span><span class="mc-chevron" aria-hidden="true"></span>
                                         </summary>
                                         <div class="marcacion-detalle__panel">
                                             <div class="marcacion-detalle__heading">Detalle de la marcación</div>

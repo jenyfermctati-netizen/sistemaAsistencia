@@ -31,7 +31,7 @@
             <button type="button"
                 class="button button--primary"
                 data-modal-open="modalCrearSolicitud">
-                + Nueva solicitud
+                <x-ui-icon name="plus" /> Nueva solicitud
             </button>
         @endunless
     </header>
@@ -109,12 +109,12 @@
 
             <div class="solicitudes-filtros__actions">
                 <button type="submit" class="button button--primary">
-                    Filtrar
+                    <x-ui-icon name="filter" /> Filtrar
                 </button>
 
                 <a href="{{ route('solicitudes.index') }}"
                     class="button button--secondary">
-                    Limpiar
+                    <x-ui-icon name="reset" /> Restablecer
                 </a>
             </div>
 
@@ -317,8 +317,9 @@
                                     <button type="button"
                                         class="solicitud-open"
                                         data-ver-solicitud-button
-                                        aria-label="Ver detalle">
-                                        ›
+                                        aria-label="Ver solicitud de {{ $solicitud->trabajador?->nombres }} {{ $solicitud->trabajador?->apellidos }}"
+                                        data-tooltip="Ver solicitud">
+                                        <x-ui-icon name="chevron-right" />
                                     </button>
 
                                 </td>

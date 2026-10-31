@@ -17,11 +17,12 @@
         </div>
 
         <button type="button" class="button button--primary" data-modal-open="modalCrearArea">
-            + Nueva área
+            <x-ui-icon name="plus" />
+            <span>Nueva área</span>
         </button>
     </div>
 
-    <section class="panel">
+    <section class="panel areas-panel">
         <div class="panel__header">
             <form method="GET" action="{{ route('areas.index') }}" class="areas-filtros">
                 <label class="filter-field">
@@ -40,8 +41,8 @@
                 </label>
 
                 <div class="filter-actions">
-                    <button type="submit" class="button button--secondary">Filtrar</button>
-                    <a href="{{ route('areas.index') }}" class="button button--secondary">Limpiar</a>
+                    <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>
+                    <a href="{{ route('areas.index') }}" class="button button--secondary"><x-ui-icon name="reset" /> Restablecer</a>
                 </div>
             </form>
         </div>
@@ -60,40 +61,51 @@
                 <tbody>
                     @forelse($areas as $area)
                         <tr>
-                            <td>
+                            <td data-label="Área">
                                 <strong>{{ $area->nombre }}</strong>
                             </td>
-                            <td>{{ $area->descripcion ?? '-' }}</td>
-                            <td>{{ $area->trabajadores_count }}</td>
-                            <td>
+                            <td data-label="Descripción">{{ $area->descripcion ?? '-' }}</td>
+                            <td data-label="Trabajadores">{{ $area->trabajadores_count }}</td>
+                            <td data-label="Estado">
                                 @if ($area->estado)
                                     <span class="badge badge--success">Activa</span>
                                 @else
                                     <span class="badge badge--danger">Inactiva</span>
                                 @endif
                             </td>
-                            <td>
+                            <td data-label="Acciones">
                                 <div class="table-actions">
-                                    <button type="button" class="button button--secondary button--small" data-editar-area
+                                    <button type="button" class="icon-button" data-editar-area
+                                        aria-label="Editar área {{ $area->nombre }}" data-tooltip="Editar"
                                         data-update-url="{{ route('areas.update', $area) }}"
                                         data-nombre="{{ $area->nombre }}" data-descripcion="{{ $area->descripcion }}"
                                         data-estado="{{ $area->estado ? 1 : 0 }}">
-                                        Editar
+                                        <x-ui-icon name="edit" />
                                     </button>
 
                                     <button type="button"
-                                        class="button button--small {{ $area->estado ? 'button--danger' : 'button--primary' }}"
+                                        class="icon-button {{ $area->estado ? 'icon-button--danger' : '' }}"
+                                        aria-label="{{ $area->estado ? 'Desactivar' : 'Activar' }} área {{ $area->nombre }}"
+                                        data-tooltip="{{ $area->estado ? 'Desactivar' : 'Activar' }}"
                                         data-cambiar-estado-area data-nombre="{{ $area->nombre }}"
                                         data-estado="{{ $area->estado ? 1 : 0 }}"
                                         data-url="{{ route('areas.estado', $area) }}">
-                                        {{ $area->estado ? 'Desactivar' : 'Activar' }}
+                                        <x-ui-icon name="power" />
                                     </button>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="table-empty">No se encontraron áreas.</td>
+                            <td colspan="5" class="table-empty">
+                                <div class="empty-state">
+                                    <strong>No se encontraron áreas</strong>
+                                    <span>Prueba con otros filtros o registra una nueva área.</span>
+                                    <button type="button" class="button button--primary" data-modal-open="modalCrearArea">
+                                        <x-ui-icon name="plus" /> Nueva área
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

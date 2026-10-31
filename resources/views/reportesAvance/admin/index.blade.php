@@ -24,8 +24,7 @@
 
         @if($puedeGestionar)
             <button type="button" class="ra-btn ra-btn--primary" data-modal-open="modalCrearPendienteArea">
-                <span aria-hidden="true">＋</span>
-                Asignar pendiente
+                <x-ui-icon name="plus" /> Asignar pendiente
             </button>
         @endif
     </header>
@@ -123,7 +122,7 @@
 
                 <div class="ra-filters__actions">
                     <button type="submit" class="ra-btn ra-btn--primary">
-                        Filtrar
+                        <x-ui-icon name="filter" /> Filtrar
                     </button>
 
                     <a href="{{ route('reportesAvance.index', array_merge($parametrosVista, ['pestana' => 'avances'])) }}"
@@ -480,12 +479,12 @@
                 <div class="ra-filters__actions">
 
                     <button type="submit" class="ra-btn ra-btn--primary">
-                        Filtrar
+                        <x-ui-icon name="filter" /> Filtrar
                     </button>
 
                     <a href="{{ route('reportesAvance.index', array_merge($parametrosVista, ['pestana' => 'pendientes'])) }}"
                         class="ra-btn ra-btn--outline">
-                        Limpiar
+                        <x-ui-icon name="reset" /> Restablecer
                     </a>
 
                 </div>

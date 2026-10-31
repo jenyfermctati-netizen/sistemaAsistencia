@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formHorarioGeneral');
     const selectorFormato = document.getElementById('formatoHora');
     const indicadorFormato = document.getElementById('formatoIndicador');
+    const copiarLunes = document.getElementById('copiarLunes');
+    const estadoCopia = document.getElementById('horarioCopyStatus');
+    const vistaMovil = window.matchMedia('(max-width: 700px)');
 
     if (!form || !selectorFormato) {
         return;
@@ -196,6 +199,85 @@ document.addEventListener('DOMContentLoaded', function () {
 
     selectorFormato.addEventListener('change', aplicarFormato);
 
+    copiarLunes?.addEventListener('click', function () {
+        const lunes = form.querySelector('.dia-editor[data-dia="1"]');
+
+        if (!lunes) {
+            return;
+        }
+
+        form.querySelectorAll('.dia-editor').forEach(function (destino) {
+            const numeroDia = Number(destino.dataset.dia);
+
+            if (numeroDia < 2 || numeroDia > 5) {
+                return;
+            }
+
+            destino.querySelector('.dia-laborable').checked = lunes.querySelector('.dia-laborable').checked;
+            destino.querySelector('[data-tipo-jornada]').value = lunes.querySelector('[data-tipo-jornada]').value;
+            destino.querySelector('.tolerancia').value = lunes.querySelector('.tolerancia').value;
+
+            lunes.querySelectorAll('[data-hora-editor]').forEach(function (origenHora) {
+                const tipo = origenHora.dataset.horaTipo;
+                const destinoHora = destino.querySelector(`[data-hora-editor][data-hora-tipo="${tipo}"]`);
+
+                if (!destinoHora) {
+                    return;
+                }
+
+                destinoHora.querySelector('[data-hora-normalizada]').value =
+                    origenHora.querySelector('[data-hora-normalizada]').value;
+                actualizarVistasHora(destinoHora);
+            });
+
+            configurarDia(destino);
+        });
+
+        if (estadoCopia) {
+            estadoCopia.textContent = 'El horario del lunes se copió de martes a viernes.';
+        }
+
+        const textoOriginal = copiarLunes.innerHTML;
+        copiarLunes.textContent = 'Horario copiado';
+        window.setTimeout(function () {
+            copiarLunes.innerHTML = textoOriginal;
+        }, 1800);
+    });
+
+    function prepararDiasMovil() {
+        form.querySelectorAll('.dia-editor').forEach(function (fila, indice) {
+            let boton = fila.querySelector('.ux-day-toggle');
+            const nombre = fila.querySelector('.dia-editor__nombre > span')?.textContent?.trim() || 'día';
+
+            if (!boton) {
+                boton = document.createElement('button');
+                boton.type = 'button';
+                boton.className = 'ux-day-toggle';
+                boton.innerHTML = '<svg class="ui-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+                fila.querySelector('.dia-editor__config')?.appendChild(boton);
+                boton.addEventListener('click', function () {
+                    const colapsado = fila.classList.toggle('is-collapsed');
+                    boton.setAttribute('aria-expanded', String(!colapsado));
+                    boton.setAttribute('aria-label', `${colapsado ? 'Mostrar' : 'Ocultar'} configuración de ${nombre}`);
+                });
+            }
+
+            fila.classList.toggle('ux-day-collapsible', vistaMovil.matches);
+
+            if (vistaMovil.matches) {
+                const colapsado = indice !== 0;
+                fila.classList.toggle('is-collapsed', colapsado);
+                boton.setAttribute('aria-expanded', String(!colapsado));
+                boton.setAttribute('aria-label', `${colapsado ? 'Mostrar' : 'Ocultar'} configuración de ${nombre}`);
+            } else {
+                fila.classList.remove('is-collapsed');
+                boton.setAttribute('aria-expanded', 'true');
+            }
+        });
+    }
+
+    vistaMovil.addEventListener?.('change', prepararDiasMovil);
+
     form.addEventListener('submit', function (event) {
         let valido = true;
 
@@ -228,4 +310,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     aplicarFormato();
+    prepararDiasMovil();
 });

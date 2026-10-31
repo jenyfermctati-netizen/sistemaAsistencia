@@ -30,6 +30,7 @@
 
             <div class="profile-menu" data-profile-menu>
                 <button type="button" class="profile-menu__trigger" data-profile-menu-trigger
+                    aria-label="Abrir menú de {{ $usuarioNavbar->name }}"
                     aria-expanded="false" aria-controls="profileMenuPanel">
                     <span class="navbar__user-info">
                         <strong>{{ $usuarioNavbar->name }}</strong>
@@ -77,14 +78,14 @@
 
                     <div class="profile-menu__actions">
                         <a href="{{ route('password.edit') }}" class="profile-menu__action">
-                            <span class="profile-menu__action-icon" aria-hidden="true">⚿</span>
+                            <span class="profile-menu__action-icon" aria-hidden="true"><x-ui-icon name="lock" /></span>
                             <span>Cambiar contraseña</span>
                         </a>
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="profile-menu__action profile-menu__action--logout">
-                                <span class="profile-menu__action-icon" aria-hidden="true">↪</span>
+                                <span class="profile-menu__action-icon" aria-hidden="true"><x-ui-icon name="logout" /></span>
                                 <span>Cerrar sesión</span>
                             </button>
                         </form>

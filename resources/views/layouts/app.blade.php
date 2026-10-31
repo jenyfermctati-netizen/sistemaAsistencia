@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ asset('css/ui-modern.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme-itrafic.css') }}">
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/ux-system.css') }}">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Ir al contenido principal</a>
@@ -30,6 +31,7 @@
     <script src="{{ asset('js/modal.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/live-forms.js') }}"></script>
+    <script src="{{ asset('js/ux-system.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

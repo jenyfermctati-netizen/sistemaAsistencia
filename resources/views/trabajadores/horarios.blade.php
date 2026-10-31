@@ -33,7 +33,7 @@
 
         <div class="page-header__actions">
             <a href="{{ route('trabajadores.index') }}" class="button button--secondary">
-                ← Trabajadores
+                <x-ui-icon name="arrow-left" /> Trabajadores
             </a>
         </div>
     </div>
@@ -94,13 +94,13 @@
                 </div>
             </div>
 
-            <div class="form-help-box">
-                <strong>Un solo horario para toda la empresa.</strong>
-                Al guardar, esta configuración queda vinculada automáticamente a cada trabajador activo. El personal
-                contratado registra entrada, salida a refrigerio, retorno y salida final. El personal con control
-                referencial puede registrar un solo turno o mañana y tarde; el sistema interpreta cada marca según la
-                hora configurada. Cada día puede establecerse como jornada completa o media jornada.
-            </div>
+            <details class="form-help-box horario-help">
+                <summary>¿Cómo funciona el horario general?</summary>
+                <p><strong>Un solo horario para toda la empresa.</strong> Al guardar, esta configuración queda vinculada
+                    automáticamente a cada trabajador activo. El personal contratado registra entrada, salida a
+                    refrigerio, retorno y salida final. El personal con control referencial puede registrar un solo
+                    turno o mañana y tarde; el sistema interpreta cada marca según la hora configurada.</p>
+            </details>
 
             <div class="form-section">
                 <div class="form-section__heading">
@@ -108,7 +108,13 @@
                         <h3 class="form-section__title">Configuración semanal</h3>
                         <p class="table-secondary-text">Elige jornada completa o media jornada para cada día.</p>
                     </div>
-                    <span class="formato-indicador" id="formatoIndicador"></span>
+                    <div class="horario-bulk-actions">
+                        <span class="formato-indicador" id="formatoIndicador"></span>
+                        <button type="button" class="button button--secondary button--small" id="copiarLunes">
+                            <x-ui-icon name="sync" /> Copiar lunes a mar–vie
+                        </button>
+                        <span class="sr-only" id="horarioCopyStatus" role="status" aria-live="polite"></span>
+                    </div>
                 </div>
 
                 <div class="dias-editor">

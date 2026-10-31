@@ -24,11 +24,11 @@
         <div class="dashboard-report__actions">
             <a class="button button--secondary button--small"
                 href="{{ route('dashboard.reporteControl.pdf', $filtrosExportacion) }}">
-                Descargar PDF
+                <x-ui-icon name="download" /> Descargar PDF
             </a>
             <a class="button button--primary button--small"
                 href="{{ route('dashboard.reporteControl.excel', $filtrosExportacion) }}">
-                Descargar Excel
+                <x-ui-icon name="download" /> Descargar Excel
             </a>
         </div>
     </div>

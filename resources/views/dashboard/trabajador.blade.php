@@ -46,21 +46,25 @@
 
     <section class="dashboard-metrics" aria-label="Tu resumen mensual">
         <article class="dashboard-metric dashboard-metric--petrol">
+            <span class="dashboard-metric__icon"><x-ui-icon name="calendar" /></span>
             <span class="dashboard-metric__label">Días registrados</span>
             <strong class="dashboard-metric__value">{{ $metrics['presentes'] }}</strong>
             <span class="dashboard-metric__caption">presente, tardanza o campo</span>
         </article>
         <article class="dashboard-metric dashboard-metric--blue">
+            <span class="dashboard-metric__icon"><x-ui-icon name="clock" /></span>
             <span class="dashboard-metric__label">Horas del mes</span>
             <strong class="dashboard-metric__value dashboard-metric__value--compact">{{ $metrics['horas'] }}</strong>
             <span class="dashboard-metric__caption">tiempo procesado</span>
         </article>
         <article class="dashboard-metric dashboard-metric--sand">
+            <span class="dashboard-metric__icon"><x-ui-icon name="alert" /></span>
             <span class="dashboard-metric__label">Tardanzas</span>
             <strong class="dashboard-metric__value">{{ $metrics['tardanzas'] }}</strong>
             <span class="dashboard-metric__caption">durante este mes</span>
         </article>
         <article class="dashboard-metric dashboard-metric--graphite">
+            <span class="dashboard-metric__icon"><x-ui-icon name="report" /></span>
             <span class="dashboard-metric__label">Incidencias</span>
             <strong class="dashboard-metric__value">{{ $metrics['incidencias'] }}</strong>
             <span class="dashboard-metric__caption">faltas o sin registro</span>

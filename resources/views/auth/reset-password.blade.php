@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/pages/login.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme-natural.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme-itrafic.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/ux-system.css') }}">
 </head>
 
 <body class="guest">

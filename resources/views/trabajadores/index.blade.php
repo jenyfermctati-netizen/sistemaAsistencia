@@ -20,15 +20,15 @@
         <div class="page-header__actions">
 
             <a href="{{ route('reportesAvance.index') }}" class="button button--secondary">
-                Reportes de avance
+                <x-ui-icon name="report" /> <span>Reportes de avance</span>
             </a>
 
             <a href="{{ route('trabajadores.horarios') }}" class="button button--secondary">
-                Horarios
+                <x-ui-icon name="clock" /> <span>Horario general</span>
             </a>
 
             <button type="button" class="button button--primary" data-modal-open="modalCrearTrabajador">
-                + Nuevo trabajador
+                <x-ui-icon name="plus" /> <span>Nuevo trabajador</span>
             </button>
 
         </div>
@@ -76,8 +76,8 @@
                 </label>
 
                 <div class="filter-actions">
-                    <button type="submit" class="button button--primary">Filtrar</button>
-                    <a href="{{ route('trabajadores.index') }}" class="button button--secondary">Limpiar</a>
+                    <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>
+                    <a href="{{ route('trabajadores.index') }}" class="button button--secondary"><x-ui-icon name="reset" /> Restablecer</a>
                 </div>
             </form>
         </div>
@@ -135,7 +135,11 @@
                                 @endif
                             </td>
                             <td class="trabajador-actions-cell tw-acciones" data-label="Acciones">
-                                <button type="button" class="tw-detalle-trigger" data-tw-modal-open>Ver detalle <span aria-hidden="true">⌄</span></button>
+                                <button type="button" class="icon-button" data-tw-modal-open
+                                    aria-label="Ver detalle de {{ $trabajador->nombres }} {{ $trabajador->apellidos }}"
+                                    data-tooltip="Ver detalle">
+                                    <x-ui-icon name="eye" />
+                                </button>
                                 <dialog class="tw-modal" aria-label="Detalle del trabajador">
                                     <div class="tw-modal__header">
                                         <div>

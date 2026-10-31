@@ -104,6 +104,13 @@ document.addEventListener(
                 String(isOpen)
             );
 
+            const profileName = profileMenuTrigger.querySelector('.navbar__user-info strong')?.textContent?.trim()
+                || 'usuario';
+            profileMenuTrigger.setAttribute(
+                'aria-label',
+                `${isOpen ? 'Cerrar' : 'Abrir'} menú de ${profileName}`
+            );
+
             profileMenuPanel.hidden = !isOpen;
 
             profileMenu.classList.toggle(

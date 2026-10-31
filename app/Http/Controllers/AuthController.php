@@ -39,7 +39,7 @@ class AuthController extends Controller
             $usuario->save();
 
             return redirect()
-                ->intended(route('reportesAvance.index'));
+                ->intended(route('dashboard'));
         }
 
         return back()

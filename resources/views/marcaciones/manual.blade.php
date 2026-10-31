@@ -13,7 +13,7 @@
 
     <header class="marcaciones-header">
         <div>
-            <a href="{{ route('marcaciones.index') }}" class="marcaciones-back">← Volver a marcaciones</a>
+            <a href="{{ route('marcaciones.index') }}" class="marcaciones-back"><x-ui-icon name="arrow-left" /> Volver a marcaciones</a>
             <h2>Registrar asistencia manual</h2>
             <p>La fecha y hora se tomarán automáticamente al momento de marcar la asistencia.</p>
         </div>

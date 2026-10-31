@@ -38,8 +38,7 @@
                     <button type="button"
                         class="button button--primary"
                         data-modal-open="modalAgregarAvance">
-                        <span class="button__icon">+</span>
-                        Agregar avance
+                        <x-ui-icon name="plus" /> Agregar avance
                     </button>
                 @endif
             </div>
@@ -145,7 +144,7 @@
                     <button type="button"
                         class="button button--primary"
                         data-modal-open="modalAgregarAvance">
-                        + Agregar avance
+                        <x-ui-icon name="plus" /> Agregar avance
                     </button>
                 </div>
             @else
@@ -217,10 +216,10 @@
                 </label>
 
                 <div class="ra-history-filters__actions">
-                    <button type="submit" class="button button--primary">Filtrar</button>
+                    <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>
                     <a href="{{ route('reportesAvance.index', ['pestana' => 'avances']) }}"
                         class="button button--secondary">
-                        Limpiar
+                        <x-ui-icon name="reset" /> Restablecer
                     </a>
                 </div>
             </form>

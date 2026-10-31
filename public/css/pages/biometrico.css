@@ -297,6 +297,44 @@
     .biometric-sync__actions .button {
         width: 100%;
     }
+
+    .biometric-sync .table thead {
+        display: none;
+    }
+
+    .biometric-sync .table,
+    .biometric-sync .table tbody,
+    .biometric-sync .table tr,
+    .biometric-sync .table td {
+        display: block;
+        width: 100%;
+    }
+
+    .biometric-sync .table tr {
+        margin-bottom: 12px;
+        padding: 6px 12px;
+        border: 1px solid #dce7ea;
+        border-radius: 14px;
+        background: #fff;
+    }
+
+    .biometric-sync .table td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 10px 2px;
+        white-space: normal;
+    }
+
+    .biometric-sync .table td[data-label]::before {
+        color: #60747c;
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
 }
 
 .button--sync-all {

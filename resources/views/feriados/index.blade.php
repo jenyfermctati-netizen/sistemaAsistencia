@@ -26,19 +26,21 @@
                         min="2020" max="2100" required>
                 </div>
 
-                <button type="submit" class="button button--secondary">
-                    Sincronizar nacionales
+                    <button type="submit" class="button button--secondary">
+                        <x-ui-icon name="sync" />
+                        <span>Sincronizar nacionales</span>
                 </button>
             </form>
 
-            <button type="button" class="button button--primary" data-modal-open="modalCrearFeriado">
-                + Nuevo feriado
+                <button type="button" class="button button--primary" data-modal-open="modalCrearFeriado">
+                    <x-ui-icon name="plus" />
+                    <span>Nuevo feriado</span>
             </button>
         </div>
     </div>
 
     {{-- FILTROS --}}
-    <section class="panel">
+    <section class="panel feriados-panel">
         <div class="panel__header">
             <form method="GET" action="{{ route('feriados.index') }}" class="feriados-filtros">
                 <label class="filter-field">
@@ -87,8 +89,8 @@
                 </label>
 
                 <div class="filter-actions">
-                    <button type="submit" class="button button--secondary">Filtrar</button>
-                    <a href="{{ route('feriados.index') }}" class="button button--secondary">Limpiar</a>
+                    <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>
+                    <a href="{{ route('feriados.index') }}" class="button button--secondary"><x-ui-icon name="reset" /> Restablecer</a>
                 </div>
             </form>
         </div>
@@ -110,24 +112,24 @@
                 <tbody>
                     @forelse($feriados as $feriado)
                         <tr>
-                            <td>
+                            <td data-label="Fecha">
                                 <div class="feriado-fecha">
                                     <strong>{{ $feriado->fecha?->format('d') }}</strong>
-                                    <span>{{ $feriado->fecha?->translatedFormat('M Y') }}</span>
+                                    <span>{{ $feriado->fecha?->locale('es')->translatedFormat('M Y') }}</span>
                                 </div>
                             </td>
 
-                            <td>
+                            <td data-label="Nombre">
                                 <strong>{{ $feriado->nombre }}</strong>
                             </td>
 
-                            <td>
+                            <td data-label="Tipo">
                                 <span class="feriado-tipo feriado-tipo--{{ strtolower($feriado->tipo) }}">
                                     {{ ucfirst(strtolower($feriado->tipo)) }}
                                 </span>
                             </td>
 
-                            <td>
+                            <td data-label="Aplicación">
                                 @if ($feriado->area)
                                     <span class="area-badge">{{ $feriado->area->nombre }}</span>
                                 @else
@@ -135,13 +137,13 @@
                                 @endif
                             </td>
 
-                            <td>
+                            <td data-label="Descripción">
                                 <span class="feriado-descripcion">
                                     {{ $feriado->descripcion ?: 'Sin descripción' }}
                                 </span>
                             </td>
 
-                            <td>
+                            <td data-label="Estado">
                                 @if ($feriado->estado)
                                     <span class="badge badge--success">Activo</span>
                                 @else
@@ -149,23 +151,26 @@
                                 @endif
                             </td>
 
-                            <td>
+                            <td data-label="Acciones">
                                 <div class="table-actions">
-                                    <button type="button" class="button button--secondary button--small"
+                                    <button type="button" class="icon-button"
+                                        aria-label="Editar feriado {{ $feriado->nombre }}" data-tooltip="Editar"
                                         data-editar-feriado data-url="{{ route('feriados.update', $feriado) }}"
                                         data-fecha="{{ $feriado->fecha?->format('Y-m-d') }}"
                                         data-nombre="{{ $feriado->nombre }}" data-tipo="{{ $feriado->tipo }}"
                                         data-area="{{ $feriado->area_id ?? '' }}"
                                         data-descripcion="{{ $feriado->descripcion }}">
-                                        Editar
+                                        <x-ui-icon name="edit" />
                                     </button>
 
                                     <button type="button"
-                                        class="button button--small {{ $feriado->estado ? 'button--danger' : 'button--secondary' }}"
+                                        class="icon-button {{ $feriado->estado ? 'icon-button--danger' : '' }}"
+                                        aria-label="{{ $feriado->estado ? 'Desactivar' : 'Activar' }} feriado {{ $feriado->nombre }}"
+                                        data-tooltip="{{ $feriado->estado ? 'Desactivar' : 'Activar' }}"
                                         data-cambiar-estado-feriado data-url="{{ route('feriados.estado', $feriado) }}"
                                         data-nombre="{{ $feriado->nombre }}"
                                         data-activo="{{ $feriado->estado ? '1' : '0' }}">
-                                        {{ $feriado->estado ? 'Desactivar' : 'Activar' }}
+                                        <x-ui-icon name="power" />
                                     </button>
                                 </div>
                             </td>

@@ -1,23 +1,27 @@
 <section class="dashboard-metrics" aria-label="Resumen de supervisión">
     <a class="dashboard-metric dashboard-metric--petrol" href="{{ route('asistencias.index', ['fecha_desde' => today()->toDateString(), 'fecha_hasta' => today()->toDateString()]) }}" aria-label="Ver asistencia del equipo supervisado">
+        <span class="dashboard-metric__icon"><x-ui-icon name="users" /></span>
         <span class="dashboard-metric__label">Equipo supervisado</span>
         <strong class="dashboard-metric__value">{{ $metrics['trabajadores'] }}</strong>
         <span class="dashboard-metric__caption">trabajadores activos</span>
     </a>
 
     <a class="dashboard-metric dashboard-metric--blue" href="{{ route('asistencias.index', ['fecha_desde' => today()->toDateString(), 'fecha_hasta' => today()->toDateString()]) }}" aria-label="Ver asistencias de hoy">
+        <span class="dashboard-metric__icon"><x-ui-icon name="attendance" /></span>
         <span class="dashboard-metric__label">Asistencias de hoy</span>
         <strong class="dashboard-metric__value">{{ $metrics['asistencias'] }}</strong>
         <span class="dashboard-metric__caption">{{ $metrics['puntuales'] }} registros puntuales</span>
     </a>
 
     <a class="dashboard-metric dashboard-metric--sand" href="{{ route('asistencias.index', ['fecha_desde' => today()->toDateString(), 'fecha_hasta' => today()->toDateString(), 'estado' => 'INCIDENCIAS']) }}" aria-label="Ver incidencias de asistencia">
+        <span class="dashboard-metric__icon"><x-ui-icon name="alert" /></span>
         <span class="dashboard-metric__label">Incidencias</span>
         <strong class="dashboard-metric__value">{{ $metrics['incidencias'] }}</strong>
         <span class="dashboard-metric__caption">tardanzas, faltas o sin registro</span>
     </a>
 
     <a class="dashboard-metric dashboard-metric--graphite" href="{{ route('reportesAvance.index', ['pestana' => 'pendientes']) }}" aria-label="Ver pendientes del área">
+        <span class="dashboard-metric__icon"><x-ui-icon name="report" /></span>
         <span class="dashboard-metric__label">Pendientes del área</span>
         <strong class="dashboard-metric__value">{{ $alerts['pendientes'] }}</strong>
         <span class="dashboard-metric__caption">actividades abiertas o por validar</span>

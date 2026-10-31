@@ -1,119 +1,115 @@
-document.addEventListener(
-    'DOMContentLoaded',
-    function () {
+(function () {
+    const openers = new WeakMap();
 
-        document.addEventListener(
-            'click',
-            function (event) {
+    function focusableElements(modal) {
+        return Array.from(modal.querySelectorAll(
+            'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter(function (element) {
+            return element.offsetParent !== null && element.getAttribute('aria-hidden') !== 'true';
+        });
+    }
 
-                const openButton =
-                    event.target.closest(
-                        '[data-modal-open]'
-                    );
+    function setOpenState(modal, isOpen) {
+        modal.classList.toggle('open', isOpen);
+        modal.setAttribute('aria-hidden', String(!isOpen));
+        document.body.classList.toggle('modal-open', isOpen || Boolean(document.querySelector('.modal.open')));
+    }
 
-                if (openButton) {
+    function openModal(id, opener) {
+        const modal = document.getElementById(id);
 
-                    const modalId =
-                        openButton.dataset.modalOpen;
+        if (!modal) {
+            return;
+        }
 
-                    openModal(modalId);
+        const current = document.querySelector('.modal.open');
+        if (current && current !== modal) {
+            closeModal(current, false);
+        }
 
-                }
+        openers.set(modal, opener || document.activeElement);
+        setOpenState(modal, true);
 
+        window.requestAnimationFrame(function () {
+            const preferred = modal.querySelector('[autofocus]');
+            const target = preferred || focusableElements(modal)[0] || modal.querySelector('.modal__content');
+            target?.focus({ preventScroll: true });
+        });
+    }
 
-                if (
-                    event.target.closest(
-                        '[data-modal-close]'
-                    )
-                ) {
+    function closeModal(modal, restoreFocus = true) {
+        if (!modal) {
+            return;
+        }
 
-                    const modal =
-                        event.target.closest(
-                            '.modal'
-                        );
+        setOpenState(modal, false);
 
-                    closeModal(modal);
-
-                }
-
+        if (restoreFocus) {
+            const opener = openers.get(modal);
+            if (opener instanceof HTMLElement && document.contains(opener)) {
+                opener.focus({ preventScroll: true });
             }
-        );
+        }
+    }
 
+    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('click', function (event) {
+            const openButton = event.target.closest('[data-modal-open]');
 
-        document.addEventListener(
-            'keydown',
-            function (event) {
-
-                if (event.key === 'Escape') {
-
-                    const modal =
-                        document.querySelector(
-                            '.modal.open'
-                        );
-
-                    if (modal) {
-
-                        closeModal(modal);
-
-                    }
-
-                }
-
+            if (openButton) {
+                openModal(openButton.dataset.modalOpen, openButton);
+                return;
             }
-        );
 
-    }
-);
+            const closeButton = event.target.closest('[data-modal-close]');
+            if (closeButton) {
+                closeModal(closeButton.closest('.modal'));
+            }
+        });
 
+        document.addEventListener('keydown', function (event) {
+            const modal = document.querySelector('.modal.open');
 
-function openModal(id) {
+            if (!modal) {
+                return;
+            }
 
-    const modal =
-        document.getElementById(id);
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                closeModal(modal);
+                return;
+            }
 
-    if (!modal) {
-        return;
-    }
+            if (event.key !== 'Tab') {
+                return;
+            }
 
-    modal.classList.add('open');
+            const focusable = focusableElements(modal);
+            if (!focusable.length) {
+                event.preventDefault();
+                modal.querySelector('.modal__content')?.focus();
+                return;
+            }
 
-    document.body.classList.add(
-        'modal-open'
-    );
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
 
-}
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        });
+    });
 
-
-function closeModal(modal) {
-
-    if (!modal) {
-        return;
-    }
-
-    modal.classList.remove('open');
-
-    document.body.classList.remove(
-        'modal-open'
-    );
-
-}
-
-
-window.AppModal = {
-
-    open(id) {
-
-        openModal(id);
-
-    },
-
-    close(id) {
-
-        const modal =
-            document.getElementById(id);
-
-        closeModal(modal);
-
-    }
-
-};
+    window.AppModal = {
+        open(id) {
+            openModal(id);
+        },
+        close(id) {
+            closeModal(document.getElementById(id));
+        },
+    };
+})();
