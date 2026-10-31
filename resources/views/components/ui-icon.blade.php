@@ -29,6 +29,9 @@
         @case('close')
             <path d="m6 6 12 12M18 6 6 18" />
             @break
+        @case('check')
+            <path d="m5 12 4 4L19 6" />
+            @break
         @case('chevron-right')
             <path d="m9 18 6-6-6-6" />
             @break

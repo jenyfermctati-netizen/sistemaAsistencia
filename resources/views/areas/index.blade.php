@@ -47,15 +47,33 @@
             </form>
         </div>
 
+        <div class="areas-list-heading">
+            <div>
+                <h3>Áreas registradas</h3>
+                <p>Consulta la descripción, cantidad de trabajadores y estado de cada área.</p>
+            </div>
+            <span class="areas-list-heading__count">
+                {{ $areas->total() }} {{ $areas->total() === 1 ? 'área' : 'áreas' }}
+            </span>
+        </div>
+
         <div class="table-container">
-            <table class="table">
+            <table class="table areas-table">
+                <caption class="sr-only">Listado de áreas de la empresa</caption>
+                <colgroup>
+                    <col class="areas-table__col areas-table__col--name">
+                    <col class="areas-table__col areas-table__col--description">
+                    <col class="areas-table__col areas-table__col--workers">
+                    <col class="areas-table__col areas-table__col--status">
+                    <col class="areas-table__col areas-table__col--actions">
+                </colgroup>
                 <thead>
                     <tr>
-                        <th>Área</th>
-                        <th>Descripción</th>
-                        <th>Trabajadores</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
+                        <th scope="col">Área</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Trabajadores</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,15 +83,15 @@
                                 <strong>{{ $area->nombre }}</strong>
                             </td>
                             <td data-label="Descripción">{{ $area->descripcion ?? '-' }}</td>
-                            <td data-label="Trabajadores">{{ $area->trabajadores_count }}</td>
-                            <td data-label="Estado">
+                            <td class="areas-table__numeric" data-label="Trabajadores">{{ $area->trabajadores_count }}</td>
+                            <td class="areas-table__status" data-label="Estado">
                                 @if ($area->estado)
                                     <span class="badge badge--success">Activa</span>
                                 @else
                                     <span class="badge badge--danger">Inactiva</span>
                                 @endif
                             </td>
-                            <td data-label="Acciones">
+                            <td class="areas-table__actions" data-label="Acciones">
                                 <div class="table-actions">
                                     <button type="button" class="icon-button" data-editar-area
                                         aria-label="Editar área {{ $area->nombre }}" data-tooltip="Editar"
@@ -96,7 +114,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
+                        <tr class="areas-table__empty-row">
                             <td colspan="5" class="table-empty">
                                 <div class="empty-state">
                                     <strong>No se encontraron áreas</strong>
