@@ -51,14 +51,44 @@ class AsistenciaController extends Controller
             $query->whereDate('fecha', '<=', $request->fecha_hasta);
         }
 
-        if ($request->filled('estado')) {
-            $request->estado === 'INCIDENCIAS'
-                ? $query->whereIn('estado', ['TARDANZA', 'FALTA', 'SIN_REGISTRO'])
-                : $query->where('estado', $request->estado);
-        }
-
         if ($request->filled('tipo_control')) {
             $query->where('tipo_control_aplicado', $request->tipo_control);
+        }
+
+        // El resumen conserva los filtros de persona, periodo y tipo de control,
+        // pero no el estado. Así permite comparar la distribución y cambiar de
+        // estado sin que las demás métricas desaparezcan.
+        $resumen = [
+            'total' => (clone $query)->count(),
+            'presentes' => (clone $query)->where('estado', 'PRESENTE')->count(),
+            'incidencias' => (clone $query)
+                ->whereIn('estado', ['TARDANZA', 'FALTA', 'SIN_REGISTRO'])
+                ->count(),
+            'excepciones' => (clone $query)
+                ->whereIn('estado', [
+                    'JUSTIFICADO',
+                    'CAMPO',
+                    'VACACIONES',
+                    'PERMISO',
+                    'FERIADO',
+                    'NO_LABORABLE',
+                ])
+                ->count(),
+        ];
+
+        if ($request->filled('estado')) {
+            match ($request->estado) {
+                'INCIDENCIAS' => $query->whereIn('estado', ['TARDANZA', 'FALTA', 'SIN_REGISTRO']),
+                'EXCEPCIONES' => $query->whereIn('estado', [
+                    'JUSTIFICADO',
+                    'CAMPO',
+                    'VACACIONES',
+                    'PERMISO',
+                    'FERIADO',
+                    'NO_LABORABLE',
+                ]),
+                default => $query->where('estado', $request->estado),
+            };
         }
 
         $asistencias = $query
@@ -67,7 +97,7 @@ class AsistenciaController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('asistencias.index', compact('asistencias', 'puedeProcesar'));
+        return view('asistencias.index', compact('asistencias', 'puedeProcesar', 'resumen'));
     }
 
     public function procesar(Request $request)
