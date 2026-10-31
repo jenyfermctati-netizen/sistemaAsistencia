@@ -3,11 +3,11 @@
        PALETA NATURAL DEL SISTEMA
     ====================================================== */
 
-    --palette-petrol: #264653;
-    --palette-smoke-blue: #afcdde;
-    --palette-sand: #d9cdbf;
-    --palette-ivory: #faf8f4;
-    --palette-graphite: #495057;
+    --palette-petrol: #204c5b;
+    --palette-smoke-blue: #b6eaf4;
+    --palette-sand: #c9d9de;
+    --palette-ivory: #e8f0f2;
+    --palette-graphite: #285968;
 
     /* ======================================================
        DIMENSIONES GENERALES
@@ -22,13 +22,13 @@
     ====================================================== */
 
     --primary: var(--palette-petrol);
-    --primary-hover: #1f3a45;
-    --primary-dark: #18313b;
-    --primary-light: #e8f1f5;
+    --primary-hover: #172b55;
+    --primary-dark: #111e44;
+    --primary-light: #e3f3f6;
 
     --accent: var(--palette-smoke-blue);
-    --accent-hover: #8fb7cc;
-    --accent-soft: #eef5f8;
+    --accent-hover: #7fd4e9;
+    --accent-soft: #eaf5f7;
 
 
     /* ======================================================
@@ -37,8 +37,8 @@
 
     --background: var(--palette-ivory);
 
-    --surface: #fffefc;
-    --surface-secondary: #f2ede6;
+    --surface: #ffffff;
+    --surface-secondary: #edf4f6;
     --surface-hover: #eef3f5;
 
 
@@ -47,8 +47,8 @@
     ====================================================== */
 
     --text: var(--palette-graphite);
-    --text-muted: #6b7378;
-    --text-soft: #93999d;
+    --text-muted: #58727b;
+    --text-soft: #78919a;
 
     --text-inverse: #ffffff;
 
@@ -58,7 +58,7 @@
     ====================================================== */
 
     --border: var(--palette-sand);
-    --border-strong: #bcae9c;
+    --border-strong: #b1cbd2;
 
 
     /* ======================================================
@@ -67,7 +67,7 @@
 
     --success: #356173;
     --success-hover: #294e5d;
-    --success-light: #e8f1f5;
+    --success-light: #e3f3f6;
 
     --warning: #9b743c;
     --warning-hover: #7f5d2e;
@@ -77,8 +77,8 @@
     --danger-hover: #8d433d;
     --danger-light: #f8e9e7;
 
-    --info: #527f97;
-    --info-light: #eef5f8;
+    --info: #087f9a;
+    --info-light: #eaf5f7;
 
 
     /* ======================================================
@@ -126,3 +126,5 @@
     --z-overlay: 999;
     --z-modal: 1200;
 }
+
+

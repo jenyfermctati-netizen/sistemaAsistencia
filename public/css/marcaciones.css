@@ -1,7 +1,7 @@
 .marcaciones-page {
-    --mc-primary: var(--primary, #0f766e);
-    --mc-primary-hover: var(--primary-hover, #0d665f);
-    --mc-primary-light: var(--primary-light, #e7f6f3);
+    --mc-primary: var(--primary, #087f9a);
+    --mc-primary-hover: var(--primary-hover, #06677e);
+    --mc-primary-light: var(--primary-light, #d8f1f5);
     --mc-surface: var(--surface, #fff);
     --mc-subtle: var(--surface-secondary, #f5f7f6);
     --mc-text: var(--text, #17211f);
@@ -1229,15 +1229,15 @@
    Mantener este bloque al final para respetar ajustes responsive.
    ================================================================ */
 .marcaciones-page {
-    --mc-primary: var(--primary, #f89d52);
-    --mc-primary-hover: var(--primary-hover, #e88a3d);
-    --mc-primary-light: #fff1e5;
+    --mc-primary: var(--primary, #00a9c7);
+    --mc-primary-hover: var(--primary-hover, #087f9a);
+    --mc-primary-light: #d8f1f5;
     --mc-surface: #fff;
     --mc-subtle: #f8f5f0;
-    --mc-text: #1b1917;
-    --mc-muted: #716a63;
+    --mc-text: #183844;
+    --mc-muted: #58727b;
     --mc-border: #e6ded5;
-    --mc-shadow: 0 12px 35px rgba(28, 25, 23, .07);
+    --mc-shadow: 0 12px 35px rgba(24, 56, 68, .07);
     gap: 20px;
 }
 
@@ -1245,7 +1245,7 @@
     padding: 22px 26px;
     border: 1px solid #30231c;
     border-radius: 18px;
-    background: radial-gradient(circle at 87% 15%, rgba(248,157,82,.22), transparent 32%),
+    background: radial-gradient(circle at 87% 15%, rgba(0, 169, 199,.22), transparent 32%),
                 linear-gradient(115deg, #171310, #30231c);
     box-shadow: 0 15px 32px rgba(28,25,23,.13);
 }
@@ -1255,8 +1255,8 @@
 .marcaciones-page .marcaciones-now span { color: #dacfc5; }
 .marcaciones-page .marcaciones-now strong { color: #fff; }
 .marcaciones-page .marcaciones-header .button--primary {
-    background: #f89d52;
-    border-color: #f89d52;
+    background: #00a9c7;
+    border-color: #00a9c7;
     color: #111;
 }
 
@@ -1273,7 +1273,7 @@
     gap: 14px;
     padding: 18px 22px;
     border-bottom: 1px solid var(--mc-border);
-    background: linear-gradient(100deg, #fffaf5, #fff 70%);
+    background: linear-gradient(100deg, #f3f9ff, #fff 70%);
     border-radius: 18px 18px 0 0;
 }
 .marcaciones-page .mc-panel-intro__icon {
@@ -1283,8 +1283,8 @@
     height: 44px;
     flex: 0 0 44px;
     border-radius: 13px;
-    background: #ffe6cd;
-    color: #a34f14;
+    background: #dcf6ff;
+    color: #036b91;
     font-size: 23px;
     font-weight: 800;
 }
@@ -1296,12 +1296,12 @@
     justify-items: end;
     gap: 1px;
     padding: 8px 13px;
-    border: 1px solid #f4d6b9;
+    border: 1px solid #c0ebf3;
     border-radius: 12px;
-    background: #fff1e5;
+    background: #d8f1f5;
     white-space: nowrap;
 }
-.marcaciones-page .mc-panel-intro__count strong { color: #8f4616; font-size: 22px; line-height: 1.1; }
+.marcaciones-page .mc-panel-intro__count strong { color: #065e90; font-size: 22px; line-height: 1.1; }
 .marcaciones-page .mc-panel-intro__count span { color: #805e46; font-size: 11px; }
 
 .marcaciones-page .marcaciones-filtros,
@@ -1316,18 +1316,18 @@
 .marcaciones-page .form-control:focus,
 .marcaciones-page .form-select:focus,
 .marcaciones-page .form-textarea:focus {
-    border-color: #f89d52;
-    box-shadow: 0 0 0 3px rgba(248,157,82,.17);
+    border-color: #00a9c7;
+    box-shadow: 0 0 0 3px rgba(0, 169, 199,.17);
     outline: none;
 }
 .marcaciones-page .mc-field__label,
 .marcaciones-page .form-label { color: #514139; font-weight: 700; }
-.marcaciones-page .marcaciones-filtros__grid { background: #fff7ef; border: 1px solid #f2e2d2; }
+.marcaciones-page .marcaciones-filtros__grid { background: #ddf0f4; border: 1px solid #d7e9f5; }
 .marcaciones-page .marcaciones-filtros__toggle:hover,
 .marcaciones-page .marcacion-detalle__toggle:hover {
-    border-color: #f89d52;
-    background: #fff1e5;
-    color: #8f4616;
+    border-color: #00a9c7;
+    background: #d8f1f5;
+    color: #065e90;
 }
 
 .marcaciones-page :is(.marcaciones-table, .manual-table) th {
@@ -1344,12 +1344,12 @@
     border-bottom-color: #eee8e1;
 }
 .marcaciones-page :is(.marcaciones-table, .manual-table) tbody tr:not(.row-anulada):hover {
-    background: #fff8f0;
+    background: #f1fbff;
 }
 .marcaciones-page .trabajador-info__avatar {
-    background: #ffead6;
-    color: #a45218;
-    border: 1px solid #f8d0ac;
+    background: #e3f0ff;
+    color: #075c9a;
+    border: 1px solid #bfdef8;
     font-weight: 800;
 }
 .marcaciones-page .trabajador-info strong { color: #211a16; font-weight: 700; }
@@ -1360,21 +1360,21 @@
 }
 
 .marcaciones-page .manual-panel__header {
-    background: linear-gradient(100deg, #fff5e9, #fff 75%);
+    background: linear-gradient(100deg, #eaf8ff, #fff 75%);
     border-radius: 18px 18px 0 0;
 }
 .marcaciones-page .mc-section-kicker {
     display: inline-block;
     margin-bottom: 5px;
-    color: #ad5b20;
+    color: #115bb8;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: .11em;
 }
 .marcaciones-page .manual-panel__header h3 { color: #211a16; font-weight: 750; }
 .marcaciones-page .registro-especial {
-    background: #fff8f0;
-    border-left: 4px solid #f89d52;
+    background: #f1fbff;
+    border-left: 4px solid #00a9c7;
 }
 
 @media (max-width: 700px) {
@@ -1519,3 +1519,28 @@
     .marcaciones-page .marcaciones-header h2 { font-size: 21px; }
     .marcaciones-page .marcaciones-header p { font-size: 12px; }
 }
+
+/* Acentos Canva del módulo de marcaciones. */
+.marcaciones-page .marcaciones-header {
+    border-color: #26317b;
+    background: radial-gradient(circle at 90% 10%,rgba(0, 169, 199,.23),transparent 40%),
+                linear-gradient(125deg,#161d48,#283783 58%,#502b96);
+}
+.marcaciones-page .marcaciones-header .button--primary,
+.marcaciones-page .marcaciones-filtros__actions .button--primary {
+    border-color: transparent;
+    background: linear-gradient(120deg,#00a9c7,#168fa8 55%,#087f9a);
+    color: #fff;
+}
+.marcaciones-page .mc-panel-intro__icon { background:#e0f8ff; color:#1264b8; }
+.marcaciones-page .mc-panel-intro__count { background:#e9f8ff; border-color:#c7e7fb; }
+
+.marcaciones-page .marcaciones-header {
+    border-color:#cfe3f5;
+    background:linear-gradient(112deg,#fff,#e9faff 58%,#efe8ff);
+    box-shadow:0 10px 25px rgba(43,111,247,.08);
+}
+.marcaciones-page .marcaciones-header h2 { color:#183844; }
+.marcaciones-page .marcaciones-header p,.marcaciones-page .marcaciones-now span { color:#58727b; }
+.marcaciones-page .marcaciones-now strong { color:#183844; }
+.marcaciones-page .marcaciones-back { color:#2867d5; }
