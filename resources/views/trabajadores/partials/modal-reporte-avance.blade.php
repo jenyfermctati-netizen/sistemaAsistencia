@@ -76,7 +76,7 @@
                 <button type="button"
                     class="button button--secondary button--small"
                     data-agregar-actividad-avance>
-                    + Agregar actividad
+                    <x-ui-icon name="plus" /> Agregar actividad
                 </button>
             </div>
 
@@ -133,7 +133,7 @@
                 <button type="button"
                     class="button button--secondary button--small"
                     data-agregar-pendiente-avance>
-                    + Agregar pendiente
+                    <x-ui-icon name="plus" /> Agregar pendiente
                 </button>
             </div>
 

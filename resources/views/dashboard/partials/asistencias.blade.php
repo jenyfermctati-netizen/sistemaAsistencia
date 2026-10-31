@@ -38,7 +38,7 @@
                             data-lunch-in="{{ $asistencia->hora_retorno_refrigerio ? substr($asistencia->hora_retorno_refrigerio, 0, 5) : '—' }}"
                             data-out="{{ $asistencia->hora_salida ? substr($asistencia->hora_salida, 0, 5) : '—' }}"
                             data-hours="{{ intdiv((int)$asistencia->minutos_trabajados, 60) }} h {{ (int)$asistencia->minutos_trabajados % 60 }} min">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <x-ui-icon name="eye" />
                         </button>
                     </td>
                 </tr>
@@ -51,7 +51,7 @@
 
 <div class="dashboard-detail-overlay" id="dashboardDetailOverlay" hidden>
     <section class="dashboard-detail-modal" role="dialog" aria-modal="true" aria-labelledby="dashboardDetailHeading">
-        <div class="dashboard-detail-heading"><div><small>DETALLE DE ASISTENCIA</small><h3 id="dashboardDetailHeading">Detalle</h3></div><button type="button" id="dashboardDetailClose" aria-label="Cerrar detalle" class="dashboard-detail-close">×</button></div>
+        <div class="dashboard-detail-heading"><div><small>DETALLE DE ASISTENCIA</small><h3 id="dashboardDetailHeading">Detalle</h3></div><button type="button" id="dashboardDetailClose" aria-label="Cerrar detalle" class="dashboard-detail-close"><x-ui-icon name="close" /></button></div>
         <dl class="dashboard-detail-grid">
             <div><dt>Área</dt><dd data-detail-field="area">—</dd></div>
             <div><dt>Fecha</dt><dd data-detail-field="date">—</dd></div>

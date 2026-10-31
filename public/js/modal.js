@@ -15,6 +15,22 @@
         document.body.classList.toggle('modal-open', isOpen || Boolean(document.querySelector('.modal.open')));
     }
 
+    function closeNativeDialogs(source) {
+        let returnFocus = source;
+
+        document.querySelectorAll('dialog[open]').forEach(function (dialog) {
+            if (source instanceof HTMLElement && dialog.contains(source)) {
+                returnFocus = dialog.parentElement?.querySelector(
+                    '[data-tw-modal-open], [data-asistencia-detail]'
+                ) || returnFocus;
+            }
+
+            dialog.close();
+        });
+
+        return returnFocus;
+    }
+
     function openModal(id, opener) {
         const modal = document.getElementById(id);
 
@@ -22,12 +38,16 @@
             return;
         }
 
-        const current = document.querySelector('.modal.open');
-        if (current && current !== modal) {
-            closeModal(current, false);
-        }
+        const source = opener instanceof HTMLElement ? opener : document.activeElement;
+        const returnFocus = closeNativeDialogs(source);
 
-        openers.set(modal, opener || document.activeElement);
+        document.querySelectorAll('.modal.open').forEach(function (current) {
+            if (current !== modal) {
+                closeModal(current, false);
+            }
+        });
+
+        openers.set(modal, returnFocus);
         setOpenState(modal, true);
 
         window.requestAnimationFrame(function () {
@@ -105,8 +125,8 @@
     });
 
     window.AppModal = {
-        open(id) {
-            openModal(id);
+        open(id, opener) {
+            openModal(id, opener);
         },
         close(id) {
             closeModal(document.getElementById(id));

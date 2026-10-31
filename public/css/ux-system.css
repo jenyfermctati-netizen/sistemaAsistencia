@@ -19,6 +19,12 @@
     --ux-shadow: 0 8px 24px rgba(24, 56, 68, .08);
 }
 
+/* Evita que el ancho mínimo heredado genere desplazamiento horizontal en
+   móviles de 320 px cuando el navegador reserva espacio para su scrollbar. */
+body:not(.guest) {
+    min-width: 0;
+}
+
 html {
     font-size: 16px;
 }
@@ -47,6 +53,17 @@ textarea {
     stroke-linejoin: round;
 }
 
+:is(.button, .ra-btn, .btn) > .ui-icon,
+a.button > .ui-icon {
+    width: 18px;
+    height: 18px;
+}
+
+:is(.button--small, .ra-btn--small) > .ui-icon {
+    width: 16px;
+    height: 16px;
+}
+
 .button,
 .ra-btn,
 .btn {
@@ -67,18 +84,34 @@ textarea {
 .icon-button {
     position: relative;
     display: inline-flex;
-    width: 44px;
-    min-width: 44px;
-    height: 44px;
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
     align-items: center;
     justify-content: center;
     padding: 0;
     border: 1px solid var(--ux-border);
-    border-radius: 11px;
+    border-radius: 10px;
     background: var(--ux-surface);
     color: var(--ux-primary);
     cursor: pointer;
     transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.icon-button .ui-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.alert__close .ui-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.solicitud-open .ui-icon,
+.dashboard-eye-button .ui-icon {
+    width: 18px;
+    height: 18px;
 }
 
 .icon-button:hover {
@@ -436,6 +469,11 @@ table tbody td {
 }
 
 /* Modales accesibles y con una única zona de scroll */
+.modal {
+    z-index: 2000;
+    isolation: isolate;
+}
+
 .modal[aria-hidden="true"] {
     display: none;
 }
@@ -445,7 +483,28 @@ table tbody td {
 }
 
 .modal__content {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
     outline: 0;
+}
+
+.modal__header {
+    flex: 0 0 auto;
+}
+
+.modal__body {
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.modal__body > * {
+    min-width: 0;
+    max-width: 100%;
 }
 
 .modal__header h2 {
@@ -463,7 +522,21 @@ table tbody td {
     padding: 0;
 }
 
-.modal__actions,
+.modal__close .ui-icon,
+.tw-modal__close .ui-icon,
+.asistencia-detail-dialog__header button .ui-icon,
+.dashboard-detail-close .ui-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.modal__actions {
+    position: static;
+    bottom: auto;
+    padding-top: 14px;
+    background: none;
+}
+
 .horario-general__actions {
     position: sticky;
     z-index: 4;
@@ -527,6 +600,33 @@ table tbody td {
 @media (max-width: 1100px) {
     .asistencias-filtros {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* En tablet la tabla de solicitudes cabe en su panel sin obligar a desplazarla
+   unos pocos píxeles para alcanzar la acción de la última columna. */
+@media (min-width: 701px) and (max-width: 800px) {
+    .solicitudes-table-wrap {
+        overflow-x: hidden;
+    }
+
+    .solicitudes-table {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .solicitudes-table th,
+    .solicitudes-table td {
+        padding-right: 9px;
+        padding-left: 9px;
+    }
+
+    .solicitudes-table .solicitud-persona {
+        min-width: 0;
+    }
+
+    .solicitudes-table .solicitud-persona strong {
+        overflow-wrap: anywhere;
     }
 }
 
@@ -740,6 +840,149 @@ table tbody td {
         margin-top: 6px;
     }
 
+    /* Solicitudes: tarjetas completas, sin acciones escondidas por desplazamiento horizontal. */
+    .solicitudes-table-wrap {
+        overflow: visible !important;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .solicitudes-table,
+    .solicitudes-table tbody {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .solicitudes-table thead {
+        display: none;
+    }
+
+    .solicitudes-table tbody {
+        display: grid;
+        gap: 12px;
+    }
+
+    .solicitudes-table .solicitud-table-row {
+        display: block;
+        overflow: hidden;
+        border: 1px solid var(--ux-border);
+        border-radius: 15px;
+        background: #fff;
+        box-shadow: 0 5px 16px rgba(24, 56, 68, .06);
+    }
+
+    .solicitudes-table tbody > tr:not(.solicitud-table-row),
+    .solicitudes-table tbody > tr:not(.solicitud-table-row) > td {
+        display: block;
+        width: 100%;
+    }
+
+    .solicitudes-table .solicitud-table-row > td {
+        display: grid;
+        width: 100%;
+        grid-template-columns: minmax(94px, .7fr) minmax(0, 1.3fr);
+        align-items: center;
+        gap: 12px;
+        padding: 11px 13px;
+        border: 0;
+        border-bottom: 1px solid #e7eef0;
+        text-align: left;
+    }
+
+    .solicitudes-table .solicitud-table-row > td:last-child {
+        border-bottom: 0;
+    }
+
+    .solicitudes-table .solicitud-table-row > td[data-label]::before {
+        color: var(--ux-muted);
+        content: attr(data-label);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .045em;
+        text-transform: uppercase;
+    }
+
+    .solicitudes-table .solicitud-persona {
+        min-width: 0;
+    }
+
+    .solicitudes-table .solicitud-table-action {
+        width: 100%;
+        text-align: left !important;
+    }
+
+    .solicitudes-table .solicitud-open {
+        width: 38px;
+        height: 38px;
+        margin-left: auto;
+    }
+
+    /* Dashboard: la tabla reciente y el consolidado también se leen como tarjetas. */
+    .dashboard-modern :is(.dashboard-table-wrap--clean, .dashboard-report__table-wrap) {
+        width: 100%;
+        margin: 0;
+        overflow: visible !important;
+    }
+
+    .dashboard-modern :is(.dashboard-table--clean, .dashboard-report__table),
+    .dashboard-modern :is(.dashboard-table--clean, .dashboard-report__table) tbody {
+        display: block !important;
+        width: 100%;
+        min-width: 0 !important;
+    }
+
+    .dashboard-modern :is(.dashboard-table--clean, .dashboard-report__table) thead {
+        display: none !important;
+    }
+
+    .dashboard-modern :is(.dashboard-table--clean, .dashboard-report__table) tbody {
+        display: grid !important;
+        gap: 12px;
+    }
+
+    .dashboard-modern :is(.dashboard-table--clean, .dashboard-report__table) tbody tr:not(.dashboard-table__empty-row) {
+        display: block !important;
+        overflow: hidden;
+        border: 1px solid var(--ux-border);
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(24, 56, 68, .05);
+    }
+
+    .dashboard-modern :is(.dashboard-table--clean, .dashboard-report__table) tbody tr:not(.dashboard-table__empty-row) > td {
+        display: grid !important;
+        width: 100%;
+        grid-template-columns: minmax(105px, .75fr) minmax(0, 1.25fr);
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 0;
+        border-bottom: 1px solid #e7eef0;
+        text-align: left;
+    }
+
+    .dashboard-modern :is(.dashboard-table--clean, .dashboard-report__table) tbody tr:not(.dashboard-table__empty-row) > td:last-child {
+        border-bottom: 0;
+    }
+
+    .dashboard-modern :is(.dashboard-table--clean, .dashboard-report__table) td[data-label]::before {
+        display: block;
+        color: var(--ux-muted);
+        content: attr(data-label);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .035em;
+        text-transform: uppercase;
+    }
+
+    .dashboard-modern .dashboard-table__empty-row,
+    .dashboard-modern .dashboard-table__empty-row > td {
+        display: block !important;
+        width: 100%;
+    }
+
     .dashboard-hero {
         min-height: auto !important;
     }
@@ -793,6 +1036,19 @@ table tbody td {
     .modal__actions {
         display: grid;
         grid-template-columns: 1fr;
+        position: static;
+        z-index: auto;
+        bottom: auto;
+        margin: 20px 0 0;
+        padding: 14px 0 0;
+        border-top: 1px solid var(--ux-border);
+        background: #fff;
+    }
+
+    .icon-button {
+        width: 42px;
+        min-width: 42px;
+        height: 42px;
     }
 
     .login-page {

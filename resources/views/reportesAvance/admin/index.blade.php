@@ -197,7 +197,7 @@
 
                             </div>
 
-                            <span class="ra-area-card__arrow">⌄</span>
+                            <span class="ra-area-card__arrow"><x-ui-icon name="chevron-down" /></span>
 
                         </summary>
 
@@ -247,7 +247,7 @@
 
                                         </div>
 
-                                        <span class="ra-worker-row__arrow">⌄</span>
+                                        <span class="ra-worker-row__arrow"><x-ui-icon name="chevron-down" /></span>
 
                                     </summary>
 
@@ -525,7 +525,7 @@
 
                         <summary class="ra-pending-group__header">
                             <h4>{{ $nombreArea }}</h4>
-                            <span class="ra-pending-group__arrow">⌄</span>
+                            <span class="ra-pending-group__arrow"><x-ui-icon name="chevron-down" /></span>
                         </summary>
 
                         <div class="ra-pending-table">

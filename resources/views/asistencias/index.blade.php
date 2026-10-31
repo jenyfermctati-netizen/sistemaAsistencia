@@ -299,7 +299,7 @@
                     <span>CONTROL DE ASISTENCIA</span>
                     <h3 id="asistenciaDetalleTitulo">Detalle del registro</h3>
                 </div>
-                <button type="button" data-asistencia-close aria-label="Cerrar detalle">×</button>
+                <button type="button" data-asistencia-close aria-label="Cerrar detalle"><x-ui-icon name="close" /></button>
             </div>
             <div class="asistencia-detail-dialog__body" id="asistenciaDetalleContenido"></div>
         </dialog>

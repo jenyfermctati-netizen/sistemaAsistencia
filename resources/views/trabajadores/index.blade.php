@@ -147,7 +147,7 @@
                                             <h3>{{ $trabajador->nombres }} {{ $trabajador->apellidos }}</h3>
                                             <p>DNI: {{ $trabajador->dni }} · {{ $trabajador->area?->nombre ?? 'Sin área' }}</p>
                                         </div>
-                                        <button type="button" class="tw-modal__close" data-tw-modal-close aria-label="Cerrar detalle">×</button>
+                                        <button type="button" class="tw-modal__close" data-tw-modal-close aria-label="Cerrar detalle"><x-ui-icon name="close" /></button>
                                     </div>
                                     <div class="tw-detalle__contenido">
                                         <div><span>Cargo</span><strong>{{ $trabajador->cargo ?? '-' }}</strong></div>

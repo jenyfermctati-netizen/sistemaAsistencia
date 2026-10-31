@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
             editarEncargado.checked = button.dataset.encargadoArea === '1';
             configurarDesignacion(editarRol, editarEstado, editarEncargado);
 
-            window.AppModal.open('modalEditarTrabajador');
+            window.AppModal.open('modalEditarTrabajador', button);
         });
     });
 
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
             confirmarEstado.textContent = esActivo ? 'Desactivar' : 'Activar';
             confirmarEstado.className = `button ${esActivo ? 'button--danger' : 'button--primary'}`;
 
-            window.AppModal.open('modalEstadoTrabajador');
+            window.AppModal.open('modalEstadoTrabajador', button);
         });
     });
 
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     button.dataset.storeUrl
                 );
 
-                window.AppModal.open('modalRegistrarAvanceTrabajador');
+                window.AppModal.open('modalRegistrarAvanceTrabajador', button);
             });
         });
 

@@ -124,7 +124,7 @@
                         </tr>
                     @endforeach
                 @empty
-                    <tr><td colspan="{{ $reporte['esVistaGeneral'] ? 6 : 5 }}" class="dashboard-empty">Sin información para el periodo.</td></tr>
+                    <tr class="dashboard-table__empty-row"><td colspan="{{ $reporte['esVistaGeneral'] ? 6 : 5 }}" class="dashboard-empty">Sin información para el periodo.</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -8,9 +8,10 @@
 
         <button
             type="button"
-            class="alert__close">
+            class="alert__close"
+            aria-label="Cerrar mensaje">
 
-            ×
+            <x-ui-icon name="close" />
 
         </button>
 
@@ -29,9 +30,10 @@
 
         <button
             type="button"
-            class="alert__close">
+            class="alert__close"
+            aria-label="Cerrar mensaje">
 
-            ×
+            <x-ui-icon name="close" />
 
         </button>
 
@@ -50,9 +52,10 @@
 
         <button
             type="button"
-            class="alert__close">
+            class="alert__close"
+            aria-label="Cerrar mensaje">
 
-            ×
+            <x-ui-icon name="close" />
 
         </button>
 
@@ -87,9 +90,10 @@
 
         <button
             type="button"
-            class="alert__close">
+            class="alert__close"
+            aria-label="Cerrar mensaje">
 
-            ×
+            <x-ui-icon name="close" />
 
         </button>
 

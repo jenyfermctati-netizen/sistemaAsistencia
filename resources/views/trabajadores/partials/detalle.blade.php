@@ -127,7 +127,7 @@
             </header>
 
             <div class="solicitud-document__empty" id="solicitudDocumentoVacio">
-                <div class="solicitud-document__empty-icon">⧉</div>
+                <div class="solicitud-document__empty-icon"><x-ui-icon name="report" /></div>
                 <strong>Sin documento adjunto</strong>
                 <span>Esta solicitud no tiene un archivo de sustento.</span>
             </div>

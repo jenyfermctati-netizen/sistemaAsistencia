@@ -247,7 +247,7 @@
                                     : '' }}">
 
                                 {{-- TRABAJADOR --}}
-                                <td>
+                                <td data-label="Trabajador">
 
                                     <div class="solicitud-persona">
 
@@ -270,7 +270,7 @@
                                 </td>
 
                                 {{-- TIPO --}}
-                                <td>
+                                <td data-label="Solicitud">
 
                                     <span class="solicitud-tipo solicitud-tipo--{{ strtolower(str_replace('_', '-', $solicitud->tipo)) }}">
                                         {{ $tipoTexto }}
@@ -279,7 +279,7 @@
                                 </td>
 
                                 {{-- FECHA --}}
-                                <td>
+                                <td data-label="Fecha">
 
                                     <div class="solicitud-table-date">
 
@@ -303,7 +303,7 @@
                                 </td>
 
                                 {{-- ESTADO --}}
-                                <td>
+                                <td data-label="Estado">
 
                                     <span class="solicitud-estado solicitud-estado--{{ strtolower($solicitud->estado) }}">
                                         {{ $estadoTexto }}
@@ -312,7 +312,7 @@
                                 </td>
 
                                 {{-- ABRIR --}}
-                                <td class="solicitud-table-action">
+                                <td class="solicitud-table-action" data-label="Acción">
 
                                     <button type="button"
                                         class="solicitud-open"

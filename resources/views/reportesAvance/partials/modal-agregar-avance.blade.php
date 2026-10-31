@@ -30,7 +30,7 @@
                 </div>
 
                 <button type="button" class="button button--secondary button--small" id="agregarActividadAdicional">
-                    + Agregar actividad
+                    <x-ui-icon name="plus" /> Agregar actividad
                 </button>
             </div>
 
@@ -72,7 +72,7 @@
                 </div>
 
                 <button type="button" class="button button--secondary button--small" id="agregarPendienteAdicional">
-                    + Agregar pendiente
+                    <x-ui-icon name="plus" /> Agregar pendiente
                 </button>
             </div>
 

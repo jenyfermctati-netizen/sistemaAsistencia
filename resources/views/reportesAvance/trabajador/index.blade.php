@@ -31,8 +31,7 @@
                     <button type="button"
                         class="button button--primary"
                         data-modal-open="modalCrearReporte">
-                        <span class="button__icon">+</span>
-                        Registrar reporte de hoy
+                        <x-ui-icon name="plus" /> Registrar reporte de hoy
                     </button>
                 @else
                     <button type="button"
@@ -260,7 +259,7 @@
                                 <span class="ra-status ra-status--warning">Por revisar</span>
                             @endif
 
-                            <span class="ra-history-card__arrow">⌄</span>
+                            <span class="ra-history-card__arrow"><x-ui-icon name="chevron-down" /></span>
                         </div>
 
                     </summary>
@@ -564,7 +563,7 @@
                         <button type="button"
                             class="button button--secondary button--small"
                             id="agregarActividad">
-                            + Agregar actividad
+                            <x-ui-icon name="plus" /> Agregar actividad
                         </button>
                     </div>
 
@@ -615,7 +614,7 @@
                         <button type="button"
                             class="button button--secondary button--small"
                             id="agregarPendiente">
-                            + Agregar pendiente
+                            <x-ui-icon name="plus" /> Agregar pendiente
                         </button>
                     </div>
 
@@ -672,7 +671,7 @@
                     <button type="button"
                         class="button button--secondary button--small"
                         id="agregarActividadEditar">
-                        + Agregar actividad
+                        <x-ui-icon name="plus" /> Agregar actividad
                     </button>
                 </div>
 
@@ -695,7 +694,7 @@
                     <button type="button"
                         class="button button--secondary button--small"
                         id="agregarPendienteEditar">
-                        + Agregar pendiente
+                        <x-ui-icon name="plus" /> Agregar pendiente
                     </button>
                 </div>
 

@@ -28,9 +28,10 @@
             <button
                 type="button"
                 class="modal__close"
+                aria-label="Cerrar {{ $title ?: 'ventana' }}"
                 data-modal-close>
 
-                ×
+                <x-ui-icon name="close" />
 
             </button>
 
