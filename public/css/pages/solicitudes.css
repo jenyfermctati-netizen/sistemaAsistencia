@@ -1,7 +1,7 @@
 .solicitudes-page {
-    --sol-primary: var(--primary, #00aeb8);
-    --sol-primary-hover: var(--primary-hover, #008d99);
-    --sol-primary-light: var(--primary-light, #e3fbfc);
+    --sol-primary: var(--primary, #087f9a);
+    --sol-primary-hover: var(--primary-hover, #06677e);
+    --sol-primary-light: var(--primary-light, #d8f1f5);
     --sol-surface: var(--surface, #fff);
     --sol-subtle: var(--surface-secondary, #f4f6f5);
     --sol-text: var(--text, #17211f);
@@ -220,7 +220,7 @@
 }
 
 .solicitudes-table thead th {
-    background: #fafcfb;
+    background: #f7fafb;
     color: var(--sol-muted);
     font-size: 9px;
     font-weight: 850;
@@ -238,7 +238,7 @@
 }
 
 .solicitud-table-row:hover {
-    background: #fafcfb;
+    background: #f7fafb;
 }
 
 .solicitud-table-row:focus-visible {
@@ -326,7 +326,7 @@
 
 .solicitud-tipo--permiso {
     background: #eef2ff;
-    color: #7d2ae8;
+    color: #087f9a;
 }
 
 .solicitud-tipo--tardanza {
@@ -341,7 +341,7 @@
 
 .solicitud-tipo--omision-marcacion {
     background: #f0fdfa;
-    color: #00aeb8;
+    color: #087f9a;
 }
 
 /* ESTADOS */
@@ -511,7 +511,7 @@
     padding: 12px 13px;
     border: 1px solid var(--sol-border);
     border-radius: 9px;
-    background: #fafcfb;
+    background: #f7fafb;
     color: var(--sol-text);
     font-size: 12px;
     line-height: 1.6;
@@ -899,14 +899,14 @@
    ========================================================= */
 
 #modalDetalleSolicitud {
-    --sol-primary: var(--primary, #1d315a);
+    --sol-primary: var(--primary, #204c5b);
     --sol-primary-hover: var(--primary-hover, #172b55);
-    --sol-primary-light: var(--primary-light, #e9f7ff);
+    --sol-primary-light: var(--primary-light, #e3f3f6);
     --sol-surface: var(--surface, #ffffff);
-    --sol-subtle: var(--surface-secondary, #eff3fb);
-    --sol-text: var(--text, #343650);
-    --sol-muted: var(--text-muted, #666783);
-    --sol-border: var(--border, #dce4f1);
+    --sol-subtle: var(--surface-secondary, #edf4f6);
+    --sol-text: var(--text, #285968);
+    --sol-muted: var(--text-muted, #58727b);
+    --sol-border: var(--border, #c9d9de);
 }
 
 @media (max-width: 700px) {

@@ -73,7 +73,7 @@ body.sidebar-visible {
     border-radius: 11px;
     background: #dcebf1;
     box-shadow: none;
-    color: #1d315a;
+    color: #204c5b;
     font-size: 13px;
 }
 
@@ -166,7 +166,7 @@ body.sidebar-visible {
 .sidebar__item.active .sidebar__icon {
     border: 0;
     background: rgba(38, 70, 83, .08);
-    color: #1d315a;
+    color: #204c5b;
 }
 
 .nav-icon {
@@ -377,7 +377,7 @@ body.sidebar-visible {
 
 :is(.form-control, .form-select, .form-textarea):focus {
     border-color: #668c9b;
-    box-shadow: 0 0 0 3px rgba(0, 196, 204, .38);
+    box-shadow: 0 0 0 3px rgba(0, 169, 199, .38);
 }
 
 .table-container,

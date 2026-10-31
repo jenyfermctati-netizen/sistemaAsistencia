@@ -12,14 +12,14 @@ html { scrollbar-color: var(--palette-smoke-blue) var(--palette-ivory); }
 
 body:not(.guest) {
     background:
-        radial-gradient(circle at 88% 2%, rgba(0, 196, 204, 0.22), transparent 24rem),
+        radial-gradient(circle at 88% 2%, rgba(0, 169, 199, 0.22), transparent 24rem),
         var(--palette-ivory);
 }
 
 .main-content {
     padding: clamp(20px, 2.5vw, 32px);
     background:
-        radial-gradient(circle at 96% 0%, rgba(0, 196, 204, 0.2), transparent 24rem),
+        radial-gradient(circle at 96% 0%, rgba(0, 169, 199, 0.2), transparent 24rem),
         linear-gradient(180deg, #ffffff 0%, var(--palette-ivory) 100%);
 }
 
@@ -30,7 +30,7 @@ body:not(.guest) {
 .sidebar {
     border-right: 1px solid rgba(255, 255, 255, 0.075);
     background:
-        radial-gradient(circle at 20% 2%, rgba(0, 196, 204, 0.18), transparent 17rem),
+        radial-gradient(circle at 20% 2%, rgba(0, 169, 199, 0.18), transparent 17rem),
         linear-gradient(180deg, var(--palette-petrol) 0%, #273975 54%, #18264c 100%);
     box-shadow: 10px 0 32px rgba(38, 70, 83, 0.16);
 }
@@ -42,7 +42,7 @@ body:not(.guest) {
     bottom: 76px;
     width: 150px;
     height: 105px;
-    border: 1px solid rgba(0, 196, 204, 0.1);
+    border: 1px solid rgba(0, 169, 199, 0.1);
     border-radius: 100% 0 100% 0;
     transform: rotate(-18deg);
     pointer-events: none;
@@ -57,7 +57,7 @@ body:not(.guest) {
 .sidebar__logo {
     width: 44px;
     height: 44px;
-    border: 1px solid rgba(0, 196, 204, 0.72);
+    border: 1px solid rgba(0, 169, 199, 0.72);
     border-radius: 14px 14px 14px 5px;
     background: linear-gradient(135deg, #e4f0f6, var(--palette-smoke-blue));
     color: var(--palette-petrol);
@@ -95,8 +95,8 @@ body:not(.guest) {
 }
 
 .sidebar__item:hover {
-    border-color: rgba(0, 196, 204, 0.18);
-    background: rgba(0, 196, 204, 0.1);
+    border-color: rgba(0, 169, 199, 0.18);
+    background: rgba(0, 169, 199, 0.1);
     color: #fffdf7;
 }
 
@@ -173,7 +173,7 @@ body:not(.guest) {
     height: 40px;
     border: 1px solid var(--palette-sand);
     border-radius: 14px 14px 14px 5px;
-    background: #e9f7ff;
+    background: #e3f3f6;
     color: var(--palette-petrol);
     font-weight: 850;
 }
@@ -206,7 +206,7 @@ body:not(.guest) {
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 26px;
     background:
-        radial-gradient(circle at 88% 16%, rgba(0, 196, 204, 0.24), transparent 25%),
+        radial-gradient(circle at 88% 16%, rgba(0, 169, 199, 0.24), transparent 25%),
         linear-gradient(135deg, var(--palette-petrol) 0%, #315d6e 60%, #477588 100%);
     box-shadow: 0 22px 52px rgba(38, 70, 83, 0.22);
 }
@@ -261,14 +261,14 @@ body:not(.guest) {
 
 .main-content > .page-header .button--primary:hover { border-color: #fff; background: #fff; color: #18264c; }
 .main-content > .page-header .button--secondary {
-    border-color: rgba(0, 196, 204, 0.46);
-    background: rgba(0, 196, 204, 0.13);
+    border-color: rgba(0, 169, 199, 0.46);
+    background: rgba(0, 169, 199, 0.13);
     color: var(--palette-ivory);
     box-shadow: none;
     backdrop-filter: blur(8px);
 }
 
-.main-content > .page-header .button--secondary:hover { background: rgba(0, 196, 204, 0.24); color: #fff; }
+.main-content > .page-header .button--secondary:hover { background: rgba(0, 169, 199, 0.24); color: #fff; }
 
 /* ==========================================================
    BOTONES, FORMULARIOS Y ESTADOS
@@ -328,7 +328,7 @@ body:not(.guest) {
 .form-textarea:focus {
     border-color: var(--accent-hover);
     background: #fff;
-    box-shadow: 0 0 0 4px rgba(0, 196, 204, 0.32);
+    box-shadow: 0 0 0 4px rgba(0, 169, 199, 0.32);
 }
 
 :is(.trabajadores-filtros, .feriados-filtros, .marcaciones-filtros, .horarios-filtros) :is(input, select):focus,
@@ -336,7 +336,7 @@ body:not(.guest) {
 .dia-editor :is(input, select):focus {
     border-color: var(--accent-hover);
     background-color: #fff;
-    box-shadow: 0 0 0 4px rgba(0, 196, 204, 0.32);
+    box-shadow: 0 0 0 4px rgba(0, 169, 199, 0.32);
 }
 
 input[type="file"]::file-selector-button {
@@ -344,7 +344,7 @@ input[type="file"]::file-selector-button {
     padding: 7px 11px;
     border: 0;
     border-radius: 8px;
-    background: #e9f7ff;
+    background: #e3f3f6;
     color: var(--palette-petrol);
     font: inherit;
     font-size: 11px;
@@ -361,12 +361,12 @@ input[type="file"]::file-selector-button {
     text-transform: uppercase;
 }
 
-.badge--success { border-color: #bfd5df; background: #e9f7ff; color: #315f70; }
+.badge--success { border-color: #bfd5df; background: #e3f3f6; color: #315f70; }
 .badge--danger { border-color: #ead0cd; background: #f8e9e7; color: #93473f; }
 .badge--warning { border-color: var(--palette-sand); background: #f4ecdf; color: #755b37; }
 .badge--info,
-.badge--primary { border-color: #c4dce8; background: #eef7ff; color: #466f83; }
-.badge--secondary { border-color: var(--palette-sand); background: #eff3fb; color: var(--palette-graphite); }
+.badge--primary { border-color: #c4dce8; background: #eaf5f7; color: #466f83; }
+.badge--secondary { border-color: var(--palette-sand); background: #edf4f6; color: var(--palette-graphite); }
 
 :is(.solicitud-tipo, .solicitud-estado, .vacacion-estado, .campo-estado, .feriado-tipo, .area-badge) {
     border: 1px solid transparent;
@@ -380,7 +380,7 @@ input[type="file"]::file-selector-button {
 :is(.solicitud-estado--aprobada, .vacacion-estado--aprobada, .vacacion-estado--en-curso,
     .campo-estado--activa) {
     border-color: #bfd5df;
-    background: #e9f7ff;
+    background: #e3f3f6;
     color: #315f70;
 }
 
@@ -401,29 +401,29 @@ input[type="file"]::file-selector-button {
 :is(.solicitud-estado--cancelada, .vacacion-estado--cancelada, .vacacion-estado--gozada,
     .campo-estado--finalizada) {
     border-color: var(--palette-sand);
-    background: #eff3fb;
+    background: #edf4f6;
     color: var(--palette-graphite);
 }
 
 :is(.solicitud-tipo--permiso, .vacacion-estado--programada) {
     border-color: #c4dce8;
-    background: #eef7ff;
+    background: #eaf5f7;
     color: #466f83;
 }
 
 :is(.solicitud-tipo--omision-marcacion, .feriado-tipo--regional, .area-badge) {
     border-color: #c8dce7;
-    background: #eef7ff;
+    background: #eaf5f7;
     color: #3f6c80;
 }
 
-.area-badge--general { border-color: #c4dce8; background: #eef7ff; color: #466f83; }
+.area-badge--general { border-color: #c4dce8; background: #eaf5f7; color: #466f83; }
 
 .alert { border-radius: 14px; box-shadow: 0 4px 14px rgba(38, 70, 83, 0.05); }
-.alert--success { border-color: #bfd5df; background: #e9f7ff; color: #315f70; }
+.alert--success { border-color: #bfd5df; background: #e3f3f6; color: #315f70; }
 .alert--danger { border-color: #e8cbc8; background: #f8e9e7; color: #8d433d; }
 .alert--warning { border-color: var(--palette-sand); background: #f4ecdf; color: #755b37; }
-.alert--info { border-color: #c4dce8; background: #eef7ff; color: #466f83; }
+.alert--info { border-color: #c4dce8; background: #eaf5f7; color: #466f83; }
 
 /* ==========================================================
    PANELES, FILTROS Y TABLAS
@@ -548,13 +548,13 @@ a.pagination__item:hover { border-color: var(--palette-smoke-blue); background: 
 
 :is(.solicitud-card__footer, .vacacion-card__footer, .campo-card__footer, .horario-card__footer) {
     border-top-color: #e5dbc9;
-    background: #eff3fb;
+    background: #edf4f6;
 }
 
 :is(.vacacion-card__avatar, .campo-card__avatar, .trabajador-info__avatar, .trabajador-masivo__avatar) {
     border: 1px solid #c8dce7;
     border-radius: 14px 14px 14px 5px;
-    background: #e9f7ff;
+    background: #e3f3f6;
     color: var(--palette-petrol);
 }
 
@@ -576,7 +576,7 @@ a.pagination__item:hover { border-color: var(--palette-smoke-blue); background: 
 .empty-state {
     border-color: var(--palette-sand);
     border-radius: 18px;
-    background: #eff3fb;
+    background: #edf4f6;
     color: var(--text-muted);
 }
 
@@ -600,9 +600,9 @@ a.pagination__item:hover { border-color: var(--palette-smoke-blue); background: 
 
 .ra-admin {
     --ra-primary: var(--palette-petrol);
-    --ra-primary-light: #e9f7ff;
+    --ra-primary-light: #e3f3f6;
     --ra-surface: var(--surface);
-    --ra-subtle: #eff3fb;
+    --ra-subtle: #edf4f6;
     --ra-text: var(--palette-graphite);
     --ra-muted: var(--text-muted);
     --ra-border: var(--palette-sand);
@@ -617,7 +617,7 @@ a.pagination__item:hover { border-color: var(--palette-smoke-blue); background: 
     overflow: hidden;
     border-radius: 26px;
     background:
-        radial-gradient(circle at 88% 16%, rgba(0, 196, 204, 0.24), transparent 25%),
+        radial-gradient(circle at 88% 16%, rgba(0, 169, 199, 0.24), transparent 25%),
         linear-gradient(135deg, var(--palette-petrol) 0%, #315d6e 60%, #477588 100%);
     color: var(--palette-ivory);
     box-shadow: 0 22px 52px rgba(38, 70, 83, 0.22);
@@ -653,10 +653,10 @@ a.pagination__item:hover { border-color: var(--palette-smoke-blue); background: 
 .ra-report,
 .ra-pending { border-radius: 19px; box-shadow: 0 10px 28px rgba(38, 70, 83, 0.07); }
 .ra-report__head { background: var(--palette-ivory); }
-.ra-person__avatar { border: 1px solid #c8dce7; border-radius: 14px 14px 14px 5px; background: #e9f7ff; color: var(--palette-petrol); }
+.ra-person__avatar { border: 1px solid #c8dce7; border-radius: 14px 14px 14px 5px; background: #e3f3f6; color: var(--palette-petrol); }
 .ra-activity { border: 1px solid var(--palette-sand); background: #fbf9f2; }
 .ra-pending { border-top: 3px solid var(--palette-smoke-blue); }
-.ra-area { background: #eef7ff; color: #466f83; }
+.ra-area { background: #eaf5f7; color: #466f83; }
 
 /* ==========================================================
    MODALES
@@ -694,7 +694,7 @@ a.pagination__item:hover { border-color: var(--palette-smoke-blue); background: 
     --login-border: var(--palette-sand);
     --login-surface: var(--surface);
     background:
-        radial-gradient(circle at 8% 10%, rgba(0, 196, 204, 0.26), transparent 28%),
+        radial-gradient(circle at 8% 10%, rgba(0, 169, 199, 0.26), transparent 28%),
         radial-gradient(circle at 92% 88%, rgba(217, 205, 191, 0.22), transparent 30%),
         var(--palette-ivory);
 }
@@ -717,11 +717,11 @@ a.pagination__item:hover { border-color: var(--palette-smoke-blue); background: 
 .login-hero__brand { border-radius: 15px 15px 15px 6px; background: rgba(250, 248, 244, 0.95); }
 .login-hero__eyebrow,
 .login-card__eyebrow { color: var(--palette-smoke-blue); }
-.login-feature__icon { border-color: rgba(0, 196, 204, 0.44); background: rgba(0, 196, 204, 0.16); color: #e8f3f8; }
+.login-feature__icon { border-color: rgba(0, 169, 199, 0.44); background: rgba(0, 169, 199, 0.16); color: #e8f3f8; }
 .login-panel { background: var(--surface); }
 .login-card__logo { border-color: var(--palette-sand); border-radius: 16px 16px 16px 6px; background: var(--palette-ivory); }
 .login-field__control input { border-color: var(--palette-sand); border-radius: 12px; background: var(--surface); color: var(--palette-graphite); }
-.login-field__control input:focus { border-color: var(--accent-hover); background: #fff; box-shadow: 0 0 0 4px rgba(0, 196, 204, 0.32); }
+.login-field__control input:focus { border-color: var(--accent-hover); background: #fff; box-shadow: 0 0 0 4px rgba(0, 169, 199, 0.32); }
 .login-field__icon,
 .password-toggle { color: #788077; }
 .remember-option input { accent-color: var(--palette-petrol); }
@@ -732,7 +732,7 @@ a.pagination__item:hover { border-color: var(--palette-smoke-blue); background: 
 }
 
 .login-submit:hover { box-shadow: 0 16px 30px rgba(38, 70, 83, 0.32); }
-.login-security__icon { background: #e9f7ff; color: var(--palette-petrol); }
+.login-security__icon { background: #e3f3f6; color: var(--palette-petrol); }
 
 /* ==========================================================
    ACCESIBILIDAD Y RESPONSIVE

@@ -70,7 +70,7 @@
 .trabajadores-filtros input:focus,
 .trabajadores-filtros select:focus {
     outline: none;
-    border-color: #2b6ff7;
+    border-color: #168fa8;
     box-shadow: 0 0 0 2px rgba(43, 111, 247, 0.1);
 }
 
@@ -291,7 +291,7 @@
 
     border-radius: 3px;
 
-    background: #2b6ff7;
+    background: #168fa8;
 }
 
 .form-grid {
@@ -345,7 +345,7 @@
 .form-grid textarea:focus {
     outline: none;
 
-    border-color: #2b6ff7;
+    border-color: #168fa8;
 
     box-shadow: 0 0 0 2px rgba(43, 111, 247, 0.1);
 }
@@ -798,8 +798,8 @@
     font-size: 13px;
 }
 .trabajadores-panel .trabajadores-filtros :is(input, select):focus {
-    border-color: #00c4cc;
-    box-shadow: 0 0 0 3px rgba(0, 196, 204, 0.19);
+    border-color: #00a9c7;
+    box-shadow: 0 0 0 3px rgba(0, 169, 199, 0.19);
     outline: 0;
 }
 .trabajadores-panel .filter-actions {
@@ -810,8 +810,8 @@
     min-height: 42px;
 }
 .trabajadores-panel .filter-actions .button--primary {
-    background: #00c4cc;
-    border-color: #00c4cc;
+    background: #00a9c7;
+    border-color: #00a9c7;
     color: #111;
 }
 .trabajadores-panel .table-container {
@@ -1057,10 +1057,10 @@
 }
 .trabajadores-panel .tw-detalle-trigger:hover {
     background: #ffe8d2;
-    border-color: #00c4cc;
+    border-color: #00a9c7;
 }
 .trabajadores-panel .tw-detalle-trigger:focus-visible {
-    outline: 3px solid #00c4cc;
+    outline: 3px solid #00a9c7;
     outline-offset: 2px;
 }
 .trabajadores-panel dialog.tw-modal {
@@ -1196,9 +1196,9 @@
 .trabajadores-panel .tw-modal__header {
     background:linear-gradient(115deg,#e5fbff,#e9f0ff 55%,#f1e8ff);
     border-bottom:1px solid #d9e6f5;
-    color:#25223c;
+    color:#183844;
 }
-.trabajadores-panel .tw-modal__header h3 { color:#25223c; }
+.trabajadores-panel .tw-modal__header h3 { color:#183844; }
 .trabajadores-panel .tw-modal__header p { color:#656b86; }
 .trabajadores-panel .tw-modal__eyebrow { color:#245fd0; }
 .trabajadores-panel .tw-modal__close { background:#fff; border-color:#d3ddf2; color:#364674; }

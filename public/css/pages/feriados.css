@@ -104,7 +104,7 @@
 .feriados-filtros input:focus,
 .feriados-filtros select:focus {
     outline: none;
-    border-color: #2b6ff7;
+    border-color: #168fa8;
     box-shadow: 0 0 0 2px rgba(43, 111, 247, 0.10);
 }
 
