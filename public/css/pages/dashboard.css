@@ -928,3 +928,83 @@
     .dashboard-table td:nth-last-child(-n + 2) { border-bottom: 1px solid #eee7de; }
     .dashboard-table td:last-child { border-bottom: 0; }
 }
+
+
+/* ============================================================
+   DASHBOARD MODERNO - AISLADO DEL MENÚ LATERAL Y OTRAS VISTAS
+   ============================================================ */
+.dashboard-modern{--dm-bg:#0f172a;--dm-card:#1e293b;--dm-card-alt:#162236;--dm-border:#334155;--dm-text:#f1f5f9;--dm-muted:#94a3b8;--dm-accent:#818cf8;--dm-accent-strong:#6366f1;gap:20px}
+.dashboard-modern .dashboard-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 16px;border:1px solid #dce3ec;border-radius:14px;background:#fff}
+.dashboard-modern .dashboard-toolbar__status{display:flex;align-items:center;gap:9px;color:#475569;font-size:12px;font-weight:600}
+.dashboard-modern .dashboard-live-dot{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#10b981;box-shadow:0 0 0 4px #10b98120}
+.dashboard-modern .dashboard-toolbar__actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.dashboard-modern .dashboard-toolbar__button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:8px 13px;border:1px solid #cbd5e1;border-radius:9px;color:#334155;background:#f8fafc;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}
+.dashboard-modern .dashboard-toolbar__button--primary{background:#4f46e5;border-color:#4f46e5;color:white}
+.dashboard-modern .dashboard-metrics{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.dashboard-modern .dashboard-metric{min-height:140px;padding:21px;border:1px solid #dbe2ec;border-radius:15px;box-shadow:0 6px 22px #0f172a0b;background:#fff}
+.dashboard-modern .dashboard-metric::before{width:0}
+.dashboard-modern .dashboard-metric::after{top:15px;right:15px;width:38px;height:38px;border-radius:11px;background:#6366f110}
+.dashboard-modern .dashboard-metric__label{font-size:11px;letter-spacing:0;text-transform:none;color:#64748b}
+.dashboard-modern .dashboard-metric__value{color:#0f172a;font-size:clamp(27px,3vw,38px)}
+.dashboard-modern .dashboard-metric__caption{color:#64748b}
+.dashboard-modern .dashboard-panel{background:#fff;border-color:#dbe2ec;border-radius:15px;box-shadow:0 6px 22px #0f172a0b}
+.dashboard-modern .dashboard-panel__header h3{color:#0f172a;font-size:15px}
+.dashboard-modern .dashboard-panel__eyebrow{letter-spacing:.11em;color:#64748b}
+.dashboard-modern .dashboard-panel__description{margin:5px 0 0;color:#64748b;font-size:12px;line-height:1.5}
+.dashboard-modern .dashboard-analytics{display:grid;grid-template-columns:minmax(270px,1fr) minmax(0,2fr);gap:18px}
+.dashboard-modern .dashboard-panel--chart{padding:20px 22px;min-width:0}
+.dashboard-modern .dashboard-chart-container{position:relative;height:210px;min-width:0}
+.dashboard-modern .dashboard-chart-container--wide{height:252px}
+.dashboard-modern .dashboard-chart-legend{display:flex;flex-wrap:wrap;gap:8px 13px;justify-content:center;margin-top:12px;color:#64748b;font-size:11px}
+.dashboard-modern .dashboard-chart-legend span{display:inline-flex;align-items:center;gap:6px}
+.dashboard-modern .dashboard-chart-legend i{display:inline-block;width:9px;height:9px;border-radius:3px}
+.dashboard-modern .dashboard-area{background:#f8fafc;border-color:#e2e8f0}
+.dashboard-modern .dashboard-progress{background:#e2e8f0}
+.dashboard-modern .dashboard-progress span{background:linear-gradient(90deg,#4f46e5,#818cf8)}
+.dashboard-modern .dashboard-attention:hover{background:#eef2ff}
+.dashboard-modern .dashboard-attention b{background:#4f46e5}
+.dashboard-modern .dashboard-table th{background:#f1f5f9;border-color:#e2e8f0;color:#64748b}
+.dashboard-modern .dashboard-table td{border-color:#e2e8f0}
+.dashboard-modern.is-dark{color:var(--dm-text)}
+.dashboard-modern.is-dark .dashboard-toolbar,.dashboard-modern.is-dark .dashboard-metric,.dashboard-modern.is-dark .dashboard-panel,.dashboard-modern.is-dark .dashboard-today{background:var(--dm-card);border-color:var(--dm-border);color:var(--dm-text);box-shadow:none}
+.dashboard-modern.is-dark .dashboard-metric__value,.dashboard-modern.is-dark .dashboard-panel__header h3,.dashboard-modern.is-dark .dashboard-today h3,.dashboard-modern.is-dark .dashboard-text-link,.dashboard-modern.is-dark .dashboard-person strong,.dashboard-modern.is-dark .dashboard-area__main strong,.dashboard-modern.is-dark .dashboard-attention strong,.dashboard-modern.is-dark .dashboard-day strong,.dashboard-modern.is-dark .dashboard-quick strong,.dashboard-modern.is-dark .dashboard-report__detail>h4{color:var(--dm-text)}
+.dashboard-modern.is-dark .dashboard-toolbar__status,.dashboard-modern.is-dark .dashboard-panel__description,.dashboard-modern.is-dark .dashboard-metric__caption,.dashboard-modern.is-dark .dashboard-metric__label,.dashboard-modern.is-dark .dashboard-panel__eyebrow,.dashboard-modern.is-dark .dashboard-area__details,.dashboard-modern.is-dark .dashboard-chart-legend{color:var(--dm-muted)}
+.dashboard-modern.is-dark .dashboard-toolbar__button{background:var(--dm-card-alt);border-color:var(--dm-border);color:var(--dm-text)}
+.dashboard-modern.is-dark .dashboard-toolbar__button--primary{background:#4f46e5;border-color:#4f46e5;color:#fff}
+.dashboard-modern.is-dark .dashboard-area,.dashboard-modern.is-dark .dashboard-day,.dashboard-modern.is-dark .dashboard-quick,.dashboard-modern.is-dark .dashboard-report__filters,.dashboard-modern.is-dark .dashboard-report__metrics article,.dashboard-modern.is-dark .dashboard-report__worker-body>div{background:var(--dm-card-alt);border-color:var(--dm-border)}
+.dashboard-modern.is-dark .dashboard-table th,.dashboard-modern.is-dark .dashboard-report__table th{background:var(--dm-card-alt);border-color:var(--dm-border);color:var(--dm-muted)}
+.dashboard-modern.is-dark .dashboard-table td,.dashboard-modern.is-dark .dashboard-report__table td{border-color:var(--dm-border);color:var(--dm-text)}
+.dashboard-modern.is-dark .dashboard-day>span:nth-child(2) strong,.dashboard-modern.is-dark .dashboard-attention small{color:var(--dm-text)}
+.dashboard-modern.is-dark .dashboard-report__area,.dashboard-modern.is-dark .dashboard-report__worker{background:var(--dm-card-alt);border-color:var(--dm-border)}
+.dashboard-modern.is-dark .dashboard-report__area>summary{background:var(--dm-card)}
+.dashboard-modern.is-dark .dashboard-report__area summary strong,.dashboard-modern.is-dark .dashboard-report__worker summary strong{color:var(--dm-text)}
+@media(max-width:1050px){.dashboard-modern .dashboard-analytics{grid-template-columns:1fr}.dashboard-modern .dashboard-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:580px){.dashboard-modern .dashboard-analytics{gap:12px}.dashboard-modern .dashboard-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-modern .dashboard-metric{min-height:115px;padding:14px}.dashboard-modern .dashboard-toolbar{align-items:stretch}.dashboard-modern .dashboard-toolbar__actions{width:100%}.dashboard-modern .dashboard-toolbar__button{flex:1}.dashboard-modern .dashboard-panel--chart{padding:16px}}
+@media(max-width:390px){.dashboard-modern .dashboard-metrics{grid-template-columns:1fr}}
+
+
+/* Dashboard minimalista: estilos aislados del menú lateral y de otros módulos. */
+.dashboard-modern .dashboard-metrics{gap:14px}
+.dashboard-modern .dashboard-panel--table .dashboard-panel__header{margin-bottom:16px}
+.dashboard-modern .dashboard-table-wrap--clean{overflow-x:auto}
+.dashboard-modern .dashboard-table--clean{min-width:660px}
+.dashboard-modern .dashboard-table--clean th{font-size:11px;letter-spacing:0;text-transform:none;font-weight:700;padding:14px 17px}
+.dashboard-modern .dashboard-table--clean td{padding:13px 17px;font-size:12px}
+.dashboard-modern .dashboard-table--clean .dashboard-person strong{font-size:12px;white-space:normal;color:#1e293b}
+.dashboard-modern .dashboard-table__time{font-weight:750;font-variant-numeric:tabular-nums}
+.dashboard-modern .dashboard-eye-button{width:34px;height:34px;display:inline-grid;place-items:center;border:1px solid #c7d2fe;border-radius:9px;background:#eef2ff;color:#4f46e5;cursor:pointer;transition:background .2s,transform .2s}
+.dashboard-modern .dashboard-eye-button:hover{background:#dfe4ff;transform:translateY(-1px)}
+.dashboard-modern .dashboard-eye-button:focus-visible{outline:3px solid #818cf8;outline-offset:2px}
+.dashboard-detail-overlay[hidden]{display:none!important}
+.dashboard-detail-overlay{position:fixed;inset:0;z-index:1000;background:rgba(15,23,42,.65);display:flex;align-items:center;justify-content:center;padding:20px}
+.dashboard-detail-modal{width:min(100%,560px);max-height:min(90vh,760px);overflow:auto;padding:24px;border:1px solid #e2e8f0;border-radius:18px;background:#fff;box-shadow:0 25px 80px rgba(15,23,42,.24);color:#0f172a}
+.dashboard-detail-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+.dashboard-detail-heading small{font-size:10px;font-weight:800;letter-spacing:.12em;color:#6366f1}
+.dashboard-detail-heading h3{margin:6px 0 0;color:#0f172a;font-size:19px}
+.dashboard-detail-close{width:34px;height:34px;border:1px solid #e2e8f0;border-radius:9px;background:#f8fafc;color:#334155;font-size:23px;cursor:pointer}
+.dashboard-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0}
+.dashboard-detail-grid>div{padding:13px;border-radius:11px;background:#f8fafc;border:1px solid #edf2f7;min-width:0}
+.dashboard-detail-grid dt{font-size:11px;color:#64748b;margin-bottom:5px}
+.dashboard-detail-grid dd{font-weight:700;font-size:13px;margin:0;overflow-wrap:anywhere}
+@media(max-width:760px){.dashboard-modern .dashboard-table-wrap--clean{overflow-x:auto;margin:0;width:100%}.dashboard-modern .dashboard-table--clean{display:table;min-width:660px}.dashboard-modern .dashboard-table--clean thead{display:table-header-group}.dashboard-modern .dashboard-table--clean tbody{display:table-row-group}.dashboard-modern .dashboard-table--clean tr{display:table-row;margin:0;border:0;background:transparent}.dashboard-modern .dashboard-table--clean td{display:table-cell;border-bottom:1px solid #e2e8f0}.dashboard-modern .dashboard-table--clean td::before{display:none}.dashboard-modern .dashboard-table--clean td:first-child{background:transparent}.dashboard-modern .dashboard-table--clean .dashboard-table__empty-row td{display:table-cell}}
+@media(max-width:480px){.dashboard-detail-modal{padding:17px}.dashboard-detail-grid{grid-template-columns:1fr}}

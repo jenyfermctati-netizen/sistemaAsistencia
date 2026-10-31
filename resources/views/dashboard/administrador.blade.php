@@ -24,88 +24,33 @@
     </a>
 </section>
 
-<div class="dashboard-columns">
-    <section class="dashboard-panel dashboard-panel--wide">
-        <div class="dashboard-panel__header">
-            <div>
-                <span class="dashboard-panel__eyebrow">OPERACIÓN POR ÁREA</span>
-                <h3>Cobertura de asistencia de hoy</h3>
-            </div>
-            <a class="dashboard-text-link" href="{{ route('asistencias.index') }}">Ver asistencias <span>→</span></a>
-        </div>
 
-        <div class="dashboard-area-list">
-            @forelse($areasResumen as $area)
-                <article class="dashboard-area">
-                    <div class="dashboard-area__main">
-                        <div>
-                            <strong>{{ $area->nombre }}</strong>
-                            <span>{{ $area->trabajadores_activos }} trabajadores activos</span>
-                        </div>
-                        <span class="dashboard-area__percentage">{{ $area->cobertura }}%</span>
-                    </div>
-                    <div class="dashboard-progress" aria-label="{{ $area->cobertura }} por ciento de cobertura de asistencia">
-                        <span style="width: {{ $area->cobertura }}%"></span>
-                    </div>
-                    <div class="dashboard-area__details">
-                        <span>{{ $area->asistencias_hoy }} asistieron</span>
-                        <span>{{ $area->tardanzas_hoy }} tardanzas</span>
-                        <span>{{ $area->sin_asistencia_hoy }} sin asistencia</span>
-                        <span>{{ $area->justificadas_hoy }} justificados</span>
-                        <span>{{ $area->sin_procesar }} pendientes de registrar</span>
-                    </div>
-                </article>
-            @empty
-                <div class="dashboard-empty">Aún no hay áreas activas registradas.</div>
-            @endforelse
-        </div>
-    </section>
-
-    <aside class="dashboard-panel">
-        <div class="dashboard-panel__header">
-            <div>
-                <span class="dashboard-panel__eyebrow">POR ATENDER</span>
-                <h3>Bandeja administrativa</h3>
-            </div>
-        </div>
-
-        <div class="dashboard-attention-list">
-            <a href="{{ route('solicitudes.index', ['estado' => 'PENDIENTE']) }}" class="dashboard-attention">
-                <span class="dashboard-attention__marker dashboard-attention__marker--blue">SO</span>
-                <span><strong>Solicitudes</strong><small>Permisos y justificaciones</small></span>
-                <b>{{ $alerts['solicitudes'] }}</b>
-            </a>
-            <a href="{{ route('vacaciones.index', ['estado' => 'PENDIENTE']) }}" class="dashboard-attention">
-                <span class="dashboard-attention__marker dashboard-attention__marker--sand">VA</span>
-                <span><strong>Vacaciones</strong><small>Solicitudes por revisar</small></span>
-                <b>{{ $alerts['vacaciones'] }}</b>
-            </a>
-            <a href="{{ route('reportesAvance.index', ['estado' => 'PENDIENTE']) }}" class="dashboard-attention">
-                <span class="dashboard-attention__marker">RA</span>
-                <span><strong>Reportes de avance</strong><small>Reportes sin revisar</small></span>
-                <b>{{ $alerts['reportes'] }}</b>
-            </a>
-            <a href="{{ route('reportesAvance.index', ['pestana' => 'pendientes']) }}" class="dashboard-attention">
-                <span class="dashboard-attention__marker dashboard-attention__marker--graphite">PE</span>
-                <span><strong>Actividades pendientes</strong><small>Abiertas o por validar</small></span>
-                <b>{{ $alerts['pendientes'] }}</b>
-            </a>
-        </div>
-    </aside>
+<div id="dashboardChartData" hidden aria-hidden="true">
+    @foreach($areasResumen as $area)
+        <span data-name="{{ $area->nombre }}" data-coverage="{{ $area->cobertura }}" data-present="{{ $area->asistencias_hoy }}" data-late="{{ $area->tardanzas_hoy }}" data-absent="{{ $area->sin_asistencia_hoy }}" data-justified="{{ $area->justificadas_hoy }}"></span>
+    @endforeach
 </div>
+
+<section class="dashboard-analytics" aria-label="Gráficos de asistencia">
+    <article class="dashboard-panel dashboard-panel--chart">
+        <div class="dashboard-panel__header"><div><span class="dashboard-panel__eyebrow">PANORAMA ACTUAL</span><h3>Distribución de asistencia de hoy</h3></div></div>
+        <div class="dashboard-chart-container"><canvas id="dashboardDonut" aria-label="Gráfico de distribución de asistencia" role="img"></canvas></div>
+        <div id="dashboardDonutLegend" class="dashboard-chart-legend"></div>
+    </article>
+    <article class="dashboard-panel dashboard-panel--chart dashboard-panel--chart-wide">
+        <div class="dashboard-panel__header"><div><span class="dashboard-panel__eyebrow">COMPARATIVA</span><h3>Asistencia por área</h3></div></div>
+        <div class="dashboard-chart-container dashboard-chart-container--wide"><canvas id="dashboardAreasChart" aria-label="Gráfico de cobertura por área" role="img"></canvas></div>
+    </article>
+</section>
 
 <section class="dashboard-panel dashboard-panel--table">
     <div class="dashboard-panel__header">
         <div>
             <span class="dashboard-panel__eyebrow">ACTUALIZACIÓN RECIENTE</span>
-            <h3>Últimas asistencias procesadas</h3>
+            <h3>Marcaciones recientes</h3>
         </div>
-        <a class="button button--secondary button--small" href="{{ route('trabajadores.index') }}">Gestionar trabajadores</a>
     </div>
 
     @include('dashboard.partials.asistencias', ['asistencias' => $asistenciasRecientes, 'mostrarArea' => true])
 </section>
 
-@if($reporteControl)
-    @include('dashboard.partials.reporte-control', ['reporte' => $reporteControl])
-@endif

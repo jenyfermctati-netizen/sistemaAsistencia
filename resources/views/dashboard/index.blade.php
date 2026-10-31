@@ -6,6 +6,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/pages/dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js" defer></script>
 @endpush
 
 @section('content')
@@ -25,7 +26,11 @@
         </div>
     </div>
 
-    <div class="dashboard-page">
+    <div class="dashboard-page dashboard-modern" id="dashboardModern">
         @include($dashboardView)
     </div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/pages/dashboard.js') }}" defer></script>
+@endpush

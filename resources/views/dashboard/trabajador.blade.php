@@ -156,8 +156,4 @@
             </div>
         </aside>
     </div>
-
-    @if($reporteControl)
-        @include('dashboard.partials.reporte-control', ['reporte' => $reporteControl])
-    @endif
 @endif
