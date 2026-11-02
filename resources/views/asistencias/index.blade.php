@@ -376,7 +376,7 @@
             </div>
 
             @if ($asistencias->hasPages())
-                <div class="pagination-container asistencias-pagination">{{ $asistencias->links() }}</div>
+                <div class="pagination-container asistencias-pagination">{{ $asistencias->onEachSide(1)->links('components.pagination') }}</div>
             @endif
         </section>
 
