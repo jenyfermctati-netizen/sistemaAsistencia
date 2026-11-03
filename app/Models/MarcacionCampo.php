@@ -18,6 +18,7 @@ class MarcacionCampo extends Model
         'tipo',
         'estado',
         'registrado_por',
+        'evidencia_path',
         'revisado_por',
         'fecha_revision',
         'observacion_revision',

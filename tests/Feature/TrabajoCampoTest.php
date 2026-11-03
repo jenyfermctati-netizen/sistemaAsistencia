@@ -15,7 +15,9 @@ use App\Models\TrabajadorHorario;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class TrabajoCampoTest extends TestCase
@@ -33,6 +35,7 @@ class TrabajoCampoTest extends TestCase
         parent::setUp();
 
         Carbon::setTestNow('2026-11-03 08:30:00');
+        Storage::fake('local');
 
         $rolAdministrador = Rol::create([
             'nombre' => 'ADMINISTRADOR',
@@ -116,13 +119,26 @@ class TrabajoCampoTest extends TestCase
         $this->assertSame($this->usuarioTrabajador->id, $asignacion->autorizado_por);
 
         $this->actingAs($this->usuarioTrabajador)
-            ->post(route('asignaciones-campo.marcar', $asignacion))
+            ->post(route('asignaciones-campo.marcar', $asignacion), [
+                'evidencia' => $this->evidencia(),
+            ])
             ->assertRedirect(route('asignaciones-campo.index'));
 
         $remota = MarcacionCampo::sole();
         $this->assertSame('PENDIENTE', $remota->estado);
+        $this->assertNotNull($remota->evidencia_path);
+        Storage::disk('local')->assertExists($remota->evidencia_path);
         $this->assertDatabaseCount('marcaciones', 0);
         $this->assertDatabaseCount('asistencias', 0);
+
+        $this->actingAs($this->usuarioTrabajador)
+            ->get(route('marcaciones-campo.evidencia', $remota))
+            ->assertOk()
+            ->assertHeader('content-type', 'image/jpeg');
+
+        $this->actingAs($this->administrador)
+            ->get(route('marcaciones-campo.evidencia', $remota))
+            ->assertOk();
 
         $this->actingAs($this->usuarioTrabajador)
             ->get(route('asignaciones-campo.index'))
@@ -153,7 +169,9 @@ class TrabajoCampoTest extends TestCase
         $asignacion = $this->crearAsignacion();
 
         $this->actingAs($this->usuarioTrabajador)
-            ->post(route('asignaciones-campo.marcar', $asignacion));
+            ->post(route('asignaciones-campo.marcar', $asignacion), [
+                'evidencia' => $this->evidencia(),
+            ]);
 
         $remota = MarcacionCampo::sole();
 
@@ -196,6 +214,17 @@ class TrabajoCampoTest extends TestCase
         $this->assertDatabaseCount('marcaciones_campo', 0);
     }
 
+    public function test_foto_es_obligatoria_para_la_marcacion_remota(): void
+    {
+        $asignacion = $this->crearAsignacion();
+
+        $this->actingAs($this->usuarioTrabajador)
+            ->post(route('asignaciones-campo.marcar', $asignacion))
+            ->assertSessionHasErrors('evidencia');
+
+        $this->assertDatabaseCount('marcaciones_campo', 0);
+    }
+
     private function crearAsignacion(): AsignacionCampo
     {
         return AsignacionCampo::create([
@@ -207,5 +236,10 @@ class TrabajoCampoTest extends TestCase
             'estado' => 'ACTIVA',
             'autorizado_por' => $this->usuarioTrabajador->id,
         ]);
+    }
+
+    private function evidencia(): UploadedFile
+    {
+        return UploadedFile::fake()->image('ubicacion-campo.jpg', 800, 600);
     }
 }

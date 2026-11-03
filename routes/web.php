@@ -105,6 +105,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/asignaciones-campo/{asignacion}/marcar', [AsignacionCampoController::class, 'marcarRemoto'])
         ->middleware('throttle:10,1')
         ->name('asignaciones-campo.marcar');
+    Route::get('/marcaciones-campo/{marcacionCampo}/evidencia', [AsignacionCampoController::class, 'verEvidencia'])
+        ->name('marcaciones-campo.evidencia');
     Route::patch('/marcaciones-campo/{marcacionCampo}/revisar', [AsignacionCampoController::class, 'revisarMarcacion'])
         ->name('marcaciones-campo.revisar');
 

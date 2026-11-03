@@ -327,7 +327,7 @@
 
 .campo-review-item {
     display: grid;
-    grid-template-columns: minmax(180px, 1fr) minmax(150px, .75fr) minmax(220px, 1.3fr) minmax(280px, 1.5fr);
+    grid-template-columns: minmax(180px, 1fr) minmax(140px, .7fr) 110px minmax(200px, 1.15fr) minmax(280px, 1.5fr);
     gap: 16px;
     align-items: center;
     padding: 16px 20px;
@@ -345,6 +345,31 @@
     min-width: 0;
     flex-direction: column;
     gap: 3px;
+}
+
+.campo-review-item__evidence a {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--primary);
+    font-size: 9px;
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.campo-review-item__evidence img {
+    width: 100px;
+    height: 72px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    object-fit: cover;
+    background: var(--surface-secondary);
+}
+
+.campo-no-evidence {
+    color: #b91c1c;
+    font-size: 10px;
+    font-weight: 700;
 }
 
 .campo-review-item__identity strong,
@@ -409,6 +434,47 @@
     gap: 6px;
 }
 
+.campo-mark-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 9px;
+    width: 100%;
+}
+
+.campo-evidence-input {
+    display: flex;
+    min-width: 220px;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 750;
+    text-align: left;
+}
+
+.campo-evidence-input input {
+    width: 100%;
+    padding: 7px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 10px;
+}
+
+.campo-evidence-link {
+    color: var(--primary);
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.campo-evidence-link:hover {
+    text-decoration: underline;
+}
+
 .campo-mini-mark {
     display: inline-flex;
     padding: 4px 8px;
@@ -440,7 +506,7 @@
 }
 
 .campo-history-table {
-    min-width: 760px;
+    min-width: 860px;
 }
 
 .campo-history-table td,
@@ -527,6 +593,11 @@
 
     .campo-worker-note {
         flex-direction: column;
+    }
+
+    .campo-mark-form,
+    .campo-mark-form .button {
+        width: 100%;
     }
 }
 

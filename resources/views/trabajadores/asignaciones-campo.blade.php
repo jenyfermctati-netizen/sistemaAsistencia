@@ -102,6 +102,19 @@
                             <strong>{{ $marcacionCampo->fecha_hora?->format('d/m/Y H:i') }}</strong>
                             <small>{{ $marcacionCampo->asignacion?->lugar ?: 'Lugar no especificado' }}</small>
                         </div>
+                        <div class="campo-review-item__evidence">
+                            @if ($marcacionCampo->evidencia_path)
+                                <a href="{{ route('marcaciones-campo.evidencia', $marcacionCampo) }}" target="_blank"
+                                    rel="noopener" aria-label="Abrir evidencia fotográfica de la marcación">
+                                    <img src="{{ route('marcaciones-campo.evidencia', $marcacionCampo) }}"
+                                        alt="Evidencia de {{ $marcacionCampo->trabajador?->nombres }}"
+                                        loading="lazy">
+                                    <span>Ver foto completa</span>
+                                </a>
+                            @else
+                                <span class="campo-no-evidence">Sin evidencia</span>
+                            @endif
+                        </div>
                         <div class="campo-review-item__activity">
                             <small>Actividad declarada</small>
                             <p>{{ $marcacionCampo->asignacion?->actividad }}</p>
@@ -131,7 +144,7 @@
     @else
         <section class="campo-worker-note">
             <strong>¿Cómo funciona?</strong>
-            <span>Registra una asignación, marca durante el periodo indicado y espera la aprobación. Hasta que el administrador apruebe, la marcación no contará en tu asistencia.</span>
+            <span>Registra una asignación, toma una foto del lugar al marcar y espera la aprobación. Hasta que el administrador apruebe, la marcación no contará en tu asistencia.</span>
         </section>
     @endif
 
@@ -217,8 +230,14 @@
 
                 <div class="campo-card__footer">
                     @if ($esTrabajador && $asignacion->estado === 'ACTIVA')
-                        <form method="POST" action="{{ route('asignaciones-campo.marcar', $asignacion) }}">
+                        <form method="POST" action="{{ route('asignaciones-campo.marcar', $asignacion) }}"
+                            enctype="multipart/form-data" class="campo-mark-form">
                             @csrf
+                            <label class="campo-evidence-input">
+                                <span>Foto de evidencia *</span>
+                                <input type="file" name="evidencia" accept="image/jpeg,image/png,image/webp"
+                                    capture="environment" required>
+                            </label>
                             <button type="submit" class="button button--primary button--small">
                                 <x-ui-icon name="clock" /> Marcar ahora
                             </button>
@@ -268,13 +287,21 @@
         </div>
         <div class="campo-history-table-wrap">
             <table class="table campo-history-table">
-                <thead><tr><th>Fecha y hora</th>@if($esAdministrador)<th>Trabajador</th>@endif<th>Tipo</th><th>Actividad</th><th>Estado</th><th>Revisión</th></tr></thead>
+                <thead><tr><th>Fecha y hora</th>@if($esAdministrador)<th>Trabajador</th>@endif<th>Tipo</th><th>Evidencia</th><th>Actividad</th><th>Estado</th><th>Revisión</th></tr></thead>
                 <tbody>
                     @forelse ($marcacionesRecientes as $marcacionCampo)
                         <tr>
                             <td>{{ $marcacionCampo->fecha_hora?->format('d/m/Y H:i') }}</td>
                             @if($esAdministrador)<td>{{ $marcacionCampo->trabajador?->nombres }} {{ $marcacionCampo->trabajador?->apellidos }}</td>@endif
                             <td>{{ ucfirst(strtolower($marcacionCampo->tipo)) }}</td>
+                            <td>
+                                @if ($marcacionCampo->evidencia_path)
+                                    <a href="{{ route('marcaciones-campo.evidencia', $marcacionCampo) }}" target="_blank" rel="noopener"
+                                        class="campo-evidence-link">Ver foto</a>
+                                @else
+                                    Sin evidencia
+                                @endif
+                            </td>
                             <td>{{ \Illuminate\Support\Str::limit($marcacionCampo->asignacion?->actividad, 60) }}</td>
                             <td><span class="campo-mini-mark campo-mini-mark--{{ strtolower($marcacionCampo->estado) }}">{{ ucfirst(strtolower($marcacionCampo->estado)) }}</span></td>
                             <td>
@@ -287,7 +314,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="{{ $esAdministrador ? 6 : 5 }}">Todavía no hay marcaciones remotas.</td></tr>
+                        <tr><td colspan="{{ $esAdministrador ? 7 : 6 }}">Todavía no hay marcaciones remotas.</td></tr>
                     @endforelse
                 </tbody>
             </table>

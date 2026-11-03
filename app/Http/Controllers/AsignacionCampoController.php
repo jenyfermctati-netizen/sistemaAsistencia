@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -256,8 +257,10 @@ class AsignacionCampoController extends Controller
     }
 
     // Registrar desde la web una marcación propia de trabajo en campo.
-    public function marcarRemoto(AsignacionCampo $asignacion): RedirectResponse
-    {
+    public function marcarRemoto(
+        Request $request,
+        AsignacionCampo $asignacion
+    ): RedirectResponse {
         $this->verificarTrabajador();
         $trabajador = $this->trabajadorActual();
         $ahora = now();
@@ -274,41 +277,89 @@ class AsignacionCampoController extends Controller
             return back()->with('error', 'Esta asignación no está vigente para marcar en este momento.');
         }
 
-        $marcacionCampo = DB::transaction(function () use ($asignacion, $trabajador, $ahora) {
-            $pendientes = MarcacionCampo::where('trabajador_id', $trabajador->id)
-                ->whereDate('fecha_hora', $ahora->toDateString())
-                ->where('estado', 'PENDIENTE')
-                ->lockForUpdate()
-                ->orderBy('fecha_hora')
-                ->get();
+        $data = $request->validate([
+            'evidencia' => [
+                'required',
+                'file',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:8192',
+            ],
+        ], [
+            'evidencia.required' => 'Debes tomar o seleccionar una foto como evidencia.',
+            'evidencia.image' => 'La evidencia debe ser una imagen válida.',
+            'evidencia.mimes' => 'La foto debe estar en formato JPG, PNG o WebP.',
+            'evidencia.max' => 'La foto no puede pesar más de 8 MB.',
+        ]);
 
-            $marcacionesTemporales = $pendientes->map(
-                fn (MarcacionCampo $pendiente) => new Marcacion([
-                    'trabajador_id' => $pendiente->trabajador_id,
-                    'fecha_hora' => $pendiente->fecha_hora,
-                    'tipo' => $pendiente->tipo,
-                    'anulada' => false,
-                ])
-            );
+        $archivo = $data['evidencia'];
+        $extension = strtolower(
+            $archivo->guessExtension()
+            ?: $archivo->getClientOriginalExtension()
+            ?: 'jpg'
+        );
+        $directorio = 'marcaciones-campo/'
+            .$trabajador->id.'/'
+            .$ahora->format('Y/m/d');
+        $evidenciaPath = $archivo->storeAs(
+            $directorio,
+            Str::uuid().'.'.$extension,
+            'local'
+        );
 
-            $clasificacion = $this->clasificadorMarcacionService
-                ->clasificarNuevaMarcacion($trabajador, $ahora, $marcacionesTemporales);
+        if (! $evidenciaPath) {
+            throw ValidationException::withMessages([
+                'evidencia' => 'No se pudo guardar la foto. Inténtalo nuevamente.',
+            ]);
+        }
 
-            if (! $clasificacion) {
-                throw ValidationException::withMessages([
-                    'marcacion' => 'Ya completaste las marcaciones requeridas para hoy.',
-                ]);
-            }
+        try {
+            $marcacionCampo = DB::transaction(function () use (
+                $asignacion,
+                $trabajador,
+                $ahora,
+                $evidenciaPath
+            ) {
+                $pendientes = MarcacionCampo::where('trabajador_id', $trabajador->id)
+                    ->whereDate('fecha_hora', $ahora->toDateString())
+                    ->where('estado', 'PENDIENTE')
+                    ->lockForUpdate()
+                    ->orderBy('fecha_hora')
+                    ->get();
 
-            return MarcacionCampo::create([
-                'asignacion_campo_id' => $asignacion->id,
-                'trabajador_id' => $trabajador->id,
-                'fecha_hora' => $ahora,
-                'tipo' => $clasificacion['tipo'],
-                'estado' => 'PENDIENTE',
-                'registrado_por' => Auth::id(),
-            ])->setAttribute('etiqueta_momento', $clasificacion['etiqueta']);
-        });
+                $marcacionesTemporales = $pendientes->map(
+                    fn (MarcacionCampo $pendiente) => new Marcacion([
+                        'trabajador_id' => $pendiente->trabajador_id,
+                        'fecha_hora' => $pendiente->fecha_hora,
+                        'tipo' => $pendiente->tipo,
+                        'anulada' => false,
+                    ])
+                );
+
+                $clasificacion = $this->clasificadorMarcacionService
+                    ->clasificarNuevaMarcacion($trabajador, $ahora, $marcacionesTemporales);
+
+                if (! $clasificacion) {
+                    throw ValidationException::withMessages([
+                        'marcacion' => 'Ya completaste las marcaciones requeridas para hoy.',
+                    ]);
+                }
+
+                return MarcacionCampo::create([
+                    'asignacion_campo_id' => $asignacion->id,
+                    'trabajador_id' => $trabajador->id,
+                    'fecha_hora' => $ahora,
+                    'tipo' => $clasificacion['tipo'],
+                    'estado' => 'PENDIENTE',
+                    'registrado_por' => Auth::id(),
+                    'evidencia_path' => $evidenciaPath,
+                ])->setAttribute('etiqueta_momento', $clasificacion['etiqueta']);
+            });
+        } catch (\Throwable $exception) {
+            Storage::disk('local')->delete($evidenciaPath);
+
+            throw $exception;
+        }
 
         return redirect()
             ->route('asignaciones-campo.index')
@@ -318,6 +369,33 @@ class AsignacionCampoController extends Controller
                 .' registrada a las '.$marcacionCampo->fecha_hora->format('H:i')
                 .'. Quedó pendiente de aprobación.'
             );
+    }
+
+    public function verEvidencia(MarcacionCampo $marcacionCampo)
+    {
+        $rol = $this->rolActual();
+        $esPropietario = $rol === 'TRABAJADOR'
+            && (int) Auth::user()?->trabajador_id === (int) $marcacionCampo->trabajador_id;
+
+        abort_unless($rol === 'ADMINISTRADOR' || $esPropietario, 403);
+        abort_unless(
+            $marcacionCampo->evidencia_path
+            && Storage::disk('local')->exists($marcacionCampo->evidencia_path),
+            404
+        );
+
+        $ruta = Storage::disk('local')->path($marcacionCampo->evidencia_path);
+        $mime = Storage::disk('local')->mimeType($marcacionCampo->evidencia_path)
+            ?: 'application/octet-stream';
+        $extension = pathinfo($marcacionCampo->evidencia_path, PATHINFO_EXTENSION);
+
+        return response()->file($ruta, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline; filename="evidencia-campo-'
+                .$marcacionCampo->id.'.'.$extension.'"',
+            'Cache-Control' => 'private, no-store, max-age=0',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     // Aprobar o rechazar una marcación remota. Solo al aprobar se crea la marcación efectiva.
