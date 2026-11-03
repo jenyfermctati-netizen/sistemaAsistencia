@@ -309,6 +309,7 @@ class AsistenciaService
             $trabajador->id
         )
             ->where('estado', 'APROBADA')
+            ->whereIn('tipo', ['PERMISO', 'OMISION_MARCACION', 'OTRO'])
             ->whereDate(
                 'fecha_inicio',
                 '<=',
@@ -526,9 +527,14 @@ class AsistenciaService
         }
 
         if ($asignacion->tipo_control === 'REFERENCIAL') {
-            $estado = $marcaciones->isEmpty()
+            $solicitudFalta = $marcaciones->isEmpty()
+                ? $this->solicitudAprobadaParaFecha($trabajador->id, $fechaTexto, 'FALTA')
+                : null;
+            $estado = $solicitudFalta
+                ? 'FJ'
+                : ($marcaciones->isEmpty()
                 ? 'SIN_REGISTRO'
-                : 'PRESENTE';
+                : 'PRESENTE');
 
             $marcasFaltantesReferenciales = collect();
 
@@ -554,7 +560,9 @@ class AsistenciaService
                 default => null,
             };
             $observacion = collect([
-                $observacionBase,
+                $solicitudFalta
+                    ? $this->observacionSolicitudAprobada($solicitudFalta)
+                    : $observacionBase,
                 $ajustesCierre->isNotEmpty() ? $ajustesCierre->join(' ') : null,
             ])->filter()->join(' ') ?: null;
 
@@ -585,10 +593,11 @@ class AsistenciaService
         }
 
         if ($marcaciones->isEmpty()) {
+            $solicitudFalta = $this->solicitudAprobadaParaFecha($trabajador->id, $fechaTexto, 'FALTA');
             $this->guardarAsistencia(
                 trabajador: $trabajador,
                 fecha: $fecha,
-                estado: 'FALTA',
+                estado: $solicitudFalta ? 'FJ' : 'FALTA',
                 horarioId: $horario->id,
                 tipoControl: 'OBLIGATORIO',
                 horaProgramadaEntrada: $horaProgramadaEntrada,
@@ -596,7 +605,9 @@ class AsistenciaService
                 horaProgramadaRetornoRefrigerio: $horaProgramadaRetornoRefrigerio,
                 horaProgramadaSalida: $horaProgramadaSalida,
                 tolerancia: $diaHorario->tolerancia_minutos,
-                observacion: 'No existen marcaciones de entrada ni salida.'
+                observacion: $solicitudFalta
+                    ? $this->observacionSolicitudAprobada($solicitudFalta)
+                    : 'No existen marcaciones de entrada ni salida.'
             );
 
             return;
@@ -673,11 +684,15 @@ class AsistenciaService
             $marcasFaltantes->push('salida final');
         }
 
+        $solicitudTardanza = $minutosTardanza > 0
+            ? $this->solicitudAprobadaParaFecha($trabajador->id, $fechaTexto, 'TARDANZA')
+            : null;
+
         $this->guardarAsistencia(
             trabajador: $trabajador,
             fecha: $fecha,
             estado: $minutosTardanza > 0
-                ? 'TARDANZA'
+                ? ($solicitudTardanza ? 'TJ' : 'TARDANZA')
                 : 'PRESENTE',
             horarioId: $horario->id,
             tipoControl: 'OBLIGATORIO',
@@ -694,17 +709,42 @@ class AsistenciaService
             minutosTardanza: $minutosTardanza,
             retornoRefrigerioEstimado: $retornoRefrigerioEstimado,
             salidaEstimada: $salidaEstimada,
-            observacion: $marcasFaltantes->isEmpty() && $ajustesCierre->isEmpty()
-                ? null
-                : collect([
+            observacion: collect([
+                    $solicitudTardanza
+                        ? $this->observacionSolicitudAprobada($solicitudTardanza)
+                        : null,
                     $marcasFaltantes->isEmpty()
                         ? null
                         : 'Falta marcar: '.$marcasFaltantes->join(', ').'.',
                     $ajustesCierre->isEmpty()
                         ? null
                         : $ajustesCierre->join(' '),
-                ])->filter()->join(' ')
+                ])->filter()->join(' ') ?: null
         );
+    }
+
+    private function solicitudAprobadaParaFecha(int $trabajadorId, string $fecha, string $tipo): ?Solicitud
+    {
+        return Solicitud::where('trabajador_id', $trabajadorId)
+            ->where('tipo', $tipo)
+            ->where('estado', 'APROBADA')
+            ->whereDate('fecha_inicio', '<=', $fecha)
+            ->where(function ($query) use ($fecha) {
+                $query->whereNull('fecha_fin')->orWhereDate('fecha_fin', '>=', $fecha);
+            })
+            ->orderByDesc('fecha_revision')
+            ->first();
+    }
+
+    private function observacionSolicitudAprobada(Solicitud $solicitud): string
+    {
+        $observacion = "Solicitud aprobada ({$solicitud->tipo})";
+
+        if ($solicitud->motivo) {
+            $observacion .= ': '.Str::limit($solicitud->motivo, 350);
+        }
+
+        return $observacion;
     }
 
     private function guardarExcepcion(

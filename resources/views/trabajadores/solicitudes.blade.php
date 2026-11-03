@@ -15,25 +15,25 @@
     <header class="solicitudes-header">
         <div>
             <h2>
-                {{ $puedeGestionar ? 'Solicitudes del personal' : 'Mis solicitudes' }}
+                {{ $puedeGestionar ? ($seccion === 'mis' ? 'Mis solicitudes' : 'Bandeja de entrada') : 'Mis solicitudes' }}
             </h2>
 
             <p>
                 @if($puedeGestionar)
-                    Revisa permisos, justificaciones, tardanzas y omisiones de marcación.
+                    {{ $seccion === 'mis' ? 'Consulta y administra las solicitudes que registraste.' : 'Revisa y responde las solicitudes pendientes del personal.' }}
                 @else
                     Consulta el estado de tus solicitudes o registra una nueva.
                 @endif
             </p>
         </div>
 
-        @unless($puedeGestionar)
+        @if($puedeSolicitar && (!$puedeGestionar || $seccion === 'mis'))
             <button type="button"
                 class="button button--primary"
                 data-modal-open="modalCrearSolicitud">
                 <x-ui-icon name="plus" /> Nueva solicitud
             </button>
-        @endunless
+        @endif
     </header>
 
     {{-- MENSAJES --}}
@@ -49,6 +49,23 @@
         </div>
     @endif
 
+    @if($puedeGestionar)
+        <nav class="solicitudes-tabs" aria-label="Secciones de solicitudes">
+            <a href="{{ route('solicitudes.index', ['seccion' => 'mis']) }}"
+                class="solicitudes-tabs__link {{ $seccion === 'mis' ? 'is-active' : '' }}"
+                @if($seccion === 'mis') aria-current="page" @endif>
+                Mis Solicitudes
+                <span>{{ $misSolicitudesCount }}</span>
+            </a>
+            <a href="{{ route('solicitudes.index', ['seccion' => 'bandeja']) }}"
+                class="solicitudes-tabs__link {{ $seccion === 'bandeja' ? 'is-active' : '' }}"
+                @if($seccion === 'bandeja') aria-current="page" @endif>
+                Bandeja de entrada
+                <span>{{ $bandejaCount }}</span>
+            </a>
+        </nav>
+    @endif
+
     {{-- FILTROS --}}
     <section class="solicitudes-filter-panel">
 
@@ -62,6 +79,10 @@
         <form method="GET"
             action="{{ route('solicitudes.index') }}"
             class="solicitudes-filtros">
+
+            @if($puedeGestionar)
+                <input type="hidden" name="seccion" value="{{ $seccion }}">
+            @endif
 
             <label class="solicitudes-field solicitudes-field--search">
                 <span>Buscar</span>
@@ -90,11 +111,11 @@
                 <span>Estado</span>
 
                 <select name="estado" class="form-select">
-                    <option value="">Todos</option>
-                    <option value="PENDIENTE" @selected(request('estado') === 'PENDIENTE')>Pendiente</option>
-                    <option value="APROBADA" @selected(request('estado') === 'APROBADA')>Aprobada</option>
-                    <option value="RECHAZADA" @selected(request('estado') === 'RECHAZADA')>Rechazada</option>
-                    <option value="CANCELADA" @selected(request('estado') === 'CANCELADA')>Cancelada</option>
+                    <option value="" @selected($estadoFiltro === '')>Todos</option>
+                    <option value="PENDIENTE" @selected($estadoFiltro === 'PENDIENTE')>Pendiente</option>
+                    <option value="APROBADA" @selected($estadoFiltro === 'APROBADA')>Aprobada</option>
+                    <option value="RECHAZADA" @selected($estadoFiltro === 'RECHAZADA')>Rechazada</option>
+                    <option value="CANCELADA" @selected($estadoFiltro === 'CANCELADA')>Cancelada</option>
                 </select>
             </label>
 
@@ -112,7 +133,7 @@
                     <x-ui-icon name="filter" /> Filtrar
                 </button>
 
-                <a href="{{ route('solicitudes.index') }}"
+                <a href="{{ route('solicitudes.index', $puedeGestionar ? ['seccion' => $seccion] : []) }}"
                     class="button button--secondary">
                     <x-ui-icon name="reset" /> Restablecer
                 </a>
@@ -130,7 +151,7 @@
             <div class="solicitudes-table-heading">
                 <div>
                     <h3>
-                        {{ $puedeGestionar ? 'Solicitudes recibidas' : 'Historial de solicitudes' }}
+                        {{ $puedeGestionar ? ($seccion === 'mis' ? 'Solicitudes registradas por ti' : 'Solicitudes por revisar') : 'Historial de solicitudes' }}
                     </h3>
 
                     <p>
@@ -234,15 +255,19 @@
 
                                 data-comentario="{{ $solicitud->comentario_revision ?? '' }}"
 
-                                data-revisar-url="{{ $puedeGestionar && $solicitud->estado === 'PENDIENTE'
+                                data-revisar-url="{{ $puedeGestionar
+                                    && $solicitud->trabajador_id !== auth()->user()->trabajador_id
+                                    && $solicitud->estado === 'PENDIENTE'
                                     ? route('solicitudes.revisar', $solicitud)
                                     : '' }}"
 
-                                data-editar-url="{{ !$puedeGestionar && $solicitud->estado === 'PENDIENTE'
+                                data-editar-url="{{ $solicitud->trabajador_id === auth()->user()->trabajador_id
+                                    && $solicitud->estado === 'PENDIENTE'
                                     ? route('solicitudes.update', $solicitud)
                                     : '' }}"
 
-                                data-cancelar-url="{{ !$puedeGestionar && $solicitud->estado === 'PENDIENTE'
+                                data-cancelar-url="{{ $solicitud->trabajador_id === auth()->user()->trabajador_id
+                                    && $solicitud->estado === 'PENDIENTE'
                                     ? route('solicitudes.cancelar', $solicitud)
                                     : '' }}">
 
@@ -336,8 +361,10 @@
                                         <strong>No existen solicitudes</strong>
 
                                         <span>
-                                            @if($puedeGestionar)
-                                                No hay solicitudes registradas.
+                                            @if($puedeGestionar && $seccion === 'bandeja')
+                                                No hay solicitudes pendientes de revisión.
+                                            @elseif($puedeGestionar)
+                                                Aún no has registrado solicitudes.
                                             @else
                                                 Todavía no has registrado solicitudes.
                                             @endif
@@ -368,7 +395,7 @@
     @include('trabajadores.partials.detalle')
 
     {{-- CREAR SOLICITUD --}}
-    @unless($puedeGestionar)
+    @if($puedeSolicitar)
 
         <x-modal id="modalCrearSolicitud"
             title="Nueva solicitud"
@@ -378,6 +405,7 @@
                 action="{{ route('solicitudes.store') }}"
                 enctype="multipart/form-data"
                 class="form"
+                data-solicitud-form
                 data-live-form
                 data-live-target="solicitudes"
                 data-reset-on-success>
@@ -389,6 +417,7 @@
                     <label class="form-label">Tipo *</label>
 
                     <select name="tipo"
+                        data-solicitud-tipo
                         class="form-select"
                         required>
 
@@ -401,72 +430,49 @@
 
                     </select>
 
+                    <small class="form-help" data-solicitud-ayuda-tipo aria-live="polite">
+                        Selecciona el tipo para ver los datos que necesitas completar.
+                    </small>
+
                 </div>
 
-                <div class="form-grid form-grid--2">
+                <div class="form-grid form-grid--2" data-solicitud-fechas hidden>
 
                     <div class="form-group">
 
-                        <label class="form-label">
-                            Fecha de inicio *
-                        </label>
+                        <label class="form-label" data-solicitud-fecha-inicio-label>Fecha *</label>
 
                         <input type="date"
                             name="fecha_inicio"
+                            data-solicitud-fecha-inicio
                             class="form-control"
                             required>
 
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" data-solicitud-fecha-fin-campo>
 
-                        <label class="form-label">
-                            Fecha de fin
-                        </label>
+                        <label class="form-label" data-solicitud-fecha-fin-label>Fecha de fin</label>
 
                         <input type="date"
                             name="fecha_fin"
+                            data-solicitud-fecha-fin
                             class="form-control">
+
+                        <small class="form-help" data-solicitud-ayuda-fechas></small>
 
                     </div>
 
                 </div>
 
-                <div class="form-grid form-grid--2">
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Hora de inicio
-                        </label>
-
-                        <input type="time"
-                            name="hora_inicio"
-                            class="form-control">
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Hora de fin
-                        </label>
-
-                        <input type="time"
-                            name="hora_fin"
-                            class="form-control">
-
-                    </div>
-
-                </div>
-
-                <div class="form-group">
+                <div class="form-group" data-solicitud-campos-comunes hidden>
 
                     <label class="form-label">
                         Motivo *
                     </label>
 
                     <textarea name="motivo"
+                        data-solicitud-motivo
                         class="form-textarea"
                         rows="5"
                         maxlength="2000"
@@ -475,10 +481,10 @@
 
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-solicitud-campos-comunes hidden>
 
                     <label class="form-label">
-                        Sustento
+                        Sustento (opcional)
                     </label>
 
                     <input type="file"
@@ -520,6 +526,7 @@
                 id="formEditarSolicitud"
                 enctype="multipart/form-data"
                 class="form"
+                data-solicitud-form
                 data-live-form
                 data-live-target="solicitudes">
 
@@ -534,6 +541,7 @@
 
                     <select name="tipo"
                         id="editarSolicitudTipo"
+                        data-solicitud-tipo
                         class="form-select"
                         required>
 
@@ -545,70 +553,44 @@
 
                     </select>
 
+                    <small class="form-help" data-solicitud-ayuda-tipo aria-live="polite">
+                        Los campos se ajustan al tipo de solicitud.
+                    </small>
+
                 </div>
 
-                <div class="form-grid form-grid--2">
+                <div class="form-grid form-grid--2" data-solicitud-fechas hidden>
 
                     <div class="form-group">
 
-                        <label class="form-label">
-                            Fecha de inicio *
-                        </label>
+                        <label class="form-label" data-solicitud-fecha-inicio-label>Fecha *</label>
 
                         <input type="date"
                             name="fecha_inicio"
                             id="editarSolicitudInicio"
+                            data-solicitud-fecha-inicio
                             class="form-control"
                             required>
 
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" data-solicitud-fecha-fin-campo>
 
-                        <label class="form-label">
-                            Fecha de fin
-                        </label>
+                        <label class="form-label" data-solicitud-fecha-fin-label>Fecha de fin</label>
 
                         <input type="date"
                             name="fecha_fin"
                             id="editarSolicitudFin"
+                            data-solicitud-fecha-fin
                             class="form-control">
+
+                        <small class="form-help" data-solicitud-ayuda-fechas></small>
 
                     </div>
 
                 </div>
 
-                <div class="form-grid form-grid--2">
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Hora de inicio
-                        </label>
-
-                        <input type="time"
-                            name="hora_inicio"
-                            id="editarSolicitudHoraInicio"
-                            class="form-control">
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Hora de fin
-                        </label>
-
-                        <input type="time"
-                            name="hora_fin"
-                            id="editarSolicitudHoraFin"
-                            class="form-control">
-
-                    </div>
-
-                </div>
-
-                <div class="form-group">
+                <div class="form-group" data-solicitud-campos-comunes hidden>
 
                     <label class="form-label">
                         Motivo *
@@ -616,6 +598,7 @@
 
                     <textarea name="motivo"
                         id="editarSolicitudMotivo"
+                        data-solicitud-motivo
                         class="form-textarea"
                         rows="5"
                         maxlength="2000"
@@ -623,10 +606,10 @@
 
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-solicitud-campos-comunes hidden>
 
                     <label class="form-label">
-                        Reemplazar sustento
+                        Reemplazar sustento (opcional)
                     </label>
 
                     <input type="file"
@@ -695,7 +678,7 @@
 
         </x-modal>
 
-    @endunless
+    @endif
 
     {{-- REVISAR ADMIN --}}
     @if($puedeGestionar)

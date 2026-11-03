@@ -106,7 +106,7 @@ class DashboardController extends Controller
                 'trabajadores' => Trabajador::where('estado', 'ACTIVO')->count(),
                 'areas' => Area::where('estado', true)->count(),
                 'asistencias' => (clone $registrosHoy)
-                    ->whereIn('estado', ['PRESENTE', 'TARDANZA', 'CAMPO'])
+                    ->whereIn('estado', ['PRESENTE', 'TARDANZA', 'TJ', 'CAMPO'])
                     ->count(),
                 'puntuales' => (clone $registrosHoy)->where('estado', 'PRESENTE')->count(),
                 'tardanzas' => (clone $registrosHoy)->where('estado', 'TARDANZA')->count(),
@@ -211,7 +211,7 @@ class DashboardController extends Controller
             'metrics' => [
                 'trabajadores' => (clone $trabajadores)->count(),
                 'asistencias' => (clone $registrosAsistencia)
-                    ->whereIn('estado', ['PRESENTE', 'TARDANZA', 'CAMPO'])
+                    ->whereIn('estado', ['PRESENTE', 'TARDANZA', 'TJ', 'CAMPO'])
                     ->count(),
                 'puntuales' => (clone $registrosAsistencia)->where('estado', 'PRESENTE')->count(),
                 'incidencias' => (clone $registrosAsistencia)
@@ -278,7 +278,7 @@ class DashboardController extends Controller
             ->whereDate('fecha', $hoy)
             ->first();
         $datos['metrics'] = [
-            'presentes' => (clone $asistenciasMes)->whereIn('estado', ['PRESENTE', 'TARDANZA', 'CAMPO'])->count(),
+            'presentes' => (clone $asistenciasMes)->whereIn('estado', ['PRESENTE', 'TARDANZA', 'TJ', 'CAMPO'])->count(),
             'tardanzas' => (clone $asistenciasMes)->where('estado', 'TARDANZA')->count(),
             'incidencias' => (clone $asistenciasMes)->whereIn('estado', ['FALTA', 'SIN_REGISTRO'])->count(),
             'horas' => $horas.' h'.($minutos ? ' '.$minutos.' min' : ''),
@@ -360,6 +360,7 @@ class DashboardController extends Controller
             $asistieron = (int) (
                 ($porEstado['PRESENTE'] ?? 0)
                 + ($porEstado['TARDANZA'] ?? 0)
+                + ($porEstado['TJ'] ?? 0)
                 + ($porEstado['CAMPO'] ?? 0)
             );
             $ausencias = (int) (
@@ -368,6 +369,8 @@ class DashboardController extends Controller
             );
             $justificadas = (int) (
                 ($porEstado['JUSTIFICADO'] ?? 0)
+                + ($porEstado['FJ'] ?? 0)
+                + ($porEstado['TJ'] ?? 0)
                 + ($porEstado['PERMISO'] ?? 0)
                 + ($porEstado['VACACIONES'] ?? 0)
                 + ($porEstado['FERIADO'] ?? 0)

@@ -16,6 +16,8 @@
         'PRESENTE' => 'Presente',
         'TARDANZA' => 'Tardanza',
         'FALTA' => 'Falta',
+        'FJ' => 'Falta justificada',
+        'TJ' => 'Tardanza justificada',
         'JUSTIFICADO' => 'Justificado',
         'CAMPO' => 'Campo',
         'VACACIONES' => 'Vacaciones',
@@ -28,6 +30,8 @@
         'PRESENTE' => 'Presente',
         'TARDANZA' => 'Tardanza',
         'FALTA' => 'Falta',
+        'FJ' => 'FJ',
+        'TJ' => 'TJ',
         'JUSTIFICADO' => 'Justificado',
         'CAMPO' => 'Campo',
         'VACACIONES' => 'Vacaciones',
@@ -326,7 +330,11 @@
                                 </td>
 
                                 <td class="attendance-result" data-label="Resultado">
-                                    <span class="attendance-status attendance-status--{{ $estadoClase }}">{{ $estadoTexto }}</span>
+                                    <span class="attendance-status attendance-status--{{ $estadoClase }}"
+                                        title="{{ $estadosVisuales[$estado] ?? $estadoTexto }}"
+                                        aria-label="{{ $estadosVisuales[$estado] ?? $estadoTexto }}">
+                                        {{ $estadoTexto }}
+                                    </span>
                                     <p title="{{ $asistencia->observacion }}">{{ $asistencia->observacion ?: 'Sin observaciones.' }}</p>
                                 </td>
 

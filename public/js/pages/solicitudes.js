@@ -2,15 +2,113 @@ document.addEventListener('DOMContentLoaded', () => {
     const $ = id => document.getElementById(id);
     const txt = (id,value,fallback='-') => { const el=$(id); if(el) el.textContent=value||fallback; };
 
+    const tiposSolicitud = {
+        TARDANZA: {
+            ayuda: 'Justifica una tardanza indicando el día en que ocurrió.',
+            fecha: 'Fecha de la tardanza *',
+            motivo: 'Explica brevemente el motivo de la tardanza.'
+        },
+        FALTA: {
+            rango: true,
+            ayuda: 'Justifica uno o varios días consecutivos de inasistencia.',
+            fechas: 'Selecciona el día o el rango continuo de días que faltaste.',
+            motivo: 'Indica por qué faltaste durante las fechas seleccionadas.'
+        },
+        PERMISO: {
+            rango: true,
+            ayuda: 'Solicita permiso para uno o varios días completos.',
+            fechas: 'Selecciona un día o el rango de días completos que necesitas.',
+            motivo: 'Describe el motivo y las fechas del permiso solicitado.'
+        },
+        OMISION_MARCACION: {
+            ayuda: 'Registra el día en que olvidaste realizar una marcación.',
+            fecha: 'Día de la omisión *',
+            motivo: 'Indica qué ocurrió el día que olvidaste marcar.'
+        },
+        OTRO: {
+            ayuda: 'Registra una solicitud que no corresponda a las opciones anteriores.',
+            fecha: 'Fecha *',
+            motivo: 'Describe el motivo de tu solicitud.'
+        }
+    };
+
+    function actualizarFormularioSolicitud(form, limpiarCamposOcultos = true) {
+        if (!form) return;
+
+        const tipo = form.querySelector('[data-solicitud-tipo]')?.value || '';
+        const config = tiposSolicitud[tipo];
+        const grupoFechas = form.querySelector('[data-solicitud-fechas]');
+        const fechaInicio = form.querySelector('[data-solicitud-fecha-inicio]');
+        const grupoFechaFin = form.querySelector('[data-solicitud-fecha-fin-campo]');
+        const fechaFin = form.querySelector('[data-solicitud-fecha-fin]');
+        const ayudaTipo = form.querySelector('[data-solicitud-ayuda-tipo]');
+        const ayudaFechas = form.querySelector('[data-solicitud-ayuda-fechas]');
+        const camposComunes = form.querySelectorAll('[data-solicitud-campos-comunes]');
+
+        if (grupoFechas) grupoFechas.hidden = !config;
+        if (fechaInicio) {
+            fechaInicio.disabled = !config;
+            fechaInicio.required = Boolean(config);
+        }
+
+        const mostrarRango = Boolean(config?.rango);
+        if (grupoFechaFin) grupoFechaFin.hidden = !mostrarRango;
+        if (fechaFin) {
+            fechaFin.disabled = !mostrarRango;
+            fechaFin.min = mostrarRango && fechaInicio?.value ? fechaInicio.value : '';
+            if (!mostrarRango && limpiarCamposOcultos) fechaFin.value = '';
+        }
+
+        camposComunes.forEach(campo => { campo.hidden = !config; });
+
+        const motivo = form.querySelector('[data-solicitud-motivo]');
+        if (motivo) {
+            motivo.disabled = !config;
+            motivo.required = Boolean(config);
+            motivo.placeholder = config?.motivo || 'Describe el motivo de tu solicitud.';
+        }
+
+        const etiquetaInicio = form.querySelector('[data-solicitud-fecha-inicio-label]');
+        if (etiquetaInicio) {
+            etiquetaInicio.textContent = mostrarRango ? 'Fecha de inicio *' : (config?.fecha || 'Fecha *');
+        }
+
+        const etiquetaFin = form.querySelector('[data-solicitud-fecha-fin-label]');
+        if (etiquetaFin) etiquetaFin.textContent = 'Fecha de fin (opcional)';
+
+        if (ayudaTipo) ayudaTipo.textContent = config?.ayuda || 'Selecciona el tipo para ver los datos que necesitas completar.';
+        if (ayudaFechas) {
+            ayudaFechas.textContent = tipo === 'FALTA'
+                ? config.fechas
+                : (mostrarRango ? config.fechas : '');
+        }
+    }
+
+    document.querySelectorAll('[data-solicitud-form]').forEach(form => {
+        actualizarFormularioSolicitud(form, false);
+        form.querySelector('[data-solicitud-tipo]')?.addEventListener('change', () => {
+            actualizarFormularioSolicitud(form, true);
+        });
+
+        const fechaInicio = form.querySelector('[data-solicitud-fecha-inicio]');
+        const fechaFin = form.querySelector('[data-solicitud-fecha-fin]');
+        fechaInicio?.addEventListener('change', () => {
+            if (!fechaFin) return;
+            fechaFin.min = fechaInicio.value || '';
+            if (fechaFin.value && fechaInicio.value && fechaFin.value < fechaInicio.value) {
+                fechaFin.value = '';
+            }
+        });
+    });
+
     function editar(d) {
         const form=$('formEditarSolicitud'); if(!form)return;
         form.action=d.url||d.editarUrl||'';
         $('editarSolicitudTipo').value=d.tipo||d.tipoCodigo||'';
         $('editarSolicitudInicio').value=d.inicio||d.fechaInicioEdit||'';
         $('editarSolicitudFin').value=d.fin||d.fechaFinEdit||'';
-        $('editarSolicitudHoraInicio').value=d.horaInicio||'';
-        $('editarSolicitudHoraFin').value=d.horaFin||'';
         $('editarSolicitudMotivo').value=d.motivo||'';
+        actualizarFormularioSolicitud(form, false);
         window.AppModal?.open('modalEditarSolicitud');
     }
 

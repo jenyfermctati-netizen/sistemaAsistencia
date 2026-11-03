@@ -2,6 +2,7 @@
     $etiquetas = [
         'PRESENTE' => 'Puntual', 'TARDANZA' => 'Tarde', 'CAMPO' => 'En campo',
         'FALTA' => 'Falta', 'SIN_REGISTRO' => 'Sin registro',
+        'FJ' => 'Falta justificada', 'TJ' => 'Tardanza justificada',
         'PERMISO' => 'Permiso', 'VACACIONES' => 'Vacaciones',
         'JUSTIFICADO' => 'Justificado', 'FERIADO' => 'Feriado', 'NO_LABORABLE' => 'No laborable',
     ];

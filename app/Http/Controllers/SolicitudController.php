@@ -6,6 +6,7 @@ use App\Models\Asistencia;
 use App\Models\Solicitud;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -17,17 +18,30 @@ class SolicitudController extends Controller
         $usuario = Auth::user();
         $rol = strtoupper(trim((string) $usuario->rol?->nombre));
         $puedeGestionar = in_array($rol, ['ADMINISTRADOR', 'GERENTE'], true);
+        $puedeSolicitar = (bool) $usuario->trabajador_id;
+        $seccion = $puedeGestionar
+            ? ($request->query('seccion') === 'mis' ? 'mis' : 'bandeja')
+            : 'mis';
+        $estadoFiltro = $request->input('estado', $puedeGestionar && $seccion === 'bandeja' ? 'PENDIENTE' : '');
 
         $query = Solicitud::with(['trabajador.area', 'asistencia', 'revisadoPor']);
 
         if ($rol === 'GERENTE') {
             $areaId = $usuario->trabajador?->area_id;
-
-            $areaId
-                ? $query->whereHas('trabajador', fn ($trabajador) =>
-                    $trabajador->where('area_id', $areaId))
-                    ->where('trabajador_id', '!=', $usuario->trabajador_id)
-                : $query->whereRaw('1 = 0');
+            if ($seccion === 'mis') {
+                $query->where('trabajador_id', $usuario->trabajador_id ?? 0);
+            } elseif ($areaId) {
+                $query->whereHas('trabajador', fn ($trabajador) => $trabajador->where('area_id', $areaId))
+                    ->where('trabajador_id', '!=', $usuario->trabajador_id ?? 0);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        } elseif ($rol === 'ADMINISTRADOR') {
+            if ($seccion === 'mis') {
+                $query->where('trabajador_id', $usuario->trabajador_id ?? 0);
+            } elseif ($usuario->trabajador_id) {
+                $query->where('trabajador_id', '!=', $usuario->trabajador_id);
+            }
         } elseif ($rol !== 'ADMINISTRADOR') {
             if (!$usuario->trabajador_id)
                 $query->whereRaw('1 = 0');
@@ -51,8 +65,8 @@ class SolicitudController extends Controller
 
         if ($request->filled('tipo'))
             $query->where('tipo', $request->tipo);
-        if ($request->filled('estado'))
-            $query->where('estado', $request->estado);
+        if ($estadoFiltro !== '')
+            $query->where('estado', $estadoFiltro);
 
         if ($request->filled('fecha')) {
             $fecha = $request->fecha;
@@ -69,15 +83,30 @@ class SolicitudController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('trabajadores.solicitudes', compact('solicitudes', 'puedeGestionar'));
+        $misSolicitudesCount = $puedeGestionar && $usuario->trabajador_id
+            ? Solicitud::where('trabajador_id', $usuario->trabajador_id)->count()
+            : 0;
+        $bandejaCount = 0;
+        if ($puedeGestionar) {
+            $pendientes = Solicitud::where('estado', 'PENDIENTE');
+            if ($rol === 'GERENTE') {
+                $areaId = $usuario->trabajador?->area_id;
+                if ($areaId) {
+                    $pendientes->whereHas('trabajador', fn ($trabajador) => $trabajador->where('area_id', $areaId));
+                } else {
+                    $pendientes->whereRaw('1 = 0');
+                }
+            }
+            if ($usuario->trabajador_id) $pendientes->where('trabajador_id', '!=', $usuario->trabajador_id);
+            $bandejaCount = $pendientes->count();
+        }
+
+        return view('trabajadores.solicitudes', compact('solicitudes', 'puedeGestionar', 'puedeSolicitar', 'seccion', 'misSolicitudesCount', 'bandejaCount', 'estadoFiltro'));
     }
 
     public function store(Request $request)
     {
         $usuario = Auth::user();
-        if (in_array($usuario->rol?->nombre, ['ADMINISTRADOR', 'GERENTE'], true))
-            abort(403);
-
         if (!$usuario->trabajador_id) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Tu cuenta no está asociada a un trabajador.'], 422);
@@ -147,8 +176,8 @@ class SolicitudController extends Controller
             'tipo' => $data['tipo'],
             'fecha_inicio' => $data['fecha_inicio'],
             'fecha_fin' => $data['fecha_fin'] ?? null,
-            'hora_inicio' => $data['hora_inicio'] ?? null,
-            'hora_fin' => $data['hora_fin'] ?? null,
+            'hora_inicio' => $data['hora_inicio'] ?? $solicitud->hora_inicio,
+            'hora_fin' => $data['hora_fin'] ?? $solicitud->hora_fin,
             'motivo' => $data['motivo'],
             'archivo' => $archivo,
             'asistencia_id' => $asistenciaId,
@@ -193,14 +222,20 @@ class SolicitudController extends Controller
             ]);
         }
 
-        $solicitud->update([
-            'estado' => $data['decision'],
-            'revisado_por' => Auth::id(),
-            'comentario_revision' => $data['decision'] === 'RECHAZADA'
-                ? trim($data['comentario_revision'])
-                : null,
-            'fecha_revision' => now(),
-        ]);
+        DB::transaction(function () use ($solicitud, $data) {
+            $solicitud->update([
+                'estado' => $data['decision'],
+                'revisado_por' => Auth::id(),
+                'comentario_revision' => $data['decision'] === 'RECHAZADA'
+                    ? trim($data['comentario_revision'])
+                    : null,
+                'fecha_revision' => now(),
+            ]);
+
+            if ($data['decision'] === 'APROBADA') {
+                $this->aplicarJustificacionEnAsistencias($solicitud);
+            }
+        });
 
         $mensaje = $data['decision'] === 'APROBADA'
             ? 'Solicitud aprobada correctamente.'
@@ -239,7 +274,7 @@ class SolicitudController extends Controller
         return $request->validate([
             'tipo' => ['required', Rule::in(['TARDANZA', 'FALTA', 'PERMISO', 'OMISION_MARCACION', 'OTRO'])],
             'fecha_inicio' => ['required', 'date'],
-            'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+            'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_inicio', 'prohibited_unless:tipo,FALTA,PERMISO'],
             'hora_inicio' => ['nullable', 'date_format:H:i', 'required_with:hora_fin'],
             'hora_fin' => ['nullable', 'date_format:H:i', 'required_with:hora_inicio'],
             'motivo' => ['required', 'string', 'max:2000'],
@@ -275,6 +310,50 @@ class SolicitudController extends Controller
             ->value('id');
     }
 
+    private function aplicarJustificacionEnAsistencias(Solicitud $solicitud): void
+    {
+        $estadoOrigen = match ($solicitud->tipo) {
+            'FALTA' => 'FALTA',
+            'TARDANZA' => 'TARDANZA',
+            default => null,
+        };
+
+        if (! $estadoOrigen) {
+            return;
+        }
+
+        $estadoJustificado = $solicitud->tipo === 'FALTA' ? 'FJ' : 'TJ';
+        $asistencias = Asistencia::where('trabajador_id', $solicitud->trabajador_id)
+            ->where(function ($query) use ($estadoOrigen, $solicitud) {
+                $query->where('estado', $estadoOrigen);
+
+                if ($solicitud->tipo === 'FALTA') {
+                    $query->orWhere(function ($sinMarcaciones) {
+                        $sinMarcaciones->where('estado', 'SIN_REGISTRO')
+                            ->whereNull('marcacion_entrada_id')
+                            ->whereNull('marcacion_salida_refrigerio_id')
+                            ->whereNull('marcacion_retorno_refrigerio_id')
+                            ->whereNull('marcacion_salida_id');
+                    });
+                }
+            })
+            ->whereDate('fecha', '>=', $solicitud->fecha_inicio)
+            ->whereDate('fecha', '<=', $solicitud->fecha_fin ?? $solicitud->fecha_inicio)
+            ->get();
+
+        foreach ($asistencias as $asistencia) {
+            $detalle = "Solicitud aprobada ({$solicitud->tipo})";
+            if ($solicitud->motivo) {
+                $detalle .= ': ' . mb_substr($solicitud->motivo, 0, 350);
+            }
+
+            $asistencia->update([
+                'estado' => $estadoJustificado,
+                'observacion' => $detalle,
+            ]);
+        }
+    }
+
     private function verificarPropietario(Solicitud $solicitud): void
     {
         $usuario = Auth::user();
@@ -284,6 +363,12 @@ class SolicitudController extends Controller
     private function verificarSupervisor(Solicitud $solicitud): void
     {
         $usuario = Auth::user();
+
+        abort_if(
+            $usuario?->trabajador_id === $solicitud->trabajador_id,
+            403,
+            'No puedes revisar tu propia solicitud.'
+        );
 
         if ($usuario?->rol?->nombre === 'ADMINISTRADOR') {
             return;

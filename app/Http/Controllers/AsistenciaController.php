@@ -67,6 +67,8 @@ class AsistenciaController extends Controller
             'excepciones' => (clone $query)
                 ->whereIn('estado', [
                     'JUSTIFICADO',
+                    'FJ',
+                    'TJ',
                     'CAMPO',
                     'VACACIONES',
                     'PERMISO',
@@ -81,6 +83,8 @@ class AsistenciaController extends Controller
                 'INCIDENCIAS' => $query->whereIn('estado', ['TARDANZA', 'FALTA', 'SIN_REGISTRO']),
                 'EXCEPCIONES' => $query->whereIn('estado', [
                     'JUSTIFICADO',
+                    'FJ',
+                    'TJ',
                     'CAMPO',
                     'VACACIONES',
                     'PERMISO',

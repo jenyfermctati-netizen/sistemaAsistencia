@@ -11,6 +11,7 @@
         $estadoHoy = $asistenciaHoy?->estado ?? 'SIN_PROCESAR';
         $etiquetaHoy = [
             'PRESENTE' => 'Presente', 'TARDANZA' => 'Tardanza', 'FALTA' => 'Falta',
+            'FJ' => 'Falta justificada', 'TJ' => 'Tardanza justificada',
             'JUSTIFICADO' => 'Justificado', 'CAMPO' => 'Trabajo en campo',
             'VACACIONES' => 'Vacaciones', 'PERMISO' => 'Permiso', 'FERIADO' => 'Feriado',
             'NO_LABORABLE' => 'No laborable', 'SIN_REGISTRO' => 'Sin registro',
