@@ -131,6 +131,16 @@ class Trabajador extends Model
         return $this->hasMany(Marcacion::class, 'trabajador_id');
     }
 
+    public function asignacionesCampo()
+    {
+        return $this->hasMany(AsignacionCampo::class, 'trabajador_id');
+    }
+
+    public function marcacionesCampo()
+    {
+        return $this->hasMany(MarcacionCampo::class, 'trabajador_id');
+    }
+
     public function vacaciones()
     {
         return $this->hasMany(Vacaciones::class, 'trabajador_id');

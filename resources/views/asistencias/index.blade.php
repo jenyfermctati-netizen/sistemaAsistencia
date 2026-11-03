@@ -39,6 +39,7 @@
     $origenesVisuales = [
         'BIOMETRICO' => 'Biométrico',
         'MANUAL' => 'Manual',
+        'WEB_CAMPO' => 'Web campo',
         'MIXTO' => 'Mixto',
     ];
     $baseSinEstado = request()->except(['page', 'estado']);

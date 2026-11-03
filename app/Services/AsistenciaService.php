@@ -263,7 +263,11 @@ class AsistenciaService
             )
             ->first();
 
-        if ($campo) {
+        $tieneMarcacionCampoAprobada = $marcaciones->contains(
+            fn (Marcacion $marcacion) => $marcacion->origen === 'WEB_CAMPO'
+        );
+
+        if ($campo && $tieneMarcacionCampoAprobada) {
             $detalle = 'Trabajo en campo';
 
             if ($campo->lugar) {

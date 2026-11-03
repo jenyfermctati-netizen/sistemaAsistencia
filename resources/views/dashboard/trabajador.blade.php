@@ -97,6 +97,7 @@
                                 · {{ match($asistencia->origen_marcacion) {
                                     'BIOMETRICO' => 'Biométrico',
                                     'MANUAL' => 'Manual',
+                                    'WEB_CAMPO' => 'Web campo',
                                     'MIXTO' => 'Mixto',
                                     default => 'Sin marcación',
                                 } }}

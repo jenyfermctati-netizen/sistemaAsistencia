@@ -123,6 +123,12 @@
             <div class="sidebar__section">
                 <div class="sidebar__title">Mi gestión</div>
 
+                <a href="{{ route('asignaciones-campo.index') }}"
+                    class="sidebar__item {{ request()->routeIs('asignaciones-campo.*') || request()->routeIs('marcaciones-campo.*') ? 'active' : '' }}">
+                    <span class="sidebar__icon"><x-nav-icon name="briefcase" /></span>
+                    <span class="sidebar__label">Trabajo en campo</span>
+                </a>
+
                 <a href="{{ route('solicitudes.index') }}"
                     class="sidebar__item {{ request()->routeIs('solicitudes.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="requests" /></span>

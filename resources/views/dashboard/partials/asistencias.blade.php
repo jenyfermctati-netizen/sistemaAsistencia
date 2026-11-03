@@ -5,7 +5,7 @@
         'PERMISO' => 'Permiso', 'VACACIONES' => 'Vacaciones',
         'JUSTIFICADO' => 'Justificado', 'FERIADO' => 'Feriado', 'NO_LABORABLE' => 'No laborable',
     ];
-    $metodos = ['BIOMETRICO' => 'Biométrico', 'MANUAL' => 'Manual', 'MIXTO' => 'Mixto'];
+    $metodos = ['BIOMETRICO' => 'Biométrico', 'MANUAL' => 'Manual', 'WEB_CAMPO' => 'Web campo', 'MIXTO' => 'Mixto'];
 @endphp
 <div class="dashboard-table-wrap dashboard-table-wrap--clean">
     <table class="dashboard-table dashboard-table--clean">

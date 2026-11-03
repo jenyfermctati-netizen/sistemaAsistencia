@@ -36,4 +36,9 @@ class AsignacionCampo extends Model
     {
         return $this->belongsTo(User::class, 'autorizado_por');
     }
+
+    public function marcacionesRemotas()
+    {
+        return $this->hasMany(MarcacionCampo::class, 'asignacion_campo_id');
+    }
 }

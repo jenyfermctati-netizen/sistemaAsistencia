@@ -55,4 +55,9 @@ class Marcacion extends Model
             'anulada_por'
         );
     }
+
+    public function registroCampo()
+    {
+        return $this->hasOne(MarcacionCampo::class, 'marcacion_id');
+    }
 }

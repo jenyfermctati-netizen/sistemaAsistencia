@@ -102,6 +102,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/asignaciones-campo', [AsignacionCampoController::class, 'store'])->name('asignaciones-campo.store');
     Route::put('/asignaciones-campo/{asignacion}', [AsignacionCampoController::class, 'update'])->name('asignaciones-campo.update');
     Route::patch('/asignaciones-campo/{asignacion}/cancelar', [AsignacionCampoController::class, 'cancelar'])->name('asignaciones-campo.cancelar');
+    Route::post('/asignaciones-campo/{asignacion}/marcar', [AsignacionCampoController::class, 'marcarRemoto'])
+        ->middleware('throttle:10,1')
+        ->name('asignaciones-campo.marcar');
+    Route::patch('/marcaciones-campo/{marcacionCampo}/revisar', [AsignacionCampoController::class, 'revisarMarcacion'])
+        ->name('marcaciones-campo.revisar');
 
     // Solicitudes
     Route::get('/solicitudes', [SolicitudController::class, 'index'])->name('solicitudes.index');

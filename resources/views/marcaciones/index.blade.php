@@ -77,6 +77,7 @@
                                 <option value="">Todos los orígenes</option>
                                 <option value="BIOMETRICO" @selected(request('origen')==='BIOMETRICO')>Biométrico</option>
                                 <option value="MANUAL" @selected(request('origen')==='MANUAL')>Manual</option>
+                                <option value="WEB_CAMPO" @selected(request('origen')==='WEB_CAMPO')>Web campo</option>
                             </select>
                         </label>
                         <label class="mc-field">
@@ -152,7 +153,11 @@
 
                                 <td class="marcacion-cell--origen" data-label="Origen">
                                     <span class="badge {{ $marcacion->origen==='BIOMETRICO' ? 'badge--primary' : 'badge--warning' }}">
-                                        {{ $marcacion->origen==='BIOMETRICO' ? 'Biométrico' : 'Manual' }}
+                                        {{ match($marcacion->origen) {
+                                            'BIOMETRICO' => 'Biométrico',
+                                            'WEB_CAMPO' => 'Web campo',
+                                            default => 'Manual',
+                                        } }}
                                     </span>
                                 </td>
 

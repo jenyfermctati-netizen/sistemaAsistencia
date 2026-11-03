@@ -83,14 +83,24 @@ class ClasificadorMarcacionService
     /**
      * @return array{tipo: string, momento: string, etiqueta: string, total_esperado: int}|null
      */
-    public function clasificarNuevaMarcacion(Trabajador $trabajador, Carbon $fechaHora): ?array
-    {
+    public function clasificarNuevaMarcacion(
+        Trabajador $trabajador,
+        Carbon $fechaHora,
+        ?Collection $marcacionesTemporales = null
+    ): ?array {
         $diaHorario = $this->obtenerDiaHorario($trabajador, $fechaHora);
         $marcaciones = Marcacion::where('trabajador_id', $trabajador->id)
             ->whereDate('fecha_hora', $fechaHora->toDateString())
             ->where('anulada', false)
             ->orderBy('fecha_hora')
             ->get();
+
+        if ($marcacionesTemporales?->isNotEmpty()) {
+            $marcaciones = $marcaciones
+                ->concat($marcacionesTemporales)
+                ->sortBy('fecha_hora')
+                ->values();
+        }
         $totalEsperado = $this->esHorarioPartido($diaHorario) ? 4 : 2;
 
         if ($marcaciones->count() >= $totalEsperado) {

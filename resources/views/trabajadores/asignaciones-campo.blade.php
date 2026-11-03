@@ -8,37 +8,16 @@
 @endpush
 
 @section('content')
-
-    {{-- MENSAJES --}}
-    @if (session('success'))
-        <div class="alert alert--success">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert--danger">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert--danger">
-            <strong>Revisa la información ingresada.</strong>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     {{-- ENCABEZADO --}}
     <div class="page-header">
         <div>
             <h2 class="page-header__title">Trabajo en campo</h2>
             <p class="page-header__description">
-                Registra y controla las asignaciones de personal fuera de oficina.
+                @if ($esAdministrador)
+                    Asigna trabajo fuera de oficina y aprueba las marcaciones remotas del personal.
+                @else
+                    Registra tus salidas de campo y marca tu asistencia desde la web.
+                @endif
             </p>
         </div>
 
@@ -59,15 +38,20 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Área</label>
-                <select name="area_id" class="form-select">
-                    <option value="">Todas</option>
-                    @foreach ($areas as $area)
-                        <option value="{{ $area->id }}" @selected(request('area_id') == $area->id)>
-                            {{ $area->nombre }}
-                        </option>
-                    @endforeach
-                </select>
+                @if ($esAdministrador)
+                    <label class="form-label">Área</label>
+                    <select name="area_id" class="form-select">
+                        <option value="">Todas</option>
+                        @foreach ($areas as $area)
+                            <option value="{{ $area->id }}" @selected(request('area_id') == $area->id)>
+                                {{ $area->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                @else
+                    <label class="form-label">Fecha</label>
+                    <input type="date" name="fecha" value="{{ request('fecha') }}" class="form-control">
+                @endif
             </div>
 
             <div class="form-group">
@@ -81,10 +65,12 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Fecha</label>
-                <input type="date" name="fecha" value="{{ request('fecha') }}" class="form-control">
-            </div>
+            @if ($esAdministrador)
+                <div class="form-group">
+                    <label class="form-label">Fecha</label>
+                    <input type="date" name="fecha" value="{{ request('fecha') }}" class="form-control">
+                </div>
+            @endif
 
             <div class="campo-filtros__actions">
                 <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>
@@ -92,6 +78,62 @@
             </div>
         </form>
     </section>
+
+    @if ($esAdministrador)
+        <section class="campo-review panel" aria-labelledby="revisionMarcacionesTitulo">
+            <div class="campo-section-heading">
+                <div>
+                    <span>REVISIÓN ADMINISTRATIVA</span>
+                    <h3 id="revisionMarcacionesTitulo">Marcaciones remotas pendientes</h3>
+                    <p>Solo las marcaciones aprobadas se incorporan al cálculo de asistencia.</p>
+                </div>
+                <strong class="campo-counter">{{ $marcacionesPendientes->count() }}</strong>
+            </div>
+
+            <div class="campo-review-list">
+                @forelse ($marcacionesPendientes as $marcacionCampo)
+                    <article class="campo-review-item">
+                        <div class="campo-review-item__identity">
+                            <strong>{{ $marcacionCampo->trabajador?->nombres }} {{ $marcacionCampo->trabajador?->apellidos }}</strong>
+                            <span>{{ $marcacionCampo->trabajador?->area?->nombre ?? 'Sin área' }} · DNI {{ $marcacionCampo->trabajador?->dni ?? '—' }}</span>
+                        </div>
+                        <div class="campo-review-item__mark">
+                            <span class="campo-mark-type">{{ ucfirst(strtolower($marcacionCampo->tipo)) }}</span>
+                            <strong>{{ $marcacionCampo->fecha_hora?->format('d/m/Y H:i') }}</strong>
+                            <small>{{ $marcacionCampo->asignacion?->lugar ?: 'Lugar no especificado' }}</small>
+                        </div>
+                        <div class="campo-review-item__activity">
+                            <small>Actividad declarada</small>
+                            <p>{{ $marcacionCampo->asignacion?->actividad }}</p>
+                        </div>
+                        <form method="POST" action="{{ route('marcaciones-campo.revisar', $marcacionCampo) }}" class="campo-review-form">
+                            @csrf
+                            @method('PATCH')
+                            <label class="form-group">
+                                <span class="form-label">Observación (obligatoria al rechazar)</span>
+                                <input type="text" name="observacion_revision" class="form-control" maxlength="500"
+                                    placeholder="Motivo o comentario de la revisión">
+                            </label>
+                            <div>
+                                <button type="submit" name="decision" value="RECHAZAR" class="button button--danger button--small">Rechazar</button>
+                                <button type="submit" name="decision" value="APROBAR" class="button button--primary button--small">Aprobar</button>
+                            </div>
+                        </form>
+                    </article>
+                @empty
+                    <div class="campo-review-empty">
+                        <strong>No hay marcaciones por revisar</strong>
+                        <span>Las nuevas marcaciones web aparecerán aquí.</span>
+                    </div>
+                @endforelse
+            </div>
+        </section>
+    @else
+        <section class="campo-worker-note">
+            <strong>¿Cómo funciona?</strong>
+            <span>Registra una asignación, marca durante el periodo indicado y espera la aprobación. Hasta que el administrador apruebe, la marcación no contará en tu asistencia.</span>
+        </section>
+    @endif
 
     {{-- LISTADO --}}
     <section class="campo-grid">
@@ -150,15 +192,38 @@
                     @endif
 
                     <div class="campo-info campo-info--full">
-                        <span class="campo-info__label">Autorizado por</span>
+                        <span class="campo-info__label">Registrado por</span>
                         <strong>
                             {{ $asignacion->autorizadoPor?->name ?? ($asignacion->autorizadoPor?->email ?? 'Usuario del sistema') }}
+                            · {{ strtoupper((string) $asignacion->autorizadoPor?->rol?->nombre) === 'TRABAJADOR' ? 'Autoasignación' : 'Administración' }}
                         </strong>
                     </div>
+
+                    @if ($asignacion->marcacionesRemotas->isNotEmpty())
+                        <div class="campo-info campo-info--full">
+                            <span class="campo-info__label">Marcaciones web</span>
+                            <div class="campo-card-marks">
+                                @foreach ($asignacion->marcacionesRemotas as $marcacionCampo)
+                                    <span class="campo-mini-mark campo-mini-mark--{{ strtolower($marcacionCampo->estado) }}">
+                                        {{ ucfirst(strtolower($marcacionCampo->tipo)) }} {{ $marcacionCampo->fecha_hora?->format('d/m H:i') }}
+                                        · {{ ucfirst(strtolower($marcacionCampo->estado)) }}
+                                        @if ($marcacionCampo->marcacion?->anulada) · Anulada @endif
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="campo-card__footer">
-                    @if ($asignacion->estado !== 'CANCELADA')
+                    @if ($esTrabajador && $asignacion->estado === 'ACTIVA')
+                        <form method="POST" action="{{ route('asignaciones-campo.marcar', $asignacion) }}">
+                            @csrf
+                            <button type="submit" class="button button--primary button--small">
+                                <x-ui-icon name="clock" /> Marcar ahora
+                            </button>
+                        </form>
+                    @elseif ($esAdministrador && $asignacion->estado !== 'CANCELADA')
                         <button type="button" class="button button--secondary button--small" data-editar-asignacion
                             data-url="{{ route('asignaciones-campo.update', $asignacion) }}"
                             data-trabajador="{{ $asignacion->trabajador_id }}"
@@ -174,8 +239,10 @@
                             data-trabajador="{{ $asignacion->trabajador?->nombres }} {{ $asignacion->trabajador?->apellidos }}">
                             Cancelar
                         </button>
-                    @else
+                    @elseif ($asignacion->estado === 'CANCELADA')
                         <span class="campo-card__cancelada">Esta asignación fue cancelada</span>
+                    @elseif ($esTrabajador)
+                        <span class="campo-card__cancelada">El marcaje web se habilita durante el periodo asignado</span>
                     @endif
                 </div>
             </article>
@@ -191,34 +258,73 @@
         {{ $asignaciones->links() }}
     </div>
 
+    <section class="campo-history panel" aria-labelledby="historialCampoTitulo">
+        <div class="campo-section-heading">
+            <div>
+                <span>TRAZABILIDAD</span>
+                <h3 id="historialCampoTitulo">{{ $esAdministrador ? 'Historial de marcaciones remotas' : 'Mis marcaciones remotas' }}</h3>
+                <p>Últimas 30 marcaciones registradas desde la web.</p>
+            </div>
+        </div>
+        <div class="campo-history-table-wrap">
+            <table class="table campo-history-table">
+                <thead><tr><th>Fecha y hora</th>@if($esAdministrador)<th>Trabajador</th>@endif<th>Tipo</th><th>Actividad</th><th>Estado</th><th>Revisión</th></tr></thead>
+                <tbody>
+                    @forelse ($marcacionesRecientes as $marcacionCampo)
+                        <tr>
+                            <td>{{ $marcacionCampo->fecha_hora?->format('d/m/Y H:i') }}</td>
+                            @if($esAdministrador)<td>{{ $marcacionCampo->trabajador?->nombres }} {{ $marcacionCampo->trabajador?->apellidos }}</td>@endif
+                            <td>{{ ucfirst(strtolower($marcacionCampo->tipo)) }}</td>
+                            <td>{{ \Illuminate\Support\Str::limit($marcacionCampo->asignacion?->actividad, 60) }}</td>
+                            <td><span class="campo-mini-mark campo-mini-mark--{{ strtolower($marcacionCampo->estado) }}">{{ ucfirst(strtolower($marcacionCampo->estado)) }}</span></td>
+                            <td>
+                                @if ($marcacionCampo->fecha_revision)
+                                    {{ $marcacionCampo->revisadoPor?->name ?? 'Administrador' }} · {{ $marcacionCampo->fecha_revision->format('d/m H:i') }}
+                                    @if ($marcacionCampo->observacion_revision)<small>{{ $marcacionCampo->observacion_revision }}</small>@endif
+                                @else
+                                    Pendiente
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="{{ $esAdministrador ? 6 : 5 }}">Todavía no hay marcaciones remotas.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     {{-- MODAL CREAR --}}
     <x-modal id="modalCrearAsignacion" title="Nueva asignación de campo">
         <form method="POST" action="{{ route('asignaciones-campo.store') }}" class="form">
             @csrf
 
-            <div class="form-group">
-                <label class="form-label">Trabajador *</label>
-                <select name="trabajador_id" class="form-select" required>
-                    <option value="">Seleccione</option>
-                    @foreach ($trabajadores as $trabajador)
-                        <option value="{{ $trabajador->id }}">
-                            {{ $trabajador->apellidos }}, {{ $trabajador->nombres }}
-                            -
-                            {{ $trabajador->area?->nombre ?? 'Sin área' }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+            @if ($esAdministrador)
+                <div class="form-group">
+                    <label class="form-label">Trabajador *</label>
+                    <select name="trabajador_id" class="form-select" required>
+                        <option value="">Seleccione</option>
+                        @foreach ($trabajadores as $trabajador)
+                            <option value="{{ $trabajador->id }}">
+                                {{ $trabajador->apellidos }}, {{ $trabajador->nombres }}
+                                - {{ $trabajador->area?->nombre ?? 'Sin área' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
 
             <div class="form-grid form-grid--2">
                 <div class="form-group">
                     <label class="form-label">Fecha de inicio *</label>
-                    <input type="date" name="fecha_inicio" class="form-control" required>
+                    <input type="date" name="fecha_inicio" value="{{ $esTrabajador ? today()->toDateString() : '' }}"
+                        @if($esTrabajador) min="{{ today()->toDateString() }}" @endif class="form-control" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Fecha de fin *</label>
-                    <input type="date" name="fecha_fin" class="form-control" required>
+                    <input type="date" name="fecha_fin" value="{{ $esTrabajador ? today()->toDateString() : '' }}"
+                        @if($esTrabajador) min="{{ today()->toDateString() }}" @endif class="form-control" required>
                 </div>
             </div>
 
@@ -246,6 +352,7 @@
         </form>
     </x-modal>
 
+    @if ($esAdministrador)
     {{-- MODAL EDITAR --}}
     <x-modal id="modalEditarAsignacion" title="Editar asignación de campo">
         <form method="POST" id="formEditarAsignacion" class="form">
@@ -296,6 +403,7 @@
             </div>
         </form>
     </x-modal>
+    @endif
 
     {{-- MODAL CANCELAR --}}
     <x-modal id="modalCancelarAsignacion" title="Cancelar asignación" size="small">
