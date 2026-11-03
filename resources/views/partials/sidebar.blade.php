@@ -56,20 +56,26 @@
                     <span class="sidebar__label">Horario</span>
                 </a>
 
-                <a href="{{ route('asignaciones-campo.index') }}"
-                    class="sidebar__item {{ request()->routeIs('asignaciones-campo.*') ? 'active' : '' }}">
-                    <span class="sidebar__icon"><x-nav-icon name="briefcase" /></span>
-                    <span class="sidebar__label">Trabajo en campo</span>
+                <a href="{{ route('feriados.index') }}"
+                    class="sidebar__item {{ request()->routeIs('feriados.*') ? 'active' : '' }}">
+                    <span class="sidebar__icon"><x-nav-icon name="calendar" /></span>
+                    <span class="sidebar__label">Feriados</span>
                 </a>
-            </div>
-
-            <div class="sidebar__section">
-                <div class="sidebar__title">Control de asistencia</div>
 
                 <a href="{{ route('biometrico.index') }}"
                     class="sidebar__item {{ request()->routeIs('biometrico.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="fingerprint" /></span>
                     <span class="sidebar__label">Biométrico</span>
+                </a>
+            </div>
+
+            <div class="sidebar__section">
+                <div class="sidebar__title">Control de asistencia</div>
+                
+                <a href="{{ route('asignaciones-campo.index') }}"
+                    class="sidebar__item {{ request()->routeIs('asignaciones-campo.*') ? 'active' : '' }}">
+                    <span class="sidebar__icon"><x-nav-icon name="briefcase" /></span>
+                    <span class="sidebar__label">Trabajo en campo</span>
                 </a>
 
                 <a href="{{ route('marcaciones.index') }}"
@@ -82,12 +88,6 @@
                     class="sidebar__item {{ request()->routeIs('asistencias.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="attendance" /></span>
                     <span class="sidebar__label">Resumen diario</span>
-                </a>
-
-                <a href="{{ route('feriados.index') }}"
-                    class="sidebar__item {{ request()->routeIs('feriados.*') ? 'active' : '' }}">
-                    <span class="sidebar__icon"><x-nav-icon name="calendar" /></span>
-                    <span class="sidebar__label">Feriados</span>
                 </a>
             </div>
         @endif
