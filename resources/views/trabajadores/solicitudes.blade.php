@@ -445,6 +445,7 @@
                         <input type="date"
                             name="fecha_inicio"
                             data-solicitud-fecha-inicio
+                            value="{{ old('fecha_inicio', now()->toDateString()) }}"
                             class="form-control"
                             required>
 
@@ -457,6 +458,7 @@
                         <input type="date"
                             name="fecha_fin"
                             data-solicitud-fecha-fin
+                            value="{{ old('fecha_fin', now()->toDateString()) }}"
                             class="form-control">
 
                         <small class="form-help" data-solicitud-ayuda-fechas></small>

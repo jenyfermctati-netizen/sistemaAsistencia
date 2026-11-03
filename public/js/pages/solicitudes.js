@@ -1,6 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const $ = id => document.getElementById(id);
     const txt = (id,value,fallback='-') => { const el=$(id); if(el) el.textContent=value||fallback; };
+    const fechaLocalHoy = () => {
+        const hoy = new Date();
+        const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoy.getDate()).padStart(2, '0');
+        return `${hoy.getFullYear()}-${mes}-${dia}`;
+    };
 
     const tiposSolicitud = {
         TARDANZA: {
@@ -56,6 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (fechaFin) {
             fechaFin.disabled = !mostrarRango;
             fechaFin.min = mostrarRango && fechaInicio?.value ? fechaInicio.value : '';
+            if (mostrarRango && !fechaFin.value) {
+                fechaFin.value = fechaInicio?.value || fechaLocalHoy();
+            }
             if (!mostrarRango && limpiarCamposOcultos) fechaFin.value = '';
         }
 
@@ -98,6 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (fechaFin.value && fechaInicio.value && fechaFin.value < fechaInicio.value) {
                 fechaFin.value = '';
             }
+        });
+    });
+
+    document.querySelectorAll('[data-solicitud-fecha-inicio], [data-solicitud-fecha-fin]').forEach(input => {
+        input.addEventListener('click', () => {
+            if (input.disabled || typeof input.showPicker !== 'function') return;
+            try { input.showPicker(); } catch (_) { /* El navegador conserva su selector nativo. */ }
         });
     });
 

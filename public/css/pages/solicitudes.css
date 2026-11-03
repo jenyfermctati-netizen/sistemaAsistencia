@@ -199,6 +199,12 @@
     outline: none;
 }
 
+.solicitudes-page input[type="date"],
+#modalCrearSolicitud input[type="date"],
+#modalEditarSolicitud input[type="date"] {
+    cursor: pointer;
+}
+
 .solicitudes-page .form-textarea {
     min-height: 105px;
     resize: vertical;

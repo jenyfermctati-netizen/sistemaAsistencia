@@ -312,6 +312,28 @@ class SolicitudController extends Controller
 
     private function aplicarJustificacionEnAsistencias(Solicitud $solicitud): void
     {
+        if ($solicitud->tipo === 'PERMISO') {
+            $asistencias = Asistencia::where('trabajador_id', $solicitud->trabajador_id)
+                ->whereNotIn('estado', ['FERIADO', 'VACACIONES', 'CAMPO'])
+                ->whereDate('fecha', '>=', $solicitud->fecha_inicio)
+                ->whereDate('fecha', '<=', $solicitud->fecha_fin ?? $solicitud->fecha_inicio)
+                ->get();
+
+            foreach ($asistencias as $asistencia) {
+                $detalle = 'Solicitud aprobada (PERMISO)';
+                if ($solicitud->motivo) {
+                    $detalle .= ': ' . mb_substr($solicitud->motivo, 0, 350);
+                }
+
+                $asistencia->update([
+                    'estado' => 'PERMISO',
+                    'observacion' => $detalle,
+                ]);
+            }
+
+            return;
+        }
+
         $estadoOrigen = match ($solicitud->tipo) {
             'FALTA' => 'FALTA',
             'TARDANZA' => 'TARDANZA',
