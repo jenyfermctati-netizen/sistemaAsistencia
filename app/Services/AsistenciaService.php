@@ -120,6 +120,7 @@ class AsistenciaService
         $retornoRefrigerioEstimado = false;
         $salidaEstimada = false;
         $salidaReinterpretada = false;
+        $refrigerioProgramadoParaCalculo = false;
 
         $horaProgramadaEntrada = $diaHorario?->hora_entrada;
         $horaProgramadaSalidaRefrigerio = $registraJornadaPartida
@@ -440,10 +441,7 @@ class AsistenciaService
             }
 
             if (
-                $requiereJornadaCompleta
-                && $entrada
-                && $salidaRefrigerio
-                && $retornoRefrigerio
+                $entrada
                 && ! $salida
                 && $horaProgramadaSalida
             ) {
@@ -452,26 +450,11 @@ class AsistenciaService
                     $horaProgramadaSalida,
                     'SALIDA'
                 );
+                $ultimaMarca = $retornoRefrigerio
+                    ?? $salidaRefrigerio
+                    ?? $entrada;
 
-                if ($salidaProgramada->fecha_hora->gt($retornoRefrigerio->fecha_hora)) {
-                    $salida = $salidaProgramada;
-                    $salidaEstimada = true;
-                }
-            }
-
-            if (
-                ! $requiereJornadaCompleta
-                && $entrada
-                && ! $salida
-                && $horaProgramadaSalida
-            ) {
-                $salidaProgramada = $this->crearMarcacionEstimada(
-                    $fecha,
-                    $horaProgramadaSalida,
-                    'SALIDA'
-                );
-
-                if ($salidaProgramada->fecha_hora->gt($entrada->fecha_hora)) {
+                if ($salidaProgramada->fecha_hora->gt($ultimaMarca->fecha_hora)) {
                     $salida = $salidaProgramada;
                     $salidaEstimada = true;
                 }
@@ -481,12 +464,30 @@ class AsistenciaService
                 && $salida->exists
                 && $salida->tipo !== 'SALIDA';
 
-            $minutosTrabajados = $this->calcularMinutosTrabajados(
-                $entrada,
-                $salidaRefrigerio,
-                $retornoRefrigerio,
-                $salida
-            );
+            if (
+                $requiereJornadaCompleta
+                && $entrada
+                && $salida
+                && (! $salidaRefrigerio || ! $retornoRefrigerio)
+                && $horaProgramadaSalidaRefrigerio
+                && $horaProgramadaRetornoRefrigerio
+            ) {
+                $minutosTrabajados = $this->calcularMinutosConRefrigerioProgramado(
+                    $entrada,
+                    $salida,
+                    $fecha,
+                    $horaProgramadaSalidaRefrigerio,
+                    $horaProgramadaRetornoRefrigerio
+                );
+                $refrigerioProgramadoParaCalculo = true;
+            } else {
+                $minutosTrabajados = $this->calcularMinutosTrabajados(
+                    $entrada,
+                    $salidaRefrigerio,
+                    $retornoRefrigerio,
+                    $salida
+                );
+            }
         }
 
         $ajustesCierre = collect();
@@ -502,6 +503,15 @@ class AsistenciaService
             $ajustesCierre->push(
                 'Salida final asumida automáticamente según el horario ('
                 .substr((string) $horaProgramadaSalida, 0, 5).').'
+            );
+        }
+
+        if ($refrigerioProgramadoParaCalculo) {
+            $ajustesCierre->push(
+                'Para calcular las horas se descontó el refrigerio programado ('
+                .substr((string) $horaProgramadaSalidaRefrigerio, 0, 5)
+                .' a '
+                .substr((string) $horaProgramadaRetornoRefrigerio, 0, 5).').'
             );
         }
 
@@ -743,6 +753,42 @@ class AsistenciaService
         }
 
         return $this->minutosEntre($entrada, $salida);
+    }
+
+    private function calcularMinutosConRefrigerioProgramado(
+        Marcacion $entrada,
+        Marcacion $salida,
+        Carbon $fecha,
+        string $horaSalidaRefrigerio,
+        string $horaRetornoRefrigerio
+    ): int {
+        $inicio = $entrada->fecha_hora;
+        $fin = $salida->fecha_hora;
+        $inicioRefrigerio = Carbon::parse(
+            $fecha->toDateString().' '.$horaSalidaRefrigerio
+        );
+        $finRefrigerio = Carbon::parse(
+            $fecha->toDateString().' '.$horaRetornoRefrigerio
+        );
+
+        if (! $fin->gt($inicio) || ! $finRefrigerio->gt($inicioRefrigerio)) {
+            return $this->minutosEntre($entrada, $salida);
+        }
+
+        $finPrimerTramo = $fin->lt($inicioRefrigerio)
+            ? $fin
+            : $inicioRefrigerio;
+        $inicioSegundoTramo = $inicio->gt($finRefrigerio)
+            ? $inicio
+            : $finRefrigerio;
+        $minutosPrimerTramo = $finPrimerTramo->gt($inicio)
+            ? (int) $inicio->diffInMinutes($finPrimerTramo)
+            : 0;
+        $minutosSegundoTramo = $fin->gt($inicioSegundoTramo)
+            ? (int) $inicioSegundoTramo->diffInMinutes($fin)
+            : 0;
+
+        return $minutosPrimerTramo + $minutosSegundoTramo;
     }
 
     private function minutosEntre(?Marcacion $entrada, ?Marcacion $salida): int
