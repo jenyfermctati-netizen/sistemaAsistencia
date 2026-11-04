@@ -1544,3 +1544,218 @@
 .marcaciones-page .marcaciones-header p,.marcaciones-page .marcaciones-now span { color:#58727b; }
 .marcaciones-page .marcaciones-now strong { color:#183844; }
 .marcaciones-page .marcaciones-back { color:#2867d5; }
+
+
+/* ================================================================
+   Filtro rápido responsive: listado de marcaciones.
+   Pantalla amplia: una fila. Tablet: envoltura compacta.
+   Móvil: cuatro botones en cuadrícula de dos columnas.
+   ================================================================ */
+.marcaciones-page--listado .mc-filtros-nuevos {
+    padding: 14px 18px;
+    min-width: 0;
+}
+.marcaciones-page--listado .mc-filtros-rapidos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+}
+.marcaciones-page--listado .mc-filtros-rapidos__titulo {
+    margin-right: 8px;
+    color: var(--mc-muted);
+    font-size: 11px;
+    letter-spacing: .045em;
+}
+.marcaciones-page--listado .mc-periodo-btn {
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 1.25;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+@media (max-width: 760px) {
+    .marcaciones-page--listado .mc-filtros-nuevos { padding: 12px 14px; }
+    .marcaciones-page--listado .mc-filtros-rapidos { gap: 7px; }
+    .marcaciones-page--listado .mc-filtros-rapidos__titulo {
+        flex: 0 0 100%;
+        width: 100%;
+        margin-right: 0;
+    }
+    .marcaciones-page--listado .mc-periodo-btn {
+        min-height: 36px;
+        padding: 7px 12px;
+    }
+    .marcaciones-page--listado .mc-panel-intro {
+        gap: 10px;
+        padding: 12px 14px;
+    }
+    .marcaciones-page--listado .mc-panel-intro__icon {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+        border-radius: 10px;
+        font-size: 19px;
+    }
+    .marcaciones-page--listado .mc-panel-intro h3 { font-size: 15px; }
+    .marcaciones-page--listado .mc-panel-intro p { font-size: 11px; }
+    .marcaciones-page--listado .mc-panel-intro__count {
+        margin-left: 0;
+        padding: 6px 9px;
+    }
+    .marcaciones-page--listado .mc-panel-intro__count strong { font-size: 17px; }
+}
+@media (max-width: 480px) {
+    .marcaciones-page--listado .mc-filtros-nuevos { padding: 11px 12px; }
+    .marcaciones-page--listado .mc-filtros-rapidos {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+    .marcaciones-page--listado .mc-filtros-rapidos__titulo {
+        grid-column: 1 / -1;
+        width: auto;
+        margin: 0 0 2px;
+    }
+    .marcaciones-page--listado .mc-periodo-btn {
+        width: 100%;
+        min-width: 0;
+        min-height: 38px;
+        padding: 7px 6px;
+        font-size: 12px;
+        white-space: normal;
+        text-align: center;
+    }
+    .marcaciones-page--listado .mc-panel-intro {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+    .marcaciones-page--listado .mc-panel-intro__icon {
+        width: 34px;
+        height: 34px;
+        flex-basis: auto;
+    }
+    .marcaciones-page--listado .mc-panel-intro__copy { min-width: 0; }
+    .marcaciones-page--listado .mc-panel-intro h3 { font-size: 13px; }
+    .marcaciones-page--listado .mc-panel-intro p { font-size: 10px; line-height: 1.25; }
+    .marcaciones-page--listado .mc-panel-intro__count {
+        width: auto;
+        min-width: 0;
+        margin: 0;
+        padding: 5px 7px;
+        justify-items: center;
+    }
+    .marcaciones-page--listado .mc-panel-intro__count strong { font-size: 15px; }
+    .marcaciones-page--listado .mc-panel-intro__count span { font-size: 9px; }
+}
+
+/* ============================================================
+   HISTORIAL COMPACTO RESPONSIVE - sólo listado de marcaciones
+   No altera registro manual, filtros ni JavaScript.
+   ============================================================ */
+@media (max-width: 1000px) {
+  .marcaciones-page--listado { gap: 12px; }
+  .marcaciones-page--listado .marcaciones-panel { border-radius: 14px; }
+  .marcaciones-page--listado .mc-panel-intro { padding: 12px 16px; gap: 10px; }
+  .marcaciones-page--listado .mc-panel-intro__icon { width: 36px; height: 36px; flex: 0 0 36px; font-size: 19px; }
+  .marcaciones-page--listado .mc-panel-intro__count { margin-left: auto; padding: 6px 10px; }
+  .marcaciones-page--listado .mc-panel-intro__count strong { font-size: 18px; }
+  .marcaciones-page--listado .mc-filtros-nuevos { padding: 10px 14px; }
+  .marcaciones-page--listado .mc-periodo-btn { min-height: 34px; padding: 6px 12px; }
+  .marcaciones-page--listado .table-container { padding: 10px; }
+  .marcaciones-page--listado .marcaciones-table tbody { gap: 8px; }
+  /* Tres filas reales en vez de cuatro filas altas con espacios vacíos. */
+  .marcaciones-page--listado .marcaciones-table tbody tr.marcacion-row {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto auto auto;
+    grid-auto-rows: min-content;
+    align-content: start;
+    align-items: center;
+    justify-content: stretch;
+    gap: 7px 10px;
+    min-height: 0;
+    height: auto;
+    padding: 12px 14px;
+    border-radius: 10px;
+  }
+  .marcaciones-page--listado .marcaciones-table tbody tr.marcacion-row > td {
+    display: block;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    padding: 0;
+    border: 0;
+    margin: 0;
+    align-self: center;
+  }
+  .marcaciones-page--listado .marcaciones-table tbody tr.marcacion-row > .mc-col-preservada { display: none !important; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--trabajador { grid-column: 1 / 9; grid-row: 1; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--fecha { grid-column: 9 / -1; grid-row: 1; text-align: right; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--origen { grid-column: 1 / 5; grid-row: 2; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--tipo { grid-column: 5 / 9; grid-row: 2; justify-content: center; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--estado { grid-column: 9 / -1; grid-row: 2; text-align: right; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--acciones {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    padding-top: 7px !important;
+    margin-top: 2px !important;
+    border-top: 1px solid var(--mc-border) !important;
+  }
+  .marcaciones-page--listado .trabajador-info > div:last-child { gap: 1px; }
+  .marcaciones-page--listado .marcacion-cell--trabajador .trabajador-info strong { font-size: 13px; line-height: 1.3; }
+  .marcaciones-page--listado .trabajador-info span { font-size: 11px; }
+  .marcaciones-page--listado .marcacion-cell--fecha::before { font-size: 15px; line-height: 1.25; }
+  .marcaciones-page--listado .marcacion-fecha-hora__fecha { margin-top: 1px; font-size: 10px; }
+  .marcaciones-page--listado .marcacion-cell--origen,
+  .marcaciones-page--listado .marcacion-cell--estado { font-size: 11px; }
+  .marcaciones-page--listado .marcacion-cell--origen::before { content: none; }
+  .marcaciones-page--listado .marcacion-cell--tipo .badge { font-size: 11px; padding: 3px 7px; }
+  .marcaciones-page--listado .marcacion-detalle__toggle {
+    min-height: 32px;
+    padding: 5px 8px;
+    font-size: 11px;
+    gap: 6px;
+  }
+  .marcaciones-page--listado .marcacion-detalle__panel { margin-top: 7px; padding: 12px; }
+  .marcaciones-page--listado .pagination-container { margin-top: 10px; }
+}
+@media (max-width: 700px) {
+  .marcaciones-page--listado .mc-panel-intro { flex-wrap: nowrap; }
+  .marcaciones-page--listado .mc-panel-intro__count { width: auto; flex: 0 0 auto; justify-items: center; }
+  .marcaciones-page--listado .mc-panel-intro__copy { min-width: 0; }
+  .marcaciones-page--listado .mc-panel-intro h3 { font-size: 14px; }
+  .marcaciones-page--listado .mc-panel-intro p { font-size: 10px; }
+  .marcaciones-page--listado .marcaciones-table tbody tr.marcacion-row { padding: 10px 11px; gap: 6px; }
+  .marcaciones-page--listado .marcacion-cell--fecha::before { font-size: 14px; }
+  .marcaciones-page--listado .marcacion-cell--origen { overflow-wrap: anywhere; white-space: normal; }
+}
+@media (max-width: 480px) {
+  .marcaciones-page--listado .mc-panel-intro { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; gap: 7px; padding: 10px; }
+  .marcaciones-page--listado .mc-panel-intro__icon { width: 30px; height: 30px; }
+  .marcaciones-page--listado .mc-panel-intro__count { margin: 0; padding: 4px 6px; }
+  .marcaciones-page--listado .mc-panel-intro__count strong { font-size: 15px; }
+  .marcaciones-page--listado .mc-panel-intro__count span { font-size: 9px; }
+  .marcaciones-page--listado .mc-panel-intro h3 { font-size: 12px; }
+  .marcaciones-page--listado .mc-panel-intro p { font-size: 9px; }
+  .marcaciones-page--listado .mc-filtros-nuevos { padding: 9px 10px; }
+  .marcaciones-page--listado .mc-filtros-rapidos { gap: 6px; }
+  .marcaciones-page--listado .mc-periodo-btn { min-height: 34px; font-size: 11px; }
+  .marcaciones-page--listado .table-container { padding: 7px; }
+  .marcaciones-page--listado .marcaciones-table tbody tr.marcacion-row { padding: 9px; gap: 5px 6px; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--trabajador { grid-column: 1 / 9; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--fecha { grid-column: 9 / -1; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--origen { grid-column: 1 / 6; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--tipo { grid-column: 6 / 9; }
+  .marcaciones-page--listado .marcacion-row > .marcacion-cell--estado { grid-column: 9 / -1; }
+  .marcaciones-page--listado .trabajador-info strong { overflow-wrap: anywhere; }
+  .marcaciones-page--listado .marcacion-cell--estado .badge { font-size: 10px; }
+  .marcaciones-page--listado .marcacion-cell--origen .badge { font-size: 11px; }
+}

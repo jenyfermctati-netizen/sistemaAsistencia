@@ -6,6 +6,129 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/marcaciones.css') }}">
+<style>
+/* Filtro compacto: los botones aplican los periodos inmediatamente */
+.marcaciones-page--listado .mc-filtros-nuevos { padding: 18px 24px 20px; }
+.mc-filtros-rapidos { display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
+.mc-filtros-rapidos__titulo { color:#526d80; font-size:13px; font-weight:800; letter-spacing:.025em; margin-right:6px; }
+.mc-periodo-btn { appearance:none; border:1px solid #cee0e9; background:#fff; color:#284b61; border-radius:999px; padding:12px 20px; font:inherit; font-size:13px; font-weight:700; line-height:1.3; cursor:pointer; transition:background .15s,border-color .15s,color .15s; }
+.mc-periodo-btn:hover,.mc-periodo-btn:focus-visible { border-color:#75c4d6; color:#087e99; }
+.mc-periodo-btn.is-active { border-color:#7bd1e4; background:#e5f7fa; color:#0086a3; }
+@media(max-width:640px) { .marcaciones-page--listado .mc-filtros-nuevos { padding:16px; } .mc-filtros-rapidos__titulo { width:100%; } .mc-periodo-btn { padding:10px 15px; } }
+
+
+/* ================================================================
+   Filtro rápido responsive: listado de marcaciones.
+   Pantalla amplia: una fila. Tablet: envoltura compacta.
+   Móvil: cuatro botones en cuadrícula de dos columnas.
+   ================================================================ */
+.marcaciones-page--listado .mc-filtros-nuevos {
+    padding: 14px 18px;
+    min-width: 0;
+}
+.marcaciones-page--listado .mc-filtros-rapidos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+}
+.marcaciones-page--listado .mc-filtros-rapidos__titulo {
+    margin-right: 8px;
+    color: var(--mc-muted);
+    font-size: 11px;
+    letter-spacing: .045em;
+}
+.marcaciones-page--listado .mc-periodo-btn {
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 1.25;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+@media (max-width: 760px) {
+    .marcaciones-page--listado .mc-filtros-nuevos { padding: 12px 14px; }
+    .marcaciones-page--listado .mc-filtros-rapidos { gap: 7px; }
+    .marcaciones-page--listado .mc-filtros-rapidos__titulo {
+        flex: 0 0 100%;
+        width: 100%;
+        margin-right: 0;
+    }
+    .marcaciones-page--listado .mc-periodo-btn {
+        min-height: 36px;
+        padding: 7px 12px;
+    }
+    .marcaciones-page--listado .mc-panel-intro {
+        gap: 10px;
+        padding: 12px 14px;
+    }
+    .marcaciones-page--listado .mc-panel-intro__icon {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+        border-radius: 10px;
+        font-size: 19px;
+    }
+    .marcaciones-page--listado .mc-panel-intro h3 { font-size: 15px; }
+    .marcaciones-page--listado .mc-panel-intro p { font-size: 11px; }
+    .marcaciones-page--listado .mc-panel-intro__count {
+        margin-left: 0;
+        padding: 6px 9px;
+    }
+    .marcaciones-page--listado .mc-panel-intro__count strong { font-size: 17px; }
+}
+@media (max-width: 480px) {
+    .marcaciones-page--listado .mc-filtros-nuevos { padding: 11px 12px; }
+    .marcaciones-page--listado .mc-filtros-rapidos {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+    .marcaciones-page--listado .mc-filtros-rapidos__titulo {
+        grid-column: 1 / -1;
+        width: auto;
+        margin: 0 0 2px;
+    }
+    .marcaciones-page--listado .mc-periodo-btn {
+        width: 100%;
+        min-width: 0;
+        min-height: 38px;
+        padding: 7px 6px;
+        font-size: 12px;
+        white-space: normal;
+        text-align: center;
+    }
+    .marcaciones-page--listado .mc-panel-intro {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+    .marcaciones-page--listado .mc-panel-intro__icon {
+        width: 34px;
+        height: 34px;
+        flex-basis: auto;
+    }
+    .marcaciones-page--listado .mc-panel-intro__copy { min-width: 0; }
+    .marcaciones-page--listado .mc-panel-intro h3 { font-size: 13px; }
+    .marcaciones-page--listado .mc-panel-intro p { font-size: 10px; line-height: 1.25; }
+    .marcaciones-page--listado .mc-panel-intro__count {
+        width: auto;
+        min-width: 0;
+        margin: 0;
+        padding: 5px 7px;
+        justify-items: center;
+    }
+    .marcaciones-page--listado .mc-panel-intro__count strong { font-size: 15px; }
+    .marcaciones-page--listado .mc-panel-intro__count span { font-size: 9px; }
+}
+
+</style>
+
 @endpush
 
 @section('content')
@@ -45,66 +168,37 @@
                 </div>
             </div>
 
-            <form method="GET" action="{{ route('marcaciones.index') }}" class="marcaciones-filtros">
-                <label class="mc-field marcaciones-filtros__buscar">
-                    <span class="mc-field__label">Buscar trabajador</span>
-                    <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control" placeholder="DNI, trabajador o biométrico...">
-                </label>
+            {{-- Las fechas se envían ocultas para que el controlador filtre la tabla. --}}
+            <form method="GET" action="{{ route('marcaciones.index') }}" class="marcaciones-filtros mc-filtros-nuevos" id="mcFiltrosForm">
+                @php
+                    $periodoSeleccionado = request('periodo', 'hoy');
+                    $fechaHoy = now()->toDateString();
+                    $fechaAyer = now()->subDay()->toDateString();
+                    $fechaInicioSemana = now()->subDays(6)->toDateString();
+                    $fechaDesdeInicial = match ($periodoSeleccionado) {
+                        'todo' => '',
+                        'ayer' => $fechaAyer,
+                        '7dias' => $fechaInicioSemana,
+                        default => $fechaHoy,
+                    };
+                    $fechaHastaInicial = match ($periodoSeleccionado) {
+                        'todo' => '',
+                        'ayer' => $fechaAyer,
+                        default => $fechaHoy,
+                    };
+                @endphp
+                <input type="hidden" name="periodo" value="{{ $periodoSeleccionado }}" data-mc-periodo>
+                <input type="hidden" name="fecha_desde" value="{{ request('fecha_desde', $fechaDesdeInicial) }}">
+                <input type="hidden" name="fecha_hasta" value="{{ request('fecha_hasta', $fechaHastaInicial) }}">
 
-                <details class="marcaciones-filtros__avanzados" data-mc-details="filtros"
-                    @if(request()->filled('fecha_desde') || request()->filled('fecha_hasta') || request()->filled('tipo') || request()->filled('origen') || request()->filled('estado')) open @endif>
-                    <summary class="marcaciones-filtros__toggle">Más filtros <span class="mc-chevron" aria-hidden="true"></span></summary>
-                    <div class="marcaciones-filtros__grid">
-                        <label class="mc-field">
-                            <span class="mc-field__label">Desde</span>
-                            <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="form-control">
-                        </label>
-                        <label class="mc-field">
-                            <span class="mc-field__label">Hasta</span>
-                            <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="form-control">
-                        </label>
-                        <label class="mc-field">
-                            <span class="mc-field__label">Tipo</span>
-                            <select name="tipo" class="form-select">
-                                <option value="">Todos los tipos</option>
-                                <option value="ENTRADA" @selected(request('tipo')==='ENTRADA')>Entrada</option>
-                                <option value="SALIDA" @selected(request('tipo')==='SALIDA')>Salida</option>
-                            </select>
-                        </label>
-                        <label class="mc-field">
-                            <span class="mc-field__label">Origen</span>
-                            <select name="origen" class="form-select">
-                                <option value="">Todos los orígenes</option>
-                                <option value="BIOMETRICO" @selected(request('origen')==='BIOMETRICO')>Biométrico</option>
-                                <option value="MANUAL" @selected(request('origen')==='MANUAL')>Manual</option>
-                                <option value="WEB_CAMPO" @selected(request('origen')==='WEB_CAMPO')>Web campo</option>
-                            </select>
-                        </label>
-                        <label class="mc-field">
-                            <span class="mc-field__label">Estado</span>
-                            <select name="estado" class="form-select">
-                                <option value="">Todos los estados</option>
-                                <option value="ACTIVA" @selected(request('estado')==='ACTIVA')>Activas</option>
-                                <option value="ANULADA" @selected(request('estado')==='ANULADA')>Anuladas</option>
-                            </select>
-                        </label>
-                    </div>
-                </details>
-
-                @if(request()->filled('fecha_desde') || request()->filled('fecha_hasta') || request()->filled('tipo') || request()->filled('origen') || request()->filled('estado'))
-                    <div class="marcaciones-filtros__resumen" aria-label="Filtros aplicados">
-                        @if(request()->filled('fecha_desde'))<span>Desde: {{ request('fecha_desde') }}</span>@endif
-                        @if(request()->filled('fecha_hasta'))<span>Hasta: {{ request('fecha_hasta') }}</span>@endif
-                        @if(request()->filled('tipo'))<span>Tipo: {{ request('tipo') }}</span>@endif
-                        @if(request()->filled('origen'))<span>Origen: {{ request('origen') }}</span>@endif
-                        @if(request()->filled('estado'))<span>Estado: {{ request('estado') }}</span>@endif
-                    </div>
-                @endif
-
-                <div class="marcaciones-filtros__actions">
-                    <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>
-                    <a href="{{ route('marcaciones.index') }}" class="button button--secondary"><x-ui-icon name="reset" /> Restablecer</a>
+                <div class="mc-filtros-rapidos" role="group" aria-label="Periodo rápido">
+                    <span class="mc-filtros-rapidos__titulo">PERIODO RÁPIDO</span>
+                    <button type="button" class="mc-periodo-btn {{ $periodoSeleccionado === 'todo' ? 'is-active' : '' }}" data-mc-periodo-btn="todo" aria-pressed="{{ $periodoSeleccionado === 'todo' ? 'true' : 'false' }}">Todo</button>
+                    <button type="button" class="mc-periodo-btn {{ $periodoSeleccionado === 'hoy' ? 'is-active' : '' }}" data-mc-periodo-btn="hoy" aria-pressed="{{ $periodoSeleccionado === 'hoy' ? 'true' : 'false' }}">Hoy</button>
+                    <button type="button" class="mc-periodo-btn {{ $periodoSeleccionado === 'ayer' ? 'is-active' : '' }}" data-mc-periodo-btn="ayer" aria-pressed="{{ $periodoSeleccionado === 'ayer' ? 'true' : 'false' }}">Ayer</button>
+                    <button type="button" class="mc-periodo-btn {{ $periodoSeleccionado === '7dias' ? 'is-active' : '' }}" data-mc-periodo-btn="7dias" aria-pressed="{{ $periodoSeleccionado === '7dias' ? 'true' : 'false' }}">Últimos 7 días</button>
                 </div>
+
             </form>
 
             <div class="table-container">
@@ -274,6 +368,55 @@
 @endsection
 
 @push('scripts')
+<script>
+(() => {
+    if (window.__mcPeriodosBound) return;
+    window.__mcPeriodosBound = true;
+    const fechaLocal = (date) => [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
+
+    // Al entrar por primera vez, incluir las fechas de hoy en la URL para
+    // que Laravel filtre también el resultado de la tabla, no solo el botón.
+    if (!window.location.search) {
+        const hoy = fechaLocal(new Date());
+        const url = new URL(window.location.href);
+        url.searchParams.set('periodo', 'hoy');
+        url.searchParams.set('fecha_desde', hoy);
+        url.searchParams.set('fecha_hasta', hoy);
+        window.location.replace(url.toString());
+        return;
+    }
+
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-mc-periodo-btn]');
+        if (!button) return;
+        const form = button.closest('form');
+        if (!form) return;
+        const periodo = button.dataset.mcPeriodoBtn;
+        const desde = form.querySelector('[name="fecha_desde"]');
+        const hasta = form.querySelector('[name="fecha_hasta"]');
+        const hoy = new Date();
+        const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+        if (periodo === 'ayer') inicio.setDate(inicio.getDate() - 1);
+        if (periodo === '7dias') inicio.setDate(inicio.getDate() - 6);
+        desde.value = periodo === 'todo' ? '' : fechaLocal(inicio);
+        hasta.value = periodo === 'todo' ? '' : fechaLocal(periodo === 'ayer' ? inicio : hoy);
+        form.querySelector('[data-mc-periodo]').value = periodo;
+        form.querySelectorAll('[data-mc-periodo-btn]').forEach((b) => {
+            const activo = b === button;
+            b.classList.toggle('is-active', activo);
+            b.setAttribute('aria-pressed', String(activo));
+        });
+        // Aplicar inmediatamente el periodo seleccionado usando el GET existente.
+        // requestSubmit también dispara los listeners de envío del sistema.
+        if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit();
+        } else {
+            form.submit();
+        }
+    });
+})();
+</script>
+
 <script src="{{ asset('js/pages/marcaciones.js') }}"></script>
 <script>
 /* Estado de presentación: conserva los desplegables durante el refresco existente.
