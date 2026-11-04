@@ -260,6 +260,14 @@ class DashboardController extends Controller
             'puedeSolicitarVacaciones' => false,
             'esEncargadoArea' => false,
             'periodoLabel' => $hoy->locale('es')->translatedFormat('F Y'),
+            'estadoResumenMes' => [
+                'puntuales' => 0,
+                'tardanzas' => 0,
+                'justificadas' => 0,
+                'incidencias' => 0,
+            ],
+            'calendarioMes' => collect(),
+            'calendarioOffset' => 0,
         ];
 
         if (! $trabajador) {
@@ -268,9 +276,10 @@ class DashboardController extends Controller
 
         $asistenciasMes = Asistencia::where('trabajador_id', $trabajador->id)
             ->whereYear('fecha', $hoy->year)
-            ->whereMonth('fecha', $hoy->month);
+            ->whereMonth('fecha', $hoy->month)
+            ->get(['fecha', 'estado', 'minutos_trabajados']);
 
-        $minutosTrabajados = (clone $asistenciasMes)->sum('minutos_trabajados');
+        $minutosTrabajados = $asistenciasMes->sum('minutos_trabajados');
         $horas = intdiv((int) $minutosTrabajados, 60);
         $minutos = (int) $minutosTrabajados % 60;
 
@@ -278,11 +287,73 @@ class DashboardController extends Controller
             ->whereDate('fecha', $hoy)
             ->first();
         $datos['metrics'] = [
-            'presentes' => (clone $asistenciasMes)->whereIn('estado', ['PRESENTE', 'TARDANZA', 'TJ', 'CAMPO'])->count(),
-            'tardanzas' => (clone $asistenciasMes)->where('estado', 'TARDANZA')->count(),
-            'incidencias' => (clone $asistenciasMes)->whereIn('estado', ['FALTA', 'SIN_REGISTRO'])->count(),
+            'presentes' => $asistenciasMes->whereIn('estado', ['PRESENTE', 'TARDANZA', 'TJ', 'CAMPO'])->count(),
+            'tardanzas' => $asistenciasMes->where('estado', 'TARDANZA')->count(),
+            'incidencias' => $asistenciasMes->whereIn('estado', ['FALTA', 'SIN_REGISTRO'])->count(),
             'horas' => $horas.' h'.($minutos ? ' '.$minutos.' min' : ''),
         ];
+        $datos['estadoResumenMes'] = [
+            'puntuales' => $asistenciasMes->whereIn('estado', ['PRESENTE', 'CAMPO'])->count(),
+            'tardanzas' => $asistenciasMes->where('estado', 'TARDANZA')->count(),
+            'justificadas' => $asistenciasMes->whereIn('estado', [
+                'FJ',
+                'TJ',
+                'JUSTIFICADO',
+                'PERMISO',
+                'VACACIONES',
+                'FERIADO',
+                'NO_LABORABLE',
+            ])->count(),
+            'incidencias' => $asistenciasMes->whereIn('estado', ['FALTA', 'SIN_REGISTRO'])->count(),
+        ];
+
+        $inicioMes = $hoy->copy()->startOfMonth();
+        $asistenciasPorFecha = $asistenciasMes->keyBy(
+            fn (Asistencia $asistencia) => $asistencia->fecha->toDateString()
+        );
+        $etiquetasEstado = [
+            'PRESENTE' => 'Presente',
+            'TARDANZA' => 'Tardanza',
+            'FALTA' => 'Falta',
+            'FJ' => 'Falta justificada',
+            'TJ' => 'Tardanza justificada',
+            'JUSTIFICADO' => 'Justificado',
+            'CAMPO' => 'Trabajo en campo',
+            'VACACIONES' => 'Vacaciones',
+            'PERMISO' => 'Permiso',
+            'FERIADO' => 'Feriado',
+            'NO_LABORABLE' => 'No laborable',
+            'SIN_REGISTRO' => 'Sin registro',
+        ];
+
+        $datos['calendarioOffset'] = $inicioMes->dayOfWeekIso - 1;
+        $datos['calendarioMes'] = collect(range(1, $inicioMes->daysInMonth))
+            ->map(function (int $dia) use ($inicioMes, $hoy, $asistenciasPorFecha, $etiquetasEstado) {
+                $fecha = $inicioMes->copy()->day($dia);
+                /** @var Asistencia|null $asistencia */
+                $asistencia = $asistenciasPorFecha->get($fecha->toDateString());
+                $estado = $asistencia?->estado;
+                $esFuturo = $fecha->gt($hoy);
+                $tono = match (true) {
+                    $esFuturo => 'future',
+                    in_array($estado, ['PRESENTE', 'CAMPO'], true) => 'success',
+                    $estado === 'TARDANZA' => 'warning',
+                    in_array($estado, ['FJ', 'TJ', 'JUSTIFICADO', 'PERMISO', 'VACACIONES', 'FERIADO', 'NO_LABORABLE'], true) => 'info',
+                    in_array($estado, ['FALTA', 'SIN_REGISTRO'], true) => 'danger',
+                    default => 'pending',
+                };
+                $etiqueta = $esFuturo
+                    ? 'Próximo día'
+                    : ($etiquetasEstado[$estado] ?? 'Sin procesar');
+
+                return [
+                    'day' => $dia,
+                    'date' => $fecha->toDateString(),
+                    'label' => $etiqueta,
+                    'tone' => $tono,
+                    'is_today' => $fecha->isSameDay($hoy),
+                ];
+            });
         $datos['solicitudesPendientes'] = Solicitud::where('trabajador_id', $trabajador->id)
             ->where('estado', 'PENDIENTE')
             ->count();
@@ -357,6 +428,10 @@ class DashboardController extends Controller
             $porEstado = $estados->pluck('total', 'estado');
             $procesadas = (int) $estados->sum('total');
             $activos = (int) $area->trabajadores_activos;
+            $puntuales = (int) (
+                ($porEstado['PRESENTE'] ?? 0)
+                + ($porEstado['CAMPO'] ?? 0)
+            );
             $asistieron = (int) (
                 ($porEstado['PRESENTE'] ?? 0)
                 + ($porEstado['TARDANZA'] ?? 0)
@@ -376,9 +451,18 @@ class DashboardController extends Controller
                 + ($porEstado['FERIADO'] ?? 0)
                 + ($porEstado['NO_LABORABLE'] ?? 0)
             );
-            $esperados = max(0, $activos - $justificadas);
+            $justificadasNoLaborables = (int) (
+                ($porEstado['FJ'] ?? 0)
+                + ($porEstado['JUSTIFICADO'] ?? 0)
+                + ($porEstado['PERMISO'] ?? 0)
+                + ($porEstado['VACACIONES'] ?? 0)
+                + ($porEstado['FERIADO'] ?? 0)
+                + ($porEstado['NO_LABORABLE'] ?? 0)
+            );
+            $esperados = max(0, $activos - $justificadasNoLaborables);
 
             $area->setAttribute('asistencias_hoy', $asistieron);
+            $area->setAttribute('puntuales_hoy', $puntuales);
             $area->setAttribute('ausencias_hoy', $ausencias);
             $area->setAttribute('tardanzas_hoy', (int) ($porEstado['TARDANZA'] ?? 0));
             $area->setAttribute('sin_asistencia_hoy', $ausencias);
@@ -392,7 +476,7 @@ class DashboardController extends Controller
             ));
             $area->setAttribute('cobertura', $esperados > 0
                 ? min(100, (int) round(($asistieron / $esperados) * 100))
-                : ($activos > 0 && $justificadas >= $activos ? 100 : 0));
+                : ($activos > 0 && $justificadasNoLaborables >= $activos ? 100 : 0));
 
             return $area;
         });

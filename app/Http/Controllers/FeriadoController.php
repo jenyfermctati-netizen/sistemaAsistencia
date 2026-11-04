@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Area;
 use App\Models\Feriado;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +16,18 @@ use Throwable;
 
 class FeriadoController extends Controller
 {
-    // Listado principal con filtros
+    // Calendario principal con filtros
     public function index(Request $request): View
     {
         $this->verificarAdministrador();
+
+        $anio = (int) $request->input('anio', now()->year);
+        $mes = (int) $request->input('mes', now()->month);
+        $anio = $anio >= 2020 && $anio <= 2100 ? $anio : now()->year;
+        $mes = $mes >= 1 && $mes <= 12 ? $mes : now()->month;
+        $periodo = Carbon::create($anio, $mes, 1)->startOfDay();
+        $inicioMes = $periodo->copy()->startOfMonth();
+        $finMes = $periodo->copy()->endOfMonth();
 
         $query = Feriado::with('area');
 
@@ -47,14 +56,56 @@ class FeriadoController extends Controller
             }
         }
 
-        if ($request->filled('anio')) {
-            $query->whereYear('fecha', $request->anio);
+        $query->whereBetween('fecha', [$inicioMes->toDateString(), $finMes->toDateString()]);
+
+        $feriados = $query->orderBy('fecha')->orderBy('nombre')->get();
+        $feriadosPorFecha = $feriados->groupBy(
+            fn (Feriado $feriado) => $feriado->fecha->toDateString()
+        );
+        $inicioCalendario = $inicioMes->copy()->startOfWeek(Carbon::MONDAY);
+        $finCalendario = $finMes->copy()->endOfWeek(Carbon::SUNDAY);
+        $calendario = collect();
+
+        for ($fecha = $inicioCalendario->copy(); $fecha->lte($finCalendario); $fecha->addDay()) {
+            $calendario->push([
+                'date' => $fecha->toDateString(),
+                'day' => $fecha->day,
+                'month_short' => $fecha->locale('es')->translatedFormat('M'),
+                'is_current_month' => $fecha->month === $mes,
+                'is_today' => $fecha->isToday(),
+                'holidays' => $feriadosPorFecha->get($fecha->toDateString(), collect()),
+            ]);
         }
 
-        $feriados = $query->orderBy('fecha')->paginate(15)->withQueryString();
         $areas = Area::orderBy('nombre')->get();
+        $meses = collect(range(1, 12))->mapWithKeys(fn (int $numero) => [
+            $numero => Carbon::create(2000, $numero, 1)->locale('es')->translatedFormat('F'),
+        ]);
+        $mesAnterior = $periodo->copy()->subMonth();
+        $mesSiguiente = $periodo->copy()->addMonth();
+        $fechaSugerida = today()->betweenIncluded($inicioMes, $finMes)
+            ? today()->toDateString()
+            : $inicioMes->toDateString();
+        $resumen = [
+            'total' => $feriados->count(),
+            'activos' => $feriados->where('estado', true)->count(),
+            'nacionales' => $feriados->where('tipo', 'NACIONAL')->count(),
+            'generales' => $feriados->whereNull('area_id')->count(),
+        ];
 
-        return view('feriados.index', compact('feriados', 'areas'));
+        return view('feriados.index', compact(
+            'feriados',
+            'areas',
+            'anio',
+            'mes',
+            'periodo',
+            'calendario',
+            'meses',
+            'mesAnterior',
+            'mesSiguiente',
+            'fechaSugerida',
+            'resumen'
+        ));
     }
 
     // Registro manual
@@ -73,9 +124,11 @@ class FeriadoController extends Controller
             'estado' => true,
         ]);
 
-        return redirect()
-            ->route('feriados.index')
-            ->with('success', 'Feriado registrado correctamente.');
+        return $this->redirigirAlCalendario(
+            $request,
+            'Feriado registrado correctamente.',
+            $data['fecha']
+        );
     }
 
     // Actualización de feriado
@@ -93,23 +146,29 @@ class FeriadoController extends Controller
             'descripcion' => $data['descripcion'] ?? null,
         ]);
 
-        return redirect()
-            ->route('feriados.index')
-            ->with('success', 'Feriado actualizado correctamente.');
+        return $this->redirigirAlCalendario(
+            $request,
+            'Feriado actualizado correctamente.',
+            $data['fecha']
+        );
     }
 
     // Alternar estado activo/inactivo
-    public function cambiarEstado(Feriado $feriado): RedirectResponse
+    public function cambiarEstado(Request $request, Feriado $feriado): RedirectResponse
     {
         $this->verificarAdministrador();
 
-        $feriado->update(['estado' => !$feriado->estado]);
+        $feriado->update(['estado' => ! $feriado->estado]);
 
         $mensaje = $feriado->estado
             ? 'Feriado activado correctamente.'
             : 'Feriado desactivado correctamente.';
 
-        return redirect()->route('feriados.index')->with('success', $mensaje);
+        return $this->redirigirAlCalendario(
+            $request,
+            $mensaje,
+            $feriado->fecha->toDateString()
+        );
     }
 
     // Sincronización automática de feriados nacionales con Nager.Date API
@@ -119,6 +178,7 @@ class FeriadoController extends Controller
 
         $data = $request->validate([
             'anio' => ['required', 'integer', 'min:2020', 'max:2100'],
+            'mes' => ['nullable', 'integer', 'between:1,12'],
         ], [
             'anio.required' => 'Debes indicar el año a sincronizar.',
             'anio.integer' => 'El año ingresado no es válido.',
@@ -135,13 +195,13 @@ class FeriadoController extends Controller
             return back()->with('error', 'No fue posible conectarse con Nager.Date. Intenta nuevamente.');
         }
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return back()->with('error', 'Nager.Date no pudo devolver los feriados solicitados.');
         }
 
         $datosApi = $response->json();
 
-        if (!is_array($datosApi) || count($datosApi) === 0) {
+        if (! is_array($datosApi) || count($datosApi) === 0) {
             return back()->with('error', "No se encontraron feriados para el año {$anio}.");
         }
 
@@ -151,7 +211,7 @@ class FeriadoController extends Controller
                 return false;
             }
 
-            return !array_key_exists('global', $item) || $item['global'] !== false;
+            return ! array_key_exists('global', $item) || $item['global'] !== false;
         })->values();
 
         if ($feriadosApi->isEmpty()) {
@@ -206,7 +266,7 @@ class FeriadoController extends Controller
                 ->whereYear('fecha', $anio)
                 ->where('estado', true);
 
-            if (!empty($fechasApi)) {
+            if (! empty($fechasApi)) {
                 $consultaDesactivar->whereNotIn('fecha', $fechasApi);
             }
 
@@ -215,7 +275,10 @@ class FeriadoController extends Controller
         });
 
         return redirect()
-            ->route('feriados.index', ['anio' => $anio])
+            ->route('feriados.index', [
+                'anio' => $anio,
+                'mes' => (int) ($data['mes'] ?? now()->month),
+            ])
             ->with(
                 'success',
                 "Sincronización {$anio} completada: {$creados} creados, {$actualizados} actualizados y {$desactivados} desactivados."
@@ -235,6 +298,27 @@ class FeriadoController extends Controller
             ],
             'descripcion' => ['nullable', 'string', 'max:500'],
         ]);
+    }
+
+    private function redirigirAlCalendario(
+        Request $request,
+        string $mensaje,
+        string $fechaReferencia
+    ): RedirectResponse {
+        $fecha = Carbon::parse($fechaReferencia);
+        $anio = (int) $request->input('return_anio', $fecha->year);
+        $mes = (int) $request->input('return_mes', $fecha->month);
+
+        if ($anio < 2020 || $anio > 2100) {
+            $anio = $fecha->year;
+        }
+        if ($mes < 1 || $mes > 12) {
+            $mes = $fecha->month;
+        }
+
+        return redirect()
+            ->route('feriados.index', ['anio' => $anio, 'mes' => $mes])
+            ->with('success', $mensaje);
     }
 
     // Control de acceso para administradores
