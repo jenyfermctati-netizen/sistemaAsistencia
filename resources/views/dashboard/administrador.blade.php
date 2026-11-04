@@ -31,19 +31,45 @@
 
 <div id="dashboardChartData" hidden aria-hidden="true">
     @foreach($areasResumen as $area)
-        <span data-name="{{ $area->nombre }}" data-coverage="{{ $area->cobertura }}" data-present="{{ $area->asistencias_hoy }}" data-late="{{ $area->tardanzas_hoy }}" data-absent="{{ $area->sin_asistencia_hoy }}" data-justified="{{ $area->justificadas_hoy }}"></span>
+        <span
+            data-name="{{ $area->nombre }}"
+            data-coverage="{{ $area->cobertura }}"
+            data-present="{{ $area->puntuales_hoy }}"
+            data-late="{{ $area->tardanzas_hoy }}"
+            data-absent="{{ $area->sin_asistencia_hoy }}"
+            data-justified="{{ $area->justificadas_hoy }}"
+            data-processed="{{ $area->procesadas_hoy }}"
+            data-pending="{{ $area->sin_procesar }}"
+            data-workers="{{ $area->trabajadores_activos }}"
+        ></span>
     @endforeach
 </div>
 
 <section class="dashboard-analytics" aria-label="Gráficos de asistencia">
     <article class="dashboard-panel dashboard-panel--chart">
-        <div class="dashboard-panel__header"><div><span class="dashboard-panel__eyebrow">PANORAMA ACTUAL</span><h3>Distribución de asistencia de hoy</h3></div></div>
-        <div class="dashboard-chart-container"><canvas id="dashboardDonut" aria-label="Gráfico de distribución de asistencia" role="img"></canvas></div>
+        <div class="dashboard-panel__header">
+            <div>
+                <span class="dashboard-panel__eyebrow">PANORAMA ACTUAL</span>
+                <h3>Distribución de asistencia de hoy</h3>
+                <p class="dashboard-panel__description">Estados de los registros procesados.</p>
+            </div>
+        </div>
+        <div class="dashboard-chart-container">
+            <div id="dashboardDonut" class="dashboard-chart-host" aria-live="polite"></div>
+        </div>
         <div id="dashboardDonutLegend" class="dashboard-chart-legend"></div>
     </article>
     <article class="dashboard-panel dashboard-panel--chart dashboard-panel--chart-wide">
-        <div class="dashboard-panel__header"><div><span class="dashboard-panel__eyebrow">COMPARATIVA</span><h3>Asistencia por área</h3></div></div>
-        <div class="dashboard-chart-container dashboard-chart-container--wide"><canvas id="dashboardAreasChart" aria-label="Gráfico de cobertura por área" role="img"></canvas></div>
+        <div class="dashboard-panel__header">
+            <div>
+                <span class="dashboard-panel__eyebrow">COMPARATIVA</span>
+                <h3>Estado de asistencia por área</h3>
+                <p class="dashboard-panel__description">Compara visualmente los estados procesados y pendientes de cada equipo.</p>
+            </div>
+        </div>
+        <div class="dashboard-chart-container dashboard-chart-container--wide dashboard-chart-container--stacked">
+            <div id="dashboardAreasChart" class="dashboard-chart-host" data-chart-mode="stacked" aria-live="polite"></div>
+        </div>
     </article>
 </section>
 
