@@ -38,6 +38,10 @@
     }
 
     function hasActiveFilters(form) {
+        if (form.dataset.uxHasActiveFilters === 'true' || form.dataset.uxHasActiveFilters === 'false') {
+            return form.dataset.uxHasActiveFilters === 'true';
+        }
+
         const ignored = new Set(['_token', 'page']);
         return Array.from(new FormData(form).entries()).some(function ([name, value]) {
             return !ignored.has(name) && String(value).trim() !== '';

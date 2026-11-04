@@ -5,6 +5,22 @@ document.addEventListener("DOMContentLoaded", function () {
         window.AppModal.open("modalCrearFeriado");
     }
 
+    const crearFecha = document.getElementById("crearFeriadoFecha");
+
+    document
+        .querySelectorAll("[data-crear-feriado-fecha]")
+        .forEach(function (button) {
+            button.addEventListener("click", function () {
+                if (crearFecha) {
+                    crearFecha.value = button.dataset.crearFeriadoFecha || "";
+                }
+
+                if (window.AppModal) {
+                    window.AppModal.open("modalCrearFeriado");
+                }
+            });
+        });
+
     const formEditar = document.getElementById("formEditarFeriado");
     const editarFecha = document.getElementById("editarFeriadoFecha");
     const editarNombre = document.getElementById("editarFeriadoNombre");
