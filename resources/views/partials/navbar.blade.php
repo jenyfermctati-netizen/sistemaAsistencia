@@ -1,6 +1,6 @@
 <header class="navbar">
     <div class="navbar__left">
-        <button type="button" id="sidebarToggle" class="navbar__menu-button" aria-label="Abrir menú principal"
+        <button type="button" id="sidebarToggle" class="navbar__menu-button" aria-label="Mostrar u ocultar menú"
             aria-controls="sidebar" aria-expanded="false">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M4 7h16M4 12h16M4 17h16" />

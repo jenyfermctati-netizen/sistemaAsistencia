@@ -1254,3 +1254,119 @@
   #modalEditarAsignacion .campo-create-dates {grid-template-columns:minmax(0,1fr);}
 }
 
+
+/* ==============================================================
+   FORMULARIOS DE CAMPO · COMPACTOS Y LIMPIOS
+   Ajuste visual de CREAR y EDITAR (mismos campos / IDs y rutas).
+   ============================================================== */
+:is(#modalCrearAsignacion,#modalEditarAsignacion) {
+    --campo-accent: var(--primary, #087f9a);
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form {
+    display: grid;
+    gap: 10px !important;
+    min-width: 0;
+    padding: 0;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px !important;
+    margin: 0 !important;
+    min-width: 0;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form .form-label {
+    margin: 0 !important;
+    font-size: 12px !important;
+    line-height: 1.3;
+    font-weight: 650;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form :is(.form-select,.form-control) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 7px 11px !important;
+    border-radius: 9px !important;
+    font-size: 13px !important;
+    line-height: 1.35;
+    box-sizing: border-box;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form .form-textarea {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 58px !important;
+    height: 58px;
+    padding: 9px 11px !important;
+    border-radius: 9px !important;
+    font-size: 13px !important;
+    line-height: 1.4;
+    resize: vertical;
+    box-sizing: border-box;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form .campo-create-dates {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    min-width: 0;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form .campo-create-date-tools {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin: -4px 0 1px !important;
+    font-size: 11px;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-date-tools .campo-create-today {
+    padding: 2px 0 !important;
+    min-height: 0 !important;
+    font-size: 11px;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-extra {
+    margin: 0;
+    border-radius: 9px;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-extra > summary {
+    min-height: 36px;
+    padding: 8px 11px !important;
+    font-size: 12px;
+    line-height: 1.3;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-extra[open] .form-group {
+    padding: 0 10px 10px !important;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center;
+    gap: 8px !important;
+    margin: 2px 0 0 !important;
+    padding: 10px 0 0 !important;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-actions .button {
+    min-height: 38px !important;
+    padding: 7px 14px !important;
+    font-size: 12px;
+    white-space: nowrap;
+}
+:is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-actions svg {
+    width: 15px;
+    height: 15px;
+}
+@media (max-width: 600px) {
+    :is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form {gap: 9px !important;}
+    :is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form .campo-create-dates {gap: 7px !important;}
+    :is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form input[type="date"] {padding: 6px 5px !important; font-size: 12px !important;}
+    :is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-actions {display:grid !important;grid-template-columns: minmax(0,1fr) minmax(0,1.4fr);}
+    :is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-actions .button {width:100%;padding:7px 8px !important;min-width:0;}
+}
+@media (max-width: 360px) {
+    :is(#modalCrearAsignacion,#modalEditarAsignacion) .campo-create-form .campo-create-dates {grid-template-columns:1fr !important;}
+}
+
+

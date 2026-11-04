@@ -375,13 +375,6 @@
     <x-modal id="modalCrearAsignacion" title="Nueva asignación de campo">
         <form method="POST" action="{{ route('asignaciones-campo.store') }}" class="form campo-create-form" id="campoCrearForm">
             @csrf
-            <div class="campo-create-intro">
-                <span class="campo-create-intro__icon" aria-hidden="true"><x-ui-icon name="briefcase" /></span>
-                <div>
-                    <strong>Planificar trabajo fuera de oficina</strong>
-                    <p>Asigna un trabajador, indica cuándo y dónde realizará la actividad.</p>
-                </div>
-            </div>
 
             @if ($esAdministrador)
                 <div class="form-group campo-create-worker">
@@ -396,8 +389,6 @@
                     </select>
                 </div>
             @endif
-
-            <div class="campo-create-section-title"><x-ui-icon name="calendar" /> Periodo de la asignación</div>
             <div class="form-grid form-grid--2 campo-create-dates">
                 <div class="form-group">
                     <label class="form-label" for="campoCrearInicio">Desde *</label>
@@ -418,8 +409,6 @@
                 <button type="button" class="campo-create-today" id="campoCrearMismoDia">Usar solo un día</button>
                 <span id="campoCrearPeriodoTexto" role="status" aria-live="polite"></span>
             </div>
-
-            <div class="campo-create-section-title"><x-ui-icon name="map-pin" /> Detalles del trabajo</div>
             <div class="form-group">
                 <label class="form-label" for="campoCrearLugar">Lugar o destino <span class="campo-create-optional">Opcional</span></label>
                 <input type="text" id="campoCrearLugar" name="lugar" value="{{ old('lugar') }}"
@@ -429,7 +418,6 @@
                 <label class="form-label" for="campoCrearActividad">Actividad a realizar *</label>
                 <textarea id="campoCrearActividad" name="actividad" class="form-textarea" rows="2" required
                     placeholder="Ej. Entrega de materiales y verificación con el cliente">{{ old('actividad') }}</textarea>
-                <span class="campo-create-hint">Describe brevemente el objetivo del trabajo en campo.</span>
             </div>
             <details class="campo-create-extra" @if(old('observacion')) open @endif>
                 <summary><x-ui-icon name="message-square" /> Agregar observaciones <span>(opcional)</span></summary>
@@ -439,7 +427,6 @@
                         placeholder="Ej. Coordinar el ingreso con el encargado">{{ old('observacion') }}</textarea>
                 </div>
             </details>
-            <div class="campo-create-footnote">Los campos con * son obligatorios.</div>
             <div class="modal__actions campo-create-actions">
                 <button type="button" class="button button--secondary" data-modal-close>Volver</button>
                 <button type="submit" class="button button--primary"><x-ui-icon name="check" /> Registrar asignación</button>
@@ -454,14 +441,6 @@
             @csrf
             @method('PUT')
 
-            <div class="campo-create-intro">
-                <span class="campo-create-intro__icon" aria-hidden="true"><x-ui-icon name="edit" /></span>
-                <div>
-                    <strong>Actualizar trabajo fuera de oficina</strong>
-                    <p>Modifica los datos de la asignación y guarda los cambios.</p>
-                </div>
-            </div>
-
             <div class="form-group campo-create-worker">
                 <label class="form-label" for="editarAsignacionTrabajador">Trabajador *</label>
                 <select name="trabajador_id" id="editarAsignacionTrabajador" class="form-select" required>
@@ -472,8 +451,6 @@
                     @endforeach
                 </select>
             </div>
-
-            <div class="campo-create-section-title"><x-ui-icon name="calendar" /> Periodo de la asignación</div>
             <div class="form-grid form-grid--2 campo-create-dates">
                 <div class="form-group">
                     <label class="form-label" for="editarAsignacionInicio">Desde *</label>
@@ -488,8 +465,6 @@
                 <button type="button" class="campo-create-today" id="campoEditarMismoDia">Usar solo un día</button>
                 <span id="campoEditarPeriodoTexto" role="status" aria-live="polite"></span>
             </div>
-
-            <div class="campo-create-section-title"><x-ui-icon name="map-pin" /> Detalles del trabajo</div>
             <div class="form-group">
                 <label class="form-label" for="editarAsignacionLugar">Lugar o destino <span class="campo-create-optional">Opcional</span></label>
                 <input type="text" name="lugar" id="editarAsignacionLugar" class="form-control" maxlength="250" placeholder="Ej. Obra del cliente, almacén, proveedor">
@@ -505,8 +480,6 @@
                     <textarea name="observacion" id="editarAsignacionObservacion" class="form-textarea" rows="2" maxlength="500"></textarea>
                 </div>
             </details>
-
-            <div class="campo-create-footnote">Los campos con * son obligatorios.</div>
             <div class="modal__actions campo-create-actions">
                 <button type="button" class="button button--secondary" data-modal-close>Volver</button>
                 <button type="submit" class="button button--primary"><x-ui-icon name="check" /> Guardar cambios</button>
@@ -765,3 +738,4 @@
     })();
     </script>
 @endpush
+

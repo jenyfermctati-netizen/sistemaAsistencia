@@ -11,13 +11,18 @@
         $puedeVerVacaciones = $esAdministrador || ($esTrabajador && $tipoVinculo === 'CONTRATADO');
     @endphp
 
+    @php
+        // Se inyecta desde AppServiceProvider mediante View::composer.
+        $pendientesCampoSidebar = (int) ($pendientesCampoSidebar ?? 0);
+    @endphp
+
     <div class="sidebar__header">
         <div class="sidebar__logo">CA</div>
         <div class="sidebar__brand">
             <strong>Control</strong>
             <span>Sistema de asistencia</span>
         </div>
-        <button type="button" class="sidebar__close" data-sidebar-close aria-label="Cerrar menú">
+        <button type="button" class="sidebar__close" data-sidebar-close aria-label="Ocultar menú">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="m6 6 12 12M18 6 6 18" />
             </svg>
@@ -72,10 +77,15 @@
             <div class="sidebar__section">
                 <div class="sidebar__title">Control de asistencia</div>
                 
-                <a href="{{ route('asignaciones-campo.index') }}"
+                <a href="{{ route('asignaciones-campo.index', ['vista' => 'pendientes']) }}"
+                    title="Trabajo en campo{{ $pendientesCampoSidebar > 0 ? ' · ' . $pendientesCampoSidebar . ' pendientes' : '' }}"
                     class="sidebar__item {{ request()->routeIs('asignaciones-campo.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="briefcase" /></span>
                     <span class="sidebar__label">Trabajo en campo</span>
+                    @if($pendientesCampoSidebar > 0)
+                        <span class="sidebar__notification" title="{{ $pendientesCampoSidebar }} marcaciones pendientes de revisión"
+                            aria-label="{{ $pendientesCampoSidebar }} marcaciones pendientes">{{ $pendientesCampoSidebar > 99 ? '99+' : $pendientesCampoSidebar }}</span>
+                    @endif
                 </a>
 
                 <a href="{{ route('marcaciones.index') }}"
