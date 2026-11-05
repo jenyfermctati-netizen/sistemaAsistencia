@@ -76,6 +76,7 @@
                     class="sidebar__item {{ request()->routeIs('asignaciones-campo.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="briefcase" /></span>
                     <span class="sidebar__label">Trabajo en campo</span>
+                    <x-sidebar-pending-count :count="$pendientesSidebar['campo']" />
                 </a>
 
                 <a href="{{ route('marcaciones.index') }}"
@@ -100,6 +101,7 @@
                     class="sidebar__item {{ request()->routeIs('solicitudes.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="requests" /></span>
                     <span class="sidebar__label">Solicitudes</span>
+                    <x-sidebar-pending-count :count="$pendientesSidebar['solicitudes']" />
                 </a>
 
                 @if ($puedeVerVacaciones)
@@ -107,6 +109,7 @@
                         class="sidebar__item {{ request()->routeIs('vacaciones.*') ? 'active' : '' }}">
                         <span class="sidebar__icon"><x-nav-icon name="vacations" /></span>
                         <span class="sidebar__label">Vacaciones</span>
+                        <x-sidebar-pending-count :count="$pendientesSidebar['vacaciones']" />
                     </a>
                 @endif
 
@@ -114,6 +117,7 @@
                     class="sidebar__item {{ request()->routeIs('reportesAvance.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="progress" /></span>
                     <span class="sidebar__label">Avances y pendientes</span>
+                    <x-sidebar-pending-count :count="$pendientesSidebar['avances']" />
                 </a>
 
             </div>
