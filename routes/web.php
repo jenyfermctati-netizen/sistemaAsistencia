@@ -182,9 +182,3 @@ Route::match(['GET', 'POST'], '/iclock/registry.aspx', [BiometricoController::cl
 Route::match(['GET', 'POST'], '/iclock/ping', [BiometricoController::class, 'ping']);
 Route::match(['GET', 'POST'], '/iclock/ping.aspx', [BiometricoController::class, 'ping']);
 
-// Ruta de pruebas para Postman (Omitimos el middleware CSRF para que Postman no de Error 419)
-Route::post('/test/marcar-asistencia', [TestBiometricoController::class, 'marcarAsistenciaTest'])
-    ->withoutMiddleware([
-        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class, 
-        \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class
-    ]);
