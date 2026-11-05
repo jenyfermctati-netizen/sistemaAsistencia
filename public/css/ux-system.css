@@ -1145,3 +1145,41 @@ table tbody td {
         animation-duration: .01ms !important;
     }
 }
+
+.download-menu {
+    position: relative;
+}
+
+.download-menu > summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.download-menu > summary::-webkit-details-marker {
+    display: none;
+}
+
+.download-menu__options {
+    position: absolute;
+    inset-block-start: calc(100% + 4px);
+    inset-inline-start: 0;
+    z-index: 5;
+    display: grid;
+    min-width: 8rem;
+    padding: 4px;
+    border: 1px solid #c8dade;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 6px 18px #18384420;
+}
+
+.download-menu__options a {
+    padding: 7px 10px;
+    border-radius: 4px;
+    color: #183844;
+    white-space: nowrap;
+}
+
+.download-menu__options a:is(:hover, :focus-visible) {
+    background: #e2f0f2;
+}

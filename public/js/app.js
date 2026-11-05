@@ -38,6 +38,14 @@ document.addEventListener(
             );
 
 
+        const desktop = window.matchMedia('(width > 1100px)');
+        const app = sidebar?.closest('.app');
+
+        function updateSidebarToggle(isOpen) {
+            toggle?.setAttribute('aria-expanded', String(isOpen));
+            toggle?.setAttribute('aria-label', isOpen ? 'Ocultar menú principal' : 'Mostrar menú principal');
+        }
+
         function setSidebarOpen(isOpen) {
 
             if (!sidebar || !overlay) {
@@ -49,15 +57,24 @@ document.addEventListener(
             overlay.classList.toggle('active', isOpen);
             overlay.classList.toggle('is-visible', isOpen);
             document.body.classList.toggle('sidebar-visible', isOpen);
-            toggle?.setAttribute('aria-expanded', String(isOpen));
-            toggle?.setAttribute('aria-label', isOpen ? 'Cerrar menú principal' : 'Abrir menú principal');
+            updateSidebarToggle(desktop.matches ? !app?.classList.contains('sidebar-collapsed') : isOpen);
 
         }
 
 
+        updateSidebarToggle(desktop.matches);
+        desktop.addEventListener('change', () => setSidebarOpen(false));
+
         toggle?.addEventListener(
             'click',
             function () {
+                if (desktop.matches) {
+                    app?.classList.remove('sidebar-collapsed');
+                    updateSidebarToggle(true);
+                    sidebarClose?.focus();
+                    return;
+                }
+
                 setSidebarOpen(!sidebar?.classList.contains('open'));
             }
         );
@@ -76,7 +93,12 @@ document.addEventListener(
         sidebarClose?.addEventListener(
             'click',
             function () {
-                setSidebarOpen(false);
+                if (desktop.matches) {
+                    app?.classList.add('sidebar-collapsed');
+                    updateSidebarToggle(false);
+                } else {
+                    setSidebarOpen(false);
+                }
                 toggle?.focus();
             }
         );

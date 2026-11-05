@@ -69,14 +69,21 @@
                         Mostrando las actividades correspondientes al periodo seleccionado.
                     @elseif(request('estado'))
                         Mostrando todos los reportes que coinciden con el estado seleccionado.
+                    @elseif(request()->boolean('historial'))
+                        Mostrando todo el historial de reportes.
                     @else
                         Mostrando únicamente las actividades registradas hoy.
                     @endif
                 </p>
             </div>
 
+            @include('reportesAvance.partials.consulta-actividades')
+
             <form method="GET" action="{{ route('reportesAvance.index') }}" class="ra-filters">
                 <input type="hidden" name="pestana" value="avances">
+                @if(request()->boolean('historial'))
+                    <input type="hidden" name="historial" value="1">
+                @endif
                 @if($vistaEquipo)
                     <input type="hidden" name="vista" value="equipo">
                 @endif
@@ -96,39 +103,19 @@
 
                     <select name="estado" class="form-select">
                         <option value="">Todos</option>
-                        <option value="PENDIENTE" @selected(request('estado') === 'PENDIENTE')>Por revisar</option>
+                        <option value="PENDIENTE" @selected(request('estado') === 'PENDIENTE')>Por revisar ({{ $diasConReportes->sum('por_revisar') }})</option>
                         <option value="REVISADO" @selected(request('estado') === 'REVISADO')>Revisado</option>
                         <option value="OBSERVADO" @selected(request('estado') === 'OBSERVADO')>Observado</option>
                     </select>
                 </label>
 
-                <label class="ra-field">
-                    <span>Desde</span>
-
-                    <input type="date"
-                        name="fecha_desde"
-                        value="{{ request('fecha_desde') }}"
-                        class="form-control">
-                </label>
-
-                <label class="ra-field">
-                    <span>Hasta</span>
-
-                    <input type="date"
-                        name="fecha_hasta"
-                        value="{{ request('fecha_hasta') }}"
-                        class="form-control">
-                </label>
+                <input type="hidden" name="fecha_desde" value="{{ request('fecha_desde') }}">
+                <input type="hidden" name="fecha_hasta" value="{{ request('fecha_hasta') }}">
 
                 <div class="ra-filters__actions">
                     <button type="submit" class="ra-btn ra-btn--primary">
                         <x-ui-icon name="filter" /> Filtrar
                     </button>
-
-                    <a href="{{ route('reportesAvance.index', array_merge($parametrosVista, ['pestana' => 'avances'])) }}"
-                        class="ra-btn ra-btn--outline">
-                        Hoy
-                    </a>
                 </div>
             </form>
         </section>

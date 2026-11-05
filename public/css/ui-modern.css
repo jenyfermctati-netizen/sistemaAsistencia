@@ -87,7 +87,8 @@ body.sidebar-visible {
 }
 
 .sidebar__close {
-    display: none;
+    display: grid;
+    flex-shrink: 0;
     place-items: center;
     width: 36px;
     height: 36px;
@@ -423,10 +424,6 @@ body.sidebar-visible {
 
 /* Responsive */
 @media (max-width: 1100px) {
-    .sidebar__close {
-        display: grid;
-    }
-
     .sidebar {
         width: min(276px, 88vw);
         min-width: min(276px, 88vw);

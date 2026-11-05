@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\ActividadReporte;
 use App\Models\Marcacion;
 use App\Models\MarcacionCampo;
 use App\Models\PendienteAvance;
-use App\Models\ReporteAvance;
 use App\Models\Solicitud;
 use App\Models\Vacaciones;
 use App\Observers\MarcacionObserver;
@@ -32,7 +32,16 @@ class AppServiceProvider extends ServiceProvider
         View::composer('partials.sidebar', function (\Illuminate\View\View $view): void {
             $usuario = auth()->user();
 
-            if (strtoupper(trim($usuario?->rol?->nombre ?? '')) !== 'ADMINISTRADOR') {
+            $rol = strtoupper(trim($usuario?->rol?->nombre ?? ''));
+
+            if ($rol === 'TRABAJADOR') {
+                $areaId = $usuario->trabajador?->area_id;
+                $view->with('pendientesAreaSidebar', $areaId
+                    ? PendienteAvance::abiertosOEnRevision()->deArea($areaId)->count()
+                    : 0);
+            }
+
+            if ($rol !== 'ADMINISTRADOR') {
                 return;
             }
 
@@ -45,8 +54,8 @@ class AppServiceProvider extends ServiceProvider
                 'vacaciones' => Vacaciones::where('estado', 'PENDIENTE')
                     ->whereHas('trabajador', fn ($query) => $query->where('tipo_vinculo', 'CONTRATADO'))
                     ->count(),
-                'avances' => ReporteAvance::where('estado', 'PENDIENTE')->count()
-                    + PendienteAvance::where('estado_revision', 'POR_REVISAR')->count(),
+                'avances' => PendienteAvance::abiertosOEnRevision()->count()
+                    + ActividadReporte::count(),
             ]);
         });
     }

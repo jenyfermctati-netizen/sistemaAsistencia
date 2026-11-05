@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asistencia;
 use App\Services\AsistenciaService;
+use App\Services\ReporteTablaExportService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -95,11 +96,34 @@ class AsistenciaController extends Controller
             };
         }
 
-        $asistencias = $query
-            ->orderByDesc('fecha')
-            ->orderBy('trabajador_id')
-            ->paginate(15)
-            ->withQueryString();
+        $query->orderByDesc('fecha')->orderBy('trabajador_id')->orderBy('id');
+
+        $formato = $request->query('descargar');
+        if (in_array($formato, ['xlsx', 'pdf'], true)) {
+            $fechas = $request->validate([
+                'fecha_desde' => ['nullable', 'date_format:Y-m-d'],
+                'fecha_hasta' => ['nullable', 'date_format:Y-m-d'],
+            ]);
+            $filas = $query->withOnly('trabajador.area')->lazy()->map(fn (Asistencia $asistencia) => [
+                $asistencia->fecha?->format('d/m/Y'),
+                $asistencia->trabajador?->area?->nombre,
+                trim($asistencia->trabajador?->nombres.' '.$asistencia->trabajador?->apellidos),
+                $asistencia->hora_entrada,
+                $asistencia->hora_salida,
+                $asistencia->minutos_trabajados,
+                $asistencia->minutos_tardanza,
+                $asistencia->estado,
+            ]);
+
+            return app(ReporteTablaExportService::class)->descargar(
+                $formato, 'resumen-diario', 'Resumen diario de asistencia',
+                ['Fecha', 'Área', 'Trabajador', 'Entrada', 'Salida', 'Min. trabajados', 'Min. tardanza', 'Estado'],
+                ['A' => 14, 'B' => 24, 'C' => 28, 'D' => 12, 'E' => 12, 'F' => 18, 'G' => 18, 'H' => 20],
+                $filas, $fechas['fecha_desde'] ?? null, $fechas['fecha_hasta'] ?? null,
+            );
+        }
+
+        $asistencias = $query->paginate(15)->withQueryString();
 
         return view('asistencias.index', compact('asistencias', 'puedeProcesar', 'resumen'));
     }

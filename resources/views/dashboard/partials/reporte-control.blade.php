@@ -22,14 +22,9 @@
         </div>
 
         <div class="dashboard-report__actions">
-            <a class="button button--secondary button--small"
-                href="{{ route('dashboard.reporteControl.pdf', $filtrosExportacion) }}">
-                <x-ui-icon name="download" /> Descargar PDF
-            </a>
-            <a class="button button--primary button--small"
-                href="{{ route('dashboard.reporteControl.excel', $filtrosExportacion) }}">
-                <x-ui-icon name="download" /> Descargar Excel
-            </a>
+            <x-download-menu
+                :excel="route('dashboard.reporteControl.excel', $filtrosExportacion)"
+                :pdf="route('dashboard.reporteControl.pdf', $filtrosExportacion)" />
         </div>
     </div>
 

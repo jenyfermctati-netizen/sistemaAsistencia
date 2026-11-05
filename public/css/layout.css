@@ -998,3 +998,19 @@
     }
 
 }
+
+@media (width > 1100px) {
+    .app.sidebar-collapsed .navbar__menu-button {
+        display: flex;
+    }
+
+    .app.sidebar-collapsed > .sidebar {
+        visibility: hidden;
+        transform: translateX(-100%);
+    }
+
+    .app.sidebar-collapsed > .app__content {
+        width: 100%;
+        margin-left: 0;
+    }
+}

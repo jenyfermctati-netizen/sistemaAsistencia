@@ -302,7 +302,7 @@
                     <span class="dashboard-quick__icon"><x-ui-icon name="alert" /></span>
                     <span class="dashboard-quick__copy">
                         <strong>Pendientes del área</strong>
-                        <small>{{ $pendientesArea }} {{ $pendientesArea === 1 ? 'actividad abierta' : 'actividades abiertas' }}</small>
+                        <small>{{ $pendientesArea }} {{ $pendientesArea === 1 ? 'actividad abierta o por validar' : 'actividades abiertas o por validar' }}</small>
                     </span>
                     <x-ui-icon name="chevron-right" class="dashboard-quick__arrow" />
                 </a>

@@ -1,5 +1,5 @@
-@props(['count'])
+@props(['count', 'label' => 'por revisar'])
 
 @if ($count > 0)
-    <span class="sidebar__pending-count" aria-label="{{ $count }} por revisar">{{ $count }}</span>
+    <span class="sidebar__pending-count" aria-label="{{ $count }} {{ $label }}">{{ $count }}</span>
 @endif

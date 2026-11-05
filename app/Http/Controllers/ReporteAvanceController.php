@@ -8,11 +8,14 @@ use App\Models\PendienteAvance;
 use App\Models\ReporteAvance;
 use App\Models\Trabajador;
 use App\Models\User;
+use App\Services\ReporteActividadesExportService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReporteAvanceController extends Controller
 {
@@ -55,6 +58,17 @@ class ReporteAvanceController extends Controller
                 : $query->whereRaw('1 = 0');
         }
 
+        $formato = $request->query('descargar');
+        $esDescarga = $pestanaActiva === 'avances' && in_array($formato, ['csv', 'xlsx', 'pdf'], true);
+        $diasConReportes = $pestanaActiva === 'avances' && ! $esDescarga
+            ? (clone $query)->withoutEagerLoads()->select('fecha_presentacion')
+                ->selectRaw('COUNT(*) AS total')
+                ->selectRaw('SUM(CASE WHEN estado = ? THEN 1 ELSE 0 END) AS por_revisar', ['PENDIENTE'])
+                ->groupBy('fecha_presentacion')
+                ->orderByDesc('fecha_presentacion')
+                ->get()
+            : collect();
+
         if ($request->filled('buscar')) {
             $buscar = trim($request->buscar);
             $query->where(function ($q) use ($buscar) {
@@ -88,16 +102,34 @@ class ReporteAvanceController extends Controller
             $query->whereDate('fecha_presentacion', '<=', $request->fecha_hasta);
         }
 
-        if (
+        $soloHoy =
             ! $esVistaPersonal
+            && ! $request->boolean('historial')
             && ! $request->filled('estado')
             && ! $request->filled('fecha_desde')
-            && ! $request->filled('fecha_hasta')
-        ) {
+            && ! $request->filled('fecha_hasta');
+
+        if ($soloHoy) {
             $query->whereDate('fecha_presentacion', today());
         }
 
         $query->orderByDesc('fecha_presentacion')->orderByDesc('id');
+
+        if ($esDescarga) {
+            if ($formato === 'csv') {
+                return $this->descargarActividades($query);
+            }
+
+            $desde = $soloHoy ? today()->toDateString() : $request->query('fecha_desde');
+            $hasta = $soloHoy ? today()->toDateString() : $request->query('fecha_hasta');
+
+            return app(ReporteActividadesExportService::class)->descargar(
+                $formato,
+                $query,
+                $desde ?: null,
+                $hasta ?: null,
+            );
+        }
 
         /*
          * El trabajador mantiene paginación porque consulta su propio historial.
@@ -130,11 +162,7 @@ class ReporteAvanceController extends Controller
             'reporte.trabajador.area',
             'resueltoPor',
             'revisadoPor',
-        ])->where(function ($q) {
-            $q
-                ->where('estado', 'PENDIENTE')
-                ->orWhere('estado_revision', 'POR_REVISAR');
-        });
+        ])->abiertosOEnRevision();
 
         if (! $puedeGestionar) {
             $areaId = $usuario->trabajador?->area_id;
@@ -142,27 +170,11 @@ class ReporteAvanceController extends Controller
             if (! $areaId) {
                 $pendientesQuery->whereRaw('1 = 0');
             } else {
-                $pendientesQuery->where(function ($q) use ($areaId) {
-                    $q
-                        ->where('area_id', $areaId)
-                        ->orWhere(function ($legado) use ($areaId) {
-                            $legado
-                                ->whereNull('area_id')
-                                ->whereHas('reporte.trabajador', fn ($trabajador) => $trabajador->where('area_id', $areaId));
-                        });
-                });
+                $pendientesQuery->deArea($areaId);
             }
         } elseif ($request->filled('area_id')) {
             $areaId = $request->integer('area_id');
-            $pendientesQuery->where(function ($q) use ($areaId) {
-                $q
-                    ->where('area_id', $areaId)
-                    ->orWhere(function ($legado) use ($areaId) {
-                        $legado
-                            ->whereNull('area_id')
-                            ->whereHas('reporte.trabajador', fn ($trabajador) => $trabajador->where('area_id', $areaId));
-                    });
-            });
+            $pendientesQuery->deArea($areaId);
         }
 
         $pendientesArea = $pendientesQuery->orderByDesc('created_at')->get();
@@ -184,6 +196,7 @@ class ReporteAvanceController extends Controller
 
         return view($vista, compact(
             'reportes',
+            'diasConReportes',
             'pendientesArea',
             'reporteHoy',
             'areas',
@@ -195,6 +208,36 @@ class ReporteAvanceController extends Controller
             'vistaEquipo',
             'parametrosVista'
         ));
+    }
+
+    private function descargarActividades(Builder $reportes): StreamedResponse
+    {
+        return response()->streamDownload(function () use ($reportes) {
+            $archivo = fopen('php://output', 'w');
+            fwrite($archivo, "\xEF\xBB\xBF");
+            fputcsv($archivo, ['Fecha', 'Área', 'Trabajador', 'Reporte', 'Estado', 'Actividad'], ';', '"', '');
+
+            foreach ($reportes->withOnly(['trabajador.area', 'actividades'])->lazy() as $reporte) {
+                foreach ($reporte->actividades as $actividad) {
+                    $fila = [
+                        $reporte->fecha_presentacion->format('d/m/Y'),
+                        $reporte->trabajador?->area?->nombre ?? '',
+                        trim(($reporte->trabajador?->nombres ?? '').' '.($reporte->trabajador?->apellidos ?? '')),
+                        (string) $reporte->id,
+                        $reporte->estado === 'PENDIENTE' ? 'Por revisar' : $reporte->estado,
+                        $actividad->descripcion,
+                    ];
+
+                    $fila = array_map(
+                        fn (string $valor) => preg_match('/^[\s\x00-\x1F]*[=+@-]|^[\t\r\n]/', $valor) ? "'".$valor : $valor,
+                        $fila
+                    );
+                    fputcsv($archivo, $fila, ';', '"', '');
+                }
+            }
+
+            fclose($archivo);
+        }, 'actividades-'.today()->toDateString().'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     public function store(Request $request)

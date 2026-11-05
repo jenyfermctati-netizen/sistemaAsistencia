@@ -17,9 +17,9 @@
             <strong>Control</strong>
             <span>Sistema de asistencia</span>
         </div>
-        <button type="button" class="sidebar__close" data-sidebar-close aria-label="Cerrar menú">
+        <button type="button" class="sidebar__close" data-sidebar-close aria-label="Ocultar menú principal" title="Ocultar menú" aria-controls="sidebar">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="m6 6 12 12M18 6 6 18" />
+                <path d="m14 6-6 6 6 6" />
             </svg>
         </button>
     </div>
@@ -113,11 +113,11 @@
                     </a>
                 @endif
 
-                <a href="{{ route('reportesAvance.index') }}"
+                <a href="{{ route('reportesAvance.index', ['pestana' => 'pendientes']) }}"
                     class="sidebar__item {{ request()->routeIs('reportesAvance.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="progress" /></span>
                     <span class="sidebar__label">Avances y pendientes</span>
-                    <x-sidebar-pending-count :count="$pendientesSidebar['avances']" />
+                    <x-sidebar-pending-count :count="$pendientesSidebar['avances']" label="registros entre actividades y pendientes" />
                 </a>
 
             </div>
@@ -151,6 +151,7 @@
                     class="sidebar__item {{ request()->routeIs('reportesAvance.*') && request('vista') !== 'equipo' ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="progress" /></span>
                     <span class="sidebar__label">Mi avance</span>
+                    <x-sidebar-pending-count :count="$pendientesAreaSidebar" label="pendientes del área" />
                 </a>
 
                 @if ($esEncargadoArea)

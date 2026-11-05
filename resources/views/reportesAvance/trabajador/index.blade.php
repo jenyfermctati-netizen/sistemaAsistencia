@@ -139,12 +139,6 @@
                             Editar reporte
                         </button>
                     @endif
-
-                    <button type="button"
-                        class="button button--primary"
-                        data-modal-open="modalAgregarAvance">
-                        <x-ui-icon name="plus" /> Agregar avance
-                    </button>
                 </div>
             @else
                 <div class="ra-today__empty">
@@ -152,14 +146,6 @@
                         <strong>Aún no registraste tu reporte de hoy</strong>
                         <span>Puedes registrar el día aunque no tengas actividades para agregar.</span>
                     </div>
-
-                    @if($puedeCrear)
-                        <button type="button"
-                            class="button button--primary"
-                            data-modal-open="modalCrearReporte">
-                            Registrar ahora
-                        </button>
-                    @endif
                 </div>
             @endif
         </section>
@@ -173,11 +159,16 @@
                 </div>
             </div>
 
+            @include('reportesAvance.partials.consulta-actividades')
+
             <form method="GET"
                 action="{{ route('reportesAvance.index') }}"
                 class="ra-history-filters">
 
                 <input type="hidden" name="pestana" value="avances">
+                @if(request()->boolean('historial'))
+                    <input type="hidden" name="historial" value="1">
+                @endif
 
                 <label class="ra-field ra-field--search">
                     <span>Buscar actividad</span>
@@ -192,27 +183,14 @@
                     <span>Estado</span>
                     <select name="estado" class="form-select">
                         <option value="">Todos</option>
-                        <option value="PENDIENTE" @selected(request('estado') === 'PENDIENTE')>Por revisar</option>
+                        <option value="PENDIENTE" @selected(request('estado') === 'PENDIENTE')>Por revisar ({{ $diasConReportes->sum('por_revisar') }})</option>
                         <option value="REVISADO" @selected(request('estado') === 'REVISADO')>Revisado</option>
                         <option value="OBSERVADO" @selected(request('estado') === 'OBSERVADO')>Observado</option>
                     </select>
                 </label>
 
-                <label class="ra-field">
-                    <span>Desde</span>
-                    <input type="date"
-                        name="fecha_desde"
-                        value="{{ request('fecha_desde') }}"
-                        class="form-control">
-                </label>
-
-                <label class="ra-field">
-                    <span>Hasta</span>
-                    <input type="date"
-                        name="fecha_hasta"
-                        value="{{ request('fecha_hasta') }}"
-                        class="form-control">
-                </label>
+                <input type="hidden" name="fecha_desde" value="{{ request('fecha_desde') }}">
+                <input type="hidden" name="fecha_hasta" value="{{ request('fecha_hasta') }}">
 
                 <div class="ra-history-filters__actions">
                     <button type="submit" class="button button--primary"><x-ui-icon name="filter" /> Filtrar</button>

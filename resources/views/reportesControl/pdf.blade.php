@@ -91,7 +91,9 @@
         <tbody>
             @forelse($areasReporte as $areaData)
                 @foreach($areaData['trabajadores'] as $trabajadorData)
-                    @php($m = $trabajadorData['metricas'])
+                    @php
+                        $m = $trabajadorData['metricas'];
+                    @endphp
                     <tr>
                         @if($esVistaGeneral)<td>{{ $areaData['area']->nombre }}</td>@endif
                         <td>{{ $trabajadorData['trabajador']->nombres }} {{ $trabajadorData['trabajador']->apellidos }}</td>

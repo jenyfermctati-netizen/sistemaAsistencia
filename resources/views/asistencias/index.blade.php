@@ -137,6 +137,12 @@
                     <h3 id="asistenciasListadoTitulo">Jornadas del personal</h3>
                     <p>La tabla resume lo importante; el botón de detalle conserva toda la información de la jornada.</p>
                 </div>
+                @php
+                    $filtrosDescarga = request()->only(['buscar', 'fecha_desde', 'fecha_hasta', 'estado', 'tipo_control']);
+                @endphp
+                <x-download-menu
+                    :excel="route('asistencias.index', $filtrosDescarga + ['descargar' => 'xlsx'])"
+                    :pdf="route('asistencias.index', $filtrosDescarga + ['descargar' => 'pdf'])" />
                 <div class="asistencias-panel__count" aria-live="polite">
                     <strong>{{ number_format($asistencias->total()) }}</strong>
                     <span>{{ $asistencias->total() === 1 ? 'registro' : 'registros' }}</span>
@@ -373,9 +379,6 @@
                                                 No hay registros disponibles para los filtros seleccionados.
                                             @endif
                                         </p>
-                                        @if ($tieneFiltros)
-                                            <a href="{{ route('asistencias.index') }}" class="button button--secondary">Limpiar filtros</a>
-                                        @endif
                                     </div>
                                 </td>
                             </tr>

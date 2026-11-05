@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asistencia;
 use App\Models\Solicitud;
+use App\Services\ReporteTablaExportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -68,20 +69,49 @@ class SolicitudController extends Controller
         if ($estadoFiltro !== '')
             $query->where('estado', $estadoFiltro);
 
-        if ($request->filled('fecha')) {
-            $fecha = $request->fecha;
-            $query
-                ->whereDate('fecha_inicio', '<=', $fecha)
-                ->where(function ($q) use ($fecha) {
-                    $q->whereNull('fecha_fin')->orWhereDate('fecha_fin', '>=', $fecha);
-                });
+        $fechas = $request->validate([
+            'fecha' => ['nullable', 'date_format:Y-m-d'],
+            'fecha_desde' => ['nullable', 'date_format:Y-m-d'],
+            'fecha_hasta' => ['nullable', 'date_format:Y-m-d'],
+        ]);
+        $desde = $fechas['fecha_desde'] ?? $fechas['fecha'] ?? null;
+        $hasta = $fechas['fecha_hasta'] ?? $fechas['fecha'] ?? null;
+
+        if ($hasta) {
+            $query->whereDate('fecha_inicio', '<=', $hasta);
+        }
+        if ($desde) {
+            $query->where(function ($rango) use ($desde) {
+                $rango->whereDate('fecha_fin', '>=', $desde)
+                    ->orWhere(fn ($dia) => $dia->whereNull('fecha_fin')->whereDate('fecha_inicio', '>=', $desde));
+            });
         }
 
-        $solicitudes = $query
-            ->orderByRaw("CASE WHEN estado='PENDIENTE' THEN 1 WHEN estado='APROBADA' THEN 2 WHEN estado='RECHAZADA' THEN 3 ELSE 4 END")
+        $query->orderByRaw("CASE WHEN estado='PENDIENTE' THEN 1 WHEN estado='APROBADA' THEN 2 WHEN estado='RECHAZADA' THEN 3 ELSE 4 END")
             ->orderByDesc('created_at')
-            ->paginate(15)
-            ->withQueryString();
+            ->orderByDesc('id');
+
+        $formato = $request->query('descargar');
+        if (in_array($formato, ['xlsx', 'pdf'], true)) {
+            $filas = $query->withOnly('trabajador.area')->lazy()->map(fn (Solicitud $solicitud) => [
+                $solicitud->fecha_inicio?->format('d/m/Y'),
+                $solicitud->fecha_fin?->format('d/m/Y'),
+                $solicitud->trabajador?->area?->nombre,
+                trim($solicitud->trabajador?->nombres.' '.$solicitud->trabajador?->apellidos),
+                $solicitud->tipo,
+                $solicitud->estado,
+                $solicitud->motivo,
+            ]);
+
+            return app(ReporteTablaExportService::class)->descargar(
+                $formato, 'solicitudes', 'Reporte de solicitudes',
+                ['Desde', 'Hasta', 'Área', 'Trabajador', 'Tipo', 'Estado', 'Motivo'],
+                ['A' => 14, 'B' => 14, 'C' => 25, 'D' => 28, 'E' => 22, 'F' => 16, 'G' => 60],
+                $filas, $desde, $hasta,
+            );
+        }
+
+        $solicitudes = $query->paginate(15)->withQueryString();
 
         $misSolicitudesCount = $puedeGestionar && $usuario->trabajador_id
             ? Solicitud::where('trabajador_id', $usuario->trabajador_id)->count()

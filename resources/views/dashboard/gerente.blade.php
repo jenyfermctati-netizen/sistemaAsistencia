@@ -46,7 +46,7 @@
             </span>
             <x-ui-icon name="chevron-right" class="dashboard-action-card__arrow" />
         </a>
-        <a href="{{ route('reportesAvance.index', ['vista' => 'equipo', 'pestana' => 'avances']) }}" class="dashboard-action-card">
+        <a href="{{ route('reportesAvance.index', ['pestana' => 'avances', 'estado' => 'PENDIENTE']) }}" class="dashboard-action-card">
             <span class="dashboard-action-card__icon dashboard-action-card__icon--blue"><x-ui-icon name="report" /></span>
             <span class="dashboard-action-card__content">
                 <small>Avances por revisar</small>
@@ -57,7 +57,7 @@
         <a href="{{ route('reportesAvance.index', ['pestana' => 'pendientes']) }}" class="dashboard-action-card">
             <span class="dashboard-action-card__icon dashboard-action-card__icon--warning"><x-ui-icon name="alert" /></span>
             <span class="dashboard-action-card__content">
-                <small>Actividades abiertas</small>
+                <small>Actividades abiertas o por validar</small>
                 <strong>{{ $alerts['pendientes'] }} {{ $alerts['pendientes'] === 1 ? 'actividad' : 'actividades' }}</strong>
             </span>
             <x-ui-icon name="chevron-right" class="dashboard-action-card__arrow" />

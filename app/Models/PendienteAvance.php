@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,6 +33,25 @@ class PendienteAvance extends Model
         'fecha_resolucion' => 'datetime',
         'fecha_revision' => 'datetime',
     ];
+
+    public function scopeAbiertosOEnRevision(Builder $query): Builder
+    {
+        return $query->where(function (Builder $estados) {
+            $estados->where('estado', 'PENDIENTE')
+                ->orWhere('estado_revision', 'POR_REVISAR');
+        });
+    }
+
+    public function scopeDeArea(Builder $query, int $areaId): Builder
+    {
+        return $query->where(function (Builder $area) use ($areaId) {
+            $area->where('area_id', $areaId)
+                ->orWhere(function (Builder $legado) use ($areaId) {
+                    $legado->whereNull('area_id')
+                        ->whereHas('reporte.trabajador', fn (Builder $trabajador) => $trabajador->where('area_id', $areaId));
+                });
+        });
+    }
 
     public function reporte()
     {

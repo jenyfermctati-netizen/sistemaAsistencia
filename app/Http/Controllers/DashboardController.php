@@ -120,10 +120,7 @@ class DashboardController extends Controller
                 'solicitudes' => Solicitud::where('estado', 'PENDIENTE')->count(),
                 'vacaciones' => Vacaciones::where('estado', 'PENDIENTE')->count(),
                 'reportes' => ReporteAvance::where('estado', 'PENDIENTE')->count(),
-                'pendientes' => PendienteAvance::where(function (Builder $query) {
-                    $query->where('estado', 'PENDIENTE')
-                        ->orWhere('estado_revision', 'POR_REVISAR');
-                })->count(),
+                'pendientes' => PendienteAvance::abiertosOEnRevision()->count(),
             ],
             'areasResumen' => $this->resumenAreas(),
             'asistenciasRecientes' => Asistencia::with([
@@ -165,15 +162,13 @@ class DashboardController extends Controller
             $this->filtrarPorAreaTrabajador($solicitudes, $areaId);
             $solicitudes->where('trabajador_id', '!=', $usuario->trabajador_id);
             $this->filtrarPorAreaTrabajador($reportes, $areaId);
-            $reportes->where('trabajador_id', '!=', $usuario->trabajador_id);
+            $reportes->where('trabajador_id', '!=', $usuario->trabajador_id)
+                ->whereHas('trabajador', fn (Builder $query) => $query->where('estado', 'ACTIVO'));
         } else {
             $this->sinResultados($trabajadores, $registrosAsistencia, $solicitudes, $reportes);
         }
 
-        $pendientes = PendienteAvance::query()->where(function (Builder $query) {
-            $query->where('estado', 'PENDIENTE')
-                ->orWhere('estado_revision', 'POR_REVISAR');
-        });
+        $pendientes = PendienteAvance::abiertosOEnRevision();
 
         if ($areaId) {
             $this->filtrarPendientesPorArea($pendientes, $areaId);
@@ -372,7 +367,7 @@ class DashboardController extends Controller
             ->whereDate('fecha_presentacion', $hoy)
             ->first();
         if ($trabajador->area_id) {
-            $datos['pendientesArea'] = PendienteAvance::where('estado', 'PENDIENTE')
+            $datos['pendientesArea'] = PendienteAvance::abiertosOEnRevision()
                 ->where(function (Builder $query) use ($trabajador) {
                     $query->where('area_id', $trabajador->area_id)
                         ->orWhere(function (Builder $legado) use ($trabajador) {

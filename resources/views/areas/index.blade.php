@@ -119,9 +119,6 @@
                                 <div class="empty-state">
                                     <strong>No se encontraron áreas</strong>
                                     <span>Prueba con otros filtros o registra una nueva área.</span>
-                                    <button type="button" class="button button--primary" data-modal-open="modalCrearArea">
-                                        <x-ui-icon name="plus" /> Nueva área
-                                    </button>
                                 </div>
                             </td>
                         </tr>

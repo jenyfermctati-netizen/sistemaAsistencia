@@ -34,6 +34,12 @@
                 <x-ui-icon name="plus" /> Nueva solicitud
             </button>
         @endif
+        @php
+            $filtrosDescarga = request()->only(['seccion', 'buscar', 'tipo', 'estado', 'fecha', 'fecha_desde', 'fecha_hasta']);
+        @endphp
+        <x-download-menu
+            :excel="route('solicitudes.index', $filtrosDescarga + ['descargar' => 'xlsx'])"
+            :pdf="route('solicitudes.index', $filtrosDescarga + ['descargar' => 'pdf'])" />
     </header>
 
     {{-- MENSAJES --}}
@@ -120,12 +126,13 @@
             </label>
 
             <label class="solicitudes-field">
-                <span>Fecha</span>
+                <span>Desde</span>
+                <input type="date" name="fecha_desde" value="{{ request('fecha_desde', request('fecha')) }}" class="form-control">
+            </label>
 
-                <input type="date"
-                    name="fecha"
-                    value="{{ request('fecha') }}"
-                    class="form-control">
+            <label class="solicitudes-field">
+                <span>Hasta</span>
+                <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta', request('fecha')) }}" class="form-control">
             </label>
 
             <div class="solicitudes-filtros__actions">
