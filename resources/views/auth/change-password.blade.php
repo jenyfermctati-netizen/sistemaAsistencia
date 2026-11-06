@@ -20,7 +20,7 @@
 
     <section class="password-card" aria-labelledby="password-card-title">
         <div class="password-card__heading">
-            <span class="password-card__icon" aria-hidden="true">⚿</span>
+
             <div>
                 <h3 id="password-card-title">Seguridad de la cuenta</h3>
                 <p>Tu sesión actual permanecerá abierta después del cambio.</p>
