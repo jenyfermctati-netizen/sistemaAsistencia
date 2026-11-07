@@ -43,7 +43,7 @@ class ReporteAvanceController extends Controller
         $query = ReporteAvance::with([
             'trabajador.area',
             'revisor',
-            'actividades',
+            'actividades.asignacionCampo',
             'pendientes.resueltoPor',
             'pendientes.revisadoPor',
             'pendientes.area',

@@ -1,0 +1,98 @@
+/* Historial del trabajador: un registro por marcación, agrupado por día. */
+.worker-log { display: grid; gap: 20px; min-width: 0; margin-bottom: 28px; }
+.worker-log__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.worker-log__stats > div { display: flex; flex-direction: column; gap: 8px; padding: 22px; background: #fff; border: 1px solid var(--border); border-radius: 16px; }
+.worker-log__stats span { color: var(--text-muted); font-size: 12px; }
+.worker-log__stats strong { color: var(--palette-petrol); font-size: 30px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.worker-log__heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.worker-log__heading h3 { margin: 5px 0; font-size: 21px; color: var(--text); }
+.worker-log__heading p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.worker-log__total { color: var(--text-muted); font-size: 12px; }
+.worker-day { min-width: 0; border: 1px solid var(--border); border-radius: 18px; background: #fff; overflow: hidden; }
+.worker-day__header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 18px 22px; background: var(--surface-secondary); border-bottom: 1px solid var(--border); }
+.worker-day__header > div > span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .07em; }
+.worker-day__header h4 { margin: 3px 0 0; font-size: 15px; color: var(--palette-petrol); }
+.worker-day__counts { display: flex; flex-wrap: wrap; gap: 8px; }
+.worker-day__counts span { padding: 5px 9px; border: 1px solid var(--border); border-radius: 8px; background: #fff; font-size: 11px; color: var(--text-muted); }
+.worker-day__list { list-style: none; margin: 0; padding: 0; }
+.worker-mark { display: grid; grid-template-columns: 85px minmax(0, 1fr) 95px; gap: 18px; align-items: center; padding: 20px 22px; }
+.worker-mark + .worker-mark { border-top: 1px solid var(--border); }
+.worker-mark__time { display: flex; flex-direction: column; gap: 4px; border-left: 3px solid var(--palette-smoke-blue); padding-left: 12px; }
+.worker-mark__time time { color: var(--palette-petrol); font-size: 21px; font-weight: 750; font-variant-numeric: tabular-nums; }
+.worker-mark__time span { color: var(--text-muted); font-size: 11px; }
+.worker-mark__body { min-width: 0; overflow-wrap: anywhere; }
+.worker-mark__title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.worker-mark__title > strong { font-size: 13px; color: var(--text); }
+.worker-mark__body p { margin: 6px 0 0; color: var(--text-muted); font-size: 12px; }
+.worker-mark__review { padding: 9px 12px; border-radius: 8px; background: var(--surface-secondary); }
+.worker-mark__photo { display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 44px; color: var(--ux-primary, #087f9a); font-size: 11px; }
+.worker-mark__photo img { width: 80px; height: 64px; object-fit: cover; border-radius: 9px; border: 1px solid var(--border); }
+.worker-mark__no-photo { color: var(--text-muted); font-size: 11px; text-align: center; }
+.worker-log__empty { padding: 32px 20px; text-align: center; border: 1px dashed var(--border); border-radius: 18px; background: var(--surface); color: var(--text-muted); }
+.worker-log__empty h4 { margin: 12px 0 6px; color: var(--text); }
+.worker-log__empty p { margin: 0; font-size: 13px; }
+@media (max-width: 600px) {
+    .worker-log__stats { gap: 8px; }
+    .worker-log__stats > div { padding: 14px 10px; border-radius: 12px; }
+    .worker-log__stats span { font-size: 11px; }
+    .worker-log__stats strong { font-size: 24px; }
+    .worker-day__header { padding: 16px; }
+    .worker-mark { grid-template-columns: 70px minmax(0, 1fr); gap: 12px; padding: 16px; align-items: start; }
+    .worker-mark__photo, .worker-mark__no-photo { grid-column: 2; justify-self: start; }
+    .worker-mark__photo { flex-direction: row; gap: 10px; }
+    .worker-mark__photo img { width: 60px; height: 48px; }
+}
+
+.worker-progress { padding: 16px; margin: 0; gap: 7px; }
+.worker-progress + .worker-progress { border-top: 1px solid var(--border); }
+.worker-progress > p { margin: 0; }
+.worker-progress > .button { justify-self: start; }
+@media (max-width: 600px) {
+    .worker-interface .campo-page { gap: 12px; }
+    .worker-interface .campo-topbar { padding: 14px; gap: 10px; }
+    .worker-interface .campo-topbar__copy { flex-basis: auto; }
+    .worker-interface .campo-topbar h2 { margin: 4px 0; font-size: 23px; }
+    .worker-interface .campo-topbar p { font-size: 12px; line-height: 1.45; }
+    .worker-interface .worker-campo-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 5px; margin: 0; }
+    .worker-interface .worker-campo-tabs .campo-tabs__tab { justify-content: center; flex-wrap: wrap; gap: 5px; padding: 9px 5px; min-width: 0; min-height: 44px; font-size: 11px; text-align: center; white-space: normal; }
+    .worker-interface .worker-campo-tabs .ui-icon { width: 16px; height: 16px; }
+    .worker-interface .campo-worker-note { padding: 10px 12px; font-size: 12px; margin: 0; }
+    .worker-interface .campo-assignments { margin: 0; padding-top: 12px; }
+    .worker-interface .campo-section-heading { margin-bottom: 12px; gap: 10px; }
+    .worker-interface .campo-grid { gap: 12px; }
+    .worker-interface .campo-card__header, .worker-interface .campo-card__preview, .worker-interface .campo-card__footer { padding: 12px; gap: 8px; }
+    .worker-interface .campo-card__preview p { margin: 6px 0; }
+    .worker-interface .worker-log { gap: 12px; margin-bottom: 0; }
+    .worker-interface .worker-log__stats > div { padding: 10px; gap: 4px; }
+    .worker-interface .worker-log__empty { padding: 18px 14px; }
+    .worker-interface .worker-day__header, .worker-interface .worker-mark, .worker-interface .worker-progress { padding: 12px; }
+    .worker-interface .worker-log__heading h3 { font-size: 19px; }
+    .worker-interface .campo-filter-popover { padding: 12px; }
+    .worker-interface .campo-mark-form { width: 100%; }
+}
+
+.worker-day--expandable > summary { cursor: pointer; list-style: none; min-height: 60px; }
+.worker-day--expandable > summary::-webkit-details-marker { display: none; }
+.worker-day--expandable > summary::after { content: '+'; display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 8px; color: #087f9a; font-size: 18px; flex: 0 0 auto; }
+.worker-day--expandable[open] > summary::after { content: '−'; }
+.worker-day--expandable:not([open]) > summary { border-bottom: 0; }
+.worker-day--expandable > summary > div:first-child { flex: 1; }
+.worker-day--expandable > summary:focus-visible { outline: 2px solid #087f9a; outline-offset: -3px; }
+@media (max-width: 600px) {
+    .worker-day--expandable .worker-day__counts { gap: 5px; }
+    .worker-day--expandable .worker-day__counts span { padding: 4px 6px; font-size: 10px; }
+    .worker-day--expandable > summary { gap: 8px; }
+}
+
+/* Fechas breves y contadores integrados, sin recuadros blancos. */
+.worker-interface .campo-page .worker-day__header h4 { font-size: 13px; line-height: 1.3; margin-top: 3px; white-space: nowrap; }
+.worker-interface .campo-page .worker-day__header > div > span { font-size: 9px; letter-spacing: .05em; }
+.worker-interface .campo-page .worker-day__counts { gap: 5px; }
+.worker-interface .campo-page .worker-day__counts span { border: 0; border-radius: 6px; padding: 5px 7px; background: #d8edf1; color: #285968; font-size: 10px; font-weight: 650; text-transform: none; letter-spacing: 0; }
+.worker-interface .campo-page .worker-day__counts span + span { background: #e0eee9; color: #356355; }
+@media (max-width: 600px) {
+    .worker-interface .campo-page .worker-day--expandable > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px 10px; padding: 11px 12px; }
+    .worker-interface .campo-page .worker-day--expandable > summary::after { grid-column: 2; grid-row: 1 / 3; }
+    .worker-interface .campo-page .worker-day__counts { grid-column: 1; }
+    .worker-interface .campo-page .worker-day__header h4 { font-size: 12px; }
+}

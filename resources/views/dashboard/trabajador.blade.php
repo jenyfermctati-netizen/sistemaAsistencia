@@ -78,14 +78,6 @@
                 </div>
             </div>
         </div>
-        <div class="dashboard-today__identity">
-            <span aria-hidden="true">{{ $iniciales }}</span>
-            <div>
-                <strong>{{ $trabajador->nombres }} {{ $trabajador->apellidos }}</strong>
-                <small>{{ $trabajador->cargo ?? 'Sin cargo' }}</small>
-                <small>{{ $trabajador->area?->nombre ?? 'Sin área asignada' }}</small>
-            </div>
-        </div>
     </section>
 
     <section class="dashboard-metrics" aria-label="Tu resumen de {{ $periodoLabel }}">
@@ -184,7 +176,7 @@
                             <strong>{{ $metrics['incidencias'] }} {{ $metrics['incidencias'] === 1 ? 'día requiere' : 'días requieren' }} tu atención</strong>
                             <small>Revisa si corresponde presentar una solicitud de regularización.</small>
                         </span>
-                        <a href="{{ route('solicitudes.index') }}">Ver solicitudes <span aria-hidden="true">→</span></a>
+                        <a href="#dashboardIncidencias" data-open-incidencias>Ver días y motivo <span aria-hidden="true">→</span></a>
                     </div>
                 @else
                     <div class="dashboard-calendar-notice dashboard-calendar-notice--success" role="status">
@@ -200,15 +192,29 @@
     </section>
 
     <div class="dashboard-columns dashboard-columns--personal">
-        <section class="dashboard-panel dashboard-panel--wide">
-            <div class="dashboard-panel__header">
+        @if($metrics['incidencias'] > 0)
+            <details id="dashboardIncidencias" class="dashboard-panel worker-dashboard-disclosure worker-incidents">
+                <summary class="dashboard-panel__header"><div><span class="dashboard-panel__eyebrow">REQUIEREN ATENCIÓN</span><h3>Días por revisar ({{ $incidenciasMes->count() }})</h3></div></summary>
+                <div class="worker-incidents__list">
+                    @foreach($incidenciasMes as $incidencia)
+                        <article>
+                            <strong>{{ $incidencia->fecha->format('d/m/Y') }} · {{ $etiquetasEstado[$incidencia->estado] ?? $incidencia->estado }}</strong>
+                            <p>{{ $incidencia->observacion ?: 'No hay registros de asistencia suficientes para esta fecha.' }}</p>
+                            <a class="button button--secondary button--small" href="{{ route('solicitudes.index', ['regularizar' => $incidencia->fecha->toDateString(), 'tipo_regularizacion' => $incidencia->estado === 'FALTA' ? 'FALTA' : 'OMISION_MARCACION']) }}">Solicitar regularización</a>
+                        </article>
+                    @endforeach
+                </div>
+            </details>
+        @endif
+        <details class="dashboard-panel dashboard-panel--wide worker-dashboard-disclosure">
+            <summary class="dashboard-panel__header">
                 <div>
                     <span class="dashboard-panel__eyebrow">HISTORIAL PERSONAL</span>
                     <h3>Últimos días procesados</h3>
                     <p class="dashboard-panel__description">Estado, horario y tiempo reconocido de cada jornada.</p>
                 </div>
                 <span class="dashboard-period-chip">{{ ucfirst($periodoLabel) }}</span>
-            </div>
+            </summary>
 
             <div class="dashboard-days">
                 @forelse($asistenciasRecientes as $asistencia)
@@ -244,16 +250,16 @@
                     </div>
                 @endforelse
             </div>
-        </section>
+        </details>
 
-        <aside class="dashboard-panel">
-            <div class="dashboard-panel__header">
+        <details class="dashboard-panel worker-dashboard-disclosure">
+            <summary class="dashboard-panel__header">
                 <div>
                     <span class="dashboard-panel__eyebrow">ACCESOS RÁPIDOS</span>
                     <h3>Gestiones personales</h3>
                     <p class="dashboard-panel__description">Entra directamente a la tarea que necesitas realizar.</p>
                 </div>
-            </div>
+            </summary>
 
             <nav class="dashboard-quick-grid" aria-label="Gestiones personales">
                 <a href="{{ route('solicitudes.index', ['estado' => 'PENDIENTE']) }}" class="dashboard-quick">
@@ -317,6 +323,21 @@
                     </a>
                 @endif
             </nav>
-        </aside>
+        </details>
     </div>
 @endif
+
+@push('scripts')
+<script>
+document.querySelectorAll('[data-open-incidencias]').forEach(link => {
+    link.addEventListener('click', event => {
+        const panel = document.getElementById('dashboardIncidencias');
+        if (!panel) return;
+        event.preventDefault();
+        panel.open = true;
+        panel.scrollIntoView({block: 'start'});
+        panel.querySelector('summary')?.focus();
+    });
+});
+</script>
+@endpush

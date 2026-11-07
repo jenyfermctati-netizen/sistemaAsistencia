@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Iniciar sesión - Control de Asistencias</title>
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
@@ -11,15 +11,16 @@
     <link rel="stylesheet" href="{{ asset('css/theme-natural.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme-itrafic.css') }}">
     <link rel="stylesheet" href="{{ asset('css/ux-system.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/design-studio.css') }}">
 </head>
 
 <body class="guest login-standalone">
+    <div class="login-backdrop" aria-hidden="true"><span class="login-backdrop__circle"></span><span class="login-backdrop__stripe"></span><span class="login-backdrop__blue"></span><span class="login-backdrop__dots login-backdrop__dots--top"></span><span class="login-backdrop__dots login-backdrop__dots--bottom"></span></div>
     <main class="login-page login-page--standalone">
         <section class="login-card" aria-labelledby="login-title">
             <header class="login-card__header">
-                <p class="login-card__eyebrow login-card__context">Control de asistencia</p>
-                <h1 id="login-title">Iniciar sesión</h1>
-                <p>Ingresa con tu cuenta para continuar.</p>
+                <h1 id="login-title">Bienvenido de nuevo</h1>
+                <p>Ingresa tus credenciales para acceder a la plataforma.</p>
             </header>
 
             @if (session('status'))
@@ -84,19 +85,21 @@
                 <div class="login-options">
                     <label class="remember-option">
                         <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
-                        <span>Recordarme</span>
+                        <span>Recordar mi sesión</span>
                     </label>
                     <a href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
                 </div>
 
                 <button type="submit" class="login-submit">
-                    <span>Iniciar sesión</span>
+                    <span>Ingresar al sistema</span>
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path d="M5 12h14M14 7l5 5-5 5" />
                     </svg>
                 </button>
             </form>
+
         </section>
+        <footer class="login-caption">Sistema de control de asistencia</footer>
     </main>
 
     <script>

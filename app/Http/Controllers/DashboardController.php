@@ -272,9 +272,10 @@ class DashboardController extends Controller
         $asistenciasMes = Asistencia::where('trabajador_id', $trabajador->id)
             ->whereYear('fecha', $hoy->year)
             ->whereMonth('fecha', $hoy->month)
-            ->get(['fecha', 'estado', 'minutos_trabajados']);
+            ->get(['fecha', 'estado', 'minutos_trabajados', 'observacion']);
 
         $minutosTrabajados = $asistenciasMes->sum('minutos_trabajados');
+        $datos['incidenciasMes'] = $asistenciasMes->whereIn('estado', ['FALTA', 'SIN_REGISTRO'])->sortByDesc('fecha')->values();
         $horas = intdiv((int) $minutosTrabajados, 60);
         $minutos = (int) $minutosTrabajados % 60;
 

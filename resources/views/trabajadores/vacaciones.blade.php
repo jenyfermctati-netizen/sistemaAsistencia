@@ -9,6 +9,7 @@
 
 @section('content')
 
+    @unless(strtoupper(trim((string) auth()->user()?->rol?->nombre)) === 'TRABAJADOR')
     {{-- MENSAJES --}}
     @if (session('success'))
         <div class="alert alert--success">
@@ -32,6 +33,8 @@
             </ul>
         </div>
     @endif
+
+    @endunless
 
     {{-- CABECERA --}}
     <div class="page-header">

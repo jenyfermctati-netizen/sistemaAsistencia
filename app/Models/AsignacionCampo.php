@@ -41,4 +41,9 @@ class AsignacionCampo extends Model
     {
         return $this->hasMany(MarcacionCampo::class, 'asignacion_campo_id');
     }
+
+    public function avances()
+    {
+        return $this->hasMany(ActividadReporte::class, 'asignacion_campo_id');
+    }
 }

@@ -44,6 +44,7 @@
         @endif
     </header>
 
+    @unless(strtoupper(trim((string) auth()->user()?->rol?->nombre)) === 'TRABAJADOR')
     {{-- MENSAJES --}}
     @if(session('success'))
         <div class="ra-alert ra-alert--success">{{ session('success') }}</div>
@@ -52,6 +53,8 @@
     @if(session('error'))
         <div class="ra-alert ra-alert--error">{{ session('error') }}</div>
     @endif
+
+    @endunless
 
     {{-- NAVEGACIÓN --}}
     <nav class="ra-tabs">
@@ -161,6 +164,8 @@
 
             @include('reportesAvance.partials.consulta-actividades')
 
+            <details class="worker-history-search" @if(request()->filled('buscar') || request()->filled('estado')) open @endif>
+            <summary><x-ui-icon name="filter" /> Buscar actividad y estado <span aria-hidden="true">⌄</span></summary>
             <form method="GET"
                 action="{{ route('reportesAvance.index') }}"
                 class="ra-history-filters">
@@ -200,6 +205,7 @@
                     </a>
                 </div>
             </form>
+            </details>
         </section>
 
         {{-- HISTORIAL --}}
@@ -255,6 +261,9 @@
 
                                     <div class="ra-history-activity__content">
                                         <p>{{ $actividad->descripcion }}</p>
+                                        @if($actividad->asignacionCampo)
+                                            <p><strong>Trabajo en campo:</strong> {{ $actividad->asignacionCampo->actividad }} · {{ $actividad->asignacionCampo->lugar ?: 'Sin lugar indicado' }}</p>
+                                        @endif
 
                                         @if($actividad->archivo)
                                             <div class="ra-activity-files">
@@ -372,6 +381,29 @@
                             @endif
 
                             <time>{{ $pendiente->created_at?->format('d/m/Y H:i') }}</time>
+                            @if($pendiente->estado_revision !== 'POR_REVISAR' && $pendiente->estado !== 'RESUELTO')
+                                <div class="ra-worker-pending__actions">
+                                    <button type="button"
+                                        class="pending-icon-action" aria-label="Editar pendiente" title="Editar pendiente"
+                                        data-editar-pendiente
+                                        data-url="{{ route('reportesAvance.pendientes.update', $pendiente) }}"
+                                        data-descripcion="{{ $pendiente->descripcion }}"
+                                        data-detalle="{{ $pendiente->detalle }}"
+                                        data-ruta-archivos="{{ $pendiente->ruta_archivos }}">
+                                        <x-ui-icon name="edit" />
+                                    </button>
+
+                                    <form method="POST"
+                                        action="{{ route('reportesAvance.pendientes.resolver', $pendiente) }}">
+                                        @csrf
+                                        @method('PATCH')
+
+                                        <button type="submit" class="pending-icon-action pending-icon-action--finish" aria-label="Marcar como finalizado" title="Marcar como finalizado">
+                                            <x-ui-icon name="close" />
+                                        </button>
+                                    </form>
+                                </div>
+                            @endif
                         </div>
 
                         <div class="ra-worker-pending__content">
@@ -423,7 +455,7 @@
                             @if($pendiente->estado_revision === 'POR_REVISAR')
 
                                 <div class="ra-worker-pending__finished">
-                                    <span>Finalizado</span>
+                                    <span>Finalizado por</span>
 
                                     <strong>
                                         @if($pendiente->resueltoPor?->id === $usuarioActual->trabajador_id)
@@ -439,29 +471,9 @@
                                     @endif
                                 </div>
 
-                            @elseif($pendiente->estado !== 'RESUELTO')
+                            @else
 
-                                <div class="ra-worker-pending__actions">
-                                    <button type="button"
-                                        class="button button--secondary button--small"
-                                        data-editar-pendiente
-                                        data-url="{{ route('reportesAvance.pendientes.update', $pendiente) }}"
-                                        data-descripcion="{{ $pendiente->descripcion }}"
-                                        data-detalle="{{ $pendiente->detalle }}"
-                                        data-ruta-archivos="{{ $pendiente->ruta_archivos }}">
-                                        Editar pendiente
-                                    </button>
-
-                                    <form method="POST"
-                                        action="{{ route('reportesAvance.pendientes.resolver', $pendiente) }}">
-                                        @csrf
-                                        @method('PATCH')
-
-                                        <button type="submit" class="button button--primary button--small">
-                                            Marcar como finalizado
-                                        </button>
-                                    </form>
-                                </div>
+                                <div class="ra-worker-pending__finished"><span>Finalizado por</span><strong>Por finalizar</strong></div>
 
                             @endif
 

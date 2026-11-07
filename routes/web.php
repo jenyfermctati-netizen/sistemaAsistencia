@@ -48,6 +48,8 @@ Route::middleware('guest')->group(function () {
 
 // Rutas autenticadas
 Route::middleware('auth')->group(function () {
+    Route::patch('/mi-cuenta/telefono', [\App\Http\Controllers\PerfilController::class, 'actualizarTelefono'])
+        ->middleware('throttle:10,1')->name('perfil.telefono.update');
     Route::get('/mi-cuenta/contrasena', [PasswordController::class, 'edit'])
         ->name('password.edit');
     Route::put('/mi-cuenta/contrasena', [PasswordController::class, 'update'])
@@ -105,6 +107,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/asignaciones-campo/{asignacion}/marcar', [AsignacionCampoController::class, 'marcarRemoto'])
         ->middleware('throttle:10,1')
         ->name('asignaciones-campo.marcar');
+    Route::post('/asignaciones-campo/{asignacion}/avances', [AsignacionCampoController::class, 'registrarAvance'])
+        ->middleware('throttle:10,1')
+        ->name('asignaciones-campo.avances.store');
     Route::get('/marcaciones-campo/{marcacionCampo}/evidencia', [AsignacionCampoController::class, 'verEvidencia'])
         ->name('marcaciones-campo.evidencia');
     Route::patch('/marcaciones-campo/{marcacionCampo}/revisar', [AsignacionCampoController::class, 'revisarMarcacion'])

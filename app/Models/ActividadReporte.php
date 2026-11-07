@@ -15,10 +15,16 @@ class ActividadReporte extends Model
         'reporte_avance_id',
         'descripcion',
         'archivo',
+        'asignacion_campo_id',
     ];
 
     public function reporte()
     {
         return $this->belongsTo(ReporteAvance::class, 'reporte_avance_id');
+    }
+
+    public function asignacionCampo()
+    {
+        return $this->belongsTo(AsignacionCampo::class, 'asignacion_campo_id');
     }
 }

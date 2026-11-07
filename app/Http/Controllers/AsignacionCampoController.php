@@ -6,6 +6,7 @@ use App\Models\Area;
 use App\Models\AsignacionCampo;
 use App\Models\Marcacion;
 use App\Models\MarcacionCampo;
+use App\Models\ReporteAvance;
 use App\Models\Trabajador;
 use App\Services\ClasificadorMarcacionService;
 use Carbon\Carbon;
@@ -36,6 +37,7 @@ class AsignacionCampoController extends Controller
         $this->actualizarEstados();
 
         $query = AsignacionCampo::with([
+            'avances' => fn ($q) => $q->with('reporte')->orderByDesc('created_at')->orderByDesc('id'),
             'trabajador.area',
             'autorizadoPor.rol',
             'marcacionesRemotas' => fn ($marcaciones) => $marcaciones
@@ -84,6 +86,22 @@ class AsignacionCampoController extends Controller
                 ->whereDate('fecha_fin', '>=', $fecha);
         }
 
+        $soloAsignacionesHoy = $esTrabajador
+            && ! $request->boolean('todas')
+            && ! $request->filled('buscar')
+            && ! $request->filled('fecha')
+            && ! $request->filled('estado');
+
+        if ($esTrabajador) {
+            $query->whereIn('estado', ['ACTIVA', 'PROGRAMADA']);
+        }
+
+        if ($soloAsignacionesHoy) {
+            $query->whereDate('fecha_inicio', '<=', today())
+                ->whereDate('fecha_fin', '>=', today())
+                ->where('estado', '!=', 'CANCELADA');
+        }
+
         $asignaciones = $query
             ->orderByDesc('fecha_inicio')
             ->orderByDesc('id')
@@ -109,7 +127,49 @@ class AsignacionCampoController extends Controller
                 ->get()
             : collect();
 
-        $marcacionesRecientes = MarcacionCampo::with([
+        $diasMarcaciones = null;
+        $resumenCampo = null;
+        $marcacionesPorFecha = collect();
+        $diasSinAprobar = null;
+        $marcacionesSinAprobar = collect();
+
+        if ($esTrabajador) {
+            $baseMarcaciones = MarcacionCampo::where('trabajador_id', Auth::user()?->trabajador_id);
+            $resumenCampo = [
+                'total' => (clone $baseMarcaciones)->count(),
+                'evidencias' => (clone $baseMarcaciones)->whereNotNull('evidencia_path')->where('evidencia_path', '!=', '')->count(),
+                'pendientes' => (clone $baseMarcaciones)->where('estado', 'PENDIENTE')->count(),
+            ];
+            $diasSinAprobar = (clone $baseMarcaciones)->where('estado', '!=', 'APROBADA')
+                ->selectRaw('DATE(fecha_hora) as fecha')->groupByRaw('DATE(fecha_hora)')
+                ->orderByDesc('fecha')->paginate(7, ['*'], 'pendientes_page')->withQueryString();
+            $marcacionesSinAprobar = (clone $baseMarcaciones)->where('estado', '!=', 'APROBADA')
+                ->with(['asignacion', 'revisadoPor', 'marcacion'])
+                ->whereIn(DB::raw('DATE(fecha_hora)'), $diasSinAprobar->pluck('fecha'))
+                ->orderByDesc('fecha_hora')->orderByDesc('id')->get()
+                ->groupBy(fn ($marca) => $marca->fecha_hora->toDateString());
+            $baseMarcaciones->where('estado', 'APROBADA');
+            // Marcaciones muestra exclusivamente registros aprobados.
+            $resumenCampo['total'] = (clone $baseMarcaciones)->count();
+            $resumenCampo['evidencias'] = (clone $baseMarcaciones)->whereNotNull('evidencia_path')->where('evidencia_path', '!=', '')->count();
+            // Paginar fechas completas: nunca cortar las marcaciones de un día.
+            $diasMarcaciones = (clone $baseMarcaciones)
+                ->selectRaw('DATE(fecha_hora) as fecha')
+                ->groupByRaw('DATE(fecha_hora)')
+                ->orderByDesc('fecha')
+                ->paginate(7, ['*'], 'historial_page')
+                ->withQueryString();
+            $fechas = $diasMarcaciones->pluck('fecha');
+            $marcacionesPorFecha = (clone $baseMarcaciones)
+                ->with(['asignacion', 'revisadoPor', 'marcacion'])
+                ->whereIn(DB::raw('DATE(fecha_hora)'), $fechas)
+                ->orderByDesc('fecha_hora')
+                ->orderByDesc('id')
+                ->get()
+                ->groupBy(fn ($marca) => $marca->fecha_hora->toDateString());
+        }
+
+        $marcacionesRecientes = $esAdministrador ? MarcacionCampo::with([
             'asignacion',
             'trabajador.area',
             'registradoPor',
@@ -122,17 +182,74 @@ class AsignacionCampoController extends Controller
             )
             ->orderByDesc('fecha_hora')
             ->limit(30)
-            ->get();
+            ->get() : collect();
 
         return view('trabajadores.asignaciones-campo', compact(
+            'diasSinAprobar',
+            'marcacionesSinAprobar',
+            'soloAsignacionesHoy',
             'asignaciones',
             'trabajadores',
             'areas',
             'marcacionesPendientes',
             'marcacionesRecientes',
+            'diasMarcaciones',
+            'marcacionesPorFecha',
+            'resumenCampo',
             'esAdministrador',
             'esTrabajador'
         ));
+    }
+
+    public function registrarAvance(Request $request, AsignacionCampo $asignacion): RedirectResponse
+    {
+        $this->verificarTrabajador();
+        $trabajador = $this->trabajadorActual();
+        abort_unless((int) $asignacion->trabajador_id === (int) $trabajador->id, 403);
+        $data = $request->validate([
+            'descripcion_avance' => ['required', 'string', 'max:500'],
+            'archivo_avance' => ['nullable', 'file', 'mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+
+        $ruta = null;
+        try {
+            DB::transaction(function () use ($request, $asignacion, $trabajador, $data, &$ruta) {
+                Trabajador::whereKey($trabajador->id)->lockForUpdate()->firstOrFail();
+                $asignacion = AsignacionCampo::whereKey($asignacion->id)->lockForUpdate()->firstOrFail();
+                if ($asignacion->estado === 'CANCELADA'
+                    || ! today()->betweenIncluded($asignacion->fecha_inicio, $asignacion->fecha_fin)) {
+                    throw ValidationException::withMessages(['descripcion_avance' => 'Solo puedes registrar avances durante el periodo de una asignación vigente.']);
+                }
+                $reporte = ReporteAvance::where('trabajador_id', $trabajador->id)
+                    ->whereDate('fecha_presentacion', today())->first();
+                if (! $reporte) {
+                    $reporte = ReporteAvance::create([
+                        'trabajador_id' => $trabajador->id,
+                        'fecha_presentacion' => today(),
+                        'estado' => 'PENDIENTE',
+                    ]);
+                }
+
+                $ruta = $request->file('archivo_avance')?->store('reportes-avance/actividades', 'public');
+                $reporte->actividades()->create([
+                    'asignacion_campo_id' => $asignacion->id,
+                    'descripcion' => trim($data['descripcion_avance']),
+                    'archivo' => $ruta,
+                ]);
+                $reporte->update([
+                    'estado' => 'PENDIENTE', 'revisado_por' => null,
+                    'comentario_revision' => null, 'fecha_revision' => null,
+                ]);
+            });
+        } catch (\Throwable $exception) {
+            if ($ruta) {
+                Storage::disk('public')->delete($ruta);
+            }
+            throw $exception;
+        }
+
+        return redirect()->route('asignaciones-campo.index', ['vista' => 'asignaciones'])
+            ->with('success', 'Avance vinculado a la asignación y agregado a tu reporte de hoy.');
     }
 
     // Registrar asignación

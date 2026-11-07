@@ -72,9 +72,29 @@
                         </div>
                         <div>
                             <dt>Celular</dt>
-                            <dd>{{ $trabajadorNavbar?->telefono ?: 'No registrado' }}</dd>
+                            <dd class="profile-phone-value">
+                                <span>{{ $trabajadorNavbar?->telefono ?: 'No registrado' }}</span>
+                                @if($trabajadorNavbar && $trabajadorNavbar->estado === 'ACTIVO')
+                                    <button type="button" class="profile-phone-edit" aria-label="Editar teléfono" title="Editar teléfono" aria-expanded="false" aria-controls="profilePhoneForm" onclick="const form = document.getElementById('profilePhoneForm'); form.hidden = !form.hidden; this.setAttribute('aria-expanded', String(!form.hidden)); if (!form.hidden) document.getElementById('profilePhone').focus();"><x-ui-icon name="edit" /></button>
+                                @endif
+                            </dd>
                         </div>
                     </dl>
+
+                    @if($trabajadorNavbar && $trabajadorNavbar->estado === 'ACTIVO')
+                        <form method="POST" action="{{ route('perfil.telefono.update') }}" class="profile-phone-form" id="profilePhoneForm" hidden>
+                            @csrf
+                            @method('PATCH')
+                            <label for="profilePhone">Editar teléfono</label>
+                            <div>
+                                <input id="profilePhone" name="telefono" type="tel" inputmode="tel" autocomplete="tel"
+                                    value="{{ old('telefono', $trabajadorNavbar->telefono) }}" placeholder="Ej. 987654321"
+                                    pattern="\+?[0-9]{7,15}" maxlength="16" required aria-describedby="profilePhoneHelp">
+                                <button type="submit" aria-label="Guardar teléfono" title="Guardar teléfono"><x-ui-icon name="check" /></button>
+                            </div>
+                            <small id="profilePhoneHelp">Solo dígitos; puedes incluir + y el código de país.</small>
+                        </form>
+                    @endif
 
                     <div class="profile-menu__actions">
                         <a href="{{ route('password.edit') }}" class="profile-menu__action">

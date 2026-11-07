@@ -13,7 +13,7 @@
 <div class="solicitudes-page">
 
     <header class="solicitudes-header">
-        <div>
+        <div class="solicitudes-header__copy">
             <h2>
                 {{ $puedeGestionar ? ($seccion === 'mis' ? 'Mis solicitudes' : 'Bandeja de entrada') : 'Mis solicitudes' }}
             </h2>
@@ -27,6 +27,7 @@
             </p>
         </div>
 
+        <div class="solicitudes-header__actions">
         @if($puedeSolicitar && (!$puedeGestionar || $seccion === 'mis'))
             <button type="button"
                 class="button button--primary"
@@ -40,8 +41,10 @@
         <x-download-menu
             :excel="route('solicitudes.index', $filtrosDescarga + ['descargar' => 'xlsx'])"
             :pdf="route('solicitudes.index', $filtrosDescarga + ['descargar' => 'pdf'])" />
+        </div>
     </header>
 
+    @unless(strtoupper(trim((string) auth()->user()?->rol?->nombre)) === 'TRABAJADOR')
     {{-- MENSAJES --}}
     @if(session('success'))
         <div class="solicitudes-alert solicitudes-alert--success">
@@ -55,7 +58,9 @@
         </div>
     @endif
 
-    @if($puedeGestionar)
+@endunless
+
+        @if($puedeGestionar)
         <nav class="solicitudes-tabs" aria-label="Secciones de solicitudes">
             <a href="{{ route('solicitudes.index', ['seccion' => 'mis']) }}"
                 class="solicitudes-tabs__link {{ $seccion === 'mis' ? 'is-active' : '' }}"
@@ -782,4 +787,20 @@
 
 @push('scripts')
 <script src="{{ asset('js/pages/solicitudes.js') }}"></script>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(location.search);
+    const fecha = params.get('regularizar');
+    const tipo = params.get('tipo_regularizacion');
+    const modal = document.getElementById('modalCrearSolicitud');
+    if (!modal || !/^\d{4}-\d{2}-\d{2}$/.test(fecha || '') || !['FALTA', 'OMISION_MARCACION'].includes(tipo)) return;
+    const select = modal.querySelector('[name="tipo"]');
+    if (select) { select.value = tipo; select.dispatchEvent(new Event('change', {bubbles:true})); }
+    modal.querySelectorAll('[name="fecha_inicio"], [name="fecha_fin"]').forEach(input => { input.value = fecha; input.dispatchEvent(new Event('change', {bubbles:true})); });
+    window.AppModal?.open('modalCrearSolicitud');
+});
+</script>
 @endpush

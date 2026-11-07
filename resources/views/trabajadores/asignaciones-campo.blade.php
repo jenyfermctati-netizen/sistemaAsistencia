@@ -5,6 +5,9 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/pages/asignaciones-campo.css') }}">
+    @if($esTrabajador)
+        <link rel="stylesheet" href="{{ asset('css/pages/campo-trabajador.css') }}">
+    @endif
 @endpush
 
 @section('content')
@@ -30,6 +33,15 @@
             <a class="campo-tabs__tab" href="#campoHistorial" data-campo-tab="historial" role="tab" aria-selected="false"><x-ui-icon name="calendar" /> Historial</a>
             <a class="campo-tabs__tab" href="#campoAsignaciones" data-campo-tab="asignaciones" role="tab" aria-selected="false"><x-ui-icon name="briefcase" /> Asignaciones</a>
         </nav>
+    @endif
+
+    @if($esTrabajador)
+        <nav class="campo-tabs worker-campo-tabs" aria-label="Mis secciones de trabajo en campo">
+            <a class="campo-tabs__tab campo-tabs__tab--active" href="{{ route('asignaciones-campo.index', ['vista' => 'asignaciones']) }}" data-campo-tab="asignaciones" aria-controls="campoAsignaciones"><x-ui-icon name="briefcase" /> Asignaciones</a>
+            <a class="campo-tabs__tab" href="{{ route('asignaciones-campo.index', ['vista' => 'avances']) }}" data-campo-tab="avances" aria-controls="campoAvances"><x-ui-icon name="clock" /> Marcaciones pendientes</a>
+            <a class="campo-tabs__tab" href="{{ route('asignaciones-campo.index', ['vista' => 'historial']) }}" data-campo-tab="historial" aria-controls="campoHistorial"><x-ui-icon name="calendar" /> Marcaciones aprobadas</a>
+        </nav>
+        @include('trabajadores.partials.avances-campo')
     @endif
 
     {{-- REVISIÓN ADMINISTRATIVA: resumen compacto y detalles bajo demanda --}}
@@ -104,6 +116,9 @@
         </section>
     @endif
 
+    @if($esTrabajador)
+        @include('trabajadores.partials.historial-campo')
+    @else
     <section id="campoHistorial" data-campo-panel="historial" role="tabpanel" @if($esAdministrador) hidden @endif class="campo-history panel" aria-labelledby="historialCampoTitulo">
         <div class="campo-section-heading">
             <div>
@@ -155,6 +170,7 @@
             </table>
         </div>
     </section>
+    @endif
 
 
     {{-- ASIGNACIONES Y FILTROS --}}
@@ -162,13 +178,16 @@
         <div class="campo-section-heading campo-assignments__heading">
             <div>
                 <span>TRABAJO EN CAMPO</span>
-                <h3 id="campoAsignacionesTitulo">{{ $esAdministrador ? 'Asignaciones del personal' : 'Mis asignaciones' }}</h3>
-                <p>Consulta las actividades y abre sus detalles cuando los necesites.</p>
+                <h3 id="campoAsignacionesTitulo">{{ $esAdministrador ? 'Asignaciones del personal' : ($soloAsignacionesHoy ? 'Mis asignaciones de hoy' : 'Mis asignaciones') }}</h3>
+                <p>{{ $soloAsignacionesHoy ? today()->format('d/m/Y').' · Usa los filtros para consultar otras fechas.' : 'Consulta las actividades y abre sus detalles cuando los necesites.' }}</p>
             </div>
             <details class="campo-filter-details" @if(request()->filled('buscar') || request()->filled('area_id') || request()->filled('fecha') || request()->filled('estado')) open @endif>
                 <summary>Buscar y filtrar <span aria-hidden="true">⌄</span></summary>
                 <div class="campo-filter-popover">
                     <form method="GET" action="{{ route('asignaciones-campo.index') }}" class="campo-filtros">
+                        @if($esTrabajador)
+                            <input type="hidden" name="todas" value="1">
+                        @endif
                         <div class="form-group">
                             <label class="form-label">Buscar</label>
                             <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control" placeholder="Trabajador, DNI, actividad o lugar...">
@@ -205,7 +224,7 @@
                         @endif
                         <div class="campo-filtros__actions">
                             <button type="submit" class="button button--primary">Filtrar</button>
-                            <a href="{{ route('asignaciones-campo.index') }}" class="button button--secondary">Restablecer</a>
+                            <a href="{{ route('asignaciones-campo.index') }}" class="button button--secondary">{{ $esTrabajador ? 'Volver a hoy' : 'Restablecer' }}</a>
                         </div>
                     </form>
                 </div>
@@ -283,7 +302,28 @@
                         </strong>
                     </div>
 
-                    @if ($asignacion->marcacionesRemotas->isNotEmpty())
+                    <div class="campo-info campo-info--full">
+                        <span class="campo-info__label">Avances de esta asignación ({{ $asignacion->avances->count() }}) · Consúltalos en Mi avance</span>
+                        @if($esAdministrador)
+                        @forelse($asignacion->avances->groupBy(fn ($avance) => $avance->reporte?->fecha_presentacion?->format('d/m/Y') ?? 'Sin fecha') as $fechaAvance => $avancesDelDia)
+                            <div class="campo-assignment-progress">
+                                <strong>{{ $fechaAvance }}</strong>
+                                @foreach($avancesDelDia as $avance)
+                                    <article>
+                                        <p>{{ $avance->descripcion }}</p>
+                                        <small>{{ $avance->created_at?->format('H:i') }} · {{ ucfirst(strtolower($avance->reporte?->estado ?? 'PENDIENTE')) }}</small>
+                                        @if($avance->archivo)
+                                            <a class="button button--secondary button--small" href="{{ route('reportesAvance.actividades.archivo', $avance) }}" target="_blank" rel="noopener">Ver evidencia del avance</a>
+                                        @endif
+                                    </article>
+                                @endforeach
+                            </div>
+                        @empty
+                            <p>Aún no hay avances vinculados a esta asignación.</p>
+                        @endforelse
+                        @endif
+                    </div>
+                    @if ($esAdministrador && $asignacion->marcacionesRemotas->isNotEmpty())
                         <div class="campo-info campo-info--full">
                             <span class="campo-info__label">Marcaciones web</span>
                             <div class="campo-card-marks">
@@ -302,10 +342,23 @@
                 </div>
 
                 <div class="campo-card__footer">
+                    @if($esTrabajador && $asignacion->estado === 'ACTIVA')
+                        <button type="button" class="button button--secondary button--small" data-campo-modal-target="campo-avance-{{ $asignacion->id }}" data-campo-modal-title="Registrar avance de campo"><x-ui-icon name="plus" /> Registrar avance</button>
+                        <div id="campo-avance-{{ $asignacion->id }}" class="campo-modal-source" hidden>
+                            <form method="POST" action="{{ route('asignaciones-campo.avances.store', $asignacion) }}" enctype="multipart/form-data" class="form campo-avance-form">
+                                @csrf
+                                <p><strong>{{ $asignacion->actividad }}</strong><br>{{ $asignacion->lugar }} · {{ today()->format('d/m/Y') }}</p>
+                                <p>Se agregará a tu reporte de hoy y quedará vinculado a esta asignación.</p>
+                                <label class="form-group"><span class="form-label">¿Qué realizaste? *</span><textarea name="descripcion_avance" class="form-control" maxlength="500" required rows="4">{{ old('descripcion_avance') }}</textarea></label>
+                                <label class="form-group"><span class="form-label">Evidencia del avance (opcional, máximo 5 MB)</span><input type="file" name="archivo_avance" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp"></label>
+                                <button type="submit" class="button button--primary">Guardar avance</button>
+                            </form>
+                        </div>
+                    @endif
                     <button type="button" class="campo-icon-btn campo-icon-btn--info"
                         data-campo-modal-target="campo-asignacion-{{ $asignacion->getKey() }}"
                         data-campo-modal-title="Información de asignación"
-                        title="Información de asignación" aria-label="Ver información de la asignación">
+                        title="Información y avances de asignación" aria-label="Ver información y avances de la asignación">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <circle cx="12" cy="12" r="9" />
                                 <path d="M12 11v5" />
@@ -359,8 +412,8 @@
             </article>
         @empty
             <div class="empty-state">
-                <strong>No existen asignaciones de campo</strong>
-                <span>Registra la primera asignación para comenzar.</span>
+                <strong>{{ $soloAsignacionesHoy ? 'No tienes asignaciones para hoy' : 'No existen asignaciones de campo' }}</strong>
+                <span>{{ $soloAsignacionesHoy ? 'Puedes crear una asignación o buscar otra fecha con los filtros.' : 'Prueba otros filtros o registra una nueva asignación.' }}</span>
             </div>
         @endforelse
     </section>
@@ -521,6 +574,37 @@
 @endsection
 
 @push('scripts')
+    @if($esTrabajador)
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.campo-mark-form, .campo-avance-form').forEach(form => {
+            form.addEventListener('submit', event => {
+                if (form.dataset.submitting === 'true') {
+                    event.preventDefault();
+                    return;
+                }
+                form.dataset.submitting = 'true';
+                const button = form.querySelector('button[type="submit"]');
+                if (button) {
+                    button.disabled = true;
+                    button.dataset.originalLabel = button.textContent;
+                    button.textContent = 'Enviando…';
+                }
+            });
+        });
+    });
+    window.addEventListener('pageshow', () => {
+        document.querySelectorAll('.campo-mark-form[data-submitting="true"], .campo-avance-form[data-submitting="true"]').forEach(form => {
+            delete form.dataset.submitting;
+            const button = form.querySelector('button[type="submit"]');
+            if (button) {
+                button.disabled = false;
+                button.textContent = button.dataset.originalLabel || 'Guardar';
+            }
+        });
+    });
+    </script>
+    @endif
     <script src="{{ asset('js/pages/asignaciones-campo.js') }}"></script>
     <script>
     (() => {
@@ -573,8 +657,8 @@
 
             const tabs = [...page.querySelectorAll('[data-campo-tab]')];
             const panels = [...page.querySelectorAll('[data-campo-panel]')];
-            const valid = ['pendientes', 'historial', 'asignaciones'];
-            const defaultTab = tabs.length ? 'pendientes' : 'asignaciones';
+            const valid = tabs.map(tab => tab.dataset.campoTab);
+            const defaultTab = @json($esAdministrador ? 'pendientes' : 'asignaciones');
             const selectTab = (name, updateURL = true) => {
                 const selected = valid.includes(name) && (tabs.length || name === 'asignaciones') ? name : defaultTab;
                 panels.forEach(panel => { panel.hidden = panel.dataset.campoPanel !== selected; });
@@ -587,10 +671,13 @@
                 if (updateURL) {
                     const url = new URL(location.href);
                     url.searchParams.set('vista', selected);
+                    if (selected !== 'avances') url.searchParams.delete('avances_page');
+                    if (selected !== 'historial') url.searchParams.delete('historial_page');
                     history.replaceState(null, '', url);
                 }
             };
-            const initial = new URL(location.href).searchParams.get('vista');
+            const params = new URL(location.href).searchParams;
+            const initial = params.get('vista') || (params.has('avances_page') ? 'avances' : params.has('historial_page') ? 'historial' : null);
             selectTab(initial || (['buscar','area_id','fecha','estado'].some(key => new URL(location.href).searchParams.has(key)) ? 'asignaciones' : defaultTab), false);
             tabs.forEach(tab => tab.addEventListener('click', e => {
                 e.preventDefault();
