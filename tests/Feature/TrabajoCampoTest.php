@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\ActividadReporte;
 use App\Models\Area;
 use App\Models\AsignacionCampo;
 use App\Models\Asistencia;
+use App\Models\Empresa;
 use App\Models\Horario;
 use App\Models\HorarioDia;
 use App\Models\Marcacion;
@@ -13,6 +15,7 @@ use App\Models\Rol;
 use App\Models\Trabajador;
 use App\Models\TrabajadorHorario;
 use App\Models\User;
+use App\Tenancy\EmpresaActual;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -33,6 +36,7 @@ class TrabajoCampoTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        app(EmpresaActual::class)->establecer(Empresa::firstOrFail());
 
         Carbon::setTestNow('2026-11-03 08:30:00');
         Storage::fake('local');
@@ -267,17 +271,17 @@ class TrabajoCampoTest extends TestCase
 
     public function test_avance_de_campo_se_vincula_a_asignacion_y_reutiliza_reporte_diario(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
         $asignacion = $this->crearAsignacion();
         $this->actingAs($this->usuarioTrabajador)
             ->post(route('asignaciones-campo.avances.store', $asignacion), [
                 'descripcion_avance' => 'Instalación de equipo terminada',
                 'archivo_avance' => $this->evidencia(),
             ])->assertSessionHasNoErrors()->assertRedirect();
-        $actividad = \App\Models\ActividadReporte::sole();
+        $actividad = ActividadReporte::sole();
         $this->assertSame($asignacion->id, $actividad->asignacion_campo_id);
         $this->assertSame($this->trabajador->id, $actividad->reporte->trabajador_id);
-        Storage::disk('public')->assertExists($actividad->archivo);
+        Storage::disk('local')->assertExists($actividad->archivo);
         $this->post(route('asignaciones-campo.avances.store', $asignacion), [
             'descripcion_avance' => 'Pruebas realizadas',
         ])->assertSessionHasNoErrors();

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReporteAvance extends Model
 {
-    use HasFactory;
+    use \App\Models\Concerns\PerteneceAEmpresa, HasFactory;
 
     protected $table = 'reportes_avance';
 

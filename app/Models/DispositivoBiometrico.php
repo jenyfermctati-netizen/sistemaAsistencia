@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PerteneceAEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class DispositivoBiometrico extends Model
 {
+    use PerteneceAEmpresa;
+
     protected $table = 'dispositivos_biometricos';
+
+    protected $hidden = ['token_hash'];
 
     protected $fillable = [
         'nombre',

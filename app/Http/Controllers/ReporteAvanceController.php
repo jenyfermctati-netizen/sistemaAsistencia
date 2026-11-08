@@ -9,6 +9,7 @@ use App\Models\ReporteAvance;
 use App\Models\Trabajador;
 use App\Models\User;
 use App\Services\ReporteActividadesExportService;
+use App\Tenancy\EmpresaActual;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -355,7 +356,7 @@ class ReporteAvanceController extends Controller
             foreach ($data['actividades'] as $indice => $actividad) {
                 $archivo = $request->file("actividades.{$indice}.archivo");
                 $ruta = $archivo
-                    ? $archivo->store('reportes-avance/actividades', 'public')
+                    ? $archivo->store('empresas/'.app(EmpresaActual::class)->requerirId().'/reportes-avance/actividades', 'local')
                     : null;
 
                 $reporte->actividades()->create([
@@ -728,7 +729,7 @@ class ReporteAvanceController extends Controller
                 $reporte->actividades()->create([
                     'descripcion' => $actividad['descripcion'],
                     'archivo' => $archivo
-                        ? $archivo->store('reportes-avance/actividades', 'public')
+                        ? $archivo->store('empresas/'.app(EmpresaActual::class)->requerirId().'/reportes-avance/actividades', 'local')
                         : null,
                 ]);
             }
@@ -770,9 +771,9 @@ class ReporteAvanceController extends Controller
             ->each(function ($actividad) {
                 if (
                     $actividad->archivo &&
-                    Storage::disk('public')->exists($actividad->archivo)
+                    Storage::disk('local')->exists($actividad->archivo)
                 ) {
-                    Storage::disk('public')->delete($actividad->archivo);
+                    Storage::disk('local')->delete($actividad->archivo);
                 }
 
                 $actividad->delete();
@@ -789,13 +790,13 @@ class ReporteAvanceController extends Controller
             $archivoNuevo = $request->file("actividades.{$indice}.archivo");
 
             if ($archivoNuevo) {
-                if ($ruta && Storage::disk('public')->exists($ruta)) {
-                    Storage::disk('public')->delete($ruta);
+                if ($ruta && Storage::disk('local')->exists($ruta)) {
+                    Storage::disk('local')->delete($ruta);
                 }
 
                 $ruta = $archivoNuevo->store(
-                    'reportes-avance/actividades',
-                    'public'
+                    'empresas/'.app(EmpresaActual::class)->requerirId().'/reportes-avance/actividades',
+                    'local'
                 );
             }
 
@@ -852,12 +853,12 @@ class ReporteAvanceController extends Controller
     {
         $this->autorizarArchivoActividad($actividad);
 
-        if (! $actividad->archivo || ! Storage::disk('public')->exists($actividad->archivo)) {
+        if (! $actividad->archivo || ! Storage::disk('local')->exists($actividad->archivo)) {
             abort(404, 'El archivo no se encuentra disponible.');
         }
 
-        $ruta = Storage::disk('public')->path($actividad->archivo);
-        $mime = Storage::disk('public')->mimeType($actividad->archivo) ?: 'application/octet-stream';
+        $ruta = Storage::disk('local')->path($actividad->archivo);
+        $mime = Storage::disk('local')->mimeType($actividad->archivo) ?: 'application/octet-stream';
 
         return response()->file($ruta, [
             'Content-Type' => $mime,
@@ -869,11 +870,11 @@ class ReporteAvanceController extends Controller
     {
         $this->autorizarArchivoActividad($actividad);
 
-        if (! $actividad->archivo || ! Storage::disk('public')->exists($actividad->archivo)) {
+        if (! $actividad->archivo || ! Storage::disk('local')->exists($actividad->archivo)) {
             abort(404, 'El archivo no se encuentra disponible.');
         }
 
-        return Storage::disk('public')->download(
+        return Storage::disk('local')->download(
             $actividad->archivo,
             basename($actividad->archivo)
         );

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Feriado extends Model
 {
-    use HasFactory;
+    use \App\Models\Concerns\PerteneceAEmpresa, HasFactory;
 
     protected $table = 'trabajador_feriados';
 

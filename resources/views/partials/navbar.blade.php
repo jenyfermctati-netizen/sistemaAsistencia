@@ -22,6 +22,12 @@
 
     <div class="navbar__right">
         @auth
+            <div class="empresa-nav">
+                <a href="{{ route('empresas.index') }}">{{ app(\App\Tenancy\EmpresaActual::class)->empresa()?->nombre ?? 'Mis empresas' }}</a>
+                @if(auth()->user()->rol?->nombre === 'ADMINISTRADOR')
+                    <a href="{{ route('empresas.usuarios') }}">Administrar accesos</a>
+                @endif
+            </div>
             @php
                 $usuarioNavbar = auth()->user();
                 $trabajadorNavbar = $usuarioNavbar->trabajador;

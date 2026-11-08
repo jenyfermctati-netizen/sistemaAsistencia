@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Tenancy\EmpresaActual;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Trabajador extends Model
 {
-    use HasFactory;
+    use \App\Models\Concerns\PerteneceAEmpresa, HasFactory;
 
     protected $table = 'trabajadores';
 
@@ -65,7 +66,9 @@ class Trabajador extends Model
 
     public function user()
     {
-        return $this->hasOne(User::class, 'trabajador_id');
+        return $this->hasOneThrough(User::class, EmpresaUsuario::class,
+            'trabajador_id', 'id', 'id', 'user_id')
+            ->where('empresa_usuario.empresa_id', app(EmpresaActual::class)->id());
     }
 
     public function trabajadorHorarios()

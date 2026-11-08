@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReprogramacionVacacion extends Model
 {
-    use HasFactory;
+    use \App\Models\Concerns\PerteneceAEmpresa, HasFactory;
 
     protected $table = 'reprogramaciones_vacaciones';
 

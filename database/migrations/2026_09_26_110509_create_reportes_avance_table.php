@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('reportes_avance', function (Blueprint $table) {
             $table->id();
             $table->foreignId('trabajador_id')->constrained('trabajadores')->restrictOnDelete();
-            $table->date('periodo_inicio');
-            $table->date('periodo_fin');
+            $table->date('periodo_inicio')->nullable();
+            $table->date('periodo_fin')->nullable();
             $table->date('fecha_presentacion');
-            $table->text('descripcion');
+            $table->text('descripcion')->nullable();
             $table->decimal('porcentaje_avance', 5, 2)->nullable();
             $table->string('archivo', 500)->nullable();
             $table->enum('estado', ['PENDIENTE','REVISADO','OBSERVADO'])->default('PENDIENTE');

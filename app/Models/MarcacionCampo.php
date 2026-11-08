@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MarcacionCampo extends Model
 {
-    use HasFactory;
+    use \App\Models\Concerns\PerteneceAEmpresa, HasFactory;
 
     protected $table = 'marcaciones_campo';
 

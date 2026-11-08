@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('horarios', function (Blueprint $table) {
@@ -15,6 +14,8 @@ return new class extends Migration
             $table->string('descripcion', 300)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
+
+            $table->string('formato_hora', 2)->default('24');
         });
     }
 

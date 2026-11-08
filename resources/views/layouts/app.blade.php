@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ asset('css/theme-itrafic.css') }}">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/ux-system.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/pages/empresas.css') }}">
     @if(strtoupper(trim((string) auth()->user()?->rol?->nombre)) === 'TRABAJADOR')
         <link rel="stylesheet" href="{{ asset('css/worker-interface.css') }}?v={{ filemtime(public_path('css/worker-interface.css')) }}">
     @endif

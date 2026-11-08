@@ -217,7 +217,7 @@
                                 );
 
                                 $archivoUrl = $solicitud->archivo
-                                    ? Storage::url($solicitud->archivo)
+                                    ? route('solicitudes.archivo.ver', $solicitud)
                                     : '';
                             @endphp
 

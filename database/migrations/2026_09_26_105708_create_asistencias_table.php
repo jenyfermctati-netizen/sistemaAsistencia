@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('asistencias', function (Blueprint $table) {
@@ -34,12 +33,32 @@ return new class extends Migration
             $table->time('hora_salida')->nullable();
             $table->unsignedInteger('minutos_trabajados')->default(0);
             $table->unsignedInteger('minutos_tardanza')->default(0);
-            $table->enum('estado', ['PRESENTE','TARDANZA','FALTA','JUSTIFICADO','CAMPO','VACACIONES','PERMISO','FERIADO','NO_LABORABLE','SIN_REGISTRO']);
+            $table->enum('estado', ['PRESENTE','TARDANZA','FALTA','FJ','TJ','JUSTIFICADO','CAMPO','VACACIONES','PERMISO','FERIADO','NO_LABORABLE','SIN_REGISTRO']);
             $table->string('observacion', 500)->nullable();
             $table->timestamp('procesado_en')->useCurrent();
             $table->timestamps();
             $table->unique(['trabajador_id', 'fecha'], 'uq_asistencias_trabajador_fecha');
             $table->index(['fecha', 'estado'], 'ix_asistencias_fecha_estado');
+
+            $table->time('hora_programada_salida_refrigerio')->nullable();
+            $table->time('hora_programada_retorno_refrigerio')->nullable();
+            $table->foreignId('marcacion_salida_refrigerio_id')
+                ->nullable()
+                ->constrained('marcaciones')
+                ->nullOnDelete();
+            $table->foreignId('marcacion_retorno_refrigerio_id')
+                ->nullable()
+                ->constrained('marcaciones')
+                ->nullOnDelete();
+            $table->time('hora_salida_refrigerio')->nullable();
+            $table->time('hora_retorno_refrigerio')->nullable();
+
+            $table->boolean('retorno_refrigerio_estimado')
+                ->default(false);
+            $table->boolean('salida_estimada')
+                ->default(false);
+            $table->timestamp('cerrada_en')
+                ->nullable();
         });
     }
 

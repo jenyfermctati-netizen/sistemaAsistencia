@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Empresa;
 use App\Services\AsistenciaService;
+use App\Tenancy\EmpresaActual;
 use Carbon\Carbon;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -22,7 +24,11 @@ Artisan::command('asistencias:cerrar {fecha?}', function () {
         return 1;
     }
 
-    $procesados = app(AsistenciaService::class)->procesarFecha($fecha);
+    $procesados = 0;
+    foreach (Empresa::where('estado', true)->cursor() as $empresa) {
+        $procesados += app(EmpresaActual::class)->ejecutar($empresa,
+            fn () => app(AsistenciaService::class)->procesarFecha($fecha));
+    }
 
     $this->info(
         "Cierre completado para {$fecha->toDateString()}: {$procesados} asistencias procesadas."

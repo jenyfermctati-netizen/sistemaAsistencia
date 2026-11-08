@@ -8,17 +8,20 @@ use App\Http\Controllers\BiometricoController;
 use App\Http\Controllers\BiometricoEstadoController;
 use App\Http\Controllers\ConsultaDniController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\FeriadoController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\MarcacionController;
 use App\Http\Controllers\NewPasswordController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PasswordResetLinkController;
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\ReporteAvanceController;
 use App\Http\Controllers\ReporteControlController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\TrabajadorController;
 use App\Http\Controllers\VacacionesController;
+use App\Http\Middleware\EmpresaBiometrico;
 use Illuminate\Support\Facades\Route;
 
 // Redirección inicial
@@ -48,7 +51,19 @@ Route::middleware('guest')->group(function () {
 
 // Rutas autenticadas
 Route::middleware('auth')->group(function () {
-    Route::patch('/mi-cuenta/telefono', [\App\Http\Controllers\PerfilController::class, 'actualizarTelefono'])
+    Route::get('/empresas', [EmpresaController::class, 'index'])->name('empresas.index');
+    Route::post('/empresas/seleccionar', [EmpresaController::class, 'seleccionar'])->name('empresas.seleccionar');
+    Route::post('/empresas', [EmpresaController::class, 'store'])->name('empresas.store');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+Route::middleware(['auth', 'empresa', 'permisos.empresa'])->group(function () {
+    Route::put('/empresa', [EmpresaController::class, 'actualizar'])->name('empresas.update');
+    Route::get('/empresa/usuarios', [EmpresaController::class, 'usuarios'])->name('empresas.usuarios');
+    Route::post('/empresa/usuarios', [EmpresaController::class, 'guardarUsuario'])->name('empresas.usuarios.store');
+    Route::post('/empresa/dispositivos', [EmpresaController::class, 'registrarDispositivo'])->name('empresas.dispositivos.store');
+    Route::post('/empresa/dispositivos/{dispositivo}/token', [EmpresaController::class, 'renovarToken'])->name('empresas.dispositivos.token');
+    Route::patch('/mi-cuenta/telefono', [PerfilController::class, 'actualizarTelefono'])
         ->middleware('throttle:10,1')->name('perfil.telefono.update');
     Route::get('/mi-cuenta/contrasena', [PasswordController::class, 'edit'])
         ->name('password.edit');
@@ -168,22 +183,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/biometrico/{dispositivo}/usuarios/{usuario}/sincronizar', [BiometricoEstadoController::class, 'sincronizarUsuario'])->name('biometrico.usuarios.sincronizar');
     Route::post('/biometrico/{dispositivo}/usuarios/sincronizar-pendientes', [BiometricoEstadoController::class, 'sincronizarPendientes'])->name('biometrico.usuarios.sincronizar-pendientes');
     // Logout
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 // Biometrico
-Route::match(['GET', 'POST'], '/iclock/cdata', [BiometricoController::class, 'cdata']);
-Route::match(['GET', 'POST'], '/iclock/cdata.aspx', [BiometricoController::class, 'cdata']);
+Route::middleware(EmpresaBiometrico::class)->group(function () {
+    Route::match(['GET', 'POST'], '/iclock/cdata', [BiometricoController::class, 'cdata']);
+    Route::match(['GET', 'POST'], '/iclock/cdata.aspx', [BiometricoController::class, 'cdata']);
 
-Route::match(['GET', 'POST'], '/iclock/getrequest', [BiometricoController::class, 'getRequest']);
-Route::match(['GET', 'POST'], '/iclock/getrequest.aspx', [BiometricoController::class, 'getRequest']);
+    Route::match(['GET', 'POST'], '/iclock/getrequest', [BiometricoController::class, 'getRequest']);
+    Route::match(['GET', 'POST'], '/iclock/getrequest.aspx', [BiometricoController::class, 'getRequest']);
 
-Route::match(['GET', 'POST'], '/iclock/devicecmd', [BiometricoController::class, 'deviceCmd']);
-Route::match(['GET', 'POST'], '/iclock/devicecmd.aspx', [BiometricoController::class, 'deviceCmd']);
+    Route::match(['GET', 'POST'], '/iclock/devicecmd', [BiometricoController::class, 'deviceCmd']);
+    Route::match(['GET', 'POST'], '/iclock/devicecmd.aspx', [BiometricoController::class, 'deviceCmd']);
 
-Route::match(['GET', 'POST'], '/iclock/registry', [BiometricoController::class, 'registry']);
-Route::match(['GET', 'POST'], '/iclock/registry.aspx', [BiometricoController::class, 'registry']);
+    Route::match(['GET', 'POST'], '/iclock/registry', [BiometricoController::class, 'registry']);
+    Route::match(['GET', 'POST'], '/iclock/registry.aspx', [BiometricoController::class, 'registry']);
 
-Route::match(['GET', 'POST'], '/iclock/ping', [BiometricoController::class, 'ping']);
-Route::match(['GET', 'POST'], '/iclock/ping.aspx', [BiometricoController::class, 'ping']);
-
+    Route::match(['GET', 'POST'], '/iclock/ping', [BiometricoController::class, 'ping']);
+    Route::match(['GET', 'POST'], '/iclock/ping.aspx', [BiometricoController::class, 'ping']);
+});

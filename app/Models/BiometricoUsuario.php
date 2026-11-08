@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PerteneceAEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class BiometricoUsuario extends Model
 {
+    use PerteneceAEmpresa;
+
     protected $table = 'biometrico_usuarios';
 
     protected $fillable = [

@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('actividades_reporte', function (Blueprint $table) {
@@ -19,12 +16,12 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('reporte_avance_id', 'ix_actividades_reporte');
+
+            $table->foreignId('asignacion_campo_id')->nullable()
+                ->constrained('asignaciones')->restrictOnDelete();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('actividades_reporte');

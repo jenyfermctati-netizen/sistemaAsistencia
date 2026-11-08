@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asistencia;
 use App\Models\Solicitud;
 use App\Services\ReporteTablaExportService;
+use App\Tenancy\EmpresaActual;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -44,10 +45,11 @@ class SolicitudController extends Controller
                 $query->where('trabajador_id', '!=', $usuario->trabajador_id);
             }
         } elseif ($rol !== 'ADMINISTRADOR') {
-            if (!$usuario->trabajador_id)
+            if (! $usuario->trabajador_id) {
                 $query->whereRaw('1 = 0');
-            else
+            } else {
                 $query->where('trabajador_id', $usuario->trabajador_id);
+            }
         }
 
         if ($request->filled('buscar')) {
@@ -64,10 +66,12 @@ class SolicitudController extends Controller
             });
         }
 
-        if ($request->filled('tipo'))
+        if ($request->filled('tipo')) {
             $query->where('tipo', $request->tipo);
-        if ($estadoFiltro !== '')
+        }
+        if ($estadoFiltro !== '') {
             $query->where('estado', $estadoFiltro);
+        }
 
         $fechas = $request->validate([
             'fecha' => ['nullable', 'date_format:Y-m-d'],
@@ -127,7 +131,9 @@ class SolicitudController extends Controller
                     $pendientes->whereRaw('1 = 0');
                 }
             }
-            if ($usuario->trabajador_id) $pendientes->where('trabajador_id', '!=', $usuario->trabajador_id);
+            if ($usuario->trabajador_id) {
+                $pendientes->where('trabajador_id', '!=', $usuario->trabajador_id);
+            }
             $bandejaCount = $pendientes->count();
         }
 
@@ -137,10 +143,11 @@ class SolicitudController extends Controller
     public function store(Request $request)
     {
         $usuario = Auth::user();
-        if (!$usuario->trabajador_id) {
+        if (! $usuario->trabajador_id) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Tu cuenta no está asociada a un trabajador.'], 422);
             }
+
             return back()->with('error', 'Tu cuenta no está asociada a un trabajador.');
         }
 
@@ -148,7 +155,7 @@ class SolicitudController extends Controller
         $this->validarHoras($data);
 
         $archivo = $request->hasFile('archivo')
-            ? $request->file('archivo')->store('solicitudes', 'public')
+            ? $request->file('archivo')->store('empresas/'.app(EmpresaActual::class)->requerirId().'/solicitudes', 'local')
             : null;
 
         $asistenciaId = $this->obtenerAsistenciaRelacionada(
@@ -190,10 +197,10 @@ class SolicitudController extends Controller
         $archivo = $solicitud->archivo;
 
         if ($request->hasFile('archivo')) {
-            if ($archivo && Storage::disk('public')->exists($archivo)) {
-                Storage::disk('public')->delete($archivo);
+            if ($archivo && Storage::disk('local')->exists($archivo)) {
+                Storage::disk('local')->delete($archivo);
             }
-            $archivo = $request->file('archivo')->store('solicitudes', 'public');
+            $archivo = $request->file('archivo')->store('empresas/'.app(EmpresaActual::class)->requerirId().'/solicitudes', 'local');
         }
 
         $asistenciaId = $this->obtenerAsistenciaRelacionada(
@@ -279,12 +286,12 @@ class SolicitudController extends Controller
         $this->verificarAccesoArchivo($solicitud);
         $this->verificarExistenciaArchivo($solicitud);
 
-        $ruta = Storage::disk('public')->path($solicitud->archivo);
-        $mime = Storage::disk('public')->mimeType($solicitud->archivo) ?: 'application/octet-stream';
+        $ruta = Storage::disk('local')->path($solicitud->archivo);
+        $mime = Storage::disk('local')->mimeType($solicitud->archivo) ?: 'application/octet-stream';
 
         return response()->file($ruta, [
             'Content-Type' => $mime,
-            'Content-Disposition' => 'inline; filename="' . basename($solicitud->archivo) . '"',
+            'Content-Disposition' => 'inline; filename="'.basename($solicitud->archivo).'"',
         ]);
     }
 
@@ -293,7 +300,7 @@ class SolicitudController extends Controller
         $this->verificarAccesoArchivo($solicitud);
         $this->verificarExistenciaArchivo($solicitud);
 
-        return Storage::disk('public')->download(
+        return Storage::disk('local')->download(
             $solicitud->archivo,
             basename($solicitud->archivo)
         );
@@ -323,7 +330,7 @@ class SolicitudController extends Controller
 
     private function validarHoras(array $data): void
     {
-        if (!empty($data['hora_inicio']) && !empty($data['hora_fin']) && $data['hora_fin'] < $data['hora_inicio']) {
+        if (! empty($data['hora_inicio']) && ! empty($data['hora_fin']) && $data['hora_fin'] < $data['hora_inicio']) {
             throw ValidationException::withMessages([
                 'hora_fin' => 'La hora de fin no puede ser anterior a la hora de inicio.',
             ]);
@@ -332,8 +339,9 @@ class SolicitudController extends Controller
 
     private function obtenerAsistenciaRelacionada(int $trabajadorId, string $fechaInicio, ?string $fechaFin): ?int
     {
-        if ($fechaFin && $fechaFin !== $fechaInicio)
+        if ($fechaFin && $fechaFin !== $fechaInicio) {
             return null;
+        }
 
         return Asistencia::where('trabajador_id', $trabajadorId)
             ->whereDate('fecha', $fechaInicio)
@@ -352,7 +360,7 @@ class SolicitudController extends Controller
             foreach ($asistencias as $asistencia) {
                 $detalle = 'Solicitud aprobada (PERMISO)';
                 if ($solicitud->motivo) {
-                    $detalle .= ': ' . mb_substr($solicitud->motivo, 0, 350);
+                    $detalle .= ': '.mb_substr($solicitud->motivo, 0, 350);
                 }
 
                 $asistencia->update([
@@ -396,7 +404,7 @@ class SolicitudController extends Controller
         foreach ($asistencias as $asistencia) {
             $detalle = "Solicitud aprobada ({$solicitud->tipo})";
             if ($solicitud->motivo) {
-                $detalle .= ': ' . mb_substr($solicitud->motivo, 0, 350);
+                $detalle .= ': '.mb_substr($solicitud->motivo, 0, 350);
             }
 
             $asistencia->update([
@@ -460,7 +468,7 @@ class SolicitudController extends Controller
     {
         abort_unless(
             $solicitud->archivo &&
-                Storage::disk('public')->exists($solicitud->archivo),
+                Storage::disk('local')->exists($solicitud->archivo),
             404
         );
     }

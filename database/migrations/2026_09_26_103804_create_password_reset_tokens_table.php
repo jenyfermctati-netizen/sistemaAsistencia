@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('horarios', function (Blueprint $table) {
-            $table->string('formato_hora', 2)->default('24')->after('descripcion');
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
         });
     }
 
     public function down(): void
     {
-        Schema::table('horarios', function (Blueprint $table) {
-            $table->dropColumn('formato_hora');
-        });
+        Schema::dropIfExists('password_reset_tokens');
     }
 };

@@ -9,6 +9,7 @@ use App\Models\MarcacionCampo;
 use App\Models\ReporteAvance;
 use App\Models\Trabajador;
 use App\Services\ClasificadorMarcacionService;
+use App\Tenancy\EmpresaActual;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -230,7 +231,7 @@ class AsignacionCampoController extends Controller
                     ]);
                 }
 
-                $ruta = $request->file('archivo_avance')?->store('reportes-avance/actividades', 'public');
+                $ruta = $request->file('archivo_avance')?->store('empresas/'.app(EmpresaActual::class)->requerirId().'/reportes-avance/actividades', 'local');
                 $reporte->actividades()->create([
                     'asignacion_campo_id' => $asignacion->id,
                     'descripcion' => trim($data['descripcion_avance']),
@@ -243,7 +244,7 @@ class AsignacionCampoController extends Controller
             });
         } catch (\Throwable $exception) {
             if ($ruta) {
-                Storage::disk('public')->delete($ruta);
+                Storage::disk('local')->delete($ruta);
             }
             throw $exception;
         }
@@ -415,7 +416,7 @@ class AsignacionCampoController extends Controller
             ?: $archivo->getClientOriginalExtension()
             ?: 'jpg'
         );
-        $directorio = 'marcaciones-campo/'
+        $directorio = 'empresas/'.app(EmpresaActual::class)->requerirId().'/marcaciones-campo/'
             .$trabajador->id.'/'
             .$ahora->format('Y/m/d');
         $evidenciaPath = $archivo->storeAs(

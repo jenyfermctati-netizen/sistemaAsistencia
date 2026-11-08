@@ -21,6 +21,9 @@ return new class extends Migration
             $table->unsignedSmallInteger('tolerancia_minutos')->default(0);
             $table->timestamps();
             $table->unique(['horario_id', 'dia_semana'], 'uq_horario_dias');
+
+            $table->time('hora_salida_refrigerio')->nullable();
+            $table->time('hora_retorno_refrigerio')->nullable();
         });
     }
 

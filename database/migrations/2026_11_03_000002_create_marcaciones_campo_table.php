@@ -41,6 +41,9 @@ return new class extends Migration
                 'ix_marcaciones_campo_trabajador_fecha'
             );
             $table->index(['estado', 'created_at'], 'ix_marcaciones_campo_revision');
+
+            $table->string('evidencia_path', 500)
+                ->nullable();
         });
     }
 

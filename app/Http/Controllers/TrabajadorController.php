@@ -342,14 +342,14 @@ class TrabajadorController extends Controller
             if (! $usuarioActual) {
                 $usuarioActual = new User;
                 $usuarioActual->trabajador_id = $trabajador->id;
+                $usuarioActual->rol_id = $data['rol_id'];
+                $usuarioActual->estado = true;
             }
 
-            $usuarioActual->rol_id = $data['rol_id'];
             $usuarioActual->name = trim(
                 "{$trabajador->nombres} {$trabajador->apellidos}"
             );
             $usuarioActual->email = $data['email'];
-            $usuarioActual->estado = $trabajador->estado === 'ACTIVO';
 
             if (! empty($data['password'])) {
                 $usuarioActual->password = Hash::make($data['password']);
@@ -365,6 +365,11 @@ class TrabajadorController extends Controller
             }
 
             $usuarioActual->save();
+            $usuarioActual->actualizarMembresia([
+                'trabajador_id' => $trabajador->id,
+                'rol_id' => $data['rol_id'],
+                'estado' => $trabajador->estado === 'ACTIVO',
+            ]);
 
             $this->sincronizarEncargatura(
                 $trabajador,
@@ -403,7 +408,7 @@ class TrabajadorController extends Controller
             ]);
 
             if ($trabajador->user) {
-                $trabajador->user->update([
+                $trabajador->user->actualizarMembresia([
                     'estado' => $nuevoEstado === 'ACTIVO',
                 ]);
             }

@@ -15,7 +15,6 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-
     /**
      * Procesar inicio de sesión.
      */
@@ -38,6 +37,13 @@ class AuthController extends Controller
             $usuario->ultimo_acceso = now();
             $usuario->save();
 
+            $request->session()->forget('empresa_id');
+            $empresas = $usuario->empresas()->wherePivot('estado', true)->where('empresas.estado', true)->get();
+            if ($empresas->count() !== 1) {
+                return redirect()->route('empresas.index');
+            }
+            $request->session()->put('empresa_id', $empresas->first()->id);
+
             return redirect()
                 ->intended(route('dashboard'));
         }
@@ -48,7 +54,6 @@ class AuthController extends Controller
             ])
             ->onlyInput('email');
     }
-
 
     /**
      * Cerrar sesión.

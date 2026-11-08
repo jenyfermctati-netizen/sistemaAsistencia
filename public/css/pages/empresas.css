@@ -1,0 +1,40 @@
+.empresa-selector {
+    width: min(100% - 32px, 720px);
+    margin: 48px auto;
+    padding: clamp(20px, 5vw, 44px);
+    background: var(--surface, #fff);
+    border: 1px solid var(--border, #dce3ed);
+    border-radius: 20px;
+    box-shadow: 0 12px 40px #16243b0a;
+}
+.empresa-eyebrow { font-size: .75rem; font-weight: 700; letter-spacing: .12em; color: var(--primary, #235da5); }
+.empresa-gestion { max-width: 1000px; }
+.empresa-gestion h1 { margin: 12px 0; }
+.empresa-gestion h3 { margin: 32px 0 12px; }
+.empresa-gestion p { margin: 12px 0; }
+.empresa-gestion form:not(.empresa-opcion):not(.empresa-dispositivo):not(.empresa-salir) {
+    padding: 20px;
+    background: var(--surface, #fff);
+    border: 1px solid var(--border, #dce3ed);
+    border-radius: 12px;
+}
+.empresa-gestion label { display: grid; gap: 6px; font-size: .9rem; font-weight: 600; }
+.empresa-gestion input, .empresa-gestion select {
+    width: 100%; min-height: 42px; padding: 9px 12px;
+    font: inherit; color: inherit; background: var(--surface, #fff);
+    border: 1px solid var(--border, #cbd5e1); border-radius: 8px;
+}
+.empresa-gestion :is(input, select, button, a):focus-visible { outline: 3px solid #548bd8; outline-offset: 3px; }
+.empresa-opcion { margin: 12px 0; }
+.empresa-opcion button { display: flex; justify-content: space-between; width: 100%; text-align: left; padding: 18px; }
+.empresa-dispositivo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; padding: 16px; border-bottom: 1px solid var(--border, #dce3ed); }
+.empresa-salir { margin-top: 28px; }
+.empresa-gestion code { overflow-wrap: anywhere; }
+.empresa-gestion hr { margin: 28px 0; border: 0; border-top: 1px solid var(--border, #dce3ed); }
+.empresa-nav { display: grid; gap: 2px; font-size: .8rem; max-width: 220px; }
+.empresa-nav a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 600px) {
+    .empresa-selector { margin: 20px auto; }
+    .empresa-gestion form:not(.empresa-opcion):not(.empresa-dispositivo):not(.empresa-salir) { padding: 14px; }
+    .empresa-nav { max-width: 125px; font-size: .7rem; }
+}

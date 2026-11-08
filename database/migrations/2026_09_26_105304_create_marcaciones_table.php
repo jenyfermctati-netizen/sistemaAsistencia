@@ -15,7 +15,7 @@ return new class extends Migration
                 ->restrictOnDelete();
             $table->dateTime('fecha_hora');
             $table->enum('tipo', ['ENTRADA','SALIDA']);
-            $table->enum('origen', ['BIOMETRICO','MANUAL']);
+            $table->enum('origen', ['BIOMETRICO', 'MANUAL', 'WEB_CAMPO']);
             $table->string('dispositivo', 100)->nullable();
             $table->string('evento_externo_id', 100)->nullable()->unique();
             $table->foreignId('registrado_por')

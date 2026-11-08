@@ -110,7 +110,7 @@ class BiometricoController extends Controller
 
         Log::info('SENSEFACE DEVICECMD', [
             'sn' => $sn,
-            'query' => $request->query(),
+            'query' => $request->except('token'),
             'body' => $contenido,
         ]);
 
@@ -143,7 +143,7 @@ class BiometricoController extends Controller
                 $dispositivo,
                 $id,
                 $codigo,
-                $linea !== '' ? $linea : http_build_query($request->query())
+                $linea !== '' ? $linea : http_build_query($request->except('token'))
             );
         }
 
@@ -457,23 +457,7 @@ class BiometricoController extends Controller
     private function validarDispositivo(Request $request): string
     {
         $sn = trim((string) $request->query('SN'));
-
-        $serialPermitido = trim(
-            (string) config('services.senseface.serial')
-        );
-
-        if (
-            $serialPermitido === '' ||
-            $sn === '' ||
-            ! hash_equals($serialPermitido, $sn)
-        ) {
-            Log::warning('SENSEFACE dispositivo no autorizado', [
-                'sn' => $sn ?: null,
-                'ip' => $request->ip(),
-            ]);
-
-            abort(403, 'Dispositivo no autorizado.');
-        }
+        abort_unless(DispositivoBiometrico::where('serial', $sn)->exists(), 403, 'Dispositivo no autorizado.');
 
         return $sn;
     }

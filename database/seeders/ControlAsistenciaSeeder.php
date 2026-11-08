@@ -33,11 +33,14 @@ class ControlAsistenciaSeeder extends Seeder
             ],
         ]);
 
+        $empresaId = DB::table('empresas')->orderBy('id')->value('id');
+
         DB::table('areas')->insert([
             [
                 'nombre' => 'Gerencia General',
                 'descripcion' => 'Área de dirección y supervisión general',
                 'estado' => true,
+                'empresa_id' => $empresaId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -45,6 +48,7 @@ class ControlAsistenciaSeeder extends Seeder
                 'nombre' => 'Administración Central',
                 'descripcion' => 'Área administrativa de la empresa',
                 'estado' => true,
+                'empresa_id' => $empresaId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -52,6 +56,7 @@ class ControlAsistenciaSeeder extends Seeder
                 'nombre' => 'División de Ingeniería y Arquitectura',
                 'descripcion' => 'Área de ingeniería y arquitectura',
                 'estado' => true,
+                'empresa_id' => $empresaId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -59,6 +64,7 @@ class ControlAsistenciaSeeder extends Seeder
                 'nombre' => 'Logística y Operaciones',
                 'descripcion' => 'Área encargada de logística y operaciones',
                 'estado' => true,
+                'empresa_id' => $empresaId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -66,6 +72,7 @@ class ControlAsistenciaSeeder extends Seeder
                 'nombre' => 'Tecnología y Desarrollo',
                 'descripcion' => 'Área encargada de tecnología y desarrollo',
                 'estado' => true,
+                'empresa_id' => $empresaId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -75,6 +82,7 @@ class ControlAsistenciaSeeder extends Seeder
             'nombre' => 'Horario Oficina',
             'descripcion' => 'Horario principal del personal de oficina',
             'estado' => true,
+            'empresa_id' => $empresaId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -89,6 +97,7 @@ class ControlAsistenciaSeeder extends Seeder
                 'hora_retorno_refrigerio' => '14:00:00',
                 'hora_salida' => '19:00:00',
                 'tolerancia_minutos' => 20,
+                'empresa_id' => $empresaId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -103,6 +112,7 @@ class ControlAsistenciaSeeder extends Seeder
             'hora_retorno_refrigerio' => null,
             'hora_salida' => '13:00:00',
             'tolerancia_minutos' => 20,
+            'empresa_id' => $empresaId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -116,6 +126,7 @@ class ControlAsistenciaSeeder extends Seeder
             'hora_retorno_refrigerio' => null,
             'hora_salida' => null,
             'tolerancia_minutos' => 0,
+            'empresa_id' => $empresaId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
