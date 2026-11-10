@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedByEmpresaRelation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AreaEncargado extends Model
 {
-    use HasFactory;
+    use HasFactory, ScopedByEmpresaRelation;
+
+    protected static string $empresaRelation = 'area';
 
     protected $table = 'area_encargados';
 

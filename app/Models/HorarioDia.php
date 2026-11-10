@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedByEmpresaRelation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class HorarioDia extends Model
 {
-    use HasFactory;
+    use HasFactory, ScopedByEmpresaRelation;
+
+    protected static string $empresaRelation = 'horario';
 
     protected $table = 'horario_dias';
 

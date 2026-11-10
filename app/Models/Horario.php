@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Horario extends Model
 {
-    use HasFactory;
+    use BelongsToEmpresa, HasFactory;
 
     protected $table = 'horarios';
 
     protected $fillable = [
+        'empresa_id',
         'nombre',
         'descripcion',
         'formato_hora',

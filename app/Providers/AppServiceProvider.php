@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\EmpresaContext;
 use App\Models\ActividadReporte;
 use App\Models\Marcacion;
 use App\Models\MarcacionCampo;
@@ -19,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(EmpresaContext::class, fn () => new EmpresaContext);
     }
 
     /**
@@ -32,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer('partials.sidebar', function (\Illuminate\View\View $view): void {
             $usuario = auth()->user();
 
-            $rol = strtoupper(trim($usuario?->rol?->nombre ?? ''));
+            $rol = $usuario?->roleCode() ?? '';
 
             if ($rol === 'TRABAJADOR') {
                 $areaId = $usuario->trabajador?->area_id;

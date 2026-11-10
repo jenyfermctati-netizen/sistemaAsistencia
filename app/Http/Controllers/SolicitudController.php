@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asistencia;
 use App\Models\Solicitud;
+use App\Support\EmpresaContext;
 use App\Services\ReporteTablaExportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ class SolicitudController extends Controller
     public function index(Request $request)
     {
         $usuario = Auth::user();
-        $rol = strtoupper(trim((string) $usuario->rol?->nombre));
+        $rol = $usuario->roleCode();
         $puedeGestionar = in_array($rol, ['ADMINISTRADOR', 'GERENTE'], true);
         $puedeSolicitar = (bool) $usuario->trabajador_id;
         $seccion = $puedeGestionar
@@ -148,7 +149,10 @@ class SolicitudController extends Controller
         $this->validarHoras($data);
 
         $archivo = $request->hasFile('archivo')
-            ? $request->file('archivo')->store('solicitudes', 'public')
+            ? $request->file('archivo')->store(
+                'empresas/'.app(EmpresaContext::class)->id().'/solicitudes',
+                'local'
+            )
             : null;
 
         $asistenciaId = $this->obtenerAsistenciaRelacionada(
@@ -190,10 +194,13 @@ class SolicitudController extends Controller
         $archivo = $solicitud->archivo;
 
         if ($request->hasFile('archivo')) {
-            if ($archivo && Storage::disk('public')->exists($archivo)) {
-                Storage::disk('public')->delete($archivo);
+            if ($archivo && Storage::disk('local')->exists($archivo)) {
+                Storage::disk('local')->delete($archivo);
             }
-            $archivo = $request->file('archivo')->store('solicitudes', 'public');
+            $archivo = $request->file('archivo')->store(
+                'empresas/'.app(EmpresaContext::class)->id().'/solicitudes',
+                'local'
+            );
         }
 
         $asistenciaId = $this->obtenerAsistenciaRelacionada(
@@ -279,8 +286,8 @@ class SolicitudController extends Controller
         $this->verificarAccesoArchivo($solicitud);
         $this->verificarExistenciaArchivo($solicitud);
 
-        $ruta = Storage::disk('public')->path($solicitud->archivo);
-        $mime = Storage::disk('public')->mimeType($solicitud->archivo) ?: 'application/octet-stream';
+        $ruta = Storage::disk('local')->path($solicitud->archivo);
+        $mime = Storage::disk('local')->mimeType($solicitud->archivo) ?: 'application/octet-stream';
 
         return response()->file($ruta, [
             'Content-Type' => $mime,
@@ -293,7 +300,7 @@ class SolicitudController extends Controller
         $this->verificarAccesoArchivo($solicitud);
         $this->verificarExistenciaArchivo($solicitud);
 
-        return Storage::disk('public')->download(
+        return Storage::disk('local')->download(
             $solicitud->archivo,
             basename($solicitud->archivo)
         );
@@ -422,14 +429,14 @@ class SolicitudController extends Controller
             'No puedes revisar tu propia solicitud.'
         );
 
-        if ($usuario?->rol?->nombre === 'ADMINISTRADOR') {
+        if ($usuario?->roleCode() === 'ADMINISTRADOR') {
             return;
         }
 
         $solicitud->loadMissing('trabajador');
 
         abort_unless(
-            $usuario?->rol?->nombre === 'GERENTE'
+            $usuario?->roleCode() === 'GERENTE'
                 && $usuario->trabajador?->area_id
                 && $solicitud->trabajador?->area_id === $usuario->trabajador->area_id
                 && $solicitud->trabajador_id !== $usuario->trabajador_id,
@@ -442,13 +449,13 @@ class SolicitudController extends Controller
         $usuario = Auth::user();
         $solicitud->loadMissing('trabajador');
 
-        $esGerenteDelArea = $usuario?->rol?->nombre === 'GERENTE'
+        $esGerenteDelArea = $usuario?->roleCode() === 'GERENTE'
             && $usuario->trabajador?->area_id
             && $solicitud->trabajador?->area_id === $usuario->trabajador->area_id;
 
         abort_unless(
             $usuario && (
-                $usuario->rol?->nombre === 'ADMINISTRADOR' ||
+                $usuario->roleCode() === 'ADMINISTRADOR' ||
                 $esGerenteDelArea ||
                 $usuario->trabajador_id === $solicitud->trabajador_id
             ),
@@ -460,7 +467,7 @@ class SolicitudController extends Controller
     {
         abort_unless(
             $solicitud->archivo &&
-                Storage::disk('public')->exists($solicitud->archivo),
+                Storage::disk('local')->exists($solicitud->archivo),
             404
         );
     }

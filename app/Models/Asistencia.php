@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Asistencia extends Model
 {
-    use HasFactory;
+    use BelongsToEmpresa, HasFactory;
 
     protected $table = 'asistencias';
 
     protected $fillable = [
+        'empresa_id',
         'trabajador_id',
         'horario_id',
         'fecha',

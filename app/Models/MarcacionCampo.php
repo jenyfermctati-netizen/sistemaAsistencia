@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MarcacionCampo extends Model
 {
-    use HasFactory;
+    use BelongsToEmpresa, HasFactory;
 
     protected $table = 'marcaciones_campo';
 
     protected $fillable = [
+        'empresa_id',
         'asignacion_campo_id',
         'trabajador_id',
         'fecha_hora',

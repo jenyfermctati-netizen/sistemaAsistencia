@@ -44,7 +44,7 @@
         </div>
     </header>
 
-    @unless(strtoupper(trim((string) auth()->user()?->rol?->nombre)) === 'TRABAJADOR')
+    @unless(auth()->user()?->roleCode() === 'TRABAJADOR')
     {{-- MENSAJES --}}
     @if(session('success'))
         <div class="solicitudes-alert solicitudes-alert--success">
@@ -217,7 +217,7 @@
                                 );
 
                                 $archivoUrl = $solicitud->archivo
-                                    ? Storage::url($solicitud->archivo)
+                                    ? route('solicitudes.archivo.ver', $solicitud)
                                     : '';
                             @endphp
 

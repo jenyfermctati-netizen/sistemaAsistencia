@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Horario;
 use App\Services\HorarioEmpresaService;
+use App\Support\EmpresaRules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -92,7 +93,7 @@ class HorarioController extends Controller
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('horarios', 'nombre')->ignore($horarioId),
+                EmpresaRules::unique('horarios', 'nombre')->ignore($horarioId),
             ],
             'descripcion' => ['nullable', 'string', 'max:300'],
             'formato_hora' => ['required', Rule::in(['12', '24'])],

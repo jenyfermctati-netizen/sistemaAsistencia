@@ -18,7 +18,7 @@ class VacacionesController extends Controller
         $this->verificarAccesoVacaciones();
 
         $usuario = Auth::user();
-        $esAdministrador = $usuario->rol?->nombre === 'ADMINISTRADOR';
+        $esAdministrador = $usuario->roleCode() === 'ADMINISTRADOR';
 
         $this->actualizarEstadosAutomaticos();
 
@@ -83,7 +83,7 @@ class VacacionesController extends Controller
 
         $usuario = Auth::user();
 
-        if ($usuario->rol?->nombre === 'ADMINISTRADOR') {
+        if ($usuario->roleCode() === 'ADMINISTRADOR') {
             abort(403);
         }
 
@@ -198,7 +198,7 @@ class VacacionesController extends Controller
         $this->verificarVacacionContratado($vacacion);
 
         $usuario = Auth::user();
-        $esAdministrador = $usuario->rol?->nombre === 'ADMINISTRADOR';
+        $esAdministrador = $usuario->roleCode() === 'ADMINISTRADOR';
 
         if ($esAdministrador) {
             if (!in_array($vacacion->estado, ['PENDIENTE', 'APROBADA', 'PROGRAMADA'], true)) {
@@ -375,7 +375,7 @@ class VacacionesController extends Controller
     {
         abort_unless(
             Auth::check() &&
-            Auth::user()->rol?->nombre === 'ADMINISTRADOR',
+            Auth::user()->roleCode() === 'ADMINISTRADOR',
             403
         );
     }
@@ -384,7 +384,7 @@ class VacacionesController extends Controller
     {
         $usuario = Auth::user();
 
-        if ($usuario->rol?->nombre === 'ADMINISTRADOR') {
+        if ($usuario->roleCode() === 'ADMINISTRADOR') {
             return;
         }
 

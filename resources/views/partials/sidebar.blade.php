@@ -1,11 +1,12 @@
 <aside class="sidebar" id="sidebar">
     @php
         $usuarioActual = auth()->user();
-        $rolUsuario = strtoupper(trim($usuarioActual?->rol?->nombre ?? ''));
+        $rolUsuario = $usuarioActual?->roleCode() ?? '';
         $tipoVinculo = strtoupper(trim($usuarioActual?->trabajador?->tipo_vinculo ?? ''));
         $esAdministrador = $rolUsuario === 'ADMINISTRADOR';
         $esTrabajador = $rolUsuario === 'TRABAJADOR';
         $esGerente = $rolUsuario === 'GERENTE';
+        $esSuperAdmin = $usuarioActual?->isSuperAdmin() ?? false;
         $esEncargadoArea = $esTrabajador
             && (bool) $usuarioActual?->trabajador?->esEncargadoDeSuArea();
         $puedeVerVacaciones = $esAdministrador || ($esTrabajador && $tipoVinculo === 'CONTRATADO');
@@ -26,13 +27,35 @@
 
     <nav class="sidebar__menu">
         <div class="sidebar__section">
-            <a href="{{ route('dashboard') }}" title="Resumen principal"
-                class="sidebar__item {{ request()->routeIs('dashboard') ? 'active' : '' }}"
-                @if (request()->routeIs('dashboard')) aria-current="page" @endif>
+            <a href="{{ route($esSuperAdmin ? 'superadmin.dashboard' : 'dashboard') }}" title="Resumen principal"
+                class="sidebar__item {{ request()->routeIs($esSuperAdmin ? 'superadmin.dashboard' : 'dashboard') ? 'active' : '' }}"
+                @if (request()->routeIs($esSuperAdmin ? 'superadmin.dashboard' : 'dashboard')) aria-current="page" @endif>
                 <span class="sidebar__icon"><x-nav-icon name="home" /></span>
                 <span class="sidebar__label">Inicio</span>
             </a>
         </div>
+
+        @if ($esSuperAdmin)
+            <div class="sidebar__section">
+                <div class="sidebar__title">Plataforma SaaS</div>
+                <a href="{{ route('superadmin.empresas.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.empresas.*') ? 'active' : '' }}">
+                    <span class="sidebar__icon"><x-nav-icon name="areas" /></span>
+                    <span class="sidebar__label">Empresas</span>
+                </a>
+                <a href="{{ route('superadmin.administradores.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.administradores.*') ? 'active' : '' }}">
+                    <span class="sidebar__icon"><x-nav-icon name="users" /></span>
+                    <span class="sidebar__label">Administradores</span>
+                </a>
+                <a href="{{ route('superadmin.dispositivos.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.dispositivos.*') ? 'active' : '' }}">
+                    <span class="sidebar__icon"><x-nav-icon name="fingerprint" /></span>
+                    <span class="sidebar__label">Dispositivos</span>
+                </a>
+                <a href="{{ route('superadmin.auditoria.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.auditoria.*') ? 'active' : '' }}">
+                    <span class="sidebar__icon"><x-nav-icon name="tasks" /></span>
+                    <span class="sidebar__label">Auditoría</span>
+                </a>
+            </div>
+        @endif
 
         @if ($esAdministrador)
             <div class="sidebar__section">

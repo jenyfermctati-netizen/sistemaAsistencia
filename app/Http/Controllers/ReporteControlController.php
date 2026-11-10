@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ReporteControlExcelService;
 use App\Services\ReporteControlService;
+use App\Support\EmpresaRules;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -37,7 +38,7 @@ class ReporteControlController extends Controller
         $filtros = $request->validate([
             'desde' => ['nullable', 'date'],
             'hasta' => ['nullable', 'date', 'after_or_equal:desde'],
-            'area_id' => ['nullable', 'integer', 'exists:areas,id'],
+            'area_id' => ['nullable', 'integer', EmpresaRules::exists('areas')],
         ]);
 
         $desde = isset($filtros['desde'])

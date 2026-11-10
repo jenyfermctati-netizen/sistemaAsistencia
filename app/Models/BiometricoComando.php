@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedByEmpresaRelation;
 use Illuminate\Database\Eloquent\Model;
 
 class BiometricoComando extends Model
 {
+    use ScopedByEmpresaRelation;
+
+    protected static string $empresaRelation = 'dispositivo';
+
     protected $table = 'biometrico_comandos';
 
     protected $fillable = [

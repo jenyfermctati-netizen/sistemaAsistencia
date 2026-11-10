@@ -12,6 +12,8 @@ use App\Models\Trabajador;
 use App\Models\User;
 use App\Models\Vacaciones;
 use App\Services\ReporteControlService;
+use App\Support\EmpresaRules;
+use App\Support\EmpresaContext;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -25,7 +27,7 @@ class DashboardController extends Controller
     {
         /** @var User $usuario */
         $usuario = Auth::user()->loadMissing(['rol', 'trabajador.area']);
-        $rol = strtoupper(trim((string) $usuario->rol?->nombre));
+        $rol = $usuario->roleCode();
 
         $datos = match ($rol) {
             'ADMINISTRADOR' => $this->datosAdministrador($usuario),
@@ -63,7 +65,7 @@ class DashboardController extends Controller
         $filtros = $request->validate([
             'reporte_desde' => ['nullable', 'date'],
             'reporte_hasta' => ['nullable', 'date', 'after_or_equal:reporte_desde'],
-            'reporte_area_id' => ['nullable', 'integer', 'exists:areas,id'],
+            'reporte_area_id' => ['nullable', 'integer', EmpresaRules::exists('areas')],
         ]);
 
         $desde = isset($filtros['reporte_desde'])
@@ -411,6 +413,7 @@ class DashboardController extends Controller
 
         $estadosPorArea = Asistencia::query()
             ->join('trabajadores', 'trabajadores.id', '=', 'asistencias.trabajador_id')
+            ->where('trabajadores.empresa_id', app(EmpresaContext::class)->id())
             ->whereDate('asistencias.fecha', today())
             ->where('trabajadores.estado', 'ACTIVO')
             ->when($areaId, fn (Builder $query) => $query->where('trabajadores.area_id', $areaId))

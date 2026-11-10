@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Empresa;
+use App\Models\Rol;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -25,6 +27,9 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'empresa_id' => Empresa::factory(),
+            'rol_id' => Rol::factory(),
+            'trabajador_id' => null,
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
@@ -41,5 +46,10 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function global(): static
+    {
+        return $this->state(fn () => ['empresa_id' => null]);
     }
 }

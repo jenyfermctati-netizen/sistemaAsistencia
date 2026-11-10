@@ -9,6 +9,8 @@ use App\Models\ReporteAvance;
 use App\Models\Trabajador;
 use App\Models\User;
 use App\Services\ReporteActividadesExportService;
+use App\Support\EmpresaRules;
+use App\Support\EmpresaContext;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +24,7 @@ class ReporteAvanceController extends Controller
     public function index(Request $request)
     {
         $usuario = Auth::user();
-        $rol = $usuario->rol?->nombre;
+        $rol = $usuario->roleCode();
         $esTrabajador = $rol === 'TRABAJADOR';
         $esEncargadoArea = $esTrabajador
             && (bool) $usuario->trabajador?->esEncargadoDeSuArea();
@@ -272,7 +274,7 @@ class ReporteAvanceController extends Controller
     public function storeParaTrabajador(Request $request, Trabajador $trabajador)
     {
         $usuario = Auth::user();
-        abort_unless($usuario->rol?->nombre === 'ADMINISTRADOR', 403);
+        abort_unless($usuario->roleCode() === 'ADMINISTRADOR', 403);
 
         if ($trabajador->estado !== 'ACTIVO') {
             return back()->with('error', 'Solo puedes registrar avances para trabajadores activos.');
@@ -355,7 +357,10 @@ class ReporteAvanceController extends Controller
             foreach ($data['actividades'] as $indice => $actividad) {
                 $archivo = $request->file("actividades.{$indice}.archivo");
                 $ruta = $archivo
-                    ? $archivo->store('reportes-avance/actividades', 'public')
+                    ? $archivo->store(
+                        'empresas/'.app(EmpresaContext::class)->id().'/reportes-avance/actividades',
+                        'local'
+                    )
                     : null;
 
                 $reporte->actividades()->create([
@@ -394,7 +399,7 @@ class ReporteAvanceController extends Controller
         $usuario = Auth::user();
 
         abort_unless(
-            in_array($usuario->rol?->nombre, ['ADMINISTRADOR', 'GERENTE'], true),
+            in_array($usuario->roleCode(), ['ADMINISTRADOR', 'GERENTE'], true),
             403
         );
 
@@ -426,10 +431,10 @@ class ReporteAvanceController extends Controller
     public function storePendiente(Request $request)
     {
         $usuario = Auth::user();
-        abort_unless($usuario->rol?->nombre === 'ADMINISTRADOR', 403);
+        abort_unless($usuario->roleCode() === 'ADMINISTRADOR', 403);
 
         $data = $request->validateWithBag('pendienteArea', [
-            'area_id' => ['required', 'integer', 'exists:areas,id'],
+            'area_id' => ['required', 'integer', EmpresaRules::exists('areas')],
             'descripcion' => ['required', 'string', 'max:500'],
             'detalle' => ['nullable', 'string', 'max:2000'],
             'ruta_archivos' => ['nullable', 'string', 'max:500'],
@@ -466,7 +471,7 @@ class ReporteAvanceController extends Controller
         $trabajador = $usuario->trabajador;
 
         abort_unless(
-            $usuario->rol?->nombre === 'TRABAJADOR' &&
+            $usuario->roleCode() === 'TRABAJADOR' &&
                 $trabajador?->area_id,
             403
         );
@@ -545,7 +550,7 @@ class ReporteAvanceController extends Controller
         $usuario = Auth::user();
 
         abort_unless(
-            $usuario->rol?->nombre === 'TRABAJADOR' &&
+            $usuario->roleCode() === 'TRABAJADOR' &&
                 $usuario->trabajador_id &&
                 $usuario->trabajador?->area_id,
             403
@@ -600,7 +605,7 @@ class ReporteAvanceController extends Controller
     public function revisarPendiente(Request $request, PendienteAvance $pendiente)
     {
         $usuario = Auth::user();
-        abort_unless($usuario->rol?->nombre === 'ADMINISTRADOR', 403);
+        abort_unless($usuario->roleCode() === 'ADMINISTRADOR', 403);
 
         if ($pendiente->estado_revision !== 'POR_REVISAR') {
             return back()->with('error', 'Este pendiente no está esperando revisión.');
@@ -671,7 +676,7 @@ class ReporteAvanceController extends Controller
     {
         $reglas = [
             'actividades' => ['nullable', 'array'],
-            'actividades.*.id' => ['nullable', 'integer', 'exists:actividades_reporte,id'],
+            'actividades.*.id' => ['nullable', 'integer'],
             'actividades.*.descripcion' => ['required', 'string', 'max:500'],
             'actividades.*.archivo' => [
                 'nullable',
@@ -680,7 +685,7 @@ class ReporteAvanceController extends Controller
                 'max:5120',
             ],
             'pendientes' => ['nullable', 'array'],
-            'pendientes.*.id' => ['nullable', 'integer', 'exists:pendientes_avance,id'],
+            'pendientes.*.id' => ['nullable', 'integer'],
             'pendientes.*.descripcion' => ['required', 'string', 'max:500'],
             'pendientes.*.detalle' => ['nullable', 'string', 'max:2000'],
             'pendientes.*.ruta_archivos' => ['nullable', 'string', 'max:500'],
@@ -728,7 +733,10 @@ class ReporteAvanceController extends Controller
                 $reporte->actividades()->create([
                     'descripcion' => $actividad['descripcion'],
                     'archivo' => $archivo
-                        ? $archivo->store('reportes-avance/actividades', 'public')
+                        ? $archivo->store(
+                            'empresas/'.app(EmpresaContext::class)->id().'/reportes-avance/actividades',
+                            'local'
+                        )
                         : null,
                 ]);
             }
@@ -770,9 +778,9 @@ class ReporteAvanceController extends Controller
             ->each(function ($actividad) {
                 if (
                     $actividad->archivo &&
-                    Storage::disk('public')->exists($actividad->archivo)
+                    Storage::disk('local')->exists($actividad->archivo)
                 ) {
-                    Storage::disk('public')->delete($actividad->archivo);
+                    Storage::disk('local')->delete($actividad->archivo);
                 }
 
                 $actividad->delete();
@@ -789,13 +797,13 @@ class ReporteAvanceController extends Controller
             $archivoNuevo = $request->file("actividades.{$indice}.archivo");
 
             if ($archivoNuevo) {
-                if ($ruta && Storage::disk('public')->exists($ruta)) {
-                    Storage::disk('public')->delete($ruta);
+                if ($ruta && Storage::disk('local')->exists($ruta)) {
+                    Storage::disk('local')->delete($ruta);
                 }
 
                 $ruta = $archivoNuevo->store(
-                    'reportes-avance/actividades',
-                    'public'
+                    'empresas/'.app(EmpresaContext::class)->id().'/reportes-avance/actividades',
+                    'local'
                 );
             }
 
@@ -852,12 +860,12 @@ class ReporteAvanceController extends Controller
     {
         $this->autorizarArchivoActividad($actividad);
 
-        if (! $actividad->archivo || ! Storage::disk('public')->exists($actividad->archivo)) {
+        if (! $actividad->archivo || ! Storage::disk('local')->exists($actividad->archivo)) {
             abort(404, 'El archivo no se encuentra disponible.');
         }
 
-        $ruta = Storage::disk('public')->path($actividad->archivo);
-        $mime = Storage::disk('public')->mimeType($actividad->archivo) ?: 'application/octet-stream';
+        $ruta = Storage::disk('local')->path($actividad->archivo);
+        $mime = Storage::disk('local')->mimeType($actividad->archivo) ?: 'application/octet-stream';
 
         return response()->file($ruta, [
             'Content-Type' => $mime,
@@ -869,11 +877,11 @@ class ReporteAvanceController extends Controller
     {
         $this->autorizarArchivoActividad($actividad);
 
-        if (! $actividad->archivo || ! Storage::disk('public')->exists($actividad->archivo)) {
+        if (! $actividad->archivo || ! Storage::disk('local')->exists($actividad->archivo)) {
             abort(404, 'El archivo no se encuentra disponible.');
         }
 
-        return Storage::disk('public')->download(
+        return Storage::disk('local')->download(
             $actividad->archivo,
             basename($actividad->archivo)
         );
@@ -885,13 +893,13 @@ class ReporteAvanceController extends Controller
 
         $actividad->loadMissing('reporte.trabajador');
 
-        $esAdministrador = $usuario->rol?->nombre === 'ADMINISTRADOR';
+        $esAdministrador = $usuario->roleCode() === 'ADMINISTRADOR';
 
-        $esGerenteDelArea = $usuario->rol?->nombre === 'GERENTE'
+        $esGerenteDelArea = $usuario->roleCode() === 'GERENTE'
             && $usuario->trabajador?->area_id
             && $actividad->reporte?->trabajador?->area_id === $usuario->trabajador->area_id;
 
-        $esEncargadoDelArea = $usuario->rol?->nombre === 'TRABAJADOR'
+        $esEncargadoDelArea = $usuario->roleCode() === 'TRABAJADOR'
             && $usuario->trabajador?->esEncargadoDeSuArea()
             && $actividad->reporte?->trabajador?->area_id === $usuario->trabajador->area_id;
 
@@ -908,14 +916,14 @@ class ReporteAvanceController extends Controller
     {
         $usuario = Auth::user();
 
-        if ($usuario->rol?->nombre === 'ADMINISTRADOR') {
+        if ($usuario->roleCode() === 'ADMINISTRADOR') {
             return;
         }
 
         $reporte->loadMissing('trabajador');
 
         abort_unless(
-            $usuario->rol?->nombre === 'GERENTE'
+            $usuario->roleCode() === 'GERENTE'
                 && $usuario->trabajador?->area_id
                 && $reporte->trabajador?->area_id === $usuario->trabajador->area_id
                 && $reporte->trabajador_id !== $usuario->trabajador_id,

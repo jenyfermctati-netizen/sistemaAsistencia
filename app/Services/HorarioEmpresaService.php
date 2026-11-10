@@ -6,6 +6,7 @@ use App\Models\Horario;
 use App\Models\Trabajador;
 use App\Models\TrabajadorHorario;
 use Carbon\Carbon;
+use Illuminate\Validation\ValidationException;
 
 class HorarioEmpresaService
 {
@@ -20,6 +21,12 @@ class HorarioEmpresaService
 
     public function asignar(Trabajador $trabajador, Horario $horario, Carbon $fechaInicio): void
     {
+        if ((int) $trabajador->empresa_id !== (int) $horario->empresa_id) {
+            throw ValidationException::withMessages([
+                'horario_id' => 'El horario y el trabajador deben pertenecer a la misma empresa.',
+            ]);
+        }
+
         $asignaciones = TrabajadorHorario::where('trabajador_id', $trabajador->id)
             ->where('estado', true)
             ->orderByDesc('fecha_inicio')

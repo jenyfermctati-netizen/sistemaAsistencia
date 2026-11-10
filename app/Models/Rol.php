@@ -11,6 +11,8 @@ class Rol extends Model
     protected $table = 'roles';
 
     protected $fillable = [
+        'codigo',
+        'ambito',
         'nombre',
         'descripcion',
         'estado',
@@ -26,5 +28,10 @@ class Rol extends Model
     public function users()
     {
         return $this->hasMany(User::class, 'rol_id');
+    }
+
+    public function esGlobal(): bool
+    {
+        return $this->ambito === 'GLOBAL';
     }
 }

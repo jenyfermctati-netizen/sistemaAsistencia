@@ -138,7 +138,7 @@ class ReporteControlService
     public function alcance(User $usuario): array
     {
         $usuario->loadMissing(['rol', 'trabajador.area']);
-        $rol = strtoupper(trim((string) $usuario->rol?->nombre));
+        $rol = $usuario->roleCode();
 
         if (in_array($rol, ['ADMINISTRADOR', 'GERENTE'], true)) {
             return [

@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Marcacion extends Model
 {
-    use HasFactory;
+    use BelongsToEmpresa, HasFactory;
 
     protected $table = 'marcaciones';
 
     protected $fillable = [
+        'empresa_id',
+        'dispositivo_id',
         'trabajador_id',
         'fecha_hora',
         'tipo',
@@ -59,5 +62,10 @@ class Marcacion extends Model
     public function registroCampo()
     {
         return $this->hasOne(MarcacionCampo::class, 'marcacion_id');
+    }
+
+    public function dispositivoBiometrico()
+    {
+        return $this->belongsTo(DispositivoBiometrico::class, 'dispositivo_id');
     }
 }

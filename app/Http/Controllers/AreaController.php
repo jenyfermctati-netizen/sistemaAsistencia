@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Area;
+use App\Support\EmpresaRules;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -47,7 +48,7 @@ class AreaController extends Controller
                 'required',
                 'string',
                 'max:150',
-                'unique:areas,nombre',
+                EmpresaRules::unique('areas', 'nombre'),
             ],
             'descripcion' => [
                 'nullable',
@@ -81,7 +82,7 @@ class AreaController extends Controller
                 'required',
                 'string',
                 'max:150',
-                Rule::unique('areas', 'nombre')->ignore($area->id),
+                EmpresaRules::unique('areas', 'nombre')->ignore($area->id),
             ],
             'descripcion' => [
                 'nullable',

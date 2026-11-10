@@ -298,7 +298,7 @@
                         <span class="campo-info__label">Registrado por</span>
                         <strong>
                             {{ $asignacion->autorizadoPor?->name ?? ($asignacion->autorizadoPor?->email ?? 'Usuario del sistema') }}
-                            · {{ strtoupper((string) $asignacion->autorizadoPor?->rol?->nombre) === 'TRABAJADOR' ? 'Autoasignación' : 'Administración' }}
+                            · {{ $asignacion->autorizadoPor?->roleCode() === 'TRABAJADOR' ? 'Autoasignación' : 'Administración' }}
                         </strong>
                     </div>
 

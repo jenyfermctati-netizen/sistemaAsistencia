@@ -9,7 +9,7 @@
 
 @section('content')
 
-    @unless(strtoupper(trim((string) auth()->user()?->rol?->nombre)) === 'TRABAJADOR')
+    @unless(auth()->user()?->roleCode() === 'TRABAJADOR')
     {{-- MENSAJES --}}
     @if (session('success'))
         <div class="alert alert--success">

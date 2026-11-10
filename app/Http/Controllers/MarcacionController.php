@@ -7,6 +7,7 @@ use App\Models\Marcacion;
 use App\Models\Trabajador;
 use App\Services\AsistenciaService;
 use App\Services\ClasificadorMarcacionService;
+use App\Support\EmpresaRules;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -224,7 +225,7 @@ class MarcacionController extends Controller
         $data = $request->validate([
             'trabajador_id' => [
                 'required',
-                'exists:trabajadores,id',
+                EmpresaRules::exists('trabajadores'),
             ],
             'fecha_hora' => [
                 'required',
@@ -354,7 +355,7 @@ class MarcacionController extends Controller
     {
         abort_unless(
             Auth::check() &&
-                Auth::user()->rol?->nombre === 'ADMINISTRADOR',
+                Auth::user()->roleCode() === 'ADMINISTRADOR',
             403
         );
     }

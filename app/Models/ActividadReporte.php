@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedByEmpresaRelation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ActividadReporte extends Model
 {
-    use HasFactory;
+    use HasFactory, ScopedByEmpresaRelation;
+
+    protected static string $empresaRelation = 'reporte';
 
     protected $table = 'actividades_reporte';
 

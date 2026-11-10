@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Area;
 use App\Models\Feriado;
+use App\Support\EmpresaRules;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -289,7 +290,7 @@ class FeriadoController extends Controller
     private function validarFeriado(Request $request): array
     {
         return $request->validate([
-            'area_id' => ['nullable', 'exists:areas,id'],
+            'area_id' => ['nullable', EmpresaRules::exists('areas')],
             'fecha' => ['required', 'date'],
             'nombre' => ['required', 'string', 'max:150'],
             'tipo' => [
@@ -325,7 +326,7 @@ class FeriadoController extends Controller
     private function verificarAdministrador(): void
     {
         abort_unless(
-            Auth::check() && Auth::user()->rol?->nombre === 'ADMINISTRADOR',
+            Auth::check() && Auth::user()->roleCode() === 'ADMINISTRADOR',
             403
         );
     }

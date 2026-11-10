@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToEmpresa;
 use App\Notifications\RestablecerContrasena;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -9,9 +10,10 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use BelongsToEmpresa, HasFactory, Notifiable;
 
     protected $fillable = [
+        'empresa_id',
         'trabajador_id',
         'rol_id',
         'name',
@@ -39,6 +41,23 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new RestablecerContrasena($token));
+    }
+
+    public function roleCode(): string
+    {
+        return strtoupper(trim((string) ($this->rol?->codigo ?? '')));
+    }
+
+    public function hasRole(string ...$codigos): bool
+    {
+        return in_array($this->roleCode(), $codigos, true);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->empresa_id === null
+            && $this->rol?->ambito === 'GLOBAL'
+            && $this->roleCode() === 'SUPERADMIN';
     }
 
     public function rol()

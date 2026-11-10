@@ -29,17 +29,30 @@ class AuthController extends Controller
         $credenciales['estado'] = 1;
 
         if (Auth::attempt($credenciales, $request->boolean('remember'))) {
-
             $request->session()->regenerate();
-
-            // Registrar último acceso
             $usuario = Auth::user();
+
+            $usuario->loadMissing(['rol', 'empresa']);
+
+            $accesoGlobalValido = $usuario->isSuperAdmin();
+            $accesoEmpresaValido = $usuario->rol?->ambito === 'EMPRESA'
+                && $usuario->empresa?->estaActiva();
+
+            if (! $accesoGlobalValido && ! $accesoEmpresaValido) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'email' => 'La cuenta o la empresa no están habilitadas para acceder.',
+                ])->onlyInput('email');
+            }
 
             $usuario->ultimo_acceso = now();
             $usuario->save();
 
             return redirect()
-                ->intended(route('dashboard'));
+                ->intended(route($accesoGlobalValido ? 'superadmin.dashboard' : 'dashboard'));
         }
 
         return back()

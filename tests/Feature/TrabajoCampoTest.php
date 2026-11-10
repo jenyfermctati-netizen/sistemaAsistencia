@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Area;
 use App\Models\AsignacionCampo;
 use App\Models\Asistencia;
+use App\Models\Empresa;
 use App\Models\Horario;
 use App\Models\HorarioDia;
 use App\Models\Marcacion;
@@ -13,6 +14,7 @@ use App\Models\Rol;
 use App\Models\Trabajador;
 use App\Models\TrabajadorHorario;
 use App\Models\User;
+use App\Support\EmpresaContext;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -30,6 +32,8 @@ class TrabajoCampoTest extends TestCase
 
     private Trabajador $trabajador;
 
+    private Empresa $empresa;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -37,12 +41,24 @@ class TrabajoCampoTest extends TestCase
         Carbon::setTestNow('2026-11-03 08:30:00');
         Storage::fake('local');
 
+        $this->empresa = Empresa::create([
+            'razon_social' => 'Empresa de prueba S.A.C.',
+            'ruc' => '20131312955',
+            'estado' => Empresa::ACTIVA,
+            'zona_horaria' => 'America/Lima',
+        ]);
+        app(EmpresaContext::class)->activate($this->empresa);
+
         $rolAdministrador = Rol::create([
-            'nombre' => 'ADMINISTRADOR',
+            'codigo' => 'ADMINISTRADOR',
+            'ambito' => 'EMPRESA',
+            'nombre' => 'Administrador',
             'estado' => true,
         ]);
         $rolTrabajador = Rol::create([
-            'nombre' => 'TRABAJADOR',
+            'codigo' => 'TRABAJADOR',
+            'ambito' => 'EMPRESA',
+            'nombre' => 'Trabajador',
             'estado' => true,
         ]);
         $area = Area::create([
@@ -99,6 +115,7 @@ class TrabajoCampoTest extends TestCase
     protected function tearDown(): void
     {
         Carbon::setTestNow();
+        app(EmpresaContext::class)->clear();
         parent::tearDown();
     }
 
@@ -267,7 +284,7 @@ class TrabajoCampoTest extends TestCase
 
     public function test_avance_de_campo_se_vincula_a_asignacion_y_reutiliza_reporte_diario(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
         $asignacion = $this->crearAsignacion();
         $this->actingAs($this->usuarioTrabajador)
             ->post(route('asignaciones-campo.avances.store', $asignacion), [
@@ -277,7 +294,7 @@ class TrabajoCampoTest extends TestCase
         $actividad = \App\Models\ActividadReporte::sole();
         $this->assertSame($asignacion->id, $actividad->asignacion_campo_id);
         $this->assertSame($this->trabajador->id, $actividad->reporte->trabajador_id);
-        Storage::disk('public')->assertExists($actividad->archivo);
+        Storage::disk('local')->assertExists($actividad->archivo);
         $this->post(route('asignaciones-campo.avances.store', $asignacion), [
             'descripcion_avance' => 'Pruebas realizadas',
         ])->assertSessionHasNoErrors();

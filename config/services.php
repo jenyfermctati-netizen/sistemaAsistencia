@@ -29,10 +29,6 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-    'senseface' => [
-        'serial' => env('BIOMETRICO_SENSEFACE_SN'),
-    ],
-    
    'decolecta' => [
     'token' => env('DECOLECTA_TOKEN'),
     'url' => env(

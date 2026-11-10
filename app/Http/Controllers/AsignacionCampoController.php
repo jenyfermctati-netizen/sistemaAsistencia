@@ -9,6 +9,8 @@ use App\Models\MarcacionCampo;
 use App\Models\ReporteAvance;
 use App\Models\Trabajador;
 use App\Services\ClasificadorMarcacionService;
+use App\Support\EmpresaRules;
+use App\Support\EmpresaContext;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -230,7 +232,10 @@ class AsignacionCampoController extends Controller
                     ]);
                 }
 
-                $ruta = $request->file('archivo_avance')?->store('reportes-avance/actividades', 'public');
+                $ruta = $request->file('archivo_avance')?->store(
+                    'empresas/'.app(EmpresaContext::class)->id().'/reportes-avance/actividades',
+                    'local'
+                );
                 $reporte->actividades()->create([
                     'asignacion_campo_id' => $asignacion->id,
                     'descripcion' => trim($data['descripcion_avance']),
@@ -243,7 +248,7 @@ class AsignacionCampoController extends Controller
             });
         } catch (\Throwable $exception) {
             if ($ruta) {
-                Storage::disk('public')->delete($ruta);
+                Storage::disk('local')->delete($ruta);
             }
             throw $exception;
         }
@@ -415,7 +420,7 @@ class AsignacionCampoController extends Controller
             ?: $archivo->getClientOriginalExtension()
             ?: 'jpg'
         );
-        $directorio = 'marcaciones-campo/'
+        $directorio = 'empresas/'.app(EmpresaContext::class)->id().'/marcaciones-campo/'
             .$trabajador->id.'/'
             .$ahora->format('Y/m/d');
         $evidenciaPath = $archivo->storeAs(
@@ -605,7 +610,7 @@ class AsignacionCampoController extends Controller
         ];
 
         if ($esAdministrador) {
-            $rules['trabajador_id'] = ['required', 'exists:trabajadores,id'];
+            $rules['trabajador_id'] = ['required', EmpresaRules::exists('trabajadores')];
         }
 
         return $request->validate($rules, [
@@ -695,7 +700,7 @@ class AsignacionCampoController extends Controller
 
     private function rolActual(): string
     {
-        return strtoupper(trim((string) Auth::user()?->rol?->nombre));
+        return Auth::user()?->roleCode() ?? '';
     }
 
     private function verificarTrabajador(): void

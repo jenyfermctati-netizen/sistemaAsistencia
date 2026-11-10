@@ -36,7 +36,8 @@ class BiometricoController extends Controller
             'sn' => $sn,
             'table' => $table,
             'ip' => $request->ip(),
-            'body' => $this->resumirBody($body),
+            'bytes' => strlen($body),
+            'lineas' => $body === '' ? 0 : count(preg_split('/\r\n|\r|\n/', $body)),
         ]);
 
         if ($table === 'ATTLOG') {
@@ -110,8 +111,9 @@ class BiometricoController extends Controller
 
         Log::info('SENSEFACE DEVICECMD', [
             'sn' => $sn,
-            'query' => $request->query(),
-            'body' => $contenido,
+            'cmd_id' => $request->query('ID') ?? $request->query('CmdID'),
+            'codigo' => $request->query('Return'),
+            'bytes' => strlen($contenido),
         ]);
 
         $lineas = $contenido !== ''
@@ -158,7 +160,7 @@ class BiometricoController extends Controller
         Log::info('SENSEFACE REGISTRY', [
             'sn' => $sn,
             'ip' => $request->ip(),
-            'body' => $this->resumirBody($request->getContent()),
+            'bytes' => strlen($request->getContent()),
         ]);
 
         return $this->texto('OK');
@@ -179,6 +181,7 @@ class BiometricoController extends Controller
         }
 
         $procesadas = 0;
+        $dispositivo = DispositivoBiometrico::where('serial', $sn)->firstOrFail();
 
         foreach (preg_split('/\r\n|\r|\n/', $body) as $linea) {
             $linea = trim($linea);
@@ -228,7 +231,7 @@ class BiometricoController extends Controller
                 $duplicada = Marcacion::where(
                     'evento_externo_id',
                     $eventoExternoId
-                )->first();
+                )->where('dispositivo_id', $dispositivo->id)->first();
 
                 if ($duplicada) {
                     Log::info('ATTLOG duplicado ignorado', [
@@ -288,6 +291,7 @@ class BiometricoController extends Controller
                 }
 
                 Marcacion::create([
+                    'dispositivo_id' => $dispositivo->id,
                     'trabajador_id' => $trabajador->id,
                     'fecha_hora' => $fechaHora,
                     'tipo' => $tipo,
@@ -409,7 +413,6 @@ class BiometricoController extends Controller
             Log::info('SENSEFACE USUARIO RECIBIDO', [
                 'sn' => $sn,
                 'pin' => $usuario['pin'],
-                'nombre' => $usuario['nombre'],
             ]);
         }
     }
@@ -456,26 +459,10 @@ class BiometricoController extends Controller
 
     private function validarDispositivo(Request $request): string
     {
-        $sn = trim((string) $request->query('SN'));
+        $dispositivo = $request->attributes->get('dispositivo_biometrico');
+        abort_unless($dispositivo instanceof DispositivoBiometrico, 403);
 
-        $serialPermitido = trim(
-            (string) config('services.senseface.serial')
-        );
-
-        if (
-            $serialPermitido === '' ||
-            $sn === '' ||
-            ! hash_equals($serialPermitido, $sn)
-        ) {
-            Log::warning('SENSEFACE dispositivo no autorizado', [
-                'sn' => $sn ?: null,
-                'ip' => $request->ip(),
-            ]);
-
-            abort(403, 'Dispositivo no autorizado.');
-        }
-
-        return $sn;
+        return $dispositivo->serial;
     }
 
     private function opcionesDispositivo(string $sn): string
@@ -496,15 +483,10 @@ class BiometricoController extends Controller
 
     private function registrarConexion(string $sn, ?string $ip): void
     {
-        DispositivoBiometrico::updateOrCreate(
-            ['serial' => $sn],
-            [
-                'nombre' => 'SenseFace Principal',
-                'modelo' => 'SenseFace 2A',
-                'ultima_ip' => $ip,
-                'ultima_conexion' => now(),
-            ]
-        );
+        DispositivoBiometrico::where('serial', $sn)->update([
+            'ultima_ip' => $ip,
+            'ultima_conexion' => now(),
+        ]);
     }
 
     private function registrarUltimaMarcacion(
@@ -514,18 +496,6 @@ class BiometricoController extends Controller
         DispositivoBiometrico::where('serial', $sn)->update([
             'ultima_marcacion' => $fechaHora,
         ]);
-    }
-
-    private function resumirBody(string $body, int $limite = 1000): string
-    {
-        if (strlen($body) <= $limite) {
-            return $body;
-        }
-
-        return substr($body, 0, $limite)
-            .'... [CONTENIDO OMITIDO - '
-            .strlen($body)
-            .' bytes]';
     }
 
     private function texto(string $contenido)

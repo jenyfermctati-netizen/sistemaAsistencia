@@ -9,6 +9,7 @@ use App\Models\Rol;
 use App\Models\Trabajador;
 use App\Models\User;
 use App\Services\HorarioEmpresaService;
+use App\Support\EmpresaRules;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -77,6 +78,7 @@ class TrabajadorController extends Controller
             ->get();
 
         $roles = Rol::where('estado', true)
+            ->where('ambito', 'EMPRESA')
             ->orderBy('nombre')
             ->get();
 
@@ -97,19 +99,19 @@ class TrabajadorController extends Controller
         $data = $request->validate([
             'area_id' => [
                 'required',
-                'exists:areas,id',
+                EmpresaRules::exists('areas'),
             ],
             'codigo_biometrico' => [
                 'nullable',
                 'string',
                 'max:50',
-                'unique:trabajadores,codigo_biometrico',
+                EmpresaRules::unique('trabajadores', 'codigo_biometrico'),
             ],
             'dni' => [
                 'required',
                 'string',
                 'max:15',
-                'unique:trabajadores,dni',
+                EmpresaRules::unique('trabajadores', 'dni'),
             ],
             'nombres' => [
                 'required',
@@ -156,7 +158,7 @@ class TrabajadorController extends Controller
             ],
             'rol_id' => [
                 'required',
-                'exists:roles,id',
+                Rule::exists('roles', 'id')->where('ambito', 'EMPRESA')->where('estado', true),
             ],
             'encargado_area' => [
                 'sometimes',
@@ -234,25 +236,19 @@ class TrabajadorController extends Controller
         $data = $request->validate([
             'area_id' => [
                 'required',
-                'exists:areas,id',
+                EmpresaRules::exists('areas'),
             ],
             'codigo_biometrico' => [
                 'nullable',
                 'string',
                 'max:50',
-                Rule::unique(
-                    'trabajadores',
-                    'codigo_biometrico'
-                )->ignore($trabajador->id),
+                EmpresaRules::unique('trabajadores', 'codigo_biometrico')->ignore($trabajador->id),
             ],
             'dni' => [
                 'required',
                 'string',
                 'max:15',
-                Rule::unique(
-                    'trabajadores',
-                    'dni'
-                )->ignore($trabajador->id),
+                EmpresaRules::unique('trabajadores', 'dni')->ignore($trabajador->id),
             ],
             'nombres' => [
                 'required',
@@ -302,7 +298,7 @@ class TrabajadorController extends Controller
             ],
             'rol_id' => [
                 'required',
-                'exists:roles,id',
+                Rule::exists('roles', 'id')->where('ambito', 'EMPRESA')->where('estado', true),
             ],
             'encargado_area' => [
                 'sometimes',
@@ -437,7 +433,7 @@ class TrabajadorController extends Controller
 
         $rol = Rol::find($data['rol_id']);
 
-        if (strtoupper(trim((string) $rol?->nombre)) !== 'TRABAJADOR') {
+        if ($rol?->codigo !== 'TRABAJADOR' || $rol?->ambito !== 'EMPRESA') {
             throw ValidationException::withMessages([
                 'encargado_area' => 'La designación de encargado solo está disponible para el rol TRABAJADOR.',
             ]);
@@ -494,7 +490,7 @@ class TrabajadorController extends Controller
     private function autorizarAdministrador(): void
     {
         abort_unless(
-            Auth::check() && Auth::user()->rol?->nombre === 'ADMINISTRADOR',
+            Auth::check() && Auth::user()->roleCode() === 'ADMINISTRADOR',
             403
         );
     }

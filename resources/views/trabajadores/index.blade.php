@@ -379,7 +379,7 @@
                         <select id="crearRol" name="rol_id" class="form-select" required>
                             <option value="">Seleccione</option>
                             @foreach ($roles as $rol)
-                                <option value="{{ $rol->id }}" data-role-nombre="{{ strtoupper(trim($rol->nombre)) }}" @selected(old('rol_id') == $rol->id)>
+                                <option value="{{ $rol->id }}" data-role-nombre="{{ $rol->codigo }}" @selected(old('rol_id') == $rol->id)>
                                     {{ $rol->nombre }}
                                 </option>
                             @endforeach
@@ -528,7 +528,7 @@
                         <label class="form-label">Rol *</label>
                         <select id="editarRol" name="rol_id" class="form-select" required>
                             @foreach ($roles as $rol)
-                                <option value="{{ $rol->id }}" data-role-nombre="{{ strtoupper(trim($rol->nombre)) }}">{{ $rol->nombre }}</option>
+                                <option value="{{ $rol->id }}" data-role-nombre="{{ $rol->codigo }}">{{ $rol->nombre }}</option>
                             @endforeach
                         </select>
                     </div>

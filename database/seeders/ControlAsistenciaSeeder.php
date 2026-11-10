@@ -9,115 +9,18 @@ class ControlAsistenciaSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('roles')->insert([
-            [
-                'nombre' => 'GERENTE',
-                'descripcion' => 'Consulta información general, indicadores y reportes',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nombre' => 'ADMINISTRADOR',
-                'descripcion' => 'Gestiona personal, asistencia, solicitudes, vacaciones y configuraciones',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nombre' => 'TRABAJADOR',
-                'descripcion' => 'Consulta información personal y registra solicitudes',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        $roles = [
+            ['codigo' => 'SUPERADMIN', 'ambito' => 'GLOBAL', 'nombre' => 'Superadministrador', 'descripcion' => 'Administra la plataforma CONNEXT y sus empresas'],
+            ['codigo' => 'GERENTE', 'ambito' => 'EMPRESA', 'nombre' => 'Gerente', 'descripcion' => 'Consulta información general, indicadores y reportes'],
+            ['codigo' => 'ADMINISTRADOR', 'ambito' => 'EMPRESA', 'nombre' => 'Administrador', 'descripcion' => 'Gestiona personal, asistencia y configuraciones de su empresa'],
+            ['codigo' => 'TRABAJADOR', 'ambito' => 'EMPRESA', 'nombre' => 'Trabajador', 'descripcion' => 'Consulta información personal y registra solicitudes'],
+        ];
 
-        DB::table('areas')->insert([
-            [
-                'nombre' => 'Gerencia General',
-                'descripcion' => 'Área de dirección y supervisión general',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nombre' => 'Administración Central',
-                'descripcion' => 'Área administrativa de la empresa',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nombre' => 'División de Ingeniería y Arquitectura',
-                'descripcion' => 'Área de ingeniería y arquitectura',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nombre' => 'Logística y Operaciones',
-                'descripcion' => 'Área encargada de logística y operaciones',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nombre' => 'Tecnología y Desarrollo',
-                'descripcion' => 'Área encargada de tecnología y desarrollo',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
-
-        $horarioId = DB::table('horarios')->insertGetId([
-            'nombre' => 'Horario Oficina',
-            'descripcion' => 'Horario principal del personal de oficina',
-            'estado' => true,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        foreach (range(1, 5) as $dia) {
-            DB::table('horario_dias')->insert([
-                'horario_id' => $horarioId,
-                'dia_semana' => $dia,
-                'es_laborable' => true,
-                'hora_entrada' => '08:20:00',
-                'hora_salida_refrigerio' => '13:00:00',
-                'hora_retorno_refrigerio' => '14:00:00',
-                'hora_salida' => '19:00:00',
-                'tolerancia_minutos' => 20,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        foreach ($roles as $rol) {
+            DB::table('roles')->updateOrInsert(
+                ['codigo' => $rol['codigo']],
+                $rol + ['estado' => true, 'created_at' => now(), 'updated_at' => now()]
+            );
         }
-
-        DB::table('horario_dias')->insert([
-            'horario_id' => $horarioId,
-            'dia_semana' => 6,
-            'es_laborable' => true,
-            'hora_entrada' => '08:20:00',
-            'hora_salida_refrigerio' => null,
-            'hora_retorno_refrigerio' => null,
-            'hora_salida' => '13:00:00',
-            'tolerancia_minutos' => 20,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('horario_dias')->insert([
-            'horario_id' => $horarioId,
-            'dia_semana' => 7,
-            'es_laborable' => false,
-            'hora_entrada' => null,
-            'hora_salida_refrigerio' => null,
-            'hora_retorno_refrigerio' => null,
-            'hora_salida' => null,
-            'tolerancia_minutos' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
     }
 }

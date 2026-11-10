@@ -54,6 +54,12 @@ class BiometricoSyncService
             ]);
         }
 
+        if ((int) $trabajador->empresa_id !== (int) $dispositivo->empresa_id) {
+            throw ValidationException::withMessages([
+                'usuario' => 'El trabajador y el dispositivo pertenecen a empresas diferentes.',
+            ]);
+        }
+
         $pin = trim((string) $trabajador->codigo_biometrico);
 
         if ($pin === '') {
@@ -313,7 +319,6 @@ class BiometricoSyncService
                 \Log::error('Error preparando sincronización masiva SenseFace', [
                     'dispositivo_id' => $dispositivo->id,
                     'usuario_id' => $usuario->id,
-                    'pin' => $usuario->pin,
                     'error' => $e->getMessage(),
                 ]);
             }

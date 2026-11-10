@@ -165,6 +165,6 @@ class AsistenciaController extends Controller
 
     private function rolActual(): string
     {
-        return strtoupper(trim((string) Auth::user()?->rol?->nombre));
+        return Auth::user()?->roleCode() ?? '';
     }
 }

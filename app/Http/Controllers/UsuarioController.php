@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Rol;
 use App\Models\Trabajador;
 use App\Models\User;
+use App\Support\EmpresaRules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -44,6 +45,7 @@ class UsuarioController extends Controller
             ->withQueryString();
 
         $roles = Rol::where('estado', true)
+            ->where('ambito', 'EMPRESA')
             ->orderBy('nombre')
             ->get();
 
@@ -68,12 +70,12 @@ class UsuarioController extends Controller
         $data = $request->validate([
             'trabajador_id' => [
                 'nullable',
-                'exists:trabajadores,id',
+                EmpresaRules::exists('trabajadores'),
                 'unique:users,trabajador_id',
             ],
             'rol_id' => [
                 'required',
-                'exists:roles,id',
+                Rule::exists('roles', 'id')->where('ambito', 'EMPRESA')->where('estado', true),
             ],
             'name' => [
                 'required',
@@ -123,13 +125,13 @@ class UsuarioController extends Controller
         $data = $request->validate([
             'trabajador_id' => [
                 'nullable',
-                'exists:trabajadores,id',
+                EmpresaRules::exists('trabajadores'),
                 Rule::unique('users', 'trabajador_id')
                     ->ignore($usuario->id),
             ],
             'rol_id' => [
                 'required',
-                'exists:roles,id',
+                Rule::exists('roles', 'id')->where('ambito', 'EMPRESA')->where('estado', true),
             ],
             'name' => [
                 'required',

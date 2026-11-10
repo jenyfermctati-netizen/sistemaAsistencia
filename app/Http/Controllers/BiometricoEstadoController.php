@@ -93,7 +93,7 @@ class BiometricoEstadoController extends Controller
 
     private function verificarAdministrador(): void
     {
-        abort_unless(Auth::check() && Auth::user()->rol?->nombre === 'ADMINISTRADOR', 403);
+        abort_unless(Auth::check() && Auth::user()->roleCode() === 'ADMINISTRADOR', 403);
     }
 
     public function sincronizarUsuario(DispositivoBiometrico $dispositivo, BiometricoUsuario $usuario)

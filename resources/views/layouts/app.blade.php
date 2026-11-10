@@ -14,11 +14,11 @@
     <link rel="stylesheet" href="{{ asset('css/theme-itrafic.css') }}">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/ux-system.css') }}">
-    @if(strtoupper(trim((string) auth()->user()?->rol?->nombre)) === 'TRABAJADOR')
+    @if(auth()->user()?->roleCode() === 'TRABAJADOR')
         <link rel="stylesheet" href="{{ asset('css/worker-interface.css') }}?v={{ filemtime(public_path('css/worker-interface.css')) }}">
     @endif
 </head>
-<body class="{{ strtoupper(trim((string) auth()->user()?->rol?->nombre)) === 'TRABAJADOR' ? 'worker-interface' : '' }}">
+<body class="{{ auth()->user()?->roleCode() === 'TRABAJADOR' ? 'worker-interface' : '' }}">
     <a class="skip-link" href="#mainContent">Ir al contenido principal</a>
     <div class="app">
         @include('partials.sidebar')

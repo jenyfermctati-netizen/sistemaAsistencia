@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Empresa;
 use App\Services\AsistenciaService;
+use App\Support\EmpresaContext;
 use Carbon\Carbon;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -12,21 +14,29 @@ Artisan::command('inspire', function () {
 
 Artisan::command('asistencias:cerrar {fecha?}', function () {
     $fechaIngresada = $this->argument('fecha');
-    $fecha = $fechaIngresada
-        ? Carbon::parse($fechaIngresada)->startOfDay()
-        : today()->subDay();
+    $total = 0;
 
-    if (! $fecha->lt(today())) {
-        $this->error('El cierre automático solo puede ejecutarse para un día ya terminado.');
+    Empresa::where('estado', Empresa::ACTIVA)->orderBy('id')->each(function (Empresa $empresa) use ($fechaIngresada, &$total) {
+        $hoyEmpresa = Carbon::now($empresa->zona_horaria)->startOfDay();
+        $fecha = $fechaIngresada
+            ? Carbon::parse($fechaIngresada, $empresa->zona_horaria)->startOfDay()
+            : $hoyEmpresa->copy()->subDay();
 
-        return 1;
-    }
+        if (! $fecha->lt($hoyEmpresa)) {
+            $this->warn("{$empresa->razon_social}: la fecha debe ser anterior al día local actual.");
 
-    $procesados = app(AsistenciaService::class)->procesarFecha($fecha);
+            return;
+        }
 
-    $this->info(
-        "Cierre completado para {$fecha->toDateString()}: {$procesados} asistencias procesadas."
-    );
+        $procesados = app(EmpresaContext::class)->run(
+            $empresa,
+            fn () => app(AsistenciaService::class)->procesarFecha($fecha)
+        );
+        $total += $procesados;
+        $this->line("{$empresa->razon_social}: {$procesados} asistencias procesadas para {$fecha->toDateString()}.");
+    });
+
+    $this->info("Cierre multiempresa completado: {$total} asistencias procesadas.");
 
     return 0;
 })->purpose('Cierra las asistencias de un día terminado y completa marcas olvidadas');
