@@ -130,6 +130,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/reportesAvance/{reporte}/agregar', [ReporteAvanceController::class, 'agregarAvance'])
         ->name('reportesAvance.agregar');
     Route::put('/reportesAvance/{reporte}', [ReporteAvanceController::class, 'update'])->name('reportesAvance.update');
+    Route::patch('/reportesAvance/revisar-masivo', [ReporteAvanceController::class, 'revisarMasivo'])
+        ->name('reportesAvance.revisarMasivo');
     Route::patch('/reportesAvance/{reporte}/revisar', [ReporteAvanceController::class, 'revisar'])->name('reportesAvance.revisar');
     Route::post('/reportesAvance/pendientes', [ReporteAvanceController::class, 'storePendiente'])->name('reportesAvance.pendientes.store');
     Route::post('/reportesAvance/pendientes/registrar', [ReporteAvanceController::class, 'storePendienteTrabajador'])

@@ -383,10 +383,144 @@ document.addEventListener('DOMContentLoaded', function () {
         return div.innerHTML;
     }
 
+    function iniciarAprobacionMasiva() {
+        const formMasivo = document.getElementById('formAprobarMasivo');
+        const checkboxesReporte = Array.from(document.querySelectorAll('[data-reporte-checkbox]'));
+        const maestroGlobal = document.querySelector('[data-seleccionar-todos-reportes]');
+        const maestrosArea = Array.from(document.querySelectorAll('[data-seleccionar-area]'));
+        const maestrosTrabajador = Array.from(document.querySelectorAll('[data-seleccionar-trabajador]'));
+        const resumenSeleccion = document.querySelector('[data-resumen-seleccion]');
+        const botonAprobar = document.querySelector('[data-aprobar-seleccionados]');
+
+        if (!formMasivo && !checkboxesReporte.length) {
+            return;
+        }
+
+        function objetivosGrupo(items) {
+            const pendientes = items.filter(cb => cb.dataset.estado === 'PENDIENTE');
+            return pendientes.length ? pendientes : items;
+        }
+
+        function sincronizarMaestro(maestro, grupo) {
+            if (!maestro || !grupo.length) return;
+            const objetivos = objetivosGrupo(grupo);
+            maestro.checked = objetivos.length > 0 && objetivos.every(cb => cb.checked);
+            maestro.indeterminate = !maestro.checked && grupo.some(cb => cb.checked);
+        }
+
+        function actualizarEstadoMasivo() {
+            const seleccionados = checkboxesReporte.filter(cb => cb.checked);
+            const totalReportes = seleccionados.length;
+            const totalActividades = seleccionados.reduce(
+                (suma, cb) => suma + Number(cb.dataset.actividades || 0),
+                0
+            );
+
+            if (resumenSeleccion) {
+                if (!totalReportes) {
+                    resumenSeleccion.textContent = '0 seleccionados';
+                } else {
+                    const etiquetaR = totalReportes === 1 ? 'reporte' : 'reportes';
+                    const etiquetaA = totalActividades === 1 ? 'actividad' : 'actividades';
+                    resumenSeleccion.textContent = `${totalReportes} ${etiquetaR} (${totalActividades} ${etiquetaA})`;
+                }
+            }
+
+            if (botonAprobar) {
+                botonAprobar.disabled = totalReportes === 0;
+            }
+
+            sincronizarMaestro(maestroGlobal, checkboxesReporte);
+
+            maestrosArea.forEach(maestro => {
+                const areaId = maestro.dataset.seleccionarArea;
+                sincronizarMaestro(maestro, checkboxesReporte.filter(cb => cb.dataset.areaId === areaId));
+            });
+
+            maestrosTrabajador.forEach(maestro => {
+                const trabajadorId = maestro.dataset.seleccionarTrabajador;
+                sincronizarMaestro(maestro, checkboxesReporte.filter(cb => cb.dataset.trabajadorId === trabajadorId));
+            });
+        }
+
+        function aplicarSeleccion(grupo, marcar) {
+            const lista = marcar ? objetivosGrupo(grupo) : grupo;
+            lista.forEach(cb => {
+                cb.checked = marcar;
+            });
+            actualizarEstadoMasivo();
+        }
+
+        maestroGlobal?.addEventListener('change', function () {
+            aplicarSeleccion(checkboxesReporte, maestroGlobal.checked);
+        });
+
+        maestrosArea.forEach(maestro => {
+            maestro.addEventListener('change', function () {
+                const areaId = maestro.dataset.seleccionarArea;
+                aplicarSeleccion(
+                    checkboxesReporte.filter(cb => cb.dataset.areaId === areaId),
+                    maestro.checked
+                );
+            });
+        });
+
+        maestrosTrabajador.forEach(maestro => {
+            maestro.addEventListener('change', function () {
+                const trabajadorId = maestro.dataset.seleccionarTrabajador;
+                aplicarSeleccion(
+                    checkboxesReporte.filter(cb => cb.dataset.trabajadorId === trabajadorId),
+                    maestro.checked
+                );
+            });
+        });
+
+        checkboxesReporte.forEach(cb => {
+            cb.addEventListener('change', actualizarEstadoMasivo);
+        });
+
+        formMasivo?.addEventListener('submit', function (event) {
+            const seleccionados = checkboxesReporte.filter(cb => cb.checked);
+            if (!seleccionados.length) {
+                event.preventDefault();
+                return;
+            }
+
+            const totalReportes = seleccionados.length;
+            const totalActividades = seleccionados.reduce(
+                (suma, cb) => suma + Number(cb.dataset.actividades || 0),
+                0
+            );
+            const etiquetaR = totalReportes === 1 ? 'reporte' : 'reportes';
+            const etiquetaA = totalActividades === 1 ? 'actividad' : 'actividades';
+
+            if (!window.confirm(`¿Aprobar ${totalReportes} ${etiquetaR} (${totalActividades} ${etiquetaA}) como revisados?`)) {
+                event.preventDefault();
+            }
+        });
+
+        document.querySelectorAll('form[data-confirm-trabajador]').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                const trabajador = form.dataset.confirmTrabajador || 'este trabajador';
+                const totalReportes = Number(form.dataset.confirmReportes || 0);
+                const totalActividades = Number(form.dataset.confirmActividades || 0);
+                const etiquetaR = totalReportes === 1 ? 'reporte' : 'reportes';
+                const etiquetaA = totalActividades === 1 ? 'actividad' : 'actividades';
+
+                if (!window.confirm(`¿Aprobar los ${totalReportes} ${etiquetaR} (${totalActividades} ${etiquetaA}) de ${trabajador}?`)) {
+                    event.preventDefault();
+                }
+            });
+        });
+
+        actualizarEstadoMasivo();
+    }
+
     actualizarNombresActividad(actividadesContainer);
     actualizarNombresPendiente(pendientesContainer);
     actualizarNombresActividad(actividadesAdicionalesContainer);
     actualizarNombresPendiente(pendientesAdicionalesContainer);
     actualizarEstadoSinPendientes();
     actualizarEstadoSinActividades();
+    iniciarAprobacionMasiva();
 });

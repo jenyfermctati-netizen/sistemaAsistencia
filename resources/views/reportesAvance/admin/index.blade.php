@@ -38,6 +38,12 @@
         <div class="ra-alert ra-alert--error">{{ session('error') }}</div>
     @endif
 
+    @if($errors->has('reporte_ids') || $errors->has('reporte_ids.*'))
+        <div class="ra-alert ra-alert--error">
+            {{ $errors->first('reporte_ids') ?: $errors->first('reporte_ids.*') }}
+        </div>
+    @endif
+
     {{-- PESTAÑAS --}}
     <nav class="ra-nav" aria-label="Secciones de reportes">
         <a href="{{ route('reportesAvance.index', array_merge($parametrosVista, ['pestana' => 'avances'])) }}"
@@ -58,6 +64,37 @@
     </nav>
 
     @if($pestanaActiva === 'avances')
+        @php
+            $filtrosRetorno = array_filter([
+                'buscar' => request('buscar'),
+                'estado' => request('estado'),
+                'area_id' => request('area_id'),
+                'fecha_desde' => request('fecha_desde'),
+                'fecha_hasta' => request('fecha_hasta'),
+                'historial' => request()->boolean('historial') ? '1' : null,
+                'vista' => $vistaEquipo ? 'equipo' : null,
+            ], fn ($valor) => $valor !== null && $valor !== '');
+
+            if ($filtrosRetorno !== []) {
+                $filtrosRetorno = ['pestana' => 'avances'] + $filtrosRetorno;
+            }
+
+            $ayerHoyParams = array_merge($parametrosVista, [
+                'pestana' => 'avances',
+                'fecha_desde' => today()->subDay()->toDateString(),
+                'fecha_hasta' => today()->toDateString(),
+            ]);
+            $esAyerYHoy = request('fecha_desde') === $ayerHoyParams['fecha_desde']
+                && request('fecha_hasta') === $ayerHoyParams['fecha_hasta'];
+
+            $totalPorRevisarGlobal = $diasConReportes->sum('por_revisar');
+            $reportesAprobablesVisibles = $reportes->where('estado', '!=', 'REVISADO');
+            $reportesPendientesVisibles = $reportes->where('estado', 'PENDIENTE');
+            $reportesObjetivoMasivo = $reportesPendientesVisibles->isNotEmpty()
+                ? $reportesPendientesVisibles
+                : $reportesAprobablesVisibles;
+            $actividadesObjetivoMasivo = $reportesObjetivoMasivo->sum(fn ($r) => $r->actividades->count());
+        @endphp
 
         {{-- FILTROS --}}
         <section class="ra-panel">
@@ -116,6 +153,20 @@
                     <button type="submit" class="ra-btn ra-btn--primary">
                         <x-ui-icon name="filter" /> Filtrar
                     </button>
+
+                    @if($puedeRevisar)
+                        <a href="{{ route('reportesAvance.index', $ayerHoyParams) }}"
+                            class="ra-btn {{ $esAyerYHoy ? 'ra-btn--primary' : 'ra-btn--outline' }}">
+                            Ayer y hoy
+                        </a>
+
+                        @if($totalPorRevisarGlobal > 0)
+                            <a href="{{ route('reportesAvance.index', array_merge($parametrosVista, ['pestana' => 'avances', 'estado' => 'PENDIENTE'])) }}"
+                                class="ra-btn {{ request('estado') === 'PENDIENTE' ? 'ra-btn--primary' : 'ra-btn--outline' }}">
+                                Por revisar ({{ $totalPorRevisarGlobal }})
+                            </a>
+                        @endif
+                    @endif
                 </div>
             </form>
         </section>
@@ -131,6 +182,39 @@
 
                 <span class="ra-counter">{{ $areas->count() }} áreas</span>
             </div>
+
+            @if($puedeRevisar && $reportesAprobablesVisibles->isNotEmpty())
+                <form method="POST"
+                    action="{{ route('reportesAvance.revisarMasivo') }}"
+                    id="formAprobarMasivo"
+                    class="ra-bulk-bar"
+                    data-confirm-masivo>
+                    @csrf
+                    @method('PATCH')
+                    @include('reportesAvance.partials.filtros-retorno', ['filtrosRetorno' => $filtrosRetorno])
+
+                    <label class="ra-bulk-check">
+                        <input type="checkbox" data-seleccionar-todos-reportes>
+                        <span>
+                            Seleccionar {{ $reportesPendientesVisibles->isNotEmpty() ? 'pendientes' : 'reportes por aprobar' }}
+                            (<strong>{{ $reportesObjetivoMasivo->count() }}</strong>
+                            {{ $reportesObjetivoMasivo->count() === 1 ? 'reporte' : 'reportes' }},
+                            <strong>{{ $actividadesObjetivoMasivo }}</strong>
+                            {{ $actividadesObjetivoMasivo === 1 ? 'actividad' : 'actividades' }})
+                        </span>
+                    </label>
+
+                    <div class="ra-bulk-bar__actions">
+                        <span class="ra-bulk-bar__summary" data-resumen-seleccion>0 seleccionados</span>
+                        <button type="submit"
+                            class="ra-btn ra-btn--approve"
+                            data-aprobar-seleccionados
+                            disabled>
+                            ✓ Aprobar seleccionados
+                        </button>
+                    </div>
+                </form>
+            @endif
 
             <div class="ra-area-grid">
 
@@ -151,6 +235,15 @@
                             ->pluck('trabajador_id')
                             ->unique()
                             ->count();
+
+                        $reportesAprobablesArea = $reportesArea->where('estado', '!=', 'REVISADO');
+                        $reportesPendientesArea = $reportesArea->where('estado', 'PENDIENTE');
+                        $reportesObjetivoArea = $reportesPendientesArea->isNotEmpty()
+                            ? $reportesPendientesArea
+                            : $reportesAprobablesArea;
+                        $actividadesObjetivoArea = $reportesObjetivoArea->sum(
+                            fn($reporte) => $reporte->actividades->count()
+                        );
                     @endphp
 
                     <details class="ra-area-card">
@@ -182,6 +275,13 @@
                                     <span>Actividades</span>
                                 </div>
 
+                                @if($puedeRevisar && $reportesPendientesArea->isNotEmpty())
+                                    <div class="ra-area-card__pending">
+                                        <strong>{{ $reportesPendientesArea->count() }}</strong>
+                                        <span>Por revisar</span>
+                                    </div>
+                                @endif
+
                             </div>
 
                             <span class="ra-area-card__arrow"><x-ui-icon name="chevron-down" /></span>
@@ -189,6 +289,21 @@
                         </summary>
 
                         <div class="ra-area-card__body">
+
+                            @if($puedeRevisar && $reportesAprobablesArea->isNotEmpty())
+                                <div class="ra-area-bulk">
+                                    <label class="ra-bulk-check">
+                                        <input type="checkbox" data-seleccionar-area="{{ $area->id }}">
+                                        <span>
+                                            Seleccionar {{ $reportesPendientesArea->isNotEmpty() ? 'pendientes' : 'por aprobar' }} en {{ $area->nombre }}
+                                            (<strong>{{ $reportesObjetivoArea->count() }}</strong>
+                                            {{ $reportesObjetivoArea->count() === 1 ? 'reporte' : 'reportes' }},
+                                            <strong>{{ $actividadesObjetivoArea }}</strong>
+                                            {{ $actividadesObjetivoArea === 1 ? 'actividad' : 'actividades' }})
+                                        </span>
+                                    </label>
+                                </div>
+                            @endif
 
                             @forelse($trabajadoresArea as $trabajador)
 
@@ -198,6 +313,15 @@
                                         ->sortByDesc('fecha_presentacion');
 
                                     $totalActividades = $reportesTrabajador->sum(
+                                        fn($reporte) => $reporte->actividades->count()
+                                    );
+
+                                    $reportesAprobablesTrabajador = $reportesTrabajador->where('estado', '!=', 'REVISADO');
+                                    $reportesPendientesTrabajador = $reportesTrabajador->where('estado', 'PENDIENTE');
+                                    $reportesObjetivoTrabajador = $reportesPendientesTrabajador->isNotEmpty()
+                                        ? $reportesPendientesTrabajador
+                                        : $reportesAprobablesTrabajador;
+                                    $actividadesObjetivoTrabajador = $reportesObjetivoTrabajador->sum(
                                         fn($reporte) => $reporte->actividades->count()
                                     );
                                 @endphp
@@ -232,6 +356,12 @@
                                                 {{ $totalActividades === 1 ? 'actividad' : 'actividades' }}
                                             </span>
 
+                                            @if($puedeRevisar && $reportesPendientesTrabajador->isNotEmpty())
+                                                <span class="ra-status ra-status--warning">
+                                                    {{ $reportesPendientesTrabajador->count() }} por revisar
+                                                </span>
+                                            @endif
+
                                         </div>
 
                                         <span class="ra-worker-row__arrow"><x-ui-icon name="chevron-down" /></span>
@@ -248,6 +378,37 @@
 
                                         @else
 
+                                            @if($puedeRevisar && $reportesAprobablesTrabajador->isNotEmpty())
+                                                <div class="ra-worker-bulk">
+                                                    <label class="ra-bulk-check">
+                                                        <input type="checkbox" data-seleccionar-trabajador="{{ $trabajador->id }}">
+                                                        <span>
+                                                            Seleccionar días ({{ $reportesObjetivoTrabajador->count() }}
+                                                            {{ $reportesObjetivoTrabajador->count() === 1 ? 'reporte' : 'reportes' }},
+                                                            {{ $actividadesObjetivoTrabajador }}
+                                                            {{ $actividadesObjetivoTrabajador === 1 ? 'actividad' : 'actividades' }})
+                                                        </span>
+                                                    </label>
+
+                                                    <form method="POST"
+                                                        action="{{ route('reportesAvance.revisarMasivo') }}"
+                                                        class="ra-worker-bulk__form"
+                                                        data-confirm-trabajador="{{ $trabajador->nombres }} {{ $trabajador->apellidos }}"
+                                                        data-confirm-reportes="{{ $reportesObjetivoTrabajador->count() }}"
+                                                        data-confirm-actividades="{{ $actividadesObjetivoTrabajador }}">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        @include('reportesAvance.partials.filtros-retorno', ['filtrosRetorno' => $filtrosRetorno])
+                                                        @foreach($reportesObjetivoTrabajador as $reporteObjetivo)
+                                                            <input type="hidden" name="reporte_ids[]" value="{{ $reporteObjetivo->id }}">
+                                                        @endforeach
+                                                        <button type="submit" class="ra-btn ra-btn--approve ra-btn--sm">
+                                                            ✓ Aprobar todas ({{ $actividadesObjetivoTrabajador }} {{ $actividadesObjetivoTrabajador === 1 ? 'actividad' : 'actividades' }})
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @endif
+
                                             <div class="ra-worker-days">
 
                                                 @foreach($reportesTrabajador as $reporte)
@@ -256,15 +417,32 @@
 
                                                         <div class="ra-worker-day__header">
 
-                                                            <div class="ra-worker-day__date">
-                                                                <strong>
-                                                                    {{ $reporte->fecha_presentacion?->translatedFormat('d M Y') ?? 'Sin fecha' }}
-                                                                </strong>
+                                                            <div class="ra-worker-day__left">
+                                                                @if($puedeRevisar && $reporte->estado !== 'REVISADO')
+                                                                    <label class="ra-day-check" title="Seleccionar reporte del {{ $reporte->fecha_presentacion?->format('d/m/Y') }}">
+                                                                        <input type="checkbox"
+                                                                            name="reporte_ids[]"
+                                                                            value="{{ $reporte->id }}"
+                                                                            form="formAprobarMasivo"
+                                                                            data-reporte-checkbox
+                                                                            data-area-id="{{ $area->id }}"
+                                                                            data-trabajador-id="{{ $trabajador->id }}"
+                                                                            data-estado="{{ $reporte->estado }}"
+                                                                            data-actividades="{{ $reporte->actividades->count() }}"
+                                                                            aria-label="Seleccionar reporte de {{ $trabajador->nombres }} {{ $trabajador->apellidos }} del {{ $reporte->fecha_presentacion?->format('d/m/Y') }}">
+                                                                    </label>
+                                                                @endif
 
-                                                                <span>
-                                                                    {{ $reporte->actividades->count() }}
-                                                                    {{ $reporte->actividades->count() === 1 ? 'actividad' : 'actividades' }}
-                                                                </span>
+                                                                <div class="ra-worker-day__date">
+                                                                    <strong>
+                                                                        {{ $reporte->fecha_presentacion?->translatedFormat('d M Y') ?? 'Sin fecha' }}
+                                                                    </strong>
+
+                                                                    <span>
+                                                                        {{ $reporte->actividades->count() }}
+                                                                        {{ $reporte->actividades->count() === 1 ? 'actividad' : 'actividades' }}
+                                                                    </span>
+                                                                </div>
                                                             </div>
 
                                                             <div class="ra-worker-day__right">
@@ -298,6 +476,7 @@
 
                                                                             @csrf
                                                                             @method('PATCH')
+                                                                            @include('reportesAvance.partials.filtros-retorno', ['filtrosRetorno' => $filtrosRetorno ?? []])
 
                                                                             <input type="hidden"
                                                                                 name="estado"
@@ -896,6 +1075,7 @@
 
                 @csrf
                 @method('PATCH')
+                @include('reportesAvance.partials.filtros-retorno', ['filtrosRetorno' => $filtrosRetorno ?? []])
 
                 <input type="hidden"
                     name="estado"

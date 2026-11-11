@@ -54,8 +54,10 @@ class AppServiceProvider extends ServiceProvider
                 'vacaciones' => Vacaciones::where('estado', 'PENDIENTE')
                     ->whereHas('trabajador', fn ($query) => $query->where('tipo_vinculo', 'CONTRATADO'))
                     ->count(),
-                'avances' => PendienteAvance::abiertosOEnRevision()->count()
-                    + ActividadReporte::count(),
+                'avances' => ActividadReporte::whereHas(
+                    'reporte',
+                    fn ($query) => $query->where('estado', 'PENDIENTE')
+                )->count(),
             ]);
         });
     }

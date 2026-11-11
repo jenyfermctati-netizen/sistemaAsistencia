@@ -113,11 +113,11 @@
                     </a>
                 @endif
 
-                <a href="{{ route('reportesAvance.index', ['pestana' => 'pendientes']) }}"
+                <a href="{{ route('reportesAvance.index') }}"
                     class="sidebar__item {{ request()->routeIs('reportesAvance.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="progress" /></span>
                     <span class="sidebar__label">Avances y pendientes</span>
-                    <x-sidebar-pending-count :count="$pendientesSidebar['avances']" label="registros entre actividades y pendientes" />
+                    <x-sidebar-pending-count :count="$pendientesSidebar['avances']" label="actividades por revisar" />
                 </a>
 
             </div>

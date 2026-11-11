@@ -256,7 +256,7 @@
 }
 
 .ra-filters__actions {
-    grid-column: span 3;
+    grid-column: span 5;
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
@@ -1306,4 +1306,128 @@
     min-height: 32px;
     padding: 4px 8px;
     font-size: .82rem;
+}
+
+/* APROBACIÓN MASIVA */
+
+.ra-admin .ra-btn--approve {
+    border-color: var(--ra-success);
+    background: var(--ra-success);
+    color: #fff;
+}
+
+.ra-admin .ra-btn--approve:hover:not(:disabled) {
+    border-color: #166534;
+    background: #166534;
+}
+
+.ra-admin .ra-btn--approve:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.ra-admin .ra-btn--sm {
+    min-height: 34px;
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.ra-bulk-bar,
+.ra-area-bulk,
+.ra-worker-bulk {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ra-bulk-bar {
+    margin-bottom: 14px;
+    padding: 12px 15px;
+    border: 1px solid #b7e1c4;
+    border-radius: 12px;
+    background: #f2fbf5;
+}
+
+.ra-bulk-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.ra-bulk-bar__summary {
+    color: var(--ra-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ra-area-bulk {
+    padding: 9px 12px;
+    border: 1px solid var(--ra-border);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.ra-worker-bulk {
+    margin-bottom: 12px;
+    padding: 9px 12px;
+    border: 1px solid var(--ra-border);
+    border-radius: 10px;
+    background: #f7fafb;
+}
+
+.ra-worker-bulk__form {
+    display: inline-flex;
+}
+
+.ra-bulk-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ra-text);
+}
+
+.ra-bulk-check input[type="checkbox"],
+.ra-day-check input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--ra-primary);
+}
+
+.ra-worker-day__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ra-day-check {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.ra-area-card__pending strong {
+    color: var(--ra-warning);
+}
+
+@media (max-width:650px) {
+    .ra-bulk-bar,
+    .ra-worker-bulk {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .ra-bulk-bar__actions,
+    .ra-bulk-bar__actions .ra-btn,
+    .ra-worker-bulk__form,
+    .ra-worker-bulk__form .ra-btn {
+        width: 100%;
+    }
 }

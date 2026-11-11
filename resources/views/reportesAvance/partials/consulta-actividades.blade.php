@@ -28,6 +28,7 @@
             $hoy = today();
             $periodos = [
                 'Hoy' => [$hoy, $hoy],
+                'Ayer y hoy' => [$hoy->copy()->subDay(), $hoy],
                 'Esta semana' => [$hoy->copy()->startOfWeek(), $hoy->copy()->endOfWeek()],
                 'Este mes' => [$hoy->copy()->startOfMonth(), $hoy->copy()->endOfMonth()],
                 'Todo el historial' => null,

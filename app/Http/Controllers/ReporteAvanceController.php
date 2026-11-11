@@ -391,12 +391,7 @@ class ReporteAvanceController extends Controller
 
     public function revisar(Request $request, ReporteAvance $reporte)
     {
-        $usuario = Auth::user();
-
-        abort_unless(
-            in_array($usuario->rol?->nombre, ['ADMINISTRADOR', 'GERENTE'], true),
-            403
-        );
+        $usuario = $this->autorizarRevisor();
 
         $this->autorizarSupervisorDelReporte($reporte);
 
@@ -419,8 +414,72 @@ class ReporteAvanceController extends Controller
         ]);
 
         return redirect()
-            ->route('reportesAvance.index')
+            ->route('reportesAvance.index', $this->parametrosRetornoRevision($request))
             ->with('success', 'Reporte revisado correctamente.');
+    }
+
+    public function revisarMasivo(Request $request)
+    {
+        $usuario = $this->autorizarRevisor();
+
+        $data = $request->validate([
+            'reporte_ids' => ['required', 'array', 'min:1'],
+            'reporte_ids.*' => ['required', 'integer', 'distinct', 'exists:reportes_avance,id'],
+        ], [
+            'reporte_ids.required' => 'Selecciona al menos un reporte para aprobar.',
+            'reporte_ids.min' => 'Selecciona al menos un reporte para aprobar.',
+        ]);
+
+        $resultado = DB::transaction(function () use ($data, $usuario) {
+            $reportes = ReporteAvance::with('trabajador')
+                ->whereIn('id', $data['reporte_ids'])
+                ->lockForUpdate()
+                ->get();
+
+            foreach ($reportes as $reporte) {
+                $this->autorizarSupervisorDelReporte($reporte);
+            }
+
+            $porAprobar = $reportes->where('estado', '!=', 'REVISADO');
+
+            if ($porAprobar->isEmpty()) {
+                return ['reportes' => 0, 'actividades' => 0];
+            }
+
+            $idsAprobar = $porAprobar->pluck('id');
+
+            ReporteAvance::whereIn('id', $idsAprobar)->update([
+                'estado' => 'REVISADO',
+                'revisado_por' => $usuario->id,
+                'comentario_revision' => null,
+                'fecha_revision' => now(),
+            ]);
+
+            $actividadesAprobadas = ActividadReporte::whereIn('reporte_avance_id', $idsAprobar)->count();
+
+            return [
+                'reportes' => $idsAprobar->count(),
+                'actividades' => $actividadesAprobadas,
+            ];
+        });
+
+        $parametros = $this->parametrosRetornoRevision($request);
+
+        if ($resultado['reportes'] === 0) {
+            return redirect()
+                ->route('reportesAvance.index', $parametros)
+                ->with('error', 'Los reportes seleccionados ya habían sido aprobados.');
+        }
+
+        $etiquetaReportes = $resultado['reportes'] === 1 ? 'reporte' : 'reportes';
+        $etiquetaActividades = $resultado['actividades'] === 1 ? 'actividad' : 'actividades';
+
+        return redirect()
+            ->route('reportesAvance.index', $parametros)
+            ->with(
+                'success',
+                "Se aprobaron {$resultado['reportes']} {$etiquetaReportes} ({$resultado['actividades']} {$etiquetaActividades}) correctamente."
+            );
     }
 
     public function storePendiente(Request $request)
@@ -902,6 +961,40 @@ class ReporteAvanceController extends Controller
             $esAdministrador || $esGerenteDelArea || $esEncargadoDelArea || $esPropietario,
             403
         );
+    }
+
+    private function autorizarRevisor(): User
+    {
+        /** @var User $usuario */
+        $usuario = Auth::user();
+
+        abort_unless(
+            in_array($usuario->rol?->nombre, ['ADMINISTRADOR', 'GERENTE'], true),
+            403
+        );
+
+        return $usuario;
+    }
+
+    private function parametrosRetornoRevision(Request $request): array
+    {
+        $claves = ['pestana', 'buscar', 'estado', 'area_id', 'fecha_desde', 'fecha_hasta', 'historial', 'vista'];
+        $retorno = $request->input('retorno', []);
+
+        if (! is_array($retorno)) {
+            return [];
+        }
+
+        $parametros = [];
+
+        foreach ($claves as $clave) {
+            $valor = $retorno[$clave] ?? null;
+            if (is_scalar($valor) && (string) $valor !== '') {
+                $parametros[$clave] = (string) $valor;
+            }
+        }
+
+        return $parametros;
     }
 
     private function autorizarSupervisorDelReporte(ReporteAvance $reporte): void
