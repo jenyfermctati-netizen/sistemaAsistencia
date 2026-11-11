@@ -104,7 +104,7 @@
 .feriados-filtros input:focus,
 .feriados-filtros select:focus {
     outline: none;
-    border-color: #168fa8;
+    border-color: var(--primary-mid);
     box-shadow: 0 0 0 2px rgba(43, 111, 247, 0.10);
 }
 
@@ -231,7 +231,7 @@
     flex: 0 0 42px;
     width: 42px;
     height: 42px;
-    border: 1px solid rgba(8, 127, 154, 0.18);
+    border: 1px solid color-mix(in srgb, var(--primary-hover) 18%, transparent);
     border-radius: 12px;
     background: var(--primary-light);
     color: var(--primary);
@@ -379,7 +379,7 @@
 }
 
 .holiday-summary-card--total {
-    --summary-accent: #087f9a;
+    --summary-accent: var(--primary-hover);
 }
 
 .holiday-summary-card--active {
@@ -480,7 +480,7 @@
 }
 
 .holiday-legend__dot--nacional {
-    --legend-color: #087f9a;
+    --legend-color: var(--primary-hover);
 }
 
 .holiday-legend__dot--regional {
@@ -501,9 +501,9 @@
     gap: 10px;
     margin: 14px 20px 0;
     padding: 11px 13px;
-    border: 1px solid rgba(8, 127, 154, 0.18);
+    border: 1px solid color-mix(in srgb, var(--primary-hover) 18%, transparent);
     border-radius: 11px;
-    background: rgba(8, 127, 154, 0.055);
+    background: color-mix(in srgb, var(--primary-hover) 6%, transparent);
     color: var(--text-muted);
     font-size: 0.74rem;
     line-height: 1.4;
@@ -650,7 +650,7 @@
 
 .holiday-calendar-day:hover .holiday-calendar-day__add,
 .holiday-calendar-day__add:focus-visible {
-    border-color: rgba(8, 127, 154, 0.2);
+    border-color: color-mix(in srgb, var(--primary-hover) 20%, transparent);
     background: var(--primary-light);
     color: var(--primary);
     opacity: 1;
@@ -664,7 +664,7 @@
 }
 
 .holiday-event {
-    --event-accent: #087f9a;
+    --event-accent: var(--primary-hover);
     --event-background: #e9f7fa;
     --event-border: #b9dfe7;
     display: flex;
@@ -679,7 +679,7 @@
 }
 
 .holiday-event--nacional {
-    --event-accent: #087f9a;
+    --event-accent: var(--primary-hover);
     --event-background: #e9f7fa;
     --event-border: #b9dfe7;
 }

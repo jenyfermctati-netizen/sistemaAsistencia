@@ -25,7 +25,7 @@
 .worker-mark__title > strong { font-size: 13px; color: var(--text); }
 .worker-mark__body p { margin: 6px 0 0; color: var(--text-muted); font-size: 12px; }
 .worker-mark__review { padding: 9px 12px; border-radius: 8px; background: var(--surface-secondary); }
-.worker-mark__photo { display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 44px; color: var(--ux-primary, #087f9a); font-size: 11px; }
+.worker-mark__photo { display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 44px; color: var(--ux-primary, var(--primary-hover)); font-size: 11px; }
 .worker-mark__photo img { width: 80px; height: 64px; object-fit: cover; border-radius: 9px; border: 1px solid var(--border); }
 .worker-mark__no-photo { color: var(--text-muted); font-size: 11px; text-align: center; }
 .worker-log__empty { padding: 32px 20px; text-align: center; border: 1px dashed var(--border); border-radius: 18px; background: var(--surface); color: var(--text-muted); }
@@ -73,11 +73,11 @@
 
 .worker-day--expandable > summary { cursor: pointer; list-style: none; min-height: 60px; }
 .worker-day--expandable > summary::-webkit-details-marker { display: none; }
-.worker-day--expandable > summary::after { content: '+'; display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 8px; color: #087f9a; font-size: 18px; flex: 0 0 auto; }
+.worker-day--expandable > summary::after { content: '+'; display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 8px; color: var(--primary-hover); font-size: 18px; flex: 0 0 auto; }
 .worker-day--expandable[open] > summary::after { content: '−'; }
 .worker-day--expandable:not([open]) > summary { border-bottom: 0; }
 .worker-day--expandable > summary > div:first-child { flex: 1; }
-.worker-day--expandable > summary:focus-visible { outline: 2px solid #087f9a; outline-offset: -3px; }
+.worker-day--expandable > summary:focus-visible { outline: 2px solid var(--primary-hover); outline-offset: -3px; }
 @media (max-width: 600px) {
     .worker-day--expandable .worker-day__counts { gap: 5px; }
     .worker-day--expandable .worker-day__counts span { padding: 4px 6px; font-size: 10px; }

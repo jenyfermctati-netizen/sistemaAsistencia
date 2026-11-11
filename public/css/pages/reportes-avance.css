@@ -1,7 +1,7 @@
 .ra-admin {
-    --ra-primary: var(--primary, #087f9a);
-    --ra-primary-hover: var(--primary-hover, #06677e);
-    --ra-primary-light: var(--primary-light, #d8f1f5);
+    --ra-primary: var(--primary, var(--primary-hover));
+    --ra-primary-hover: var(--primary-hover, var(--primary-dark));
+    --ra-primary-light: var(--primary-light, var(--primary-light));
     --ra-surface: var(--surface, #fff);
     --ra-subtle: var(--surface-secondary, #f1f4f2);
     --ra-text: var(--text, #17211f);
@@ -10,7 +10,7 @@
     --ra-success: #15803d;
     --ra-warning: #a16207;
     --ra-danger: #b42318;
-    --ra-info: #087f9a;
+    --ra-info: var(--primary-hover);
     --ra-shadow: 0 6px 20px rgba(20, 45, 38, .05);
     width: 100%;
     min-width: 0;

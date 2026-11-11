@@ -37,6 +37,7 @@ class PasswordController extends Controller
 
         $request->user()->forceFill([
             'password' => Hash::make($data['password']),
+            'password_changed_at' => now(),
             'remember_token' => Str::random(60),
         ])->save();
 

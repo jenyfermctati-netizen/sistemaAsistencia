@@ -526,7 +526,7 @@ button {
     padding: 15px 17px;
     border: 1px solid #d6efef;
     border-radius: 12px;
-    background: linear-gradient(135deg, #effafa, #e8f6f6);
+    background: linear-gradient(135deg, #effafa, var(--primary-light));
 }
 
 .login-security__icon {

@@ -51,6 +51,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::view('/ayuda', 'ayuda')->name('ayuda');
     Route::patch('/mi-cuenta/telefono', [PerfilController::class, 'actualizarTelefono'])
         ->middleware(['empresa', 'throttle:10,1'])->name('perfil.telefono.update');
     Route::get('/mi-cuenta/contrasena', [PasswordController::class, 'edit'])

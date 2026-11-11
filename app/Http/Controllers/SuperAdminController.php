@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Auditoria;
 use App\Models\DispositivoBiometrico;
 use App\Models\Empresa;
 use App\Models\Rol;
-use App\Models\Trabajador;
 use App\Models\User;
 use App\Notifications\EmpresaSuspendida;
 use App\Notifications\InvitacionAdministradorEmpresa;
@@ -14,7 +12,6 @@ use App\Rules\RucPeru;
 use App\Services\AuditoriaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -28,25 +25,44 @@ class SuperAdminController extends Controller
 
     public function dashboard(): View
     {
+        $inicioPeriodo = now()->startOfDay()->subDays(6);
+        $empresasPorDia = Empresa::where('created_at', '>=', $inicioPeriodo)
+            ->get(['created_at'])
+            ->groupBy(fn (Empresa $empresa) => $empresa->created_at->toDateString());
+        $tendenciaEmpresas = collect(range(6, 0))
+            ->map(function (int $diasAtras) use ($empresasPorDia) {
+                $fecha = now()->startOfDay()->subDays($diasAtras);
+
+                return [
+                    'label' => $fecha->locale('es')->translatedFormat('D'),
+                    'fecha' => $fecha->toDateString(),
+                    'total' => $empresasPorDia->get($fecha->toDateString(), collect())->count(),
+                ];
+            });
+
+        $rolAdministradorId = $this->rolAdministrador()->id;
         $metricas = [
             'empresas' => Empresa::count(),
             'activas' => Empresa::where('estado', Empresa::ACTIVA)->count(),
             'suspendidas' => Empresa::where('estado', Empresa::SUSPENDIDA)->count(),
-            'trabajadores' => Trabajador::withoutGlobalScopes()->count(),
-            'usuarios' => User::withoutGlobalScopes()->whereNotNull('empresa_id')->count(),
-            'dispositivos' => DispositivoBiometrico::withoutGlobalScopes()->count(),
+            'inactivas' => Empresa::where('estado', Empresa::INACTIVA)->count(),
             'nuevas' => Empresa::where('created_at', '>=', now()->subDays(30))->count(),
         ];
 
-        $empresasRecientes = Empresa::withCount(['trabajadores', 'users', 'dispositivosBiometricos'])
+        $empresasRecientes = Empresa::withCount([
+            'users as administradores_count' => fn ($users) => $users->where('rol_id', $rolAdministradorId),
+        ])
             ->latest()->limit(8)->get();
 
-        return view('superadmin.dashboard', compact('metricas', 'empresasRecientes'));
+        return view('superadmin.dashboard', compact('metricas', 'empresasRecientes', 'tendenciaEmpresas'));
     }
 
     public function empresas(Request $request): View
     {
-        $query = Empresa::query()->withCount(['trabajadores', 'users', 'dispositivosBiometricos']);
+        $rolAdministradorId = $this->rolAdministrador()->id;
+        $query = Empresa::query()->withCount([
+            'users as administradores_count' => fn ($users) => $users->where('rol_id', $rolAdministradorId),
+        ]);
 
         $query->when($request->filled('buscar'), function ($query) use ($request) {
             $buscar = trim((string) $request->input('buscar'));
@@ -63,50 +79,25 @@ class SuperAdminController extends Controller
 
     public function storeEmpresa(Request $request): RedirectResponse
     {
-        $data = $request->validate($this->reglasEmpresa() + [
-            'admin_nombre' => ['required', 'string', 'max:150'],
-            'admin_email' => ['required', 'email', 'max:255', 'unique:users,email'],
-        ]);
+        $request->mergeIfMissing(['color_turquesa' => '#00A9C7']);
+        $data = $request->validate($this->reglasEmpresa());
+        $empresa = Empresa::create($this->datosEmpresa($data));
+        $this->auditoria->modelo('CREAR_EMPRESA', $empresa);
 
-        $rolAdministrador = $this->rolAdministrador();
-
-        [$empresa, $administrador] = DB::transaction(function () use ($data, $rolAdministrador) {
-            $empresa = Empresa::create($this->datosEmpresa($data));
-            $administrador = User::withoutGlobalScopes()->create([
-                'empresa_id' => $empresa->id,
-                'trabajador_id' => null,
-                'rol_id' => $rolAdministrador->id,
-                'name' => $data['admin_nombre'],
-                'email' => mb_strtolower($data['admin_email']),
-                'password' => Str::random(64),
-                'estado' => true,
-            ]);
-
-            $this->auditoria->modelo('CREAR_EMPRESA', $empresa);
-            $this->auditoria->modelo('CREAR_ADMIN_EMPRESA', $administrador);
-
-            return [$empresa, $administrador];
-        });
-
-        $correoEnviado = $this->enviarInvitacion($administrador, $empresa);
-
-        return redirect()->route('superadmin.empresas.show', $empresa)
-            ->with($correoEnviado ? 'success' : 'warning', $correoEnviado
-                ? 'Empresa creada y la invitación fue enviada al administrador.'
-                : 'Empresa creada, pero el correo de invitación falló. Reintenta desde la ficha de la empresa.');
+        return redirect(route('superadmin.empresas.show', $empresa).'#accesos')
+            ->with('success', 'Empresa creada. Añade sus administradores para continuar.');
     }
 
     public function showEmpresa(Empresa $empresa): View
     {
-        $empresa->loadCount(['trabajadores', 'users', 'dispositivosBiometricos']);
         $administradores = $this->administradoresQuery($empresa)->orderBy('name')->get();
-        $dispositivos = $empresa->dispositivosBiometricos()->latest()->get();
 
-        return view('superadmin.empresas.show', compact('empresa', 'administradores', 'dispositivos'));
+        return view('superadmin.empresas.show', compact('empresa', 'administradores'));
     }
 
     public function updateEmpresa(Request $request, Empresa $empresa): RedirectResponse
     {
+        $request->mergeIfMissing(['color_turquesa' => $empresa->color_turquesa ?: '#00A9C7']);
         $data = $request->validate($this->reglasEmpresa($empresa));
         $anteriores = $empresa->getAttributes();
         $empresa->update($this->datosEmpresa($data));
@@ -144,18 +135,18 @@ class SuperAdminController extends Controller
     public function administradores(Request $request): View
     {
         $rolId = $this->rolAdministrador()->id;
-        $query = User::withoutGlobalScopes()->with('empresa')
-            ->where('rol_id', $rolId)->whereNotNull('empresa_id');
-        $query->when($request->filled('empresa_id'), fn ($q) => $q->where('empresa_id', $request->integer('empresa_id')));
+        $query = Empresa::query()->withCount([
+            'users as administradores_count' => fn ($users) => $users->where('rol_id', $rolId),
+        ]);
         $query->when($request->filled('buscar'), function ($q) use ($request) {
             $buscar = trim((string) $request->input('buscar'));
-            $q->where(fn ($f) => $f->where('name', 'like', "%{$buscar}%")->orWhere('email', 'like', "%{$buscar}%"));
+            $q->where(fn ($f) => $f->where('razon_social', 'like', "%{$buscar}%")
+                ->orWhere('nombre_comercial', 'like', "%{$buscar}%")
+                ->orWhere('ruc', 'like', "%{$buscar}%"));
         });
+        $empresas = $query->orderBy('razon_social')->paginate(20)->withQueryString();
 
-        $administradores = $query->orderBy('name')->paginate(20)->withQueryString();
-        $empresas = Empresa::orderBy('razon_social')->get(['id', 'razon_social']);
-
-        return view('superadmin.administradores.index', compact('administradores', 'empresas'));
+        return view('superadmin.administradores.index', compact('empresas'));
     }
 
     public function storeAdministrador(Request $request, Empresa $empresa): RedirectResponse
@@ -262,13 +253,20 @@ class SuperAdminController extends Controller
 
     public function auditoria(Request $request): View
     {
-        $query = Auditoria::withoutGlobalScopes()->with(['empresa', 'usuario']);
-        $query->when($request->filled('empresa_id'), fn ($q) => $q->where('empresa_id', $request->integer('empresa_id')));
-        $query->when($request->filled('accion'), fn ($q) => $q->where('accion', 'like', '%'.trim((string) $request->input('accion')).'%'));
-        $registros = $query->latest()->paginate(30)->withQueryString();
-        $empresas = Empresa::orderBy('razon_social')->get(['id', 'razon_social']);
+        $rolId = $this->rolAdministrador()->id;
+        $query = User::withoutGlobalScopes()->with('empresa')
+            ->where('rol_id', $rolId)
+            ->whereNotNull('empresa_id');
+        $query->when($request->filled('buscar'), function ($users) use ($request) {
+            $buscar = trim((string) $request->input('buscar'));
+            $users->where(fn ($filter) => $filter
+                ->where('name', 'like', "%{$buscar}%")
+                ->orWhere('email', 'like', "%{$buscar}%")
+                ->orWhereHas('empresa', fn ($empresa) => $empresa->where('razon_social', 'like', "%{$buscar}%")));
+        });
+        $administradores = $query->orderByDesc('ingresos_count')->orderBy('name')->paginate(30)->withQueryString();
 
-        return view('superadmin.auditoria.index', compact('registros', 'empresas'));
+        return view('superadmin.auditoria.index', compact('administradores'));
     }
 
     private function reglasEmpresa(?Empresa $empresa = null): array
@@ -281,13 +279,14 @@ class SuperAdminController extends Controller
             'telefono' => ['nullable', 'string', 'max:20'],
             'direccion' => ['nullable', 'string', 'max:500'],
             'zona_horaria' => ['required', 'timezone:all'],
+            'color_turquesa' => ['required', 'regex:/^#[A-Fa-f0-9]{6}$/'],
         ];
     }
 
     private function datosEmpresa(array $data): array
     {
         return collect($data)->only([
-            'razon_social', 'nombre_comercial', 'ruc', 'email', 'telefono', 'direccion', 'zona_horaria',
+            'razon_social', 'nombre_comercial', 'ruc', 'email', 'telefono', 'direccion', 'zona_horaria', 'color_turquesa',
         ])->all();
     }
 

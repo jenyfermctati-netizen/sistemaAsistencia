@@ -122,7 +122,7 @@
 
     box-shadow:
         0 5px 14px
-        rgba(20, 184, 166, 0.18);
+        color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
 
@@ -255,6 +255,14 @@
         box-shadow 0.18s ease;
 }
 
+.sidebar__group { margin: 0; }
+.sidebar__group > summary { list-style: none; cursor: pointer; }
+.sidebar__group > summary::-webkit-details-marker { display: none; }
+.sidebar__group-chevron { margin-left: auto; color: #a8bbb6; transition: transform .18s ease; }
+.sidebar__group[open] > summary .sidebar__group-chevron { transform: rotate(180deg); }
+.sidebar__subitems { display: grid; gap: 3px; margin: 3px 0 6px 21px; padding-left: 10px; border-left: 1px solid rgba(255,255,255,.16); }
+.sidebar__subitems .sidebar__item { min-height: 38px; padding: 7px 10px; font-size: .9em; }
+
 .sidebar__item:hover {
     background: rgba(255, 255, 255, 0.065);
 
@@ -267,8 +275,8 @@
     background:
         linear-gradient(
             90deg,
-            rgba(20, 184, 166, 0.20),
-            rgba(20, 184, 166, 0.07)
+            color-mix(in srgb, var(--primary) 20%, transparent),
+            color-mix(in srgb, var(--primary) 7%, transparent)
         );
 
     color: #ffffff;
@@ -277,7 +285,7 @@
 
     box-shadow:
         inset 0 0 0 1px
-        rgba(45, 212, 191, 0.08);
+        color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
 
@@ -303,7 +311,7 @@
         4px
         0;
 
-    background: #2dd4bf;
+    background: var(--primary);
 }
 
 
@@ -346,10 +354,21 @@
 
 .sidebar__item.active .sidebar__icon {
     background:
-        rgba(20, 184, 166, 0.18);
+        color-mix(in srgb, var(--primary) 18%, transparent);
 
-    color: #99f6e4;
+    color: var(--primary-light);
 }
+
+/* Menú con lectura compacta y separación uniforme. */
+.sidebar__menu { padding: 10px 9px 14px; }
+.sidebar__section + .sidebar__section { margin-top: 2px; }
+.sidebar__title { margin-top: 13px; margin-bottom: 6px; font-size: 10px; letter-spacing: .09em; }
+.sidebar__item { min-height: 41px; gap: 9px; padding: 5px 9px; margin-bottom: 2px; border-radius: 8px; font-size: 13px; }
+.sidebar__icon { width: 30px; height: 30px; border-radius: 7px; }
+.sidebar__subitems { gap: 1px; margin: 2px 0 5px 18px; padding-left: 8px; }
+.sidebar__subitems .sidebar__item { min-height: 34px; padding: 5px 8px; font-size: 12px; }
+.sidebar__group > summary:hover { transform: none; }
+.sidebar__group > summary:focus-visible { outline: 2px solid rgba(153, 246, 228, .65); outline-offset: 1px; }
 
 
 /* ==========================================================

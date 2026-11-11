@@ -33,6 +33,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'ultimo_acceso' => 'datetime',
+            'ingresos_count' => 'integer',
+            'password_changed_at' => 'datetime',
             'estado' => 'boolean',
             'password' => 'hashed',
         ];

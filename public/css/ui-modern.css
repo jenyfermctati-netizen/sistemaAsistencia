@@ -230,7 +230,7 @@ body.sidebar-visible {
     height: 36px;
     border-color: var(--ui-border);
     border-radius: 10px;
-    background: #edf4f6;
+    background: var(--primary-soft);
 }
 
 .profile-menu__panel {
@@ -378,7 +378,7 @@ body.sidebar-visible {
 
 :is(.form-control, .form-select, .form-textarea):focus {
     border-color: #668c9b;
-    box-shadow: 0 0 0 3px rgba(0, 169, 199, .38);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 38%, transparent);
 }
 
 .table-container,

@@ -15,6 +15,13 @@ class Empresa extends Model
 
     public const INACTIVA = 'INACTIVA';
 
+    public const COLORES_TURQUESA = [
+        '#00A9C7' => 'Turquesa brillante',
+        '#087F9A' => 'Turquesa profundo',
+        '#0F766E' => 'Verde turquesa',
+        '#0E7490' => 'Turquesa medio',
+    ];
+
     protected $fillable = [
         'razon_social',
         'nombre_comercial',
@@ -23,6 +30,7 @@ class Empresa extends Model
         'telefono',
         'direccion',
         'logo',
+        'color_turquesa',
         'estado',
         'zona_horaria',
     ];

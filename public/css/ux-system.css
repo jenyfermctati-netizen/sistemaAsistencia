@@ -1,21 +1,21 @@
 /* Sistema UX unificado. Cargado al final para normalizar módulos históricos. */
 :root {
-    --ux-primary: #087f9a;
-    --ux-primary-hover: #06677e;
-    --ux-accent: #00a9c7;
-    --ux-bg: #e8f0f2;
+    --ux-primary: var(--primary-hover);
+    --ux-primary-hover: var(--primary-dark);
+    --ux-accent: var(--primary);
+    --ux-bg: var(--primary-soft);
     --ux-surface: #ffffff;
     --ux-surface-soft: #f7fafb;
     --ux-text: #183844;
     --ux-muted: #58727b;
-    --ux-border: #c9d9de;
+    --ux-border: var(--primary-border);
     --ux-danger: #93473f;
     --ux-danger-bg: #f8e9e7;
     --ux-success: #25634f;
     --ux-success-bg: #e4f4ee;
     --ux-warning: #785823;
     --ux-warning-bg: #fff3dc;
-    --ux-focus: 0 0 0 3px rgba(0, 169, 199, .22);
+    --ux-focus: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
     --ux-shadow: 0 8px 24px rgba(24, 56, 68, .08);
 }
 
@@ -220,7 +220,7 @@ a.button > .ui-icon {
     padding: 24px 26px;
     border: 1px solid var(--ux-border);
     border-radius: 18px;
-    background: linear-gradient(112deg, #d8f1f5, #f7fafb) !important;
+    background: linear-gradient(112deg, var(--primary-light), #f7fafb) !important;
     color: var(--ux-text) !important;
     box-shadow: var(--ux-shadow);
 }
@@ -1188,13 +1188,13 @@ table tbody td {
 .profile-phone-form label { font-size: 12px; font-weight: 700; color: var(--text); }
 .profile-phone-form > div { display: flex; gap: 8px; min-width: 0; }
 .profile-phone-form input { flex: 1; width: 100%; min-width: 0; min-height: 44px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; background: var(--surface); color: var(--text); font-size: 16px; }
-.profile-phone-form button { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border: 0; border-radius: 8px; background: #087f9a; color: #fff; cursor: pointer; }
+.profile-phone-form button { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border: 0; border-radius: 8px; background: var(--primary-hover); color: #fff; cursor: pointer; }
 .profile-phone-form small { color: var(--text-muted); font-size: 10px; line-height: 1.4; }
 .profile-menu__panel { max-height: calc(100dvh - 90px); overflow-y: auto; }
 
 .profile-phone-form[hidden] { display: none !important; }
 .profile-phone-value { display: flex; align-items: center; gap: 5px; min-width: 0; }
 .profile-phone-value > span { min-width: 0; overflow-wrap: anywhere; }
-.profile-phone-edit { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; height: 32px; padding: 7px; border: 0; border-radius: 7px; background: transparent; color: #087f9a; cursor: pointer; }
+.profile-phone-edit { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; height: 32px; padding: 7px; border: 0; border-radius: 7px; background: transparent; color: var(--primary-hover); cursor: pointer; }
 .profile-phone-edit:hover { background: #d8edf1; }
 .profile-phone-edit .ui-icon { width: 16px; height: 16px; }

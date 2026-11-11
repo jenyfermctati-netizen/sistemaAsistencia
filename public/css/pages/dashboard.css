@@ -1,8 +1,8 @@
 .dashboard-page {
     --dashboard-petrol: #204c5b;
     --dashboard-blue: #b6eaf4;
-    --dashboard-sand: #c9d9de;
-    --dashboard-ivory: #e8f0f2;
+    --dashboard-sand: var(--primary-border);
+    --dashboard-ivory: var(--primary-soft);
     --dashboard-graphite: #285968;
     display: grid;
     gap: 22px;
@@ -64,7 +64,7 @@
     margin-right: 8px;
     border-radius: 50%;
     background: var(--palette-smoke-blue);
-    box-shadow: 0 0 0 4px rgba(0, 169, 199, .15);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent);
 }
 
 .dashboard-metrics {
@@ -97,7 +97,7 @@
 }
 
 .dashboard-metric[href]:focus-visible {
-    outline: 3px solid rgba(0, 169, 199, .9);
+    outline: 3px solid color-mix(in srgb, var(--primary) 90%, transparent);
     outline-offset: 3px;
 }
 
@@ -129,7 +129,7 @@
 .dashboard-metric--blue::before { background: var(--dashboard-blue); }
 .dashboard-metric--sand::before { background: #b99e7d; }
 .dashboard-metric--graphite::before { background: var(--dashboard-graphite); }
-.dashboard-metric--blue::after { background: rgba(0, 169, 199, .20); }
+.dashboard-metric--blue::after { background: color-mix(in srgb, var(--primary) 20%, transparent); }
 .dashboard-metric--sand::after { background: rgba(217, 205, 191, .22); }
 .dashboard-metric--graphite::after { background: rgba(73, 80, 87, .06); }
 
@@ -325,14 +325,14 @@
     justify-content: center;
     flex: 0 0 auto;
     border-radius: 13px;
-    background: #e5eef2;
+    background: var(--primary-light);
     color: var(--dashboard-petrol);
     font-size: 10px;
     font-weight: 900;
     letter-spacing: .04em;
 }
 
-.dashboard-attention__marker--blue { background: #e5f0f5; }
+.dashboard-attention__marker--blue { background: var(--primary-light); }
 .dashboard-attention__marker--sand { background: #f0e8dc; color: #765c3d; }
 .dashboard-attention__marker--graphite { background: #e9eaeb; color: var(--dashboard-graphite); }
 
@@ -409,7 +409,7 @@
     padding: 5px 9px;
     border: 1px solid #cbdce4;
     border-radius: 999px;
-    background: #edf4f6;
+    background: var(--primary-soft);
     color: var(--dashboard-petrol);
     font-size: 9.5px;
     font-weight: 850;
@@ -1255,7 +1255,7 @@
     display: block;
     height: 100%;
     border-radius: inherit;
-    background: linear-gradient(90deg, #087f99, #23acc3);
+    background: linear-gradient(90deg, var(--primary-hover), var(--primary-mid));
     transition: width .35s ease;
 }
 
@@ -1333,10 +1333,10 @@
     height: 27px;
     display: flex;
     overflow: hidden;
-    border: 1px solid #dce6ea;
+    border: 1px solid var(--primary-border);
     border-radius: 7px;
     background:
-        linear-gradient(90deg, transparent 24.8%, #dce6ea 25%, transparent 25.2%, transparent 49.8%, #dce6ea 50%, transparent 50.2%, transparent 74.8%, #dce6ea 75%, transparent 75.2%),
+        linear-gradient(90deg, transparent 24.8%, var(--primary-border) 25%, transparent 25.2%, transparent 49.8%, var(--primary-border) 50%, transparent 50.2%, transparent 74.8%, var(--primary-border) 75%, transparent 75.2%),
         #f3f7f8;
 }
 
@@ -1427,7 +1427,7 @@
     place-items: center;
     border-radius: 11px;
     background: #e8f5f7;
-    color: #087f99;
+    color: var(--primary-hover);
 }
 
 .dashboard-modern .dashboard-action-card__icon--blue {
@@ -1583,7 +1583,7 @@
     height: 42px;
     border-radius: 12px;
     background: #dff1f5;
-    color: #087f99;
+    color: var(--primary-hover);
 }
 
 .dashboard-modern .dashboard-attendance-calendar {
@@ -1618,7 +1618,7 @@
     justify-items: center;
     gap: 3px;
     padding: 7px 4px;
-    border: 1px solid #dce6ea;
+    border: 1px solid var(--primary-border);
     border-radius: 10px;
     background: #f6f9fa;
     color: #60747c;
@@ -1712,7 +1712,7 @@
     align-items: center;
     gap: 10px;
     padding: 10px 11px;
-    border: 1px solid #dce6ea;
+    border: 1px solid var(--primary-border);
     border-radius: 11px;
     background: #f7fafb;
 }
@@ -1750,7 +1750,7 @@
 }
 
 .dashboard-modern .dashboard-calendar-notice a {
-    color: #087f99;
+    color: var(--primary-hover);
     font-size: 10px;
     font-weight: 800;
     text-decoration: none;
@@ -1805,7 +1805,7 @@
     place-items: center;
     border-radius: 10px;
     background: #e5f3f6;
-    color: #087f99;
+    color: var(--primary-hover);
 }
 
 .dashboard-modern .dashboard-quick--attention > .dashboard-quick__icon {
@@ -1881,7 +1881,7 @@
     margin-bottom: 2px;
     border-radius: 12px;
     background: #e6f3f6;
-    color: #087f99;
+    color: var(--primary-hover);
 }
 
 .dashboard-modern .dashboard-empty__icon .ui-icon {

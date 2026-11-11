@@ -88,7 +88,7 @@
 
 .campo-estado--programada {
     background: #eef2ff;
-    color: #087f9a;
+    color: var(--primary-hover);
 }
 
 .campo-estado--activa {
@@ -1028,7 +1028,7 @@
 }
 
 .campo-page :is(.campo-review-item__details, .campo-card__details, .campo-filter-details, .campo-history-detail)>summary:focus-visible {
-    outline: 2px solid #00a9c7;
+    outline: 2px solid var(--primary);
     outline-offset: 3px;
 }
 
@@ -1973,7 +1973,7 @@
     border: 1px solid #cbe2ed;
     border-radius: 11px;
     background: #edfaff;
-    color: #087f9a;
+    color: var(--primary-hover);
     text-decoration: none;
     vertical-align: middle;
     transition: background .16s ease, transform .16s ease, border-color .16s ease;
@@ -2853,7 +2853,7 @@
     border: 1px solid var(--border, #d6e5ec) !important;
     border-radius: 11px !important;
     background: var(--surface, #ffffff) !important;
-    color: var(--primary, #087f9a) !important;
+    color: var(--primary, var(--primary-hover)) !important;
     box-shadow: 0 1px 3px rgba(21, 73, 88, .04) !important;
     line-height: 1 !important;
     text-decoration: none !important;
@@ -2871,7 +2871,7 @@
 
 .campo-page .campo-icon-btn--info,
 .campo-page .campo-icon-btn--edit {
-    color: var(--primary, #087f9a) !important;
+    color: var(--primary, var(--primary-hover)) !important;
 }
 
 .campo-page .campo-icon-btn--delete {
@@ -2892,7 +2892,7 @@
 }
 
 .campo-page .campo-icon-btn:focus-visible {
-    outline: 2px solid var(--primary, #087f9a) !important;
+    outline: 2px solid var(--primary, var(--primary-hover)) !important;
     outline-offset: 3px;
 }
 
@@ -3151,7 +3151,7 @@
 }
 
 :is(#modalCrearAsignacion, #modalEditarAsignacion) {
-    --campo-accent: var(--primary, #087f9a);
+    --campo-accent: var(--primary, var(--primary-hover));
 }
 
 :is(#modalCrearAsignacion, #modalEditarAsignacion) .campo-create-form {

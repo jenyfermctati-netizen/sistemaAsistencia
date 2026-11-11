@@ -15,8 +15,8 @@
     <div class="sidebar__header">
         <div class="sidebar__logo">CA</div>
         <div class="sidebar__brand">
-            <strong>Control</strong>
-            <span>Sistema de asistencia</span>
+            <strong>{{ $esSuperAdmin ? 'CONNEXT' : 'Control' }}</strong>
+            <span>{{ $esSuperAdmin ? 'Plataforma multiempresa' : 'Sistema de asistencia' }}</span>
         </div>
         <button type="button" class="sidebar__close" data-sidebar-close aria-label="Ocultar menú principal" title="Ocultar menú" aria-controls="sidebar">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -38,17 +38,24 @@
         @if ($esSuperAdmin)
             <div class="sidebar__section">
                 <div class="sidebar__title">Plataforma SaaS</div>
-                <a href="{{ route('superadmin.empresas.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.empresas.*') ? 'active' : '' }}">
-                    <span class="sidebar__icon"><x-nav-icon name="areas" /></span>
-                    <span class="sidebar__label">Empresas</span>
-                </a>
+                <details class="sidebar__group" @if (request()->routeIs('superadmin.empresas.*')) open @endif>
+                    <summary class="sidebar__item {{ request()->routeIs('superadmin.empresas.*') ? 'active' : '' }}">
+                        <span class="sidebar__icon"><x-nav-icon name="areas" /></span>
+                        <span class="sidebar__label">Empresas</span>
+                        <span class="sidebar__group-chevron" aria-hidden="true">⌄</span>
+                    </summary>
+                    <div class="sidebar__subitems">
+                        <a href="{{ route('superadmin.empresas.index', ['section' => 'new']) }}#nueva-empresa" class="sidebar__item {{ request()->routeIs('superadmin.empresas.index') && request('section') === 'new' ? 'active' : '' }}">
+                            <span class="sidebar__label">Nueva empresa</span>
+                        </a>
+                        <a href="{{ route('superadmin.empresas.index') }}#informacion" class="sidebar__item {{ request()->routeIs('superadmin.empresas.index') && request('section') !== 'new' ? 'active' : '' }}">
+                            <span class="sidebar__label">Información</span>
+                        </a>
+                    </div>
+                </details>
                 <a href="{{ route('superadmin.administradores.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.administradores.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="users" /></span>
                     <span class="sidebar__label">Administradores</span>
-                </a>
-                <a href="{{ route('superadmin.dispositivos.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.dispositivos.*') ? 'active' : '' }}">
-                    <span class="sidebar__icon"><x-nav-icon name="fingerprint" /></span>
-                    <span class="sidebar__label">Dispositivos</span>
                 </a>
                 <a href="{{ route('superadmin.auditoria.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.auditoria.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="tasks" /></span>
@@ -230,13 +237,20 @@
 
             </div>
         @endif
+
+        <div class="sidebar__section">
+            <a href="{{ route('ayuda') }}" class="sidebar__item {{ request()->routeIs('ayuda') ? 'active' : '' }}" @if (request()->routeIs('ayuda')) aria-current="page" @endif>
+                <span class="sidebar__icon"><x-nav-icon name="help" /></span>
+                <span class="sidebar__label">Ayuda</span>
+            </a>
+        </div>
     </nav>
 
     <div class="sidebar__footer">
         <div class="sidebar__footer-icon">CA</div>
         <div>
-            <strong>Control de Asistencia</strong>
-            <span>Gestión interna</span>
+            <strong>{{ $esSuperAdmin ? 'CONNEXT SaaS' : 'Control de Asistencia' }}</strong>
+            <span>{{ $esSuperAdmin ? 'Administración central' : 'Gestión interna' }}</span>
         </div>
     </div>
 </aside>

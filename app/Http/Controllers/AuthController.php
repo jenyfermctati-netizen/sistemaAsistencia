@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -48,8 +49,9 @@ class AuthController extends Controller
                 ])->onlyInput('email');
             }
 
-            $usuario->ultimo_acceso = now();
-            $usuario->save();
+            DB::table('users')->where('id', $usuario->getKey())->increment('ingresos_count', 1, [
+                'ultimo_acceso' => now(),
+            ]);
 
             return redirect()
                 ->intended(route($accesoGlobalValido ? 'superadmin.dashboard' : 'dashboard'));

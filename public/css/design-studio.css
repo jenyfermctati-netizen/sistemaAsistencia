@@ -1,7 +1,7 @@
 /* Diseño del acceso, aislado del resto del sistema. */
 body.guest.login-standalone {
     --login-brand-ink: var(--palette-petrol);
-    --login-brand-action: #087f9a;
+    --login-brand-action: var(--primary-hover);
     height: 100vh;
     height: 100dvh;
     min-width: 0;
@@ -57,16 +57,16 @@ body.guest.login-standalone {
 .guest.login-standalone .password-toggle { width: 44px; height: 44px; }
 .guest.login-standalone .login-options a { display: inline-flex; align-items: center; min-height: 44px; }
 .guest.login-standalone .login-field > label { position: absolute; z-index: 1; top: -10px; left: 15px; margin: 0; padding: 0 6px; background: #fff; color: var(--text-muted); font-size: 12px; line-height: 20px; }
-.guest.login-standalone .login-field:focus-within > label { color: #087f9a; }
+.guest.login-standalone .login-field:focus-within > label { color: var(--primary-hover); }
 .guest.login-standalone .login-field__control input { height: 56px; min-height: 56px; border: 1px solid var(--palette-sand); border-radius: 9px; background: #fff; color: var(--palette-petrol); font-size: 16px; box-shadow: none; }
-.guest.login-standalone .login-field__control input:focus { border-color: #087f9a; outline: 1px solid #087f9a !important; outline-offset: 0; background: #fff; box-shadow: none; }
+.guest.login-standalone .login-field__control input:focus { border-color: var(--primary-hover); outline: 1px solid var(--primary-hover) !important; outline-offset: 0; background: #fff; box-shadow: none; }
 .guest.login-standalone .login-field__icon, .guest.login-standalone .password-toggle { color: #58727b; }
 .guest.login-standalone .login-options { gap: 12px; font-size: 12px; color: var(--text-muted); }
-.guest.login-standalone .login-options a { color: #087f9a; }
+.guest.login-standalone .login-options a { color: var(--primary-hover); }
 .guest.login-standalone .remember-option { gap: 9px; }
-.guest.login-standalone .remember-option input { width: 19px; height: 19px; accent-color: #087f9a; }
+.guest.login-standalone .remember-option input { width: 19px; height: 19px; accent-color: var(--primary-hover); }
 .guest.login-standalone .login-submit { height: 58px; min-height: 58px; margin-top: 4px; border-radius: 12px; background: var(--palette-petrol); color: #fff; box-shadow: none; font-size: 16px; transition: background-color 180ms ease; }
-.guest.login-standalone .login-submit:hover { background: #06677e; transform: none; box-shadow: none; }
+.guest.login-standalone .login-submit:hover { background: var(--primary-dark); transform: none; box-shadow: none; }
 .login-caption { flex: 0 0 auto; color: var(--text-muted); text-align: center; font-size: 12px; }
 @media (max-width: 600px) {
     .login-backdrop__blue { width: 160px; height: 160px; right: -100px; top: 12%; border-radius: 30px; }

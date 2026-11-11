@@ -47,6 +47,9 @@
         @case('tasks')
             <path d="M9 6h11M9 12h11M9 18h11M3 6l1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2" />
             @break
+        @case('help')
+            <circle cx="12" cy="12" r="9" /><path d="M9.6 9a2.5 2.5 0 1 1 4.4 1.6c-1.2 1.1-2 1.4-2 3M12 17h.01" />
+            @break
         @default
             <circle cx="12" cy="12" r="9" /><path d="M12 8v4M12 16h.01" />
     @endswitch

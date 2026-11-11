@@ -1,0 +1,108 @@
+/* Tenant color replaces the fixed cyan/blue accents while keeping neutral white surfaces. */
+body[data-empresa-theme] {
+    accent-color: var(--primary);
+    scrollbar-color: var(--primary) var(--primary-soft);
+}
+
+body[data-empresa-theme] .sidebar {
+    background: linear-gradient(180deg, var(--company-sidebar-a), var(--company-sidebar-b) 52%, var(--company-sidebar-c));
+}
+
+body[data-empresa-theme] .sidebar__logo,
+body[data-empresa-theme] .sidebar__footer-icon {
+    border-color: var(--primary-border);
+    background: var(--primary);
+    color: var(--company-contrast);
+}
+
+body[data-empresa-theme] .sidebar__item:hover {
+    background: color-mix(in srgb, var(--primary) 24%, transparent);
+}
+
+body[data-empresa-theme] .sidebar__item.active {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    box-shadow: inset 0 0 0 1px var(--primary-border);
+}
+
+body[data-empresa-theme] .sidebar__item.active::before { background: var(--primary-dark); }
+body[data-empresa-theme] .sidebar__item.active .sidebar__icon { background: var(--primary); color: var(--company-contrast); }
+body[data-empresa-theme] .sidebar__group-chevron { color: var(--primary-light); }
+
+body[data-empresa-theme] .navbar__menu-button,
+body[data-empresa-theme] .navbar__avatar {
+    border-color: var(--primary-border);
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+}
+
+body[data-empresa-theme] .dashboard-page {
+    --dashboard-petrol: var(--primary-dark);
+    --dashboard-graphite: var(--primary-dark);
+    --dashboard-accent: var(--primary);
+    --dashboard-blue: var(--primary-light);
+    --dashboard-sand: var(--primary-border);
+}
+
+body[data-empresa-theme] .dashboard-hero,
+body[data-empresa-theme] .main-content > .page-header:not(.dashboard-hero),
+body[data-empresa-theme] :is(.solicitudes-header, .marcaciones-header, .ra-admin__header) {
+    background:
+        radial-gradient(circle at 90% 15%, color-mix(in srgb, var(--primary) 35%, transparent), transparent 28%),
+        linear-gradient(135deg, var(--company-sidebar-c), var(--company-sidebar-a));
+}
+
+body[data-empresa-theme] .dashboard-hero__eyebrow,
+body[data-empresa-theme] .dashboard-panel__eyebrow { color: var(--primary); }
+body[data-empresa-theme] .dashboard-scope__dot { background: var(--primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent); }
+body[data-empresa-theme] .dashboard-metric:focus-visible { outline-color: var(--primary); }
+body[data-empresa-theme] .dashboard-metric:hover { border-color: var(--primary-border); }
+body[data-empresa-theme] .dashboard-metric--petrol::before,
+body[data-empresa-theme] .dashboard-metric--blue::before { background: var(--primary); }
+body[data-empresa-theme] .dashboard-metric--blue::after { background: color-mix(in srgb, var(--primary) 18%, white); }
+body[data-empresa-theme] .dashboard-coverage-row__track > span { background: linear-gradient(90deg, var(--primary-dark), var(--primary)); }
+body[data-empresa-theme] .dashboard-coverage-row__value,
+body[data-empresa-theme] .dashboard-text-link,
+body[data-empresa-theme] .dashboard-quick__icon { color: var(--primary-dark); }
+
+body[data-empresa-theme] :is(.button--primary, .btn-primary, .ra-btn--primary, .login-submit, .profile-phone-form button) {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--company-contrast);
+}
+
+body[data-empresa-theme] :is(.button--primary, .btn-primary, .ra-btn--primary, .login-submit, .profile-phone-form button):hover {
+    border-color: var(--primary-hover);
+    background: var(--primary-hover);
+}
+
+body[data-empresa-theme] .profile-phone-edit,
+body[data-empresa-theme] :is(.tab-button.active, .nav-tabs .active, .pagination__item.is-active, .badge--primary) {
+    border-color: var(--primary-border);
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+body[data-empresa-theme] :is(input, select, textarea):focus,
+body[data-empresa-theme] :is(button, a):focus-visible {
+    outline-color: color-mix(in srgb, var(--primary) 48%, transparent);
+}
+
+body[data-empresa-theme] .sa-page .sa-button:not(.sa-button--secondary):not(.sa-button--quiet):not(.sa-button--warning):not(.sa-button--danger) {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--company-contrast);
+}
+
+body[data-empresa-theme] .sa-page .sa-button:not(.sa-button--secondary):not(.sa-button--quiet):not(.sa-button--warning):not(.sa-button--danger):hover {
+    border-color: var(--primary-hover);
+    background: var(--primary-hover);
+}
+
+body[data-empresa-theme] .sa-icon-button,
+body[data-empresa-theme] .sa-inline-create > summary,
+body[data-empresa-theme] .sa-create-toggle { color: var(--primary-dark); }
+body[data-empresa-theme] .sa-icon-button:hover { border-color: var(--primary-border); background: var(--primary-soft); }
+body[data-empresa-theme] .sa-login-count { background: var(--primary-light); color: var(--primary-dark); }
+body[data-empresa-theme] .sa-color-swatch:hover,
+body[data-empresa-theme] .sa-color-swatch:focus-visible { outline-color: var(--primary-dark); }

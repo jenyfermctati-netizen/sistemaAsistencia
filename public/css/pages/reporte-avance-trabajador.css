@@ -1,13 +1,13 @@
 .ra-worker {
     --rw-primary: var(--primary, #204c5b);
     --rw-primary-hover: var(--primary-hover, #172b55);
-    --rw-primary-light: var(--primary-light, #e3f3f6);
-    --rw-bg: var(--background, #e8f0f2);
+    --rw-primary-light: var(--primary-light, var(--primary-light));
+    --rw-bg: var(--background, var(--primary-soft));
     --rw-surface: var(--surface, #ffffff);
-    --rw-subtle: var(--surface-secondary, #edf4f6);
+    --rw-subtle: var(--surface-secondary, var(--primary-soft));
     --rw-text: var(--text, #285968);
     --rw-muted: var(--text-muted, #58727b);
-    --rw-border: var(--border, #c9d9de);
+    --rw-border: var(--border, var(--primary-border));
     --rw-success: #15803d;
     --rw-warning: #9a6700;
     --rw-danger: #b42318;
@@ -67,7 +67,7 @@
     padding: clamp(26px, 4vw, 40px);
     border-radius: 25px;
     background:
-        radial-gradient(circle at 90% 15%, rgba(0, 169, 199, .24), transparent 27%),
+        radial-gradient(circle at 90% 15%, color-mix(in srgb, var(--primary) 24%, transparent), transparent 27%),
         linear-gradient(135deg, #204c5b, #315d6e 56%, #477588);
     color: #fff;
     box-shadow: 0 22px 52px rgba(38, 70, 83, .2);
@@ -112,7 +112,7 @@
 }
 
 .ra-worker__hero h2 {
-    color: #e8f0f2;
+    color: var(--primary-soft);
     font-size: clamp(27px, 3vw, 38px);
     line-height: 1.1;
     letter-spacing: -.035em;
@@ -366,7 +366,7 @@
 }
 
 .ra-status--success {
-    background: #e3f3f6;
+    background: var(--primary-light);
     color: var(--rw-success);
 }
 
@@ -381,12 +381,12 @@
 }
 
 .ra-status--info {
-    background: #eaf5f7;
+    background: var(--primary-light);
     color: var(--rw-info);
 }
 
 .ra-status--neutral {
-    background: #edf4f6;
+    background: var(--primary-soft);
     color: #58727b;
 }
 

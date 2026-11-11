@@ -279,7 +279,7 @@ p {
 
     box-shadow:
         0 5px 14px
-        rgba(20, 184, 166, 0.18);
+        color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
 
@@ -431,8 +431,8 @@ p {
     background:
         linear-gradient(
             90deg,
-            rgba(20, 184, 166, 0.20),
-            rgba(20, 184, 166, 0.07)
+            color-mix(in srgb, var(--primary) 20%, transparent),
+            color-mix(in srgb, var(--primary) 7%, transparent)
         );
 
     color: #ffffff;
@@ -441,7 +441,7 @@ p {
 
     box-shadow:
         inset 0 0 0 1px
-        rgba(45, 212, 191, 0.07);
+        color-mix(in srgb, var(--primary) 7%, transparent);
 }
 
 
@@ -467,7 +467,7 @@ p {
         4px
         0;
 
-    background: #2dd4bf;
+    background: var(--primary);
 }
 
 
@@ -510,9 +510,9 @@ p {
 
 .sidebar__item.active .sidebar__icon {
     background:
-        rgba(20, 184, 166, 0.18);
+        color-mix(in srgb, var(--primary) 18%, transparent);
 
-    color: #99f6e4;
+    color: var(--primary-light);
 }
 
 
@@ -583,7 +583,7 @@ p {
     border-radius: 8px;
 
     background:
-        rgba(20, 184, 166, 0.10);
+        color-mix(in srgb, var(--primary) 10%, transparent);
 
     color: #ccfbf1;
 
@@ -636,7 +636,7 @@ p {
 
 ::selection {
     background:
-        rgba(20, 184, 166, 0.18);
+        color-mix(in srgb, var(--primary) 18%, transparent);
 
     color: #0f3f3a;
 }
