@@ -6,7 +6,7 @@
     --ui-border: #dce3e2;
     --ui-border-strong: #c9d4d2;
     --ui-muted: #697775;
-    --ui-shadow: 0 8px 24px rgba(31, 58, 69, 0.065);
+    --ui-shadow: 0 8px 24px color-mix(in srgb, var(--empresa-1f3a45, #1f3a45) 6.5%, transparent);
 }
 
 html {
@@ -51,9 +51,9 @@ body.sidebar-visible {
 
 /* Navegación lateral */
 .sidebar {
-    background: linear-gradient(180deg, #243f49 0%, #1f3740 55%, #192f36 100%);
+    background: linear-gradient(180deg, var(--empresa-243f49, #243f49) 0%, var(--empresa-1f3740, #1f3740) 55%, var(--empresa-192f36, #192f36) 100%);
     border-right: 0;
-    box-shadow: 8px 0 28px rgba(25, 47, 54, .12);
+    box-shadow: 8px 0 28px color-mix(in srgb, var(--empresa-192f36, #192f36) 12%, transparent);
 }
 
 .sidebar::after {
@@ -71,9 +71,9 @@ body.sidebar-visible {
     height: 38px;
     border: 1px solid rgba(255, 255, 255, .24);
     border-radius: 11px;
-    background: #dcebf1;
+    background: var(--empresa-dcebf1, #dcebf1);
     box-shadow: none;
-    color: #204c5b;
+    color: var(--empresa-204c5b, #204c5b);
     font-size: 13px;
 }
 
@@ -82,7 +82,7 @@ body.sidebar-visible {
 }
 
 .sidebar__brand span {
-    color: #b9cbd1;
+    color: var(--empresa-b9cbd1, #b9cbd1);
     font-size: 10.5px;
 }
 
@@ -121,7 +121,7 @@ body.sidebar-visible {
 .sidebar__title {
     margin: 15px 10px 6px;
     padding: 0;
-    color: #9fb4bb;
+    color: var(--empresa-9fb4bb, #9fb4bb);
     font-size: 9px;
     letter-spacing: .13em;
 }
@@ -133,7 +133,7 @@ body.sidebar-visible {
     padding: 5px 8px;
     border: 1px solid transparent;
     border-radius: 10px;
-    color: #d8e3e6;
+    color: var(--empresa-d8e3e6, #d8e3e6);
     font-size: 13px;
     font-weight: 560;
 }
@@ -145,10 +145,10 @@ body.sidebar-visible {
 }
 
 .sidebar__item.active {
-    border-color: rgba(215, 235, 242, .72);
-    background: #dcebf1;
-    color: #203d47;
-    box-shadow: 0 5px 14px rgba(7, 31, 39, .18);
+    border-color: color-mix(in srgb, var(--empresa-d7ebf2, #d7ebf2) 72%, transparent);
+    background: var(--empresa-dcebf1, #dcebf1);
+    color: var(--empresa-203d47, #203d47);
+    box-shadow: 0 5px 14px color-mix(in srgb, var(--empresa-071f27, #071f27) 18%, transparent);
 }
 
 .sidebar__icon {
@@ -157,7 +157,7 @@ body.sidebar-visible {
     border: 0;
     border-radius: 8px;
     background: transparent;
-    color: #bcd0d6;
+    color: var(--empresa-bcd0d6, #bcd0d6);
 }
 
 .sidebar__item:hover .sidebar__icon {
@@ -166,8 +166,8 @@ body.sidebar-visible {
 
 .sidebar__item.active .sidebar__icon {
     border: 0;
-    background: rgba(38, 70, 83, .08);
-    color: #204c5b;
+    background: color-mix(in srgb, var(--empresa-264653, #264653) 8%, transparent);
+    color: var(--empresa-204c5b, #204c5b);
 }
 
 .nav-icon {
@@ -182,7 +182,7 @@ body.sidebar-visible {
 .sidebar__footer {
     min-height: 57px;
     padding: 10px 13px;
-    background: rgba(8, 27, 33, .13);
+    background: color-mix(in srgb, var(--empresa-081b21, #081b21) 13%, transparent);
 }
 
 .sidebar__footer-icon {
@@ -198,11 +198,11 @@ body.sidebar-visible {
     padding: 8px 20px;
     border-bottom-color: var(--ui-border);
     background: rgba(255, 255, 255, .94);
-    box-shadow: 0 2px 12px rgba(31, 58, 69, .045);
+    box-shadow: 0 2px 12px color-mix(in srgb, var(--empresa-1f3a45, #1f3a45) 4.5%, transparent);
 }
 
 .navbar__title {
-    color: #34484e;
+    color: var(--empresa-34484e, #34484e);
     font-size: 16px;
     font-weight: 760;
 }
@@ -230,13 +230,13 @@ body.sidebar-visible {
     height: 36px;
     border-color: var(--ui-border);
     border-radius: 10px;
-    background: #edf4f6;
+    background: var(--empresa-edf4f6, #edf4f6);
 }
 
 .profile-menu__panel {
     border-color: var(--ui-border);
     border-radius: 14px;
-    box-shadow: 0 16px 40px rgba(31, 58, 69, .15);
+    box-shadow: 0 16px 40px color-mix(in srgb, var(--empresa-1f3a45, #1f3a45) 15%, transparent);
 }
 
 /* Encabezados de los módulos */
@@ -267,7 +267,7 @@ body.sidebar-visible {
 .main-content > .page-header:not(.dashboard-hero) :is(.page-header__title, h1),
 :is(.solicitudes-header, .marcaciones-header, .ra-admin__header) h2 {
     margin: 0 0 4px;
-    color: #31474e;
+    color: var(--empresa-31474e, #31474e);
     font-size: clamp(21px, 2vw, 27px);
     font-weight: 760;
     line-height: 1.18;
@@ -305,7 +305,7 @@ body.sidebar-visible {
     margin-bottom: 4px;
     padding: 28px 30px;
     border-radius: 20px;
-    box-shadow: 0 15px 36px rgba(38, 70, 83, .17);
+    box-shadow: 0 15px 36px color-mix(in srgb, var(--empresa-264653, #264653) 17%, transparent);
 }
 
 .marcaciones-back {
@@ -318,7 +318,7 @@ body.sidebar-visible {
 
 .marcaciones-now {
     border-color: var(--ui-border);
-    background: #f4f8f8;
+    background: var(--empresa-f4f8f8, #f4f8f8);
     color: var(--text);
 }
 
@@ -377,8 +377,8 @@ body.sidebar-visible {
 }
 
 :is(.form-control, .form-select, .form-textarea):focus {
-    border-color: #668c9b;
-    box-shadow: 0 0 0 3px rgba(0, 169, 199, .38);
+    border-color: var(--empresa-668c9b, #668c9b);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--empresa-00a9c7, #00a9c7) 38%, transparent);
 }
 
 .table-container,
@@ -390,7 +390,7 @@ body.sidebar-visible {
 
 :is(.table, .marcaciones-table, .solicitudes-table) th {
     border-color: var(--ui-border);
-    background: #f2f6f6;
+    background: var(--empresa-f2f6f6, #f2f6f6);
     color: #526663;
     font-size: 11px;
     font-weight: 800;
@@ -404,7 +404,7 @@ body.sidebar-visible {
 }
 
 :is(.table, .marcaciones-table, .solicitudes-table) tbody tr:hover {
-    background: #f7fafa;
+    background: var(--empresa-f7fafa, #f7fafa);
 }
 
 .table-empty {

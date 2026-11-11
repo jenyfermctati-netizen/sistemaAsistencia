@@ -32,6 +32,7 @@ class SuperAdminController extends Controller
             'empresas' => Empresa::count(),
             'activas' => Empresa::where('estado', Empresa::ACTIVA)->count(),
             'suspendidas' => Empresa::where('estado', Empresa::SUSPENDIDA)->count(),
+            'inactivas' => Empresa::where('estado', Empresa::INACTIVA)->count(),
             'trabajadores' => Trabajador::withoutGlobalScopes()->count(),
             'usuarios' => User::withoutGlobalScopes()->whereNotNull('empresa_id')->count(),
             'dispositivos' => DispositivoBiometrico::withoutGlobalScopes()->count(),
@@ -41,7 +42,20 @@ class SuperAdminController extends Controller
         $empresasRecientes = Empresa::withCount(['trabajadores', 'users', 'dispositivosBiometricos'])
             ->latest()->limit(8)->get();
 
-        return view('superadmin.dashboard', compact('metricas', 'empresasRecientes'));
+        $inicio = now()->startOfMonth()->subMonths(5);
+        $altas = Empresa::where('created_at', '>=', $inicio)
+            ->where('created_at', '<', now()->startOfMonth()->addMonth())
+            ->get(['created_at'])->countBy(fn ($empresa) => $empresa->created_at->format('Y-m'));
+        $registrosMensuales = collect(range(0, 5))->map(function ($indice) use ($inicio, $altas) {
+            $mes = $inicio->copy()->addMonths($indice);
+
+            return [
+                'etiqueta' => $mes->locale('es')->translatedFormat('M Y'),
+                'total' => (int) $altas->get($mes->format('Y-m'), 0),
+            ];
+        });
+
+        return view('superadmin.dashboard', compact('metricas', 'empresasRecientes', 'registrosMensuales'));
     }
 
     public function empresas(Request $request): View
@@ -56,7 +70,9 @@ class SuperAdminController extends Controller
         });
         $query->when($request->filled('estado'), fn ($q) => $q->where('estado', $request->input('estado')));
 
-        $empresas = $query->latest()->paginate(15)->withQueryString();
+        $orden = in_array($request->input('orden'), ['nombre', 'recientes'], true) ? $request->input('orden') : 'nombre';
+        $orden === 'recientes' ? $query->orderByDesc('created_at')->orderByDesc('id') : $query->orderBy('razon_social')->orderBy('id');
+        $empresas = $query->paginate(12)->withQueryString();
 
         return view('superadmin.empresas.index', compact('empresas'));
     }
@@ -262,18 +278,27 @@ class SuperAdminController extends Controller
 
     public function auditoria(Request $request): View
     {
+        $resumenQuery = Empresa::query()->when($request->filled('empresa_id'), fn ($q) => $q->whereKey($request->integer('empresa_id')));
+        $estados = (clone $resumenQuery)->selectRaw('estado, COUNT(*) as total')->groupBy('estado')->pluck('total', 'estado');
+        $resumenEstados = [
+            'ACTIVA' => (int) $estados->get('ACTIVA', 0),
+            'SUSPENDIDA' => (int) $estados->get('SUSPENDIDA', 0),
+            'INACTIVA' => (int) $estados->get('INACTIVA', 0),
+        ];
+        $estadoEmpresas = $resumenQuery->orderBy('razon_social')->paginate(10, ['*'], 'estados_page')->withQueryString();
         $query = Auditoria::withoutGlobalScopes()->with(['empresa', 'usuario']);
         $query->when($request->filled('empresa_id'), fn ($q) => $q->where('empresa_id', $request->integer('empresa_id')));
         $query->when($request->filled('accion'), fn ($q) => $q->where('accion', 'like', '%'.trim((string) $request->input('accion')).'%'));
         $registros = $query->latest()->paginate(30)->withQueryString();
         $empresas = Empresa::orderBy('razon_social')->get(['id', 'razon_social']);
 
-        return view('superadmin.auditoria.index', compact('registros', 'empresas'));
+        return view('superadmin.auditoria.index', compact('registros', 'empresas', 'resumenEstados', 'estadoEmpresas'));
     }
 
     private function reglasEmpresa(?Empresa $empresa = null): array
     {
         return [
+            'color_principal' => ['sometimes', 'required', 'regex:/^#[0-9a-fA-F]{6}$/'],
             'razon_social' => ['required', 'string', 'max:200'],
             'nombre_comercial' => ['nullable', 'string', 'max:200'],
             'ruc' => ['required', 'digits:11', new RucPeru, Rule::unique('empresas', 'ruc')->ignore($empresa?->id)],
@@ -287,7 +312,7 @@ class SuperAdminController extends Controller
     private function datosEmpresa(array $data): array
     {
         return collect($data)->only([
-            'razon_social', 'nombre_comercial', 'ruc', 'email', 'telefono', 'direccion', 'zona_horaria',
+            'razon_social', 'nombre_comercial', 'ruc', 'email', 'telefono', 'direccion', 'zona_horaria', 'color_principal',
         ])->all();
     }
 

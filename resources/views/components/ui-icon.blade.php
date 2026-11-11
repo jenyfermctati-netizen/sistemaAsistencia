@@ -2,6 +2,12 @@
 
 <svg {{ $attributes->merge(['class' => 'ui-icon', 'viewBox' => '0 0 24 24', 'fill' => 'none', 'aria-hidden' => 'true']) }}>
     @switch($name)
+        @case('settings')
+            <path d="M4 7h16M4 17h16" /><circle cx="9" cy="7" r="3" fill="white" /><circle cx="15" cy="17" r="3" fill="white" />
+            @break
+        @case('mail')
+            <rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 6 9 7 9-7" />
+            @break
         @case('plus')
             <path d="M12 5v14M5 12h14" />
             @break

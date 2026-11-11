@@ -25,6 +25,7 @@ class Empresa extends Model
         'logo',
         'estado',
         'zona_horaria',
+        'color_principal',
     ];
 
     public function estaActiva(): bool

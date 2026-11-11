@@ -1,10 +1,10 @@
 root {
-    --login-primary: #159ab5;
-    --login-primary-dark: #0c738d;
-    --login-ink: #183544;
-    --login-text: #294555;
+    --login-primary: var(--empresa-159ab5, #159ab5);
+    --login-primary-dark: var(--empresa-0c738d, #0c738d);
+    --login-ink: var(--empresa-183544, #183544);
+    --login-text: var(--empresa-294555, #294555);
     --login-muted: #6d7e88;
-    --login-border: #d8e3e8;
+    --login-border: var(--empresa-d8e3e8, #d8e3e8);
     --login-surface: #ffffff;
     --login-danger: #b42318;
 }
@@ -27,9 +27,9 @@ body {
 body {
     color: var(--login-text);
     background:
-        radial-gradient(circle at 8% 10%, rgba(21, 154, 181, 0.12), transparent 27%),
-        radial-gradient(circle at 92% 88%, rgba(34, 197, 184, 0.12), transparent 30%),
-        #edf7f8;
+        radial-gradient(circle at 8% 10%, color-mix(in srgb, var(--empresa-159ab5, #159ab5) 12%, transparent), transparent 27%),
+        radial-gradient(circle at 92% 88%, color-mix(in srgb, var(--empresa-22c5b8, #22c5b8) 12%, transparent), transparent 30%),
+        var(--empresa-edf7f8, #edf7f8);
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
 }
@@ -63,7 +63,7 @@ button {
     border: 1px solid rgba(255, 255, 255, 0.78);
     border-radius: 24px;
     background: var(--login-surface);
-    box-shadow: 0 28px 70px rgba(21, 67, 82, 0.18);
+    box-shadow: 0 28px 70px color-mix(in srgb, var(--empresa-154352, #154352) 18%, transparent);
 }
 
 .login-hero {
@@ -77,8 +77,8 @@ button {
     overflow: hidden;
     color: #ffffff;
     background-image:
-        linear-gradient(180deg, rgba(4, 33, 48, 0.28) 0%, rgba(4, 35, 45, 0.08) 36%, rgba(3, 37, 43, 0.84) 100%),
-        linear-gradient(90deg, rgba(3, 30, 43, 0.45), rgba(3, 30, 43, 0.02)),
+        linear-gradient(180deg, color-mix(in srgb, var(--empresa-042130, #042130) 28%, transparent) 0%, color-mix(in srgb, var(--empresa-04232d, #04232d) 8%, transparent) 36%, color-mix(in srgb, var(--empresa-03252b, #03252b) 84%, transparent) 100%),
+        linear-gradient(90deg, color-mix(in srgb, var(--empresa-031e2b, #031e2b) 45%, transparent), color-mix(in srgb, var(--empresa-031e2b, #031e2b) 2%, transparent)),
         url('../../images/auth/login-office.png');
     background-position: center;
     background-size: cover;
@@ -89,22 +89,22 @@ button {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(145deg, rgba(10, 65, 79, 0.2), transparent 50%);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--empresa-0a414f, #0a414f) 20%, transparent), transparent 50%);
     pointer-events: none;
 }
 
 .login-hero.login-hero--login {
     justify-content: flex-end;
     background-image:
-        linear-gradient(180deg, rgba(3, 29, 43, 0.14) 0%, rgba(3, 29, 43, 0.18) 40%, rgba(3, 31, 40, 0.92) 100%),
-        linear-gradient(90deg, rgba(3, 30, 43, 0.36), rgba(3, 30, 43, 0.02)),
+        linear-gradient(180deg, color-mix(in srgb, var(--empresa-031d2b, #031d2b) 14%, transparent) 0%, color-mix(in srgb, var(--empresa-031d2b, #031d2b) 18%, transparent) 40%, color-mix(in srgb, var(--empresa-031f28, #031f28) 92%, transparent) 100%),
+        linear-gradient(90deg, color-mix(in srgb, var(--empresa-031e2b, #031e2b) 36%, transparent), color-mix(in srgb, var(--empresa-031e2b, #031e2b) 2%, transparent)),
         url('../../images/auth/login-office.png');
 }
 
 .login-hero--login::after {
     background:
-        radial-gradient(circle at 88% 10%, rgba(140, 243, 239, 0.14), transparent 27%),
-        linear-gradient(145deg, rgba(10, 65, 79, 0.16), transparent 50%);
+        radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--empresa-8cf3ef, #8cf3ef) 14%, transparent), transparent 27%),
+        linear-gradient(145deg, color-mix(in srgb, var(--empresa-0a414f, #0a414f) 16%, transparent), transparent 50%);
 }
 
 .login-hero__brand {
@@ -114,7 +114,7 @@ button {
     border: 1px solid rgba(255, 255, 255, 0.55);
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 12px 30px rgba(0, 25, 37, 0.15);
+    box-shadow: 0 12px 30px color-mix(in srgb, var(--empresa-001925, #001925) 15%, transparent);
     backdrop-filter: blur(10px);
 }
 
@@ -141,7 +141,7 @@ button {
 .login-card__eyebrow {
     display: inline-block;
     margin-bottom: 13px;
-    color: #8cf3ef;
+    color: var(--empresa-8cf3ef, #8cf3ef);
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.16em;
@@ -156,7 +156,7 @@ button {
     padding: 6px 10px;
     border: 1px solid rgba(201, 255, 250, 0.22);
     border-radius: 999px;
-    background: rgba(4, 47, 57, 0.32);
+    background: color-mix(in srgb, var(--empresa-042f39, #042f39) 32%, transparent);
     color: #c9fffa;
     backdrop-filter: blur(10px);
 }
@@ -166,8 +166,8 @@ button {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #64e6dc;
-    box-shadow: 0 0 0 4px rgba(100, 230, 220, 0.13);
+    background: var(--empresa-64e6dc, #64e6dc);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--empresa-64e6dc, #64e6dc) 13%, transparent);
 }
 
 .login-hero__copy h1 {
@@ -211,10 +211,10 @@ button {
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
-    scrollbar-color: rgba(38, 70, 83, 0.22) transparent;
+    scrollbar-color: color-mix(in srgb, var(--empresa-264653, #264653) 22%, transparent) transparent;
     scrollbar-width: thin;
     background:
-        radial-gradient(circle at 100% 0%, rgba(21, 154, 181, 0.06), transparent 34%),
+        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--empresa-159ab5, #159ab5) 6%, transparent), transparent 34%),
         #ffffff;
 }
 
@@ -228,7 +228,7 @@ button {
 
 .login-panel::-webkit-scrollbar-thumb {
     border-radius: 999px;
-    background: rgba(38, 70, 83, 0.22);
+    background: color-mix(in srgb, var(--empresa-264653, #264653) 22%, transparent);
 }
 
 .login-card {
@@ -342,7 +342,7 @@ button {
     border: 1px solid var(--login-border);
     border-radius: 11px;
     outline: none;
-    background: #fbfdfe;
+    background: var(--empresa-fbfdfe, #fbfdfe);
     color: var(--login-ink);
     font-size: 15px;
     transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
@@ -355,7 +355,7 @@ button {
 .login-field__control input:focus {
     border-color: var(--login-primary);
     background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(21, 154, 181, 0.11);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--empresa-159ab5, #159ab5) 11%, transparent);
 }
 
 .login-field__icon,
@@ -400,7 +400,7 @@ button {
 }
 
 .password-toggle:hover {
-    background: #eef7f8;
+    background: var(--empresa-eef7f8, #eef7f8);
     color: var(--login-primary-dark);
 }
 
@@ -472,7 +472,7 @@ button {
     padding: 12px 20px;
     border-radius: 11px;
     background: linear-gradient(135deg, var(--login-primary), var(--login-primary-dark));
-    box-shadow: 0 11px 24px rgba(12, 115, 141, 0.22);
+    box-shadow: 0 11px 24px color-mix(in srgb, var(--empresa-0c738d, #0c738d) 22%, transparent);
     color: #ffffff;
     cursor: pointer;
     font-size: 16px;
@@ -483,7 +483,7 @@ button {
 .login-submit:hover {
     filter: brightness(1.04);
     transform: translateY(-1px);
-    box-shadow: 0 14px 28px rgba(12, 115, 141, 0.28);
+    box-shadow: 0 14px 28px color-mix(in srgb, var(--empresa-0c738d, #0c738d) 28%, transparent);
 }
 
 .login-submit:active {
@@ -516,7 +516,7 @@ button {
     content: "";
     height: 1px;
     flex: 1;
-    background: #dce7eb;
+    background: var(--empresa-dce7eb, #dce7eb);
 }
 
 .login-security {
@@ -524,9 +524,9 @@ button {
     align-items: center;
     gap: 14px;
     padding: 15px 17px;
-    border: 1px solid #d6efef;
+    border: 1px solid var(--empresa-d6efef, #d6efef);
     border-radius: 12px;
-    background: linear-gradient(135deg, #effafa, #e8f6f6);
+    background: linear-gradient(135deg, var(--empresa-effafa, #effafa), var(--empresa-e8f6f6, #e8f6f6));
 }
 
 .login-security__icon {
@@ -536,7 +536,7 @@ button {
     flex: 0 0 auto;
     place-items: center;
     border-radius: 11px;
-    background: rgba(21, 154, 181, 0.1);
+    background: color-mix(in srgb, var(--empresa-159ab5, #159ab5) 10%, transparent);
     color: var(--login-primary-dark);
 }
 
@@ -872,8 +872,8 @@ input:focus-visible {
 }
 
 body.login-standalone {
-    --login-brand-ink: #1d3945;
-    --login-brand-action: #08728a;
+    --login-brand-ink: var(--empresa-1d3945, #1d3945);
+    --login-brand-action: var(--empresa-08728a, #08728a);
     height: auto;
     min-height: 100svh;
     overflow: visible;
@@ -893,7 +893,7 @@ body.login-standalone {
     border: 1px solid #e1ded7;
     border-radius: 16px;
     background: #fff;
-    box-shadow: 0 12px 28px rgba(29, 57, 69, 0.09);
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--empresa-1d3945, #1d3945) 9%, transparent);
 }
 
 .guest.login-standalone .login-card__header {
@@ -919,7 +919,7 @@ body.login-standalone {
 }
 
 .guest.login-standalone .login-card__header > p:last-child {
-    color: #4f6672;
+    color: var(--empresa-4f6672, #4f6672);
     font-size: .92rem;
 }
 
@@ -975,7 +975,7 @@ body.login-standalone {
 }
 
 .guest.login-standalone .login-submit:hover {
-    background: #284e5c;
+    background: var(--empresa-284e5c, #284e5c);
 }
 
 .login-standalone :is(button, a, input):focus-visible {

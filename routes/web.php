@@ -64,7 +64,9 @@ Route::prefix('superadmin')->name('superadmin.')
     ->middleware(['auth', 'superadmin'])
     ->group(function () {
         Route::get('/', [SuperAdminController::class, 'dashboard'])->name('dashboard');
+        Route::view('/ayuda', 'superadmin.ayuda')->name('ayuda');
         Route::get('/empresas', [SuperAdminController::class, 'empresas'])->name('empresas.index');
+        Route::view('/empresas/nueva', 'superadmin.empresas.create')->name('empresas.create');
         Route::post('/empresas', [SuperAdminController::class, 'storeEmpresa'])->name('empresas.store');
         Route::get('/empresas/{empresa}', [SuperAdminController::class, 'showEmpresa'])->name('empresas.show');
         Route::put('/empresas/{empresa}', [SuperAdminController::class, 'updateEmpresa'])->name('empresas.update');

@@ -25,7 +25,7 @@
     justify-content: space-between;
     gap: 20px;
     padding-bottom: 22px;
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid var(--empresa-edf0f2, #edf0f2);
 }
 .biometrico-card__header > div {
     display: flex;
@@ -38,8 +38,8 @@
     width: 52px;
     height: 52px;
     border-radius: 14px;
-    background: #e9f3f7;
-    color: #28708c;
+    background: var(--empresa-e9f3f7, #e9f3f7);
+    color: var(--empresa-28708c, #28708c);
     font-weight: 700;
 }
 .biometrico-card h2 {
@@ -101,7 +101,7 @@
 }
 .biometrico-footer {
     padding-top: 18px;
-    border-top: 1px solid #edf0f2;
+    border-top: 1px solid var(--empresa-edf0f2, #edf0f2);
     font-size: 14px;
 }
 .biometrico-ok {
@@ -163,13 +163,13 @@
     text-transform: uppercase;
     letter-spacing: 0.03em;
     color: #6b7280;
-    background: #f8fafb;
+    background: var(--empresa-f8fafb, #f8fafb);
     border-bottom: 1px solid #e5e7eb;
     white-space: nowrap;
 }
 .table td {
     padding: 13px 14px;
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid var(--empresa-edf0f2, #edf0f2);
     color: #374151;
     vertical-align: middle;
 }
@@ -194,8 +194,8 @@
     color: #9a671b;
 }
 .sync-device {
-    background: #edf3f7;
-    color: #496574;
+    background: var(--empresa-edf3f7, #edf3f7);
+    color: var(--empresa-496574, #496574);
 }
 .sync-error {
     background: #fbecec;
@@ -313,7 +313,7 @@
     .biometric-sync .table tr {
         margin-bottom: 12px;
         padding: 6px 12px;
-        border: 1px solid #dce7ea;
+        border: 1px solid var(--empresa-dce7ea, #dce7ea);
         border-radius: 14px;
         background: #fff;
     }
@@ -338,12 +338,12 @@
 }
 
 .button--sync-all {
-    background: #28708c;
-    border-color: #28708c;
+    background: var(--empresa-28708c, #28708c);
+    border-color: var(--empresa-28708c, #28708c);
     color: #fff;
 }
 
 .button--sync-all:hover {
-    background: #225f77;
-    border-color: #225f77;
+    background: var(--empresa-225f77, #225f77);
+    border-color: var(--empresa-225f77, #225f77);
 }

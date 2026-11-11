@@ -769,7 +769,7 @@
 
     border:
         1px solid
-        rgba(15, 118, 110, 0.12);
+        color-mix(in srgb, var(--empresa-0f766e, #0f766e) 12%, transparent);
 
     color: var(--primary);
 
@@ -1014,3 +1014,5 @@
         margin-left: 0;
     }
 }
+
+.sidebar-company-menu>summary{list-style:none;cursor:pointer}.sidebar-company-menu>summary::-webkit-details-marker{display:none}.sidebar-company-chevron{margin-left:auto;font-size:18px;transition:transform .15s}.sidebar-company-menu[open] .sidebar-company-chevron{transform:rotate(180deg)}.sidebar-company-submenu{padding-left:14px;margin:4px 0 8px 18px;border-left:1px solid rgba(255,255,255,.2)}.sidebar-company-submenu .sidebar__item{font-size:.84rem;min-height:42px}.sidebar-company-submenu .sidebar__icon{width:28px;height:28px}.sidebar-company-name{display:block;padding:8px 12px;color:#fff;font-size:.76rem;line-height:1.5;overflow-wrap:anywhere;opacity:.85}.sidebar-company-menu>summary:focus-visible{outline:2px solid #fff;outline-offset:2px}

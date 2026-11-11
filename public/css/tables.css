@@ -397,7 +397,7 @@ body {
         .horarios-filtros
     )) {
         padding: 12px;
-        background: linear-gradient(180deg, var(--surface), rgba(175, 203, 222, 0.08));
+        background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--empresa-afcbde, #afcbde) 8%, transparent));
     }
 
     .panel > :is(.vacaciones-filtros, .campo-filtros) {
@@ -519,7 +519,7 @@ body {
         color: var(--text);
         font-size: 11px;
         line-height: 1.3;
-        box-shadow: 0 1px 2px rgba(38, 70, 83, 0.025);
+        box-shadow: 0 1px 2px color-mix(in srgb, var(--empresa-264653, #264653) 2.5%, transparent);
     }
 
     :is(
@@ -538,7 +538,7 @@ body {
     ) :is(input:not([type="hidden"]), select):focus {
         border-color: var(--primary);
         outline: none;
-        box-shadow: 0 0 0 3px rgba(175, 203, 222, 0.28);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--empresa-afcbde, #afcbde) 28%, transparent);
     }
 
     :is(
@@ -611,7 +611,7 @@ body {
         border-color: var(--primary);
         background: var(--primary);
         color: #fff;
-        box-shadow: 0 5px 13px rgba(38, 70, 83, 0.13);
+        box-shadow: 0 5px 13px color-mix(in srgb, var(--empresa-264653, #264653) 13%, transparent);
     }
 }
 

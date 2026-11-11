@@ -239,6 +239,39 @@ class MultiEmpresaSaasTest extends TestCase
         $this->post(route('biometrico.usuarios.reconciliar', $dispositivoB))->assertNotFound();
     }
 
+    public function test_navegacion_de_plataforma_y_secciones_de_empresa(): void
+    {
+        $empresa = $this->empresa('Empresa de prueba', 900);
+        $this->actingAs($this->superadmin());
+        $this->get(route('superadmin.dashboard'))->assertOk()->assertSee('Gráficos de la plataforma');
+        $this->get(route('superadmin.empresas.show', $empresa))->assertOk()
+            ->assertSee('Información de la empresa')->assertDontSee('name="color_principal"', false);
+        $this->get(route('superadmin.empresas.show', ['empresa' => $empresa, 'seccion' => 'administradores']))
+            ->assertOk()->assertSee('Agregar administrador')->assertDontSee('name="color_principal"', false);
+        $this->get(route('superadmin.empresas.show', ['empresa' => $empresa, 'seccion' => 'configuracion']))
+            ->assertOk()->assertSee('name="color_principal"', false)->assertSee('Registrar dispositivo');
+        $this->get(route('superadmin.auditoria.index', ['empresa_id' => $empresa->id]))
+            ->assertOk()->assertSee('Estado actual de las empresas')->assertSee('Historial de cambios')
+            ->assertViewHas('resumenEstados', ['ACTIVA' => 1, 'SUSPENDIDA' => 0, 'INACTIVA' => 0]);
+        $this->get(route('superadmin.ayuda'))->assertOk()->assertSee('¿Dónde encuentro cada cosa?');
+    }
+
+    public function test_listado_permite_seleccionar_varias_empresas_y_conserva_la_seccion(): void
+    {
+        $this->empresa('Zeta Empresa', 901);
+        $this->empresa('Alfa Empresa', 902);
+        $this->actingAs($this->superadmin());
+        $this->get(route('superadmin.empresas.index', ['seccion' => 'administradores']))
+            ->assertOk()->assertSee('Agregar empresa')->assertSee('Ver administradores')
+            ->assertViewHas('empresas', fn ($empresas) => $empresas->total() === 2
+                && $empresas->first()->nombre_comercial === 'Alfa Empresa');
+        $this->get(route('superadmin.empresas.index', ['buscar' => 'Zeta', 'seccion' => 'configuracion']))
+            ->assertOk()->assertSee('Ver configuración')
+            ->assertViewHas('empresas', fn ($empresas) => $empresas->total() === 1
+                && $empresas->first()->nombre_comercial === 'Zeta Empresa');
+        $this->get(route('superadmin.empresas.create'))->assertOk()->assertSee('Designar administrador');
+    }
+
     private function empresa(string $nombre, int $semilla): Empresa
     {
         return Empresa::create([

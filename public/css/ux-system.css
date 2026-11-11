@@ -1,22 +1,22 @@
 /* Sistema UX unificado. Cargado al final para normalizar módulos históricos. */
 :root {
-    --ux-primary: #087f9a;
-    --ux-primary-hover: #06677e;
-    --ux-accent: #00a9c7;
-    --ux-bg: #e8f0f2;
+    --ux-primary: var(--empresa-087f9a, #087f9a);
+    --ux-primary-hover: var(--empresa-06677e, #06677e);
+    --ux-accent: var(--empresa-00a9c7, #00a9c7);
+    --ux-bg: var(--empresa-e8f0f2, #e8f0f2);
     --ux-surface: #ffffff;
-    --ux-surface-soft: #f7fafb;
-    --ux-text: #183844;
-    --ux-muted: #58727b;
-    --ux-border: #c9d9de;
+    --ux-surface-soft: var(--empresa-f7fafb, #f7fafb);
+    --ux-text: var(--empresa-183844, #183844);
+    --ux-muted: var(--empresa-58727b, #58727b);
+    --ux-border: var(--empresa-c9d9de, #c9d9de);
     --ux-danger: #93473f;
     --ux-danger-bg: #f8e9e7;
     --ux-success: #25634f;
     --ux-success-bg: #e4f4ee;
     --ux-warning: #785823;
     --ux-warning-bg: #fff3dc;
-    --ux-focus: 0 0 0 3px rgba(0, 169, 199, .22);
-    --ux-shadow: 0 8px 24px rgba(24, 56, 68, .08);
+    --ux-focus: 0 0 0 3px color-mix(in srgb, var(--empresa-00a9c7, #00a9c7) 22%, transparent);
+    --ux-shadow: 0 8px 24px color-mix(in srgb, var(--empresa-183844, #183844) 8%, transparent);
 }
 
 /* Evita que el ancho mínimo heredado genere desplazamiento horizontal en
@@ -116,7 +116,7 @@ a.button > .ui-icon {
 
 .icon-button:hover {
     border-color: var(--ux-accent);
-    background: #dff3f6;
+    background: var(--empresa-dff3f6, #dff3f6);
     color: var(--ux-primary-hover);
     transform: translateY(-1px);
 }
@@ -145,7 +145,7 @@ a.button > .ui-icon {
     max-width: 220px;
     padding: 6px 9px;
     border-radius: 7px;
-    background: #183844;
+    background: var(--empresa-183844, #183844);
     color: #fff;
     content: attr(data-tooltip);
     font-size: 12px;
@@ -220,7 +220,7 @@ a.button > .ui-icon {
     padding: 24px 26px;
     border: 1px solid var(--ux-border);
     border-radius: 18px;
-    background: linear-gradient(112deg, #d8f1f5, #f7fafb) !important;
+    background: linear-gradient(112deg, var(--empresa-d8f1f5, #d8f1f5), var(--empresa-f7fafb, #f7fafb)) !important;
     color: var(--ux-text) !important;
     box-shadow: var(--ux-shadow);
 }
@@ -266,7 +266,7 @@ a.button > .ui-icon {
 }
 
 .panel__header {
-    background: #f7fafb;
+    background: var(--empresa-f7fafb, #f7fafb);
 }
 
 .form-label,
@@ -365,7 +365,7 @@ table tbody td {
 .table-container[tabindex]::after {
     display: block;
     padding: 7px 12px;
-    background: #f7fafb;
+    background: var(--empresa-f7fafb, #f7fafb);
     color: var(--ux-muted);
     content: "Desliza horizontalmente para ver más columnas";
     font-size: 12px;
@@ -381,9 +381,9 @@ table tbody td {
     justify-content: center;
     gap: 8px;
     padding: 28px;
-    border: 1px dashed #b8ced5;
+    border: 1px dashed var(--empresa-b8ced5, #b8ced5);
     border-radius: 16px;
-    background: #f7fafb;
+    background: var(--empresa-f7fafb, #f7fafb);
     color: var(--ux-muted);
     text-align: center;
 }
@@ -407,7 +407,7 @@ table tbody td {
     align-items: center;
     justify-content: center;
     border-radius: 15px;
-    background: #dff3f6;
+    background: var(--empresa-dff3f6, #dff3f6);
     color: var(--ux-primary);
 }
 
@@ -444,7 +444,7 @@ table tbody td {
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    background: #dff3f6;
+    background: var(--empresa-dff3f6, #dff3f6);
     color: var(--ux-primary);
 }
 
@@ -454,8 +454,8 @@ table tbody td {
 }
 
 .dashboard-metric--graphite .dashboard-metric__icon {
-    background: #e8eef0;
-    color: #355762;
+    background: var(--empresa-e8eef0, #e8eef0);
+    color: var(--empresa-355762, #355762);
 }
 
 .dashboard-metric__label {
@@ -800,7 +800,7 @@ table tbody td {
         border: 1px solid var(--ux-border);
         border-radius: 15px;
         background: #fff;
-        box-shadow: 0 5px 16px rgba(24, 56, 68, .06);
+        box-shadow: 0 5px 16px color-mix(in srgb, var(--empresa-183844, #183844) 6%, transparent);
     }
 
     :is(.areas-panel, .feriados-panel, .asistencias-panel) tbody td {
@@ -811,7 +811,7 @@ table tbody td {
         min-height: 44px;
         padding: 11px 13px;
         border: 0;
-        border-bottom: 1px solid #e7eef0;
+        border-bottom: 1px solid var(--empresa-e7eef0, #e7eef0);
         text-align: left;
     }
 
@@ -870,7 +870,7 @@ table tbody td {
         border: 1px solid var(--ux-border);
         border-radius: 15px;
         background: #fff;
-        box-shadow: 0 5px 16px rgba(24, 56, 68, .06);
+        box-shadow: 0 5px 16px color-mix(in srgb, var(--empresa-183844, #183844) 6%, transparent);
     }
 
     .solicitudes-table tbody > tr:not(.solicitud-table-row),
@@ -887,7 +887,7 @@ table tbody td {
         gap: 12px;
         padding: 11px 13px;
         border: 0;
-        border-bottom: 1px solid #e7eef0;
+        border-bottom: 1px solid var(--empresa-e7eef0, #e7eef0);
         text-align: left;
     }
 
@@ -948,7 +948,7 @@ table tbody td {
         border: 1px solid var(--ux-border);
         border-radius: 14px;
         background: #fff;
-        box-shadow: 0 4px 14px rgba(24, 56, 68, .05);
+        box-shadow: 0 4px 14px color-mix(in srgb, var(--empresa-183844, #183844) 5%, transparent);
     }
 
     .dashboard-modern :is(.dashboard-table--clean, .dashboard-report__table) tbody tr:not(.dashboard-table__empty-row) > td {
@@ -959,7 +959,7 @@ table tbody td {
         gap: 10px;
         padding: 10px 12px;
         border: 0;
-        border-bottom: 1px solid #e7eef0;
+        border-bottom: 1px solid var(--empresa-e7eef0, #e7eef0);
         text-align: left;
     }
 
@@ -1167,7 +1167,7 @@ table tbody td {
     display: grid;
     min-width: 8rem;
     padding: 4px;
-    border: 1px solid #c8dade;
+    border: 1px solid var(--empresa-c8dade, #c8dade);
     border-radius: 8px;
     background: #fff;
     box-shadow: 0 6px 18px #18384420;
@@ -1176,25 +1176,25 @@ table tbody td {
 .download-menu__options a {
     padding: 7px 10px;
     border-radius: 4px;
-    color: #183844;
+    color: var(--empresa-183844, #183844);
     white-space: nowrap;
 }
 
 .download-menu__options a:is(:hover, :focus-visible) {
-    background: #e2f0f2;
+    background: var(--empresa-e2f0f2, #e2f0f2);
 }
 
 .profile-phone-form { display: grid; gap: 7px; padding: 12px 16px; border-top: 1px solid var(--border); }
 .profile-phone-form label { font-size: 12px; font-weight: 700; color: var(--text); }
 .profile-phone-form > div { display: flex; gap: 8px; min-width: 0; }
 .profile-phone-form input { flex: 1; width: 100%; min-width: 0; min-height: 44px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; background: var(--surface); color: var(--text); font-size: 16px; }
-.profile-phone-form button { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border: 0; border-radius: 8px; background: #087f9a; color: #fff; cursor: pointer; }
+.profile-phone-form button { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border: 0; border-radius: 8px; background: var(--empresa-087f9a, #087f9a); color: #fff; cursor: pointer; }
 .profile-phone-form small { color: var(--text-muted); font-size: 10px; line-height: 1.4; }
 .profile-menu__panel { max-height: calc(100dvh - 90px); overflow-y: auto; }
 
 .profile-phone-form[hidden] { display: none !important; }
 .profile-phone-value { display: flex; align-items: center; gap: 5px; min-width: 0; }
 .profile-phone-value > span { min-width: 0; overflow-wrap: anywhere; }
-.profile-phone-edit { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; height: 32px; padding: 7px; border: 0; border-radius: 7px; background: transparent; color: #087f9a; cursor: pointer; }
-.profile-phone-edit:hover { background: #d8edf1; }
+.profile-phone-edit { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; height: 32px; padding: 7px; border: 0; border-radius: 7px; background: transparent; color: var(--empresa-087f9a, #087f9a); cursor: pointer; }
+.profile-phone-edit:hover { background: var(--empresa-d8edf1, #d8edf1); }
 .profile-phone-edit .ui-icon { width: 16px; height: 16px; }

@@ -88,7 +88,7 @@
 
 .campo-estado--programada {
     background: #eef2ff;
-    color: #087f9a;
+    color: var(--empresa-087f9a, #087f9a);
 }
 
 .campo-estado--activa {
@@ -172,10 +172,10 @@
     align-items: flex-start;
     margin-top: 18px;
     padding: 14px 16px;
-    border: 1px solid #bae6fd;
+    border: 1px solid var(--empresa-bae6fd, #bae6fd);
     border-radius: 12px;
-    background: #f0f9ff;
-    color: #0c4a6e;
+    background: var(--empresa-f0f9ff, #f0f9ff);
+    color: var(--empresa-0c4a6e, #0c4a6e);
     font-size: 12px;
     line-height: 1.5;
 }
@@ -513,7 +513,7 @@
     gap: 18px;
     min-width: 0;
     width: 100%;
-    color: var(--text, #142c3b);
+    color: var(--text, var(--empresa-142c3b, #142c3b));
 }
 
 .campo-page,
@@ -568,13 +568,13 @@
 .campo-page .campo-review,
 .campo-page .campo-history {
     overflow: visible;
-    border: 1px solid var(--border, #dce6ed);
+    border: 1px solid var(--border, var(--empresa-dce6ed, #dce6ed));
     border-radius: 16px;
     background: var(--surface, #fff);
 }
 
 .campo-page .campo-section-heading--review {
-    background: linear-gradient(100deg, #f2faff, #fff);
+    background: linear-gradient(100deg, var(--empresa-f2faff, #f2faff), #fff);
     border-radius: 16px 16px 0 0;
 }
 
@@ -586,8 +586,8 @@
     display: inline-flex;
     gap: 5px;
     border-radius: 99px;
-    background: #e3f7fd;
-    color: #08768f;
+    background: var(--empresa-e3f7fd, #e3f7fd);
+    color: var(--empresa-08768f, #08768f);
     flex-shrink: 0;
     font-size: 15px;
 }
@@ -609,14 +609,14 @@
     gap: 10px 14px;
     min-width: 0;
     padding: 14px 16px;
-    border: 1px solid #e0eaf1;
+    border: 1px solid var(--empresa-e0eaf1, #e0eaf1);
     border-radius: 12px;
-    box-shadow: 0 3px 12px rgba(19, 57, 76, .035);
+    box-shadow: 0 3px 12px color-mix(in srgb, var(--empresa-13394c, #13394c) 3.5%, transparent);
     background: #fff;
 }
 
 .campo-page .campo-review-item:last-child {
-    border-bottom: 1px solid #e0eaf1;
+    border-bottom: 1px solid var(--empresa-e0eaf1, #e0eaf1);
 }
 
 .campo-page .campo-review-item__identity {
@@ -634,8 +634,8 @@
     width: 36px;
     height: 36px;
     border-radius: 11px;
-    background: #dff5fc;
-    color: #087b98;
+    background: var(--empresa-dff5fc, #dff5fc);
+    color: var(--empresa-087b98, #087b98);
     font-weight: 800;
 }
 
@@ -659,7 +659,7 @@
 .campo-page .campo-review-item__summary {
     min-width: 0;
     margin: 0;
-    color: #425e6c;
+    color: var(--empresa-425e6c, #425e6c);
     font-size: 12px;
     line-height: 1.45;
     display: -webkit-box;
@@ -709,7 +709,7 @@
     cursor: pointer;
     list-style: none;
     border-radius: 9px;
-    color: #06768f;
+    color: var(--empresa-06768f, #06768f);
     font-weight: 700;
     font-size: 12px;
 }
@@ -815,14 +815,14 @@
 }
 
 .campo-page .campo-filter-details>summary {
-    border: 1px solid #cbdfea;
+    border: 1px solid var(--empresa-cbdfea, #cbdfea);
     background: #fff;
     padding: 10px 13px;
     white-space: nowrap;
 }
 
 .campo-page .campo-filter-details[open]>summary {
-    background: #eaf9ff;
+    background: var(--empresa-eaf9ff, #eaf9ff);
 }
 
 .campo-page .campo-filter-popover {
@@ -831,10 +831,10 @@
     right: 0;
     width: min(700px, calc(100vw - 48px));
     padding: 5px;
-    border: 1px solid #d9e8ef;
+    border: 1px solid var(--empresa-d9e8ef, #d9e8ef);
     border-radius: 14px;
     background: #fff;
-    box-shadow: 0 14px 40px rgba(17, 59, 78, .14);
+    box-shadow: 0 14px 40px color-mix(in srgb, var(--empresa-113b4e, #113b4e) 14%, transparent);
 }
 
 .campo-page .campo-filtros {
@@ -862,7 +862,7 @@
 .campo-page .campo-card {
     min-width: 0;
     border-radius: 13px;
-    box-shadow: 0 3px 14px rgba(23, 61, 81, .045);
+    box-shadow: 0 3px 14px color-mix(in srgb, var(--empresa-173d51, #173d51) 4.5%, transparent);
 }
 
 .campo-page .campo-card__header {
@@ -905,14 +905,14 @@
 
 .campo-page .campo-card__dates {
     grid-column: 1/-1;
-    color: #41728c;
+    color: var(--empresa-41728c, #41728c);
     font-size: 11px;
     font-weight: 700;
 }
 
 .campo-page .campo-card__preview p {
     margin: 0;
-    color: var(--text, #243b49);
+    color: var(--text, var(--empresa-243b49, #243b49));
     font-size: 12px;
     line-height: 1.45;
     display: -webkit-box;
@@ -925,7 +925,7 @@
 
 .campo-page .campo-card__place {
     font-size: 11px;
-    color: var(--text-muted, #607987);
+    color: var(--text-muted, var(--empresa-607987, #607987));
     text-align: right;
     max-width: 150px;
     overflow-wrap: anywhere;
@@ -959,7 +959,7 @@
 }
 
 .campo-page .campo-history .campo-section-heading {
-    background: linear-gradient(90deg, #f5fbff, #fff);
+    background: linear-gradient(90deg, var(--empresa-f5fbff, #f5fbff), #fff);
     border-radius: 16px 16px 0 0;
 }
 
@@ -982,8 +982,8 @@
 }
 
 .campo-page .campo-history-table th {
-    background: #eff5f8;
-    color: #284353;
+    background: var(--empresa-eff5f8, #eff5f8);
+    color: var(--empresa-284353, #284353);
     font-weight: 750;
 }
 
@@ -997,7 +997,7 @@
 }
 
 .campo-page .campo-history-detail>summary {
-    color: #087d99;
+    color: var(--empresa-087d99, #087d99);
     cursor: pointer;
     font-weight: 700;
     font-size: 12px;
@@ -1010,10 +1010,10 @@
     right: 0;
     width: min(260px, 70vw);
     padding: 13px;
-    border: 1px solid #dce7ed;
+    border: 1px solid var(--empresa-dce7ed, #dce7ed);
     border-radius: 10px;
     background: #fff;
-    box-shadow: 0 10px 28px rgba(20, 51, 64, .16);
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--empresa-143340, #143340) 16%, transparent);
     font-size: 11px;
     overflow-wrap: anywhere;
 }
@@ -1028,7 +1028,7 @@
 }
 
 .campo-page :is(.campo-review-item__details, .campo-card__details, .campo-filter-details, .campo-history-detail)>summary:focus-visible {
-    outline: 2px solid #00a9c7;
+    outline: 2px solid var(--empresa-00a9c7, #00a9c7);
     outline-offset: 3px;
 }
 
@@ -1198,7 +1198,7 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 7px;
         padding: 11px;
-        border: 1px solid #e0eaf1;
+        border: 1px solid var(--empresa-e0eaf1, #e0eaf1);
         border-radius: 10px;
     }
 
@@ -1306,8 +1306,8 @@
 
 .campo-page {
     --campo-ink: #111f37;
-    --campo-blue: #078bac;
-    --campo-line: #dce8f0;
+    --campo-blue: var(--empresa-078bac, #078bac);
+    --campo-line: var(--empresa-dce8f0, #dce8f0);
     gap: 20px;
     min-width: 0;
 }
@@ -1327,7 +1327,7 @@
 
 .campo-page .campo-kicker {
     display: block;
-    color: #087e9a;
+    color: var(--empresa-087e9a, #087e9a);
     font-size: 10px;
     font-weight: 800;
     letter-spacing: .11em;
@@ -1363,8 +1363,8 @@
     gap: 7px;
     padding: 10px 14px;
     border-radius: 99px;
-    background: #d7f4fd;
-    color: #07536d;
+    background: var(--empresa-d7f4fd, #d7f4fd);
+    color: var(--empresa-07536d, #07536d);
     white-space: nowrap;
     font-size: 12px;
     font-weight: 750;
@@ -1401,13 +1401,13 @@
 }
 
 .campo-page .campo-tabs__tab:hover {
-    background: #eff9ff;
+    background: var(--empresa-eff9ff, #eff9ff);
 }
 
 .campo-page .campo-tabs__tab--active {
-    background: #e5f8fe;
-    color: #07536c;
-    border-bottom-color: #079bb8;
+    background: var(--empresa-e5f8fe, #e5f8fe);
+    color: var(--empresa-07536c, #07536c);
+    border-bottom-color: var(--empresa-079bb8, #079bb8);
 }
 
 .campo-page .campo-review {
@@ -1445,10 +1445,10 @@
     align-items: center;
     gap: 8px 12px;
     padding: 14px 18px;
-    border: 1px solid #dce9f2;
+    border: 1px solid var(--empresa-dce9f2, #dce9f2);
     border-radius: 16px;
     background: #fff;
-    box-shadow: 0 5px 18px rgba(33, 89, 121, .055);
+    box-shadow: 0 5px 18px color-mix(in srgb, var(--empresa-215979, #215979) 5.5%, transparent);
 }
 
 .campo-page .campo-review-item__identity strong {
@@ -1486,34 +1486,34 @@
 .campo-page .campo-review-item__details>summary {
     padding: 5px 9px;
     min-height: 31px;
-    border: 1px solid #d3e4ed;
+    border: 1px solid var(--empresa-d3e4ed, #d3e4ed);
     background: #fbfdff;
 }
 
 .campo-page .campo-review-item__details[open]>summary {
-    background: #eaf7fc;
+    background: var(--empresa-eaf7fc, #eaf7fc);
 }
 
 .campo-page .campo-review-empty {
-    border: 1px dashed #c9e1ee;
+    border: 1px dashed var(--empresa-c9e1ee, #c9e1ee);
     border-radius: 14px;
-    background: #f9fdff;
+    background: var(--empresa-f9fdff, #f9fdff);
     min-height: 112px;
     justify-content: center;
 }
 
 .campo-page .campo-history {
     margin-top: 4px;
-    border: 1px solid #dce8f0;
+    border: 1px solid var(--empresa-dce8f0, #dce8f0);
     border-radius: 16px;
-    box-shadow: 0 4px 19px rgba(30, 82, 115, .04);
+    box-shadow: 0 4px 19px color-mix(in srgb, var(--empresa-1e5273, #1e5273) 4%, transparent);
     overflow: visible;
 }
 
 .campo-page .campo-history .campo-section-heading {
     padding: 20px 22px;
     background: transparent;
-    border-bottom: 1px solid #e5eef4;
+    border-bottom: 1px solid var(--empresa-e5eef4, #e5eef4);
 }
 
 .campo-page .campo-history .campo-section-heading h3 {
@@ -1530,7 +1530,7 @@
 }
 
 .campo-page .campo-history-table th {
-    background: #edf4f8;
+    background: var(--empresa-edf4f8, #edf4f8);
     color: #38526c;
     font-size: 11px;
     letter-spacing: 0;
@@ -1543,11 +1543,11 @@
 }
 
 .campo-page .campo-history-table tbody tr:hover {
-    background: #f3fbff;
+    background: var(--empresa-f3fbff, #f3fbff);
 }
 
 .campo-page .campo-assignments {
-    border-top: 1px solid #dce8ef;
+    border-top: 1px solid var(--empresa-dce8ef, #dce8ef);
     padding-top: 14px;
     margin-top: 4px;
 }
@@ -1562,9 +1562,9 @@
 }
 
 .campo-page .campo-card {
-    border: 1px solid #dce9f2;
+    border: 1px solid var(--empresa-dce9f2, #dce9f2);
     border-radius: 15px;
-    box-shadow: 0 4px 16px rgba(34, 82, 103, .04);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--empresa-225267, #225267) 4%, transparent);
 }
 
 .campo-page :is(.campo-card__details, .campo-review-item__details, .campo-history-detail) summary {
@@ -1573,7 +1573,7 @@
 
 .campo-page :is(.campo-card__details, .campo-review-item__details, .campo-history-detail) summary:focus-visible,
 .campo-page .campo-tabs a:focus-visible {
-    outline: 2px solid #059bb8;
+    outline: 2px solid var(--empresa-059bb8, #059bb8);
     outline-offset: 3px;
 }
 
@@ -1671,7 +1671,7 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
         padding: 12px;
-        border: 1px solid #e1ebf2;
+        border: 1px solid var(--empresa-e1ebf2, #e1ebf2);
         border-radius: 12px;
     }
 
@@ -1783,12 +1783,12 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    border: 1px solid #cfe1ed;
+    border: 1px solid var(--empresa-cfe1ed, #cfe1ed);
     border-radius: 9px;
     padding: 7px 12px;
     min-height: 36px;
-    background: #fafdff;
-    color: #046583;
+    background: var(--empresa-fafdff, #fafdff);
+    color: var(--empresa-046583, #046583);
     font: inherit;
     font-size: 12px;
     font-weight: 700;
@@ -1796,12 +1796,12 @@
 }
 
 .campo-page .campo-details-trigger:hover {
-    background: #e3f6fc;
+    background: var(--empresa-e3f6fc, #e3f6fc);
 }
 
 .campo-page .campo-details-trigger:focus-visible,
 .campo-overlay__close:focus-visible {
-    outline: 2px solid #008fac;
+    outline: 2px solid var(--empresa-008fac, #008fac);
     outline-offset: 3px;
 }
 
@@ -1817,11 +1817,11 @@
     max-height: min(86dvh, 900px);
     margin: auto;
     padding: 0;
-    border: 1px solid #d8e6ef;
+    border: 1px solid var(--empresa-d8e6ef, #d8e6ef);
     border-radius: 18px;
     background: #fff;
-    color: #163343;
-    box-shadow: 0 20px 80px rgba(13, 43, 61, .2);
+    color: var(--empresa-163343, #163343);
+    box-shadow: 0 20px 80px color-mix(in srgb, var(--empresa-0d2b3d, #0d2b3d) 20%, transparent);
     overflow: hidden;
 }
 
@@ -1846,8 +1846,8 @@
     justify-content: space-between;
     gap: 12px;
     padding: 16px 20px;
-    border-bottom: 1px solid #e4eef3;
-    background: linear-gradient(105deg, #f3fbff, #fff);
+    border-bottom: 1px solid var(--empresa-e4eef3, #e4eef3);
+    background: linear-gradient(105deg, var(--empresa-f3fbff, #f3fbff), #fff);
 }
 
 .campo-page .campo-overlay__head h3 {
@@ -1860,9 +1860,9 @@
     width: 38px;
     height: 38px;
     border-radius: 10px;
-    border: 1px solid #dbe9f0;
+    border: 1px solid var(--empresa-dbe9f0, #dbe9f0);
     background: #fff;
-    color: #274d64;
+    color: var(--empresa-274d64, #274d64);
     font-size: 25px;
     cursor: pointer;
 }
@@ -1970,23 +1970,23 @@
     justify-content: center;
     width: 40px;
     height: 40px;
-    border: 1px solid #cbe2ed;
+    border: 1px solid var(--empresa-cbe2ed, #cbe2ed);
     border-radius: 11px;
-    background: #edfaff;
-    color: #087f9a;
+    background: var(--empresa-edfaff, #edfaff);
+    color: var(--empresa-087f9a, #087f9a);
     text-decoration: none;
     vertical-align: middle;
     transition: background .16s ease, transform .16s ease, border-color .16s ease;
 }
 
 .campo-page a.campo-photo-icon:hover {
-    background: #d8f3fc;
-    border-color: #79cfe1;
+    background: var(--empresa-d8f3fc, #d8f3fc);
+    border-color: var(--empresa-79cfe1, #79cfe1);
     transform: translateY(-1px);
 }
 
 .campo-page a.campo-photo-icon:focus-visible {
-    outline: 2px solid #008fac;
+    outline: 2px solid var(--empresa-008fac, #008fac);
     outline-offset: 3px;
 }
 
@@ -2024,9 +2024,9 @@
 }
 
 .campo-page {
-    --campo-line: #dce8ef;
-    --campo-soft: #f5fafd;
-    --campo-ink: #173849;
+    --campo-line: var(--empresa-dce8ef, #dce8ef);
+    --campo-soft: var(--empresa-f5fafd, #f5fafd);
+    --campo-ink: var(--empresa-173849, #173849);
     gap: clamp(10px, 1.6vw, 17px);
     min-width: 0;
 }
@@ -2157,7 +2157,7 @@
     border-color: var(--campo-line);
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 9px rgba(23, 61, 81, .035);
+    box-shadow: 0 2px 9px color-mix(in srgb, var(--empresa-173d51, #173d51) 3.5%, transparent);
 }
 
 .campo-page .campo-card__header {
@@ -2329,14 +2329,14 @@
 
     .campo-page .campo-card__preview {
         padding: 8px 12px;
-        border-left: 1px solid #e8eff3;
+        border-left: 1px solid var(--empresa-e8eff3, #e8eff3);
     }
 
     .campo-page .campo-card__details {
         margin: 0;
         padding: 0 10px;
         border-top: 0;
-        border-left: 1px solid #e8eff3;
+        border-left: 1px solid var(--empresa-e8eff3, #e8eff3);
     }
 
     .campo-page .campo-card__footer {
@@ -2434,7 +2434,7 @@
     .campo-page .campo-history-table td[data-label="Fecha"] {
         grid-column: 1;
         grid-row: 2;
-        color: #607a8a;
+        color: var(--empresa-607a8a, #607a8a);
         font-size: 10px;
     }
 
@@ -2615,9 +2615,9 @@
     align-items: center;
     gap: 11px;
     padding: 11px 13px;
-    border: 1px solid #d7eaf0;
+    border: 1px solid var(--empresa-d7eaf0, #d7eaf0);
     border-radius: 12px;
-    background: #f3fbfe;
+    background: var(--empresa-f3fbfe, #f3fbfe);
 }
 
 #modalCrearAsignacion .campo-create-intro__icon {
@@ -2627,21 +2627,21 @@
     height: 36px;
     flex-shrink: 0;
     border-radius: 10px;
-    color: #087c9a;
-    background: #ddf3fa;
+    color: var(--empresa-087c9a, #087c9a);
+    background: var(--empresa-ddf3fa, #ddf3fa);
 }
 
 #modalCrearAsignacion .campo-create-intro strong {
     display: block;
     font-size: 13px;
-    color: #123d4d;
+    color: var(--empresa-123d4d, #123d4d);
 }
 
 #modalCrearAsignacion .campo-create-intro p {
     margin: 2px 0 0;
     font-size: 11px;
     line-height: 1.4;
-    color: #5c7885;
+    color: var(--empresa-5c7885, #5c7885);
 }
 
 #modalCrearAsignacion .campo-create-section-title {
@@ -2650,7 +2650,7 @@
     gap: 7px;
     font-size: 12px;
     font-weight: 750;
-    color: #087c9a;
+    color: var(--empresa-087c9a, #087c9a);
     margin-top: 4px;
 }
 
@@ -2683,13 +2683,13 @@
     gap: 6px;
     margin-top: -5px;
     font-size: 11px;
-    color: #577887;
+    color: var(--empresa-577887, #577887);
 }
 
 #modalCrearAsignacion .campo-create-today {
     border: 0;
     background: transparent;
-    color: #087d9e;
+    color: var(--empresa-087d9e, #087d9e);
     font-size: 11px;
     font-weight: 700;
     padding: 4px 0;
@@ -2701,7 +2701,7 @@
 }
 
 #modalCrearAsignacion .campo-create-extra {
-    border: 1px solid #dce9ed;
+    border: 1px solid var(--empresa-dce9ed, #dce9ed);
     border-radius: 10px;
     overflow: hidden;
 }
@@ -2714,7 +2714,7 @@
     cursor: pointer;
     font-size: 12px;
     font-weight: 700;
-    color: #244e5d;
+    color: var(--empresa-244e5d, #244e5d);
     list-style: none;
 }
 
@@ -2813,7 +2813,7 @@
 }
 
 .campo-page .campo-action-icon:focus-visible {
-    outline: 2px solid #0891b2;
+    outline: 2px solid var(--empresa-0891b2, #0891b2);
     outline-offset: 3px;
 }
 
@@ -2850,11 +2850,11 @@
     flex: 0 0 42px !important;
     padding: 0 !important;
     margin: 0 !important;
-    border: 1px solid var(--border, #d6e5ec) !important;
+    border: 1px solid var(--border, var(--empresa-d6e5ec, #d6e5ec)) !important;
     border-radius: 11px !important;
     background: var(--surface, #ffffff) !important;
-    color: var(--primary, #087f9a) !important;
-    box-shadow: 0 1px 3px rgba(21, 73, 88, .04) !important;
+    color: var(--primary, var(--empresa-087f9a, #087f9a)) !important;
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--empresa-154958, #154958) 4%, transparent) !important;
     line-height: 1 !important;
     text-decoration: none !important;
     cursor: pointer;
@@ -2871,7 +2871,7 @@
 
 .campo-page .campo-icon-btn--info,
 .campo-page .campo-icon-btn--edit {
-    color: var(--primary, #087f9a) !important;
+    color: var(--primary, var(--empresa-087f9a, #087f9a)) !important;
 }
 
 .campo-page .campo-icon-btn--delete {
@@ -2882,8 +2882,8 @@
 
 .campo-page .campo-icon-btn--info:hover,
 .campo-page .campo-icon-btn--edit:hover {
-    background: var(--primary-light, #e3f6fa) !important;
-    border-color: #a8dce9 !important;
+    background: var(--primary-light, var(--empresa-e3f6fa, #e3f6fa)) !important;
+    border-color: var(--empresa-a8dce9, #a8dce9) !important;
 }
 
 .campo-page .campo-icon-btn--delete:hover {
@@ -2892,7 +2892,7 @@
 }
 
 .campo-page .campo-icon-btn:focus-visible {
-    outline: 2px solid var(--primary, #087f9a) !important;
+    outline: 2px solid var(--primary, var(--empresa-087f9a, #087f9a)) !important;
     outline-offset: 3px;
 }
 
@@ -2933,9 +2933,9 @@
     align-items: center;
     gap: 11px;
     padding: 11px 13px;
-    border: 1px solid #d7eaf0;
+    border: 1px solid var(--empresa-d7eaf0, #d7eaf0);
     border-radius: 12px;
-    background: #f3fbfe;
+    background: var(--empresa-f3fbfe, #f3fbfe);
 }
 
 #modalEditarAsignacion .campo-create-intro__icon {
@@ -2945,21 +2945,21 @@
     height: 36px;
     flex-shrink: 0;
     border-radius: 10px;
-    color: #087c9a;
-    background: #ddf3fa;
+    color: var(--empresa-087c9a, #087c9a);
+    background: var(--empresa-ddf3fa, #ddf3fa);
 }
 
 #modalEditarAsignacion .campo-create-intro strong {
     display: block;
     font-size: 13px;
-    color: #123d4d;
+    color: var(--empresa-123d4d, #123d4d);
 }
 
 #modalEditarAsignacion .campo-create-intro p {
     margin: 2px 0 0;
     font-size: 11px;
     line-height: 1.4;
-    color: #5c7885;
+    color: var(--empresa-5c7885, #5c7885);
 }
 
 #modalEditarAsignacion .campo-create-section-title {
@@ -2968,7 +2968,7 @@
     gap: 7px;
     font-size: 12px;
     font-weight: 750;
-    color: #087c9a;
+    color: var(--empresa-087c9a, #087c9a);
     margin-top: 4px;
 }
 
@@ -3001,13 +3001,13 @@
     gap: 6px;
     margin-top: -5px;
     font-size: 11px;
-    color: #577887;
+    color: var(--empresa-577887, #577887);
 }
 
 #modalEditarAsignacion .campo-create-today {
     border: 0;
     background: transparent;
-    color: #087d9e;
+    color: var(--empresa-087d9e, #087d9e);
     font-size: 11px;
     font-weight: 700;
     padding: 4px 0;
@@ -3019,7 +3019,7 @@
 }
 
 #modalEditarAsignacion .campo-create-extra {
-    border: 1px solid #dce9ed;
+    border: 1px solid var(--empresa-dce9ed, #dce9ed);
     border-radius: 10px;
     overflow: hidden;
 }
@@ -3032,7 +3032,7 @@
     cursor: pointer;
     font-size: 12px;
     font-weight: 700;
-    color: #244e5d;
+    color: var(--empresa-244e5d, #244e5d);
     list-style: none;
 }
 
@@ -3151,7 +3151,7 @@
 }
 
 :is(#modalCrearAsignacion, #modalEditarAsignacion) {
-    --campo-accent: var(--primary, #087f9a);
+    --campo-accent: var(--primary, var(--empresa-087f9a, #087f9a));
 }
 
 :is(#modalCrearAsignacion, #modalEditarAsignacion) .campo-create-form {

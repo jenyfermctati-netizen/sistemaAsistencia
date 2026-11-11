@@ -1,10 +1,10 @@
 .asistencias-page {
-    --attendance-text: #183844;
-    --attendance-muted: #58727b;
-    --attendance-border: #d4e2e6;
-    --attendance-soft: #f4f9fa;
-    --attendance-primary: #078ba5;
-    --attendance-primary-dark: #056f84;
+    --attendance-text: var(--empresa-183844, #183844);
+    --attendance-muted: var(--empresa-58727b, #58727b);
+    --attendance-border: var(--empresa-d4e2e6, #d4e2e6);
+    --attendance-soft: var(--empresa-f4f9fa, #f4f9fa);
+    --attendance-primary: var(--empresa-078ba5, #078ba5);
+    --attendance-primary-dark: var(--empresa-056f84, #056f84);
     display: grid;
     gap: 18px;
 }
@@ -30,12 +30,12 @@
     justify-content: space-between;
     gap: 24px;
     padding: 24px 26px;
-    border: 1px solid #cfe1e5;
+    border: 1px solid var(--empresa-cfe1e5, #cfe1e5);
     border-radius: 18px;
     background:
-        radial-gradient(circle at 82% 18%, rgba(20, 171, 194, .12), transparent 25%),
-        linear-gradient(120deg, #f7fcfd, #eef8fa);
-    box-shadow: 0 12px 30px rgba(24, 56, 68, .07);
+        radial-gradient(circle at 82% 18%, color-mix(in srgb, var(--empresa-14abc2, #14abc2) 12%, transparent), transparent 25%),
+        linear-gradient(120deg, var(--empresa-f7fcfd, #f7fcfd), var(--empresa-eef8fa, #eef8fa));
+    box-shadow: 0 12px 30px color-mix(in srgb, var(--empresa-183844, #183844) 7%, transparent);
 }
 
 .asistencias-hero__content {
@@ -70,10 +70,10 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    border: 1px solid #b9dce3;
+    border: 1px solid var(--empresa-b9dce3, #b9dce3);
     border-radius: 11px;
     background: rgba(255, 255, 255, .74);
-    color: #16778c;
+    color: var(--empresa-16778c, #16778c);
     font-size: 12px;
     font-weight: 750;
     white-space: nowrap;
@@ -106,7 +106,7 @@
     border-radius: 15px;
     background: #fff;
     color: var(--attendance-text);
-    box-shadow: 0 7px 20px rgba(24, 56, 68, .055);
+    box-shadow: 0 7px 20px color-mix(in srgb, var(--empresa-183844, #183844) 5.5%, transparent);
     text-decoration: none;
     transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
@@ -117,29 +117,29 @@
     bottom: 0;
     left: 0;
     width: 4px;
-    background: var(--metric-color, #138aa1);
+    background: var(--metric-color, var(--empresa-138aa1, #138aa1));
     content: "";
 }
 
 .asistencias-metric:hover,
 .asistencias-metric:focus-visible {
-    border-color: color-mix(in srgb, var(--metric-color, #138aa1) 55%, white);
-    box-shadow: 0 11px 26px rgba(24, 56, 68, .1);
+    border-color: color-mix(in srgb, var(--metric-color, var(--empresa-138aa1, #138aa1)) 55%, white);
+    box-shadow: 0 11px 26px color-mix(in srgb, var(--empresa-183844, #183844) 10%, transparent);
     transform: translateY(-2px);
 }
 
 .asistencias-metric:focus-visible {
-    outline: 3px solid rgba(7, 139, 165, .22);
+    outline: 3px solid color-mix(in srgb, var(--empresa-078ba5, #078ba5) 22%, transparent);
     outline-offset: 2px;
 }
 
 .asistencias-metric.is-active {
-    border-color: var(--metric-color, #138aa1);
-    background: color-mix(in srgb, var(--metric-color, #138aa1) 5%, white);
-    box-shadow: 0 10px 24px rgba(24, 56, 68, .1);
+    border-color: var(--metric-color, var(--empresa-138aa1, #138aa1));
+    background: color-mix(in srgb, var(--metric-color, var(--empresa-138aa1, #138aa1)) 5%, white);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--empresa-183844, #183844) 10%, transparent);
 }
 
-.asistencias-metric--total { --metric-color: #078ba5; }
+.asistencias-metric--total { --metric-color: var(--empresa-078ba5, #078ba5); }
 .asistencias-metric--success { --metric-color: #238566; }
 .asistencias-metric--warning { --metric-color: #c17825; }
 .asistencias-metric--info { --metric-color: #5276b8; }
@@ -169,7 +169,7 @@
 }
 
 .asistencias-metric__content > span {
-    color: #34545f;
+    color: var(--empresa-34545f, #34545f);
     font-size: 11px;
     font-weight: 750;
 }
@@ -195,7 +195,7 @@
 /* Ayuda contextual */
 .asistencias-guide {
     overflow: hidden;
-    border: 1px solid #d5e3e6;
+    border: 1px solid var(--empresa-d5e3e6, #d5e3e6);
     border-radius: 14px;
     background: #fff;
 }
@@ -217,7 +217,7 @@
 }
 
 .asistencias-guide summary:focus-visible {
-    outline: 3px solid rgba(7, 139, 165, .2);
+    outline: 3px solid color-mix(in srgb, var(--empresa-078ba5, #078ba5) 20%, transparent);
     outline-offset: -3px;
 }
 
@@ -228,8 +228,8 @@
     align-items: center;
     justify-content: center;
     border-radius: 11px;
-    background: #e8f6f8;
-    color: #078ba5;
+    background: var(--empresa-e8f6f8, #e8f6f8);
+    color: var(--empresa-078ba5, #078ba5);
 }
 
 .asistencias-guide__icon .ui-icon {
@@ -266,8 +266,8 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0;
-    border-top: 1px solid #e1eaec;
-    background: #f8fbfc;
+    border-top: 1px solid var(--empresa-e1eaec, #e1eaec);
+    background: var(--empresa-f8fbfc, #f8fbfc);
 }
 
 .asistencias-guide__flow > div {
@@ -281,7 +281,7 @@
 }
 
 .asistencias-guide__flow > div + div {
-    border-left: 1px solid #dbe6e9;
+    border-left: 1px solid var(--empresa-dbe6e9, #dbe6e9);
 }
 
 .asistencias-guide__flow > div > span {
@@ -292,14 +292,14 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: #dff2f5;
-    color: #087f98;
+    background: var(--empresa-dff2f5, #dff2f5);
+    color: var(--empresa-087f98, #087f98);
     font-size: 10px;
     font-weight: 850;
 }
 
 .asistencias-guide__flow strong {
-    color: #284852;
+    color: var(--empresa-284852, #284852);
     font-size: 11px;
 }
 
@@ -312,10 +312,10 @@
 /* Panel y filtros */
 .asistencias-page .asistencias-panel {
     overflow: hidden;
-    border: 1px solid #cfdee2;
+    border: 1px solid var(--empresa-cfdee2, #cfdee2);
     border-radius: 17px;
     background: #fff;
-    box-shadow: 0 12px 32px rgba(24, 56, 68, .075);
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--empresa-183844, #183844) 7.5%, transparent);
 }
 
 .asistencias-panel__intro {
@@ -324,8 +324,8 @@
     justify-content: space-between;
     gap: 20px;
     padding: 19px 20px 16px;
-    border-bottom: 1px solid #dce7ea;
-    background: linear-gradient(110deg, #fbfefe, #f2f9fa);
+    border-bottom: 1px solid var(--empresa-dce7ea, #dce7ea);
+    background: linear-gradient(110deg, var(--empresa-fbfefe, #fbfefe), var(--empresa-f2f9fa, #f2f9fa));
 }
 
 .asistencias-panel__intro h3 {
@@ -347,10 +347,10 @@
     align-items: baseline;
     gap: 2px 5px;
     padding: 9px 12px;
-    border: 1px solid #bbdce3;
+    border: 1px solid var(--empresa-bbdce3, #bbdce3);
     border-radius: 12px;
-    background: #e8f6f8;
-    color: #16768a;
+    background: var(--empresa-e8f6f8, #e8f6f8);
+    color: var(--empresa-16768a, #16768a);
 }
 
 .asistencias-panel__count strong {
@@ -365,14 +365,14 @@
 
 .asistencias-panel__count small {
     grid-column: 1 / -1;
-    color: #56747e;
+    color: var(--empresa-56747e, #56747e);
     font-size: 9px;
 }
 
 .asistencias-page .asistencias-filter-panel {
     display: block;
     padding: 14px 18px 16px;
-    border-bottom: 1px solid #dce7ea;
+    border-bottom: 1px solid var(--empresa-dce7ea, #dce7ea);
     background: #fff;
 }
 
@@ -385,7 +385,7 @@
 
 .asistencias-periods > span {
     margin-right: 4px;
-    color: #58727b;
+    color: var(--empresa-58727b, #58727b);
     font-size: 10px;
     font-weight: 800;
     letter-spacing: .04em;
@@ -397,10 +397,10 @@
     min-height: 30px;
     align-items: center;
     padding: 5px 10px;
-    border: 1px solid #d2e1e5;
+    border: 1px solid var(--empresa-d2e1e5, #d2e1e5);
     border-radius: 999px;
     background: #fff;
-    color: #47636d;
+    color: var(--empresa-47636d, #47636d);
     font-size: 10px;
     font-weight: 700;
     text-decoration: none;
@@ -409,13 +409,13 @@
 .asistencias-periods a:hover,
 .asistencias-periods a:focus-visible,
 .asistencias-periods a.is-active {
-    border-color: #8bc7d2;
-    background: #e4f5f7;
-    color: #087c94;
+    border-color: var(--empresa-8bc7d2, #8bc7d2);
+    background: var(--empresa-e4f5f7, #e4f5f7);
+    color: var(--empresa-087c94, #087c94);
 }
 
 .asistencias-periods a:focus-visible {
-    outline: 3px solid rgba(7, 139, 165, .18);
+    outline: 3px solid color-mix(in srgb, var(--empresa-078ba5, #078ba5) 18%, transparent);
     outline-offset: 2px;
 }
 
@@ -431,7 +431,7 @@
 }
 
 .asistencias-page .asistencias-filtros .filter-field__label {
-    color: #3c5963;
+    color: var(--empresa-3c5963, #3c5963);
     font-size: 10.5px;
     font-weight: 780;
 }
@@ -440,16 +440,16 @@
     width: 100%;
     min-width: 0;
     min-height: 42px;
-    border-color: #cbdce1;
+    border-color: var(--empresa-cbdce1, #cbdce1);
     border-radius: 10px;
-    background-color: #fbfdfd;
+    background-color: var(--empresa-fbfdfd, #fbfdfd);
     font-size: 12px;
 }
 
 .asistencias-page .asistencias-filtros :is(.form-control, .form-select):focus {
-    border-color: #2ba7bc;
+    border-color: var(--empresa-2ba7bc, #2ba7bc);
     outline: 0;
-    box-shadow: 0 0 0 3px rgba(7, 139, 165, .15);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--empresa-078ba5, #078ba5) 15%, transparent);
 }
 
 .asistencias-page .asistencias-filtros__actions {
@@ -470,12 +470,12 @@
     gap: 6px;
     margin-top: 12px;
     padding-top: 11px;
-    border-top: 1px solid #e4ecee;
+    border-top: 1px solid var(--empresa-e4ecee, #e4ecee);
 }
 
 .asistencias-active-filters strong {
     margin-right: 2px;
-    color: #36525c;
+    color: var(--empresa-36525c, #36525c);
     font-size: 10px;
 }
 
@@ -485,8 +485,8 @@
     align-items: center;
     padding: 4px 8px;
     border-radius: 999px;
-    background: #eef5f7;
-    color: #58727b;
+    background: var(--empresa-eef5f7, #eef5f7);
+    color: var(--empresa-58727b, #58727b);
     font-size: 9.5px;
 }
 
@@ -514,9 +514,9 @@
 
 .asistencias-page .attendance-ledger thead th {
     padding: 12px 9px;
-    border-bottom: 1px solid #cadde1;
-    background: #edf5f6;
-    color: #34535e;
+    border-bottom: 1px solid var(--empresa-cadde1, #cadde1);
+    background: var(--empresa-edf5f6, #edf5f6);
+    color: var(--empresa-34535e, #34535e);
     font-size: 9.5px;
     font-weight: 850;
     letter-spacing: .055em;
@@ -531,8 +531,8 @@
 .asistencias-page .attendance-ledger tbody td {
     min-width: 0;
     padding: 15px 9px;
-    border-bottom: 1px solid #e2eaec;
-    color: #284750;
+    border-bottom: 1px solid var(--empresa-e2eaec, #e2eaec);
+    color: var(--empresa-284750, #284750);
     font-size: 11px;
     vertical-align: middle;
 }
@@ -547,7 +547,7 @@
 }
 
 .asistencias-page .attendance-ledger tbody tr:hover {
-    background: #f8fbfc;
+    background: var(--empresa-f8fbfc, #f8fbfc);
 }
 
 .asistencias-page .attendance-ledger .attendance-date {
@@ -568,7 +568,7 @@
 }
 
 .attendance-date strong {
-    color: #183844;
+    color: var(--empresa-183844, #183844);
     font-size: 12px;
     text-transform: capitalize;
 }
@@ -591,10 +591,10 @@
     flex: 0 0 34px;
     align-items: center;
     justify-content: center;
-    border: 1px solid #b9dce3;
+    border: 1px solid var(--empresa-b9dce3, #b9dce3);
     border-radius: 10px;
-    background: #e2f4f7;
-    color: #087f98;
+    background: var(--empresa-e2f4f7, #e2f4f7);
+    color: var(--empresa-087f98, #087f98);
     font-size: 10px;
     font-weight: 850;
 }
@@ -607,7 +607,7 @@
 
 .attendance-worker__identity strong {
     overflow: hidden;
-    color: #183844;
+    color: var(--empresa-183844, #183844);
     font-size: 11.5px;
     line-height: 1.3;
     text-overflow: ellipsis;
@@ -629,7 +629,7 @@
 .attendance-context > strong {
     display: block;
     margin-bottom: 6px;
-    color: #294852;
+    color: var(--empresa-294852, #294852);
     font-size: 10.5px;
 }
 
@@ -646,7 +646,7 @@
     align-items: center;
     padding: 3px 7px;
     border-radius: 999px;
-    background: #eef3f4;
+    background: var(--empresa-eef3f4, #eef3f4);
     color: #596f76;
     font-size: 8.5px;
     font-weight: 800;
@@ -654,8 +654,8 @@
 }
 
 .attendance-control--obligatorio {
-    background: #e4f4f6;
-    color: #11758a;
+    background: var(--empresa-e4f4f6, #e4f4f6);
+    color: var(--empresa-11758a, #11758a);
 }
 
 .attendance-control--referencial {
@@ -678,9 +678,9 @@
     place-content: center;
     gap: 2px;
     padding: 6px 3px;
-    border: 1px solid #c9dce0;
+    border: 1px solid var(--empresa-c9dce0, #c9dce0);
     border-radius: 8px;
-    background: #f7fbfb;
+    background: var(--empresa-f7fbfb, #f7fbfb);
     text-align: center;
     font-variant-numeric: tabular-nums;
 }
@@ -695,7 +695,7 @@
 }
 
 .attendance-timeline__step strong {
-    color: #1c4651;
+    color: var(--empresa-1c4651, #1c4651);
     font-size: 11px;
 }
 
@@ -755,7 +755,7 @@
 }
 
 .attendance-balance strong {
-    color: #284852;
+    color: var(--empresa-284852, #284852);
     font-size: 10.5px;
     font-variant-numeric: tabular-nums;
 }
@@ -777,9 +777,9 @@
     min-height: 22px;
     align-items: center;
     padding: 3px 8px;
-    border: 1px solid #d0dcdf;
+    border: 1px solid var(--empresa-d0dcdf, #d0dcdf);
     border-radius: 999px;
-    background: #eef3f4;
+    background: var(--empresa-eef3f4, #eef3f4);
     color: #536a72;
     font-size: 8px;
     font-weight: 850;
@@ -809,7 +809,7 @@
 .attendance-status--sin-registro,
 .attendance-status--no-laborable {
     border-color: #d6dfe1;
-    background: #eff3f4;
+    background: var(--empresa-eff3f4, #eff3f4);
     color: #5f737a;
 }
 
@@ -848,22 +848,22 @@
     justify-content: center;
     gap: 8px;
     padding: 0;
-    border: 1px solid #c6dce1;
+    border: 1px solid var(--empresa-c6dce1, #c6dce1);
     border-radius: 10px;
     background: #fff;
-    color: #087f98;
+    color: var(--empresa-087f98, #087f98);
     cursor: pointer;
     transition: border-color .18s ease, background .18s ease, color .18s ease;
 }
 
 .attendance-detail-button:hover {
-    border-color: #5bb2c2;
-    background: #e8f6f8;
-    color: #056f84;
+    border-color: var(--empresa-5bb2c2, #5bb2c2);
+    background: var(--empresa-e8f6f8, #e8f6f8);
+    color: var(--empresa-056f84, #056f84);
 }
 
 .attendance-detail-button:focus-visible {
-    outline: 3px solid rgba(7, 139, 165, .2);
+    outline: 3px solid color-mix(in srgb, var(--empresa-078ba5, #078ba5) 20%, transparent);
     outline-offset: 2px;
 }
 
@@ -896,7 +896,7 @@
     justify-items: center;
     gap: 8px;
     margin: 0 auto;
-    color: #58727b;
+    color: var(--empresa-58727b, #58727b);
     text-align: center;
 }
 
@@ -907,8 +907,8 @@
     align-items: center;
     justify-content: center;
     border-radius: 14px;
-    background: #e8f6f8;
-    color: #078ba5;
+    background: var(--empresa-e8f6f8, #e8f6f8);
+    color: var(--empresa-078ba5, #078ba5);
 }
 
 .attendance-empty .ui-icon {
@@ -917,7 +917,7 @@
 }
 
 .attendance-empty strong {
-    color: #244650;
+    color: var(--empresa-244650, #244650);
     font-size: 14px;
 }
 
@@ -929,8 +929,8 @@
 
 .asistencias-pagination {
     padding: 13px 18px;
-    border-top: 1px solid #dce7ea;
-    background: #fbfdfd;
+    border-top: 1px solid var(--empresa-dce7ea, #dce7ea);
+    background: var(--empresa-fbfdfd, #fbfdfd);
 }
 
 /* Detalle de la jornada */
@@ -944,11 +944,11 @@
     margin: auto;
     padding: 0;
     overflow: hidden auto;
-    border: 1px solid #c8dce1;
+    border: 1px solid var(--empresa-c8dce1, #c8dce1);
     border-radius: 18px;
-    background: #f7fafb;
+    background: var(--empresa-f7fafb, #f7fafb);
     color: var(--attendance-text);
-    box-shadow: 0 30px 80px rgba(9, 35, 43, .32);
+    box-shadow: 0 30px 80px color-mix(in srgb, var(--empresa-09232b, #09232b) 32%, transparent);
 }
 
 .asistencia-detail-dialog:not([open]) {
@@ -956,7 +956,7 @@
 }
 
 .asistencia-detail-dialog::backdrop {
-    background: rgba(9, 30, 37, .62);
+    background: color-mix(in srgb, var(--empresa-091e25, #091e25) 62%, transparent);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
 }
@@ -970,7 +970,7 @@
     justify-content: space-between;
     gap: 16px;
     padding: 19px 20px;
-    background: linear-gradient(125deg, #0b6579, #078ba5 58%, #20a9bd);
+    background: linear-gradient(125deg, var(--empresa-0b6579, #0b6579), var(--empresa-078ba5, #078ba5) 58%, var(--empresa-20a9bd, #20a9bd));
     color: #fff;
 }
 
@@ -979,7 +979,7 @@
 }
 
 .asistencia-detail-dialog__header > div > span {
-    color: #c8f2f7;
+    color: var(--empresa-c8f2f7, #c8f2f7);
     font-size: 9px;
     font-weight: 850;
     letter-spacing: .1em;
@@ -1025,7 +1025,7 @@
 
 .asistencia-detail-summary,
 .asistencia-detail-group {
-    border: 1px solid #d6e3e6;
+    border: 1px solid var(--empresa-d6e3e6, #d6e3e6);
     border-radius: 13px;
     background: #fff;
 }
@@ -1045,7 +1045,7 @@
 }
 
 .asistencia-detail-summary > div > span {
-    color: #087f98;
+    color: var(--empresa-087f98, #087f98);
     font-size: 9px;
     font-weight: 800;
     letter-spacing: .04em;
@@ -1054,7 +1054,7 @@
 
 .asistencia-detail-summary > div > strong {
     overflow-wrap: anywhere;
-    color: #183844;
+    color: var(--empresa-183844, #183844);
     font-size: 14px;
 }
 
@@ -1069,7 +1069,7 @@
 
 .asistencia-detail-group h4 {
     margin: 0 0 11px;
-    color: #2a4a54;
+    color: var(--empresa-2a4a54, #2a4a54);
     font-size: 11px;
     letter-spacing: .035em;
     text-transform: uppercase;
@@ -1086,9 +1086,9 @@
 .asistencia-detail-punches > div {
     min-width: 0;
     padding: 9px 10px;
-    border: 1px solid #e0e9eb;
+    border: 1px solid var(--empresa-e0e9eb, #e0e9eb);
     border-radius: 9px;
-    background: #f8fbfb;
+    background: var(--empresa-f8fbfb, #f8fbfb);
 }
 
 .asistencia-detail-grid dt,
@@ -1104,7 +1104,7 @@
 .asistencia-detail-punches strong {
     margin: 0;
     overflow-wrap: anywhere;
-    color: #284852;
+    color: var(--empresa-284852, #284852);
     font-size: 11px;
 }
 
@@ -1112,13 +1112,13 @@
     margin: 9px 0 0;
     padding: 9px 10px;
     border-radius: 9px;
-    background: #edf6f7;
-    color: #526d76;
+    background: var(--empresa-edf6f7, #edf6f7);
+    color: var(--empresa-526d76, #526d76);
     font-size: 10px;
 }
 
 .asistencia-detail-programmed strong {
-    color: #2a505b;
+    color: var(--empresa-2a505b, #2a505b);
 }
 
 .asistencia-detail-punches {
@@ -1166,7 +1166,7 @@
 /* Procesamiento */
 .asistencia-process-form__intro {
     margin: 0 0 15px;
-    color: #58727b;
+    color: var(--empresa-58727b, #58727b);
     font-size: 12px;
     line-height: 1.5;
 }
@@ -1228,7 +1228,7 @@
     .asistencias-table-shell {
         padding: 12px;
         overflow: visible;
-        background: #f2f7f8;
+        background: var(--empresa-f2f7f8, #f2f7f8);
     }
 
     .asistencias-page .asistencias-panel .attendance-ledger,
@@ -1253,10 +1253,10 @@
         grid-template-columns: 105px minmax(180px, 1fr) minmax(220px, 1fr) 48px;
         gap: 0;
         overflow: hidden;
-        border: 1px solid #d2e1e4;
+        border: 1px solid var(--empresa-d2e1e4, #d2e1e4);
         border-radius: 14px;
         background: #fff;
-        box-shadow: 0 5px 16px rgba(24, 56, 68, .055);
+        box-shadow: 0 5px 16px color-mix(in srgb, var(--empresa-183844, #183844) 5.5%, transparent);
     }
 
     .asistencias-page .asistencias-panel .attendance-ledger .attendance-row > td {
@@ -1293,23 +1293,23 @@
     .asistencias-page .attendance-ledger .attendance-context {
         grid-column: 1 / 3;
         grid-row: 2;
-        border-top: 1px solid #e4ecee;
-        background: #fbfdfd;
+        border-top: 1px solid var(--empresa-e4ecee, #e4ecee);
+        background: var(--empresa-fbfdfd, #fbfdfd);
     }
 
     .asistencias-page .attendance-ledger .attendance-balance {
         grid-column: 3 / 5;
         grid-row: 2;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        border-top: 1px solid #e4ecee;
-        border-left: 1px solid #e4ecee;
-        background: #fbfdfd;
+        border-top: 1px solid var(--empresa-e4ecee, #e4ecee);
+        border-left: 1px solid var(--empresa-e4ecee, #e4ecee);
+        background: var(--empresa-fbfdfd, #fbfdfd);
     }
 
     .asistencias-page .attendance-ledger .attendance-punches {
         grid-column: 1 / 5;
         grid-row: 3;
-        border-top: 1px solid #e4ecee;
+        border-top: 1px solid var(--empresa-e4ecee, #e4ecee);
     }
 }
 
@@ -1333,7 +1333,7 @@
     }
 
     .asistencias-guide__flow > div + div {
-        border-top: 1px solid #dbe6e9;
+        border-top: 1px solid var(--empresa-dbe6e9, #dbe6e9);
         border-left: 0;
     }
 
@@ -1402,7 +1402,7 @@
         margin: 0 -13px 0;
         padding: 12px 13px;
         overflow-x: auto;
-        border-bottom: 1px solid #e0e9eb;
+        border-bottom: 1px solid var(--empresa-e0e9eb, #e0e9eb);
         scrollbar-width: none;
     }
 
@@ -1459,14 +1459,14 @@
     .asistencias-page .attendance-ledger .attendance-worker {
         grid-column: 1 / -1;
         grid-row: 2;
-        border-top: 1px solid #e4ecee;
+        border-top: 1px solid var(--empresa-e4ecee, #e4ecee);
     }
 
     .asistencias-page .attendance-ledger .attendance-result {
         grid-column: 1 / -1;
         grid-row: 3;
-        border-top: 1px solid #e4ecee;
-        background: #fbfdfd;
+        border-top: 1px solid var(--empresa-e4ecee, #e4ecee);
+        background: var(--empresa-fbfdfd, #fbfdfd);
     }
 
     .asistencias-page .attendance-ledger .attendance-context {

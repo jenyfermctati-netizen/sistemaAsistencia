@@ -63,7 +63,7 @@
     color: #ffffff;
 
     box-shadow:
-        0 3px 8px rgba(15, 118, 110, 0.16);
+        0 3px 8px color-mix(in srgb, var(--empresa-0f766e, #0f766e) 16%, transparent);
 }
 
 .button--primary:hover {
@@ -72,7 +72,7 @@
     border-color: var(--primary-hover);
 
     box-shadow:
-        0 5px 12px rgba(15, 118, 110, 0.20);
+        0 5px 12px color-mix(in srgb, var(--empresa-0f766e, #0f766e) 20%, transparent);
 }
 
 
@@ -243,9 +243,9 @@
 .alert--info {
     background: var(--primary-light);
 
-    border-color: rgba(15, 118, 110, 0.18);
+    border-color: color-mix(in srgb, var(--empresa-0f766e, #0f766e) 18%, transparent);
 
-    color: #115e59;
+    color: var(--empresa-115e59, #115e59);
 }
 
 
@@ -352,7 +352,7 @@
     transform: translateY(-2px);
 
     border-color:
-        rgba(15, 118, 110, 0.22);
+        color-mix(in srgb, var(--empresa-0f766e, #0f766e) 22%, transparent);
 
     box-shadow: var(--shadow);
 }
@@ -692,7 +692,7 @@ a.pagination__item:hover {
     border-color: var(--primary);
     background: var(--primary);
     color: var(--text-inverse);
-    box-shadow: 0 3px 8px rgba(15, 118, 110, 0.18);
+    box-shadow: 0 3px 8px color-mix(in srgb, var(--empresa-0f766e, #0f766e) 18%, transparent);
 }
 
 .pagination__item.is-disabled {

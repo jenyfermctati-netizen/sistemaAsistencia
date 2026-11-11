@@ -17,7 +17,16 @@
     @if(auth()->user()?->roleCode() === 'TRABAJADOR')
         <link rel="stylesheet" href="{{ asset('css/worker-interface.css') }}?v={{ filemtime(public_path('css/worker-interface.css')) }}">
     @endif
-</head>
+    @if(auth()->user() && !auth()->user()->isSuperAdmin())
+        @php($coloresEmpresa = \App\Support\ColoresEmpresa::variables(auth()->user()->empresa?->color_principal))
+        @if($coloresEmpresa)
+            <style>:root {
+                @foreach($coloresEmpresa as $nombreColor => $valorColor)
+                    {{ $nombreColor }}: {{ $valorColor }};
+                @endforeach
+            }</style>
+        @endif
+    @endif</head>
 <body class="{{ auth()->user()?->roleCode() === 'TRABAJADOR' ? 'worker-interface' : '' }}">
     <a class="skip-link" href="#mainContent">Ir al contenido principal</a>
     <div class="app">

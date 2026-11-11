@@ -38,21 +38,47 @@
         @if ($esSuperAdmin)
             <div class="sidebar__section">
                 <div class="sidebar__title">Plataforma SaaS</div>
-                <a href="{{ route('superadmin.empresas.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.empresas.*') ? 'active' : '' }}">
+                @php
+                    $empresaMenu = request()->route('empresa');
+                    $seccionMenu = request('seccion', 'informacion');
+                    $enEmpresas = request()->routeIs('superadmin.empresas.*', 'superadmin.administradores.*');
+                @endphp
+                <details class="sidebar-company-menu" @if($enEmpresas) open @endif>
+                <summary class="sidebar__item">
                     <span class="sidebar__icon"><x-nav-icon name="areas" /></span>
                     <span class="sidebar__label">Empresas</span>
-                </a>
-                <a href="{{ route('superadmin.administradores.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.administradores.*') ? 'active' : '' }}">
-                    <span class="sidebar__icon"><x-nav-icon name="users" /></span>
-                    <span class="sidebar__label">Administradores</span>
-                </a>
-                <a href="{{ route('superadmin.dispositivos.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.dispositivos.*') ? 'active' : '' }}">
-                    <span class="sidebar__icon"><x-nav-icon name="fingerprint" /></span>
-                    <span class="sidebar__label">Dispositivos</span>
-                </a>
+                    <span class="sidebar-company-chevron" aria-hidden="true">⌄</span>
+                </summary>
+                <div class="sidebar-company-submenu">
+                    <a class="sidebar__item {{ request()->routeIs('superadmin.empresas.index') && !request()->has('seccion') ? 'active' : '' }}" href="{{ route('superadmin.empresas.index') }}">
+                        <span class="sidebar__icon"><x-nav-icon name="areas" /></span><span class="sidebar__label">Todas las empresas</span>
+                    </a>
+                    <a class="sidebar__item {{ request()->routeIs('superadmin.empresas.create') ? 'active' : '' }}" href="{{ route('superadmin.empresas.create') }}">
+                        <span class="sidebar__icon"><x-ui-icon name="plus" /></span><span class="sidebar__label">Agregar empresa</span>
+                    </a>
+                    @if($empresaMenu instanceof \App\Models\Empresa)
+                        <span class="sidebar-company-name">{{ $empresaMenu->nombre_comercial ?: $empresaMenu->razon_social }}</span>
+                    @endif
+                    @foreach(['informacion' => ['Información', 'areas'], 'administradores' => ['Administradores', 'users'], 'configuracion' => ['Configuración', 'clock']] as $clave => [$etiqueta, $icono])
+                        <a href="{{ $empresaMenu instanceof \App\Models\Empresa ? route('superadmin.empresas.show', ['empresa' => $empresaMenu, 'seccion' => $clave]) : route('superadmin.empresas.index', ['seccion' => $clave]) }}"
+                           class="sidebar__item {{ ($empresaMenu instanceof \App\Models\Empresa || (request()->routeIs('superadmin.empresas.index') && request()->has('seccion'))) && $seccionMenu === $clave ? 'active' : '' }}"
+                           @if(($empresaMenu instanceof \App\Models\Empresa || (request()->routeIs('superadmin.empresas.index') && request()->has('seccion'))) && $seccionMenu === $clave) aria-current="page" @endif>
+                            <span class="sidebar__icon"><x-nav-icon :name="$icono" /></span>
+                            <span class="sidebar__label">{{ $etiqueta }}</span>
+                        </a>
+                    @endforeach
+                    @if($empresaMenu instanceof \App\Models\Empresa)
+                        <a class="sidebar__item" href="{{ route('superadmin.empresas.index', ['seccion' => $seccionMenu]) }}"><span class="sidebar__label">Cambiar empresa</span></a>
+                    @endif
+                </div>
+                </details>
                 <a href="{{ route('superadmin.auditoria.index') }}" class="sidebar__item {{ request()->routeIs('superadmin.auditoria.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="tasks" /></span>
                     <span class="sidebar__label">Auditoría</span>
+                </a>
+                <a href="{{ route('superadmin.ayuda') }}" class="sidebar__item {{ request()->routeIs('superadmin.ayuda') ? 'active' : '' }}">
+                    <span class="sidebar__icon"><x-nav-icon name="requests" /></span>
+                    <span class="sidebar__label">Ayuda</span>
                 </a>
             </div>
         @endif

@@ -1,0 +1,8 @@
+<details class="sa-section" id="guia"><summary><x-ui-icon name="report" /> Cómo funciona <span>Roles, invitaciones y primeros pasos</span></summary><div class="sa-guide">
+<h3>Tu cuenta de superadministrador</h3><p>Al ingresar ves la plataforma: empresas, administradores, dispositivos e historial. Tú creas las empresas y controlas su acceso.</p>
+<h3>Cómo designar al administrador</h3><ol><li>Abre <strong>Empresas → Nueva empresa</strong>.</li><li>Completa los datos de la empresa y <strong>Designar administrador</strong> con su nombre y correo.</li><li>Selecciona <strong>Crear empresa y enviar invitación</strong>. Se abrirá su ficha.</li><li>El administrador abre el correo, define su contraseña e ingresa por la misma pantalla de inicio de sesión.</li></ol>
+<p>Para agregar otro responsable: <strong>Empresas → Administrar → Agregar administrador</strong>. Cada cuenta utiliza un correo único; el sistema actual asigna cada administrador a una empresa.</p>
+<h3>Qué verá el administrador</h3><p>Su panel muestra solo los datos de su empresa. Primero configura áreas y horario; luego registra el personal. Puede gestionar asistencia, solicitudes y reportes. Los biométricos se configuran cuando la empresa los utiliza.</p>
+<h3>Si no llega el correo</h3><p>Revisa la dirección y spam. El botón con el sobre en la ficha permite reenviar la invitación. Es necesario configurar el servicio de correo. Si MAIL_MAILER es log, el mensaje se guarda en storage/logs/laravel.log y no llega al buzón.</p>
+<h3>Estados de acceso</h3><p><strong>Activa:</strong> permite trabajar. <strong>Suspendida o inactiva:</strong> bloquea el acceso operativo y conserva los registros. Abre Datos y acceso en la ficha para cambiarlo.</p>
+</div></details>

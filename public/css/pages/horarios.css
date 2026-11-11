@@ -1,12 +1,12 @@
 /* Editor del horario general: jerarquía por pasos y semana legible. */
 .horario-page {
-    --schedule-primary: #087f9a;
-    --schedule-primary-soft: #e1f4f7;
-    --schedule-text: #183844;
-    --schedule-muted: #58727b;
-    --schedule-border: #c9d9de;
+    --schedule-primary: var(--empresa-087f9a, #087f9a);
+    --schedule-primary-soft: var(--empresa-e1f4f7, #e1f4f7);
+    --schedule-text: var(--empresa-183844, #183844);
+    --schedule-muted: var(--empresa-58727b, #58727b);
+    --schedule-border: var(--empresa-c9d9de, #c9d9de);
     --schedule-surface: #ffffff;
-    --schedule-soft: #f5f9fa;
+    --schedule-soft: var(--empresa-f5f9fa, #f5f9fa);
     --schedule-warm: #fff8ec;
     --schedule-danger: #9f443b;
     --schedule-danger-soft: #fff0ee;
@@ -44,9 +44,9 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    border: 1px solid rgba(8, 127, 154, .22);
+    border: 1px solid color-mix(in srgb, var(--empresa-087f9a, #087f9a) 22%, transparent);
     border-radius: 11px;
-    background: rgba(225, 244, 247, .7);
+    background: color-mix(in srgb, var(--empresa-e1f4f7, #e1f4f7) 70%, transparent);
     color: var(--schedule-primary);
     font-size: 12px;
     font-weight: 750;
@@ -70,7 +70,7 @@
     justify-content: space-between;
     gap: 18px;
     padding: 20px 22px;
-    background: linear-gradient(135deg, #f9fcfc, #eef8fa);
+    background: linear-gradient(135deg, var(--empresa-f9fcfc, #f9fcfc), var(--empresa-eef8fa, #eef8fa));
 }
 
 .horario-general__header > div {
@@ -171,7 +171,7 @@
     color: #fff;
     font-size: 14px;
     font-weight: 850;
-    box-shadow: 0 5px 14px rgba(8, 127, 154, .2);
+    box-shadow: 0 5px 14px color-mix(in srgb, var(--empresa-087f9a, #087f9a) 20%, transparent);
 }
 
 .horario-step__heading h3 {
@@ -367,7 +367,7 @@
     padding: 13px 15px;
     border: 1px solid var(--schedule-border);
     border-radius: 13px;
-    background: linear-gradient(135deg, #f9fcfc, #f1f8f9);
+    background: linear-gradient(135deg, var(--empresa-f9fcfc, #f9fcfc), var(--empresa-f1f8f9, #f1f8f9));
 }
 
 .horario-week-guide__summary {
@@ -467,18 +467,18 @@
     border: 1px solid var(--schedule-border);
     border-radius: 13px;
     background: var(--schedule-surface);
-    box-shadow: 0 3px 10px rgba(24, 56, 68, .035);
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--empresa-183844, #183844) 3.5%, transparent);
     transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
 }
 
 .dia-editor:hover {
-    border-color: #9fc6d0;
-    box-shadow: 0 5px 14px rgba(24, 56, 68, .065);
+    border-color: var(--empresa-9fc6d0, #9fc6d0);
+    box-shadow: 0 5px 14px color-mix(in srgb, var(--empresa-183844, #183844) 6.5%, transparent);
 }
 
 .dia-editor:focus-within {
     border-color: var(--schedule-primary);
-    box-shadow: 0 0 0 3px rgba(8, 127, 154, .12);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--empresa-087f9a, #087f9a) 12%, transparent);
 }
 
 .dia-editor.is-invalid {
@@ -524,7 +524,7 @@
     align-items: center;
     margin-left: auto;
     padding: 3px 7px;
-    border: 1px solid rgba(8, 127, 154, .18);
+    border: 1px solid color-mix(in srgb, var(--empresa-087f9a, #087f9a) 18%, transparent);
     border-radius: 999px;
     background: var(--schedule-primary-soft);
     color: var(--schedule-primary);
@@ -599,7 +599,7 @@
     min-height: 40px;
     align-items: center;
     justify-content: center;
-    border: 1px dashed #cbd9dc;
+    border: 1px dashed var(--empresa-cbd9dc, #cbd9dc);
     border-radius: 9px;
     background: #f7f9f9;
     color: #7a8f96;
@@ -667,7 +667,7 @@
 
 .dia-editor--descanso .dia-editor__estado {
     border-color: #d5dddf;
-    background: #edf1f2;
+    background: var(--empresa-edf1f2, #edf1f2);
     color: #63767c;
 }
 
@@ -682,7 +682,7 @@
     margin: 28px -24px -24px;
     padding: 16px 24px;
     border-top: 1px solid var(--schedule-border);
-    background: #f8fbfb;
+    background: var(--empresa-f8fbfb, #f8fbfb);
 }
 
 .horario-save-summary {
@@ -883,7 +883,7 @@
         margin: 0 -13px;
         padding: 11px 50px 12px 13px;
         border-bottom: 1px solid var(--schedule-border);
-        background: #f1f8f9;
+        background: var(--empresa-f1f8f9, #f1f8f9);
     }
 
     .dia-editor__journey {

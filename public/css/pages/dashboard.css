@@ -1,9 +1,9 @@
 .dashboard-page {
-    --dashboard-petrol: #204c5b;
-    --dashboard-blue: #b6eaf4;
-    --dashboard-sand: #c9d9de;
-    --dashboard-ivory: #e8f0f2;
-    --dashboard-graphite: #285968;
+    --dashboard-petrol: var(--empresa-204c5b, #204c5b);
+    --dashboard-blue: var(--empresa-b6eaf4, #b6eaf4);
+    --dashboard-sand: var(--empresa-c9d9de, #c9d9de);
+    --dashboard-ivory: var(--empresa-e8f0f2, #e8f0f2);
+    --dashboard-graphite: var(--empresa-285968, #285968);
     display: grid;
     gap: 22px;
     width: 100%;
@@ -64,7 +64,7 @@
     margin-right: 8px;
     border-radius: 50%;
     background: var(--palette-smoke-blue);
-    box-shadow: 0 0 0 4px rgba(0, 169, 199, .15);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--empresa-00a9c7, #00a9c7) 15%, transparent);
 }
 
 .dashboard-metrics {
@@ -88,7 +88,7 @@
     background: #ffffff;
     color: inherit;
     text-decoration: none;
-    box-shadow: 0 10px 28px rgba(38, 70, 83, .075);
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--empresa-264653, #264653) 7.5%, transparent);
     transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
@@ -97,7 +97,7 @@
 }
 
 .dashboard-metric[href]:focus-visible {
-    outline: 3px solid rgba(0, 169, 199, .9);
+    outline: 3px solid color-mix(in srgb, var(--empresa-00a9c7, #00a9c7) 90%, transparent);
     outline-offset: 3px;
 }
 
@@ -117,26 +117,26 @@
     width: 94px;
     height: 94px;
     border-radius: 50%;
-    background: rgba(38, 70, 83, .045);
+    background: color-mix(in srgb, var(--empresa-264653, #264653) 4.5%, transparent);
 }
 
 .dashboard-metric:hover {
     transform: translateY(-2px);
     border-color: var(--dashboard-blue);
-    box-shadow: 0 17px 38px rgba(38, 70, 83, .12);
+    box-shadow: 0 17px 38px color-mix(in srgb, var(--empresa-264653, #264653) 12%, transparent);
 }
 
 .dashboard-metric--blue::before { background: var(--dashboard-blue); }
 .dashboard-metric--sand::before { background: #b99e7d; }
 .dashboard-metric--graphite::before { background: var(--dashboard-graphite); }
-.dashboard-metric--blue::after { background: rgba(0, 169, 199, .20); }
+.dashboard-metric--blue::after { background: color-mix(in srgb, var(--empresa-00a9c7, #00a9c7) 20%, transparent); }
 .dashboard-metric--sand::after { background: rgba(217, 205, 191, .22); }
 .dashboard-metric--graphite::after { background: rgba(73, 80, 87, .06); }
 
 .dashboard-metric__label {
     position: relative;
     z-index: 1;
-    color: #58727b;
+    color: var(--empresa-58727b, #58727b);
     font-size: 10.5px;
     font-weight: 850;
     letter-spacing: .09em;
@@ -176,7 +176,7 @@
     border: 1px solid var(--dashboard-sand);
     border-radius: 21px;
     background: #ffffff;
-    box-shadow: 0 12px 32px rgba(38, 70, 83, .075);
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--empresa-264653, #264653) 7.5%, transparent);
     overflow: hidden;
 }
 
@@ -285,7 +285,7 @@
     display: block;
     height: 100%;
     border-radius: inherit;
-    background: linear-gradient(90deg, var(--dashboard-petrol), #7194a5);
+    background: linear-gradient(90deg, var(--dashboard-petrol), var(--empresa-7194a5, #7194a5));
 }
 
 .dashboard-area__details {
@@ -311,8 +311,8 @@
 
 .dashboard-attention:hover {
     transform: translateX(2px);
-    border-color: #d5e3ea;
-    background: #f2f6f7;
+    border-color: var(--empresa-d5e3ea, #d5e3ea);
+    background: var(--empresa-f2f6f7, #f2f6f7);
 }
 
 .dashboard-attention__marker,
@@ -325,14 +325,14 @@
     justify-content: center;
     flex: 0 0 auto;
     border-radius: 13px;
-    background: #e5eef2;
+    background: var(--empresa-e5eef2, #e5eef2);
     color: var(--dashboard-petrol);
     font-size: 10px;
     font-weight: 900;
     letter-spacing: .04em;
 }
 
-.dashboard-attention__marker--blue { background: #e5f0f5; }
+.dashboard-attention__marker--blue { background: var(--empresa-e5f0f5, #e5f0f5); }
 .dashboard-attention__marker--sand { background: #f0e8dc; color: #765c3d; }
 .dashboard-attention__marker--graphite { background: #e9eaeb; color: var(--dashboard-graphite); }
 
@@ -407,9 +407,9 @@
 .dashboard-status {
     display: inline-flex;
     padding: 5px 9px;
-    border: 1px solid #cbdce4;
+    border: 1px solid var(--empresa-cbdce4, #cbdce4);
     border-radius: 999px;
-    background: #edf4f6;
+    background: var(--empresa-edf4f6, #edf4f6);
     color: var(--dashboard-petrol);
     font-size: 9.5px;
     font-weight: 850;
@@ -438,10 +438,10 @@
     gap: 24px;
     padding: 23px 25px;
     overflow: hidden;
-    border: 1px solid #cbdde5;
+    border: 1px solid var(--empresa-cbdde5, #cbdde5);
     border-radius: 20px;
-    background: linear-gradient(120deg, #edf5f7 0%, #ffffff 72%);
-    box-shadow: 0 12px 30px rgba(38, 70, 83, .075);
+    background: linear-gradient(120deg, var(--empresa-edf5f7, #edf5f7) 0%, #ffffff 72%);
+    box-shadow: 0 12px 30px color-mix(in srgb, var(--empresa-264653, #264653) 7.5%, transparent);
 }
 
 .dashboard-today::before {
@@ -474,9 +474,9 @@
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    border: 1px solid #c6dbe5;
+    border: 1px solid var(--empresa-c6dbe5, #c6dbe5);
     border-radius: 15px;
-    background: #dceaf0;
+    background: var(--empresa-dceaf0, #dceaf0);
     color: var(--dashboard-petrol);
     font-size: 13px;
     font-weight: 900;
@@ -506,7 +506,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    background: #e4eef2;
+    background: var(--empresa-e4eef2, #e4eef2);
 }
 
 .dashboard-day__date strong { color: var(--dashboard-petrol); font-size: 15px; line-height: 1; }
@@ -531,7 +531,7 @@
     transition: transform .16s ease, border-color .16s ease, background .16s ease;
 }
 
-.dashboard-quick:hover { transform: translateY(-2px); border-color: var(--dashboard-blue); background: #f3f7f8; }
+.dashboard-quick:hover { transform: translateY(-2px); border-color: var(--dashboard-blue); background: var(--empresa-f3f7f8, #f3f7f8); }
 .dashboard-quick > span { width: 33px; height: 33px; border-radius: 10px; }
 .dashboard-quick strong { color: var(--dashboard-petrol); font-size: 11.5px; }
 .dashboard-quick small { color: #777e82; font-size: 10px; line-height: 1.35; }
@@ -594,7 +594,7 @@
 }
 
 .dashboard-report__filters label span {
-    color: #58727b;
+    color: var(--empresa-58727b, #58727b);
     font-size: 9px;
     font-weight: 850;
     letter-spacing: .08em;
@@ -882,7 +882,7 @@
     .dashboard-table td:first-child {
         grid-column: 1 / -1;
         border-bottom: 1px solid #dfd5c9;
-        background: #f1f5f6;
+        background: var(--empresa-f1f5f6, #f1f5f6);
     }
     .dashboard-table td::before {
         content: attr(data-label);
@@ -1011,13 +1011,13 @@
 
 /* Dashboard operativo: visualizaciones nativas y panel personal. */
 .dashboard-modern {
-    --dashboard-accent: #078ba5;
-    --dashboard-accent-soft: #e6f5f8;
+    --dashboard-accent: var(--empresa-078ba5, #078ba5);
+    --dashboard-accent-soft: var(--empresa-e6f5f8, #e6f5f8);
     --dashboard-success: #0f9f77;
     --dashboard-warning: #b76e12;
     --dashboard-danger: #c74b58;
-    --dashboard-line: #dce7ec;
-    --dashboard-surface: #f7fafb;
+    --dashboard-line: var(--empresa-dce7ec, #dce7ec);
+    --dashboard-surface: var(--empresa-f7fafb, #f7fafb);
 }
 
 .dashboard-modern .dashboard-metric {
@@ -1025,7 +1025,7 @@
 }
 
 .dashboard-modern .dashboard-metric:hover {
-    border-color: #9bcfdb;
+    border-color: var(--empresa-9bcfdb, #9bcfdb);
 }
 
 .dashboard-modern .dashboard-metric__icon {
@@ -1051,10 +1051,10 @@
     align-items: center;
     min-height: 30px;
     padding: 5px 10px;
-    border: 1px solid #cfe0e6;
+    border: 1px solid var(--empresa-cfe0e6, #cfe0e6);
     border-radius: 999px;
-    background: #f4f9fa;
-    color: #42616b;
+    background: var(--empresa-f4f9fa, #f4f9fa);
+    color: var(--empresa-42616b, #42616b);
     font-size: 11px;
     font-weight: 750;
     white-space: nowrap;
@@ -1098,7 +1098,7 @@
     width: min(174px, 78%);
     aspect-ratio: 1;
     border-radius: 50%;
-    box-shadow: 0 10px 28px rgba(15, 47, 59, .09);
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--empresa-0f2f3b, #0f2f3b) 9%, transparent);
 }
 
 .dashboard-modern .dashboard-donut-chart__center {
@@ -1108,14 +1108,14 @@
     align-content: center;
     justify-items: center;
     padding: 8px;
-    border: 1px solid #edf3f5;
+    border: 1px solid var(--empresa-edf3f5, #edf3f5);
     border-radius: 50%;
     background: #fff;
     text-align: center;
 }
 
 .dashboard-modern .dashboard-donut-chart__center strong {
-    color: #173e4b;
+    color: var(--empresa-173e4b, #173e4b);
     font-size: 30px;
     line-height: 1;
     letter-spacing: -.04em;
@@ -1151,7 +1151,7 @@
 }
 
 .dashboard-modern .dashboard-chart-legend__item b {
-    color: #173e4b;
+    color: var(--empresa-173e4b, #173e4b);
     font-variant-numeric: tabular-nums;
 }
 
@@ -1163,9 +1163,9 @@
     justify-items: center;
     gap: 6px;
     padding: 24px;
-    border: 1px dashed #cbdde4;
+    border: 1px dashed var(--empresa-cbdde4, #cbdde4);
     border-radius: 14px;
-    background: #f8fbfc;
+    background: var(--empresa-f8fbfc, #f8fbfc);
     color: #698089;
     text-align: center;
 }
@@ -1177,13 +1177,13 @@
     place-items: center;
     margin-bottom: 3px;
     border-radius: 50%;
-    background: #e8f3f6;
+    background: var(--empresa-e8f3f6, #e8f3f6);
     color: var(--dashboard-accent);
     font-size: 22px;
 }
 
 .dashboard-modern .dashboard-chart-empty strong {
-    color: #264e5b;
+    color: var(--empresa-264e5b, #264e5b);
     font-size: 13px;
 }
 
@@ -1204,7 +1204,7 @@
 
 .dashboard-modern .dashboard-coverage-row {
     padding: 14px 15px;
-    border: 1px solid #e0e9ed;
+    border: 1px solid var(--empresa-e0e9ed, #e0e9ed);
     border-radius: 13px;
     background: var(--dashboard-surface);
 }
@@ -1225,7 +1225,7 @@
 
 .dashboard-modern .dashboard-coverage-row__title strong {
     overflow: hidden;
-    color: #183f4c;
+    color: var(--empresa-183f4c, #183f4c);
     font-size: 12.5px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1248,14 +1248,14 @@
     margin: 11px 0 9px;
     overflow: hidden;
     border-radius: 999px;
-    background: #e3ecef;
+    background: var(--empresa-e3ecef, #e3ecef);
 }
 
 .dashboard-modern .dashboard-coverage-row__track > span {
     display: block;
     height: 100%;
     border-radius: inherit;
-    background: linear-gradient(90deg, #087f99, #23acc3);
+    background: linear-gradient(90deg, var(--empresa-087f99, #087f99), var(--empresa-23acc3, #23acc3));
     transition: width .35s ease;
 }
 
@@ -1316,7 +1316,7 @@
 
 .dashboard-modern .dashboard-area-stacked-chart__label strong {
     overflow: hidden;
-    color: #183f4c;
+    color: var(--empresa-183f4c, #183f4c);
     font-size: 11px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1333,11 +1333,11 @@
     height: 27px;
     display: flex;
     overflow: hidden;
-    border: 1px solid #dce6ea;
+    border: 1px solid var(--empresa-dce6ea, #dce6ea);
     border-radius: 7px;
     background:
-        linear-gradient(90deg, transparent 24.8%, #dce6ea 25%, transparent 25.2%, transparent 49.8%, #dce6ea 50%, transparent 50.2%, transparent 74.8%, #dce6ea 75%, transparent 75.2%),
-        #f3f7f8;
+        linear-gradient(90deg, transparent 24.8%, var(--empresa-dce6ea, #dce6ea) 25%, transparent 25.2%, transparent 49.8%, var(--empresa-dce6ea, #dce6ea) 50%, transparent 50.2%, transparent 74.8%, var(--empresa-dce6ea, #dce6ea) 75%, transparent 75.2%),
+        var(--empresa-f3f7f8, #f3f7f8);
 }
 
 .dashboard-modern .dashboard-area-stacked-chart__segment {
@@ -1357,7 +1357,7 @@
 }
 
 .dashboard-modern .dashboard-area-stacked-chart__total {
-    color: #405e69;
+    color: var(--empresa-405e69, #405e69);
     font-size: 11px;
     font-variant-numeric: tabular-nums;
     text-align: right;
@@ -1404,19 +1404,19 @@
     background: #fff;
     color: inherit;
     text-decoration: none;
-    box-shadow: 0 5px 18px rgba(15, 47, 59, .045);
+    box-shadow: 0 5px 18px color-mix(in srgb, var(--empresa-0f2f3b, #0f2f3b) 4.5%, transparent);
     transition: border-color .16s ease, transform .16s ease, box-shadow .16s ease;
 }
 
 .dashboard-modern .dashboard-action-card:hover {
     transform: translateY(-2px);
-    border-color: #9bcfdb;
-    box-shadow: 0 10px 24px rgba(15, 47, 59, .08);
+    border-color: var(--empresa-9bcfdb, #9bcfdb);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--empresa-0f2f3b, #0f2f3b) 8%, transparent);
 }
 
 .dashboard-modern .dashboard-action-card:focus-visible,
 .dashboard-modern .dashboard-quick:focus-visible {
-    outline: 3px solid rgba(7, 139, 165, .28);
+    outline: 3px solid color-mix(in srgb, var(--empresa-078ba5, #078ba5) 28%, transparent);
     outline-offset: 2px;
 }
 
@@ -1426,8 +1426,8 @@
     display: grid;
     place-items: center;
     border-radius: 11px;
-    background: #e8f5f7;
-    color: #087f99;
+    background: var(--empresa-e8f5f7, #e8f5f7);
+    color: var(--empresa-087f99, #087f99);
 }
 
 .dashboard-modern .dashboard-action-card__icon--blue {
@@ -1462,7 +1462,7 @@
 
 .dashboard-modern .dashboard-action-card__content strong {
     overflow: hidden;
-    color: #173e4b;
+    color: var(--empresa-173e4b, #173e4b);
     font-size: 12.5px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1475,9 +1475,9 @@
 .dashboard-modern .dashboard-today {
     align-items: stretch;
     padding: 25px 26px;
-    border-color: #cfe1e6;
+    border-color: var(--empresa-cfe1e6, #cfe1e6);
     border-radius: 17px;
-    background: linear-gradient(120deg, #edf8fa 0%, #fff 75%);
+    background: linear-gradient(120deg, var(--empresa-edf8fa, #edf8fa) 0%, #fff 75%);
 }
 
 .dashboard-modern .dashboard-today__status {
@@ -1531,7 +1531,7 @@
     display: grid;
     gap: 3px;
     padding: 11px 10px 10px 27px;
-    border: 1px solid #dce8ec;
+    border: 1px solid var(--empresa-dce8ec, #dce8ec);
     border-radius: 11px;
     background: rgba(255, 255, 255, .78);
 }
@@ -1563,7 +1563,7 @@
 }
 
 .dashboard-modern .dashboard-timeline__item strong {
-    color: #173e4b;
+    color: var(--empresa-173e4b, #173e4b);
     font-size: 15px;
     font-variant-numeric: tabular-nums;
 }
@@ -1573,7 +1573,7 @@
     min-width: 220px;
     max-width: 280px;
     padding: 13px;
-    border: 1px solid #d8e6ea;
+    border: 1px solid var(--empresa-d8e6ea, #d8e6ea);
     border-radius: 13px;
     background: rgba(255, 255, 255, .72);
 }
@@ -1582,8 +1582,8 @@
     width: 42px;
     height: 42px;
     border-radius: 12px;
-    background: #dff1f5;
-    color: #087f99;
+    background: var(--empresa-dff1f5, #dff1f5);
+    color: var(--empresa-087f99, #087f99);
 }
 
 .dashboard-modern .dashboard-attendance-calendar {
@@ -1618,9 +1618,9 @@
     justify-items: center;
     gap: 3px;
     padding: 7px 4px;
-    border: 1px solid #dce6ea;
+    border: 1px solid var(--empresa-dce6ea, #dce6ea);
     border-radius: 10px;
-    background: #f6f9fa;
+    background: var(--empresa-f6f9fa, #f6f9fa);
     color: #60747c;
 }
 
@@ -1654,9 +1654,9 @@
 }
 
 .dashboard-modern .dashboard-attendance-day--info {
-    border-color: #b8dce6;
-    background: #ebf6f9;
-    color: #176d82;
+    border-color: var(--empresa-b8dce6, #b8dce6);
+    background: var(--empresa-ebf6f9, #ebf6f9);
+    color: var(--empresa-176d82, #176d82);
 }
 
 .dashboard-modern .dashboard-attendance-day--danger {
@@ -1696,14 +1696,14 @@
     height: 8px;
     flex: 0 0 8px;
     border-radius: 50%;
-    background: #cbd5dc;
+    background: var(--empresa-cbd5dc, #cbd5dc);
 }
 
 .dashboard-modern .dashboard-attendance-calendar__legend .is-success { background: var(--dashboard-success); }
 .dashboard-modern .dashboard-attendance-calendar__legend .is-warning { background: #d58a24; }
-.dashboard-modern .dashboard-attendance-calendar__legend .is-info { background: #168cab; }
+.dashboard-modern .dashboard-attendance-calendar__legend .is-info { background: var(--empresa-168cab, #168cab); }
 .dashboard-modern .dashboard-attendance-calendar__legend .is-danger { background: #d65c67; }
-.dashboard-modern .dashboard-attendance-calendar__legend .is-pending { background: #cbd5dc; }
+.dashboard-modern .dashboard-attendance-calendar__legend .is-pending { background: var(--empresa-cbd5dc, #cbd5dc); }
 
 .dashboard-modern .dashboard-calendar-notice {
     min-width: 0;
@@ -1712,9 +1712,9 @@
     align-items: center;
     gap: 10px;
     padding: 10px 11px;
-    border: 1px solid #dce6ea;
+    border: 1px solid var(--empresa-dce6ea, #dce6ea);
     border-radius: 11px;
-    background: #f7fafb;
+    background: var(--empresa-f7fafb, #f7fafb);
 }
 
 .dashboard-modern .dashboard-calendar-notice__icon {
@@ -1739,7 +1739,7 @@
 }
 
 .dashboard-modern .dashboard-calendar-notice strong {
-    color: #214b58;
+    color: var(--empresa-214b58, #214b58);
     font-size: 10.5px;
 }
 
@@ -1750,7 +1750,7 @@
 }
 
 .dashboard-modern .dashboard-calendar-notice a {
-    color: #087f99;
+    color: var(--empresa-087f99, #087f99);
     font-size: 10px;
     font-weight: 800;
     text-decoration: none;
@@ -1783,14 +1783,14 @@
     gap: 10px;
     min-height: 68px;
     padding: 10px 11px;
-    border-color: #dfe8eb;
+    border-color: var(--empresa-dfe8eb, #dfe8eb);
     border-radius: 12px;
-    background: #f8fbfc;
+    background: var(--empresa-f8fbfc, #f8fbfc);
 }
 
 .dashboard-modern .dashboard-quick:hover {
-    border-color: #9bcfdb;
-    background: #f1f9fa;
+    border-color: var(--empresa-9bcfdb, #9bcfdb);
+    background: var(--empresa-f1f9fa, #f1f9fa);
 }
 
 .dashboard-modern .dashboard-quick--attention {
@@ -1804,8 +1804,8 @@
     display: grid;
     place-items: center;
     border-radius: 10px;
-    background: #e5f3f6;
-    color: #087f99;
+    background: var(--empresa-e5f3f6, #e5f3f6);
+    color: var(--empresa-087f99, #087f99);
 }
 
 .dashboard-modern .dashboard-quick--attention > .dashboard-quick__icon {
@@ -1835,7 +1835,7 @@
 }
 
 .dashboard-modern .dashboard-quick__copy strong {
-    color: #173e4b;
+    color: var(--empresa-173e4b, #173e4b);
     font-size: 11.5px;
 }
 
@@ -1855,8 +1855,8 @@
 }
 
 .dashboard-modern .dashboard-day {
-    border-color: #e0e8eb;
-    background: #f8fbfc;
+    border-color: var(--empresa-e0e8eb, #e0e8eb);
+    background: var(--empresa-f8fbfc, #f8fbfc);
 }
 
 .dashboard-modern .dashboard-day > span:nth-child(2) {
@@ -1868,9 +1868,9 @@
     justify-items: center;
     gap: 5px;
     padding: 30px 18px;
-    border: 1px dashed #cadce3;
+    border: 1px dashed var(--empresa-cadce3, #cadce3);
     border-radius: 13px;
-    background: #f8fbfc;
+    background: var(--empresa-f8fbfc, #f8fbfc);
 }
 
 .dashboard-modern .dashboard-empty__icon {
@@ -1880,8 +1880,8 @@
     place-items: center;
     margin-bottom: 2px;
     border-radius: 12px;
-    background: #e6f3f6;
-    color: #087f99;
+    background: var(--empresa-e6f3f6, #e6f3f6);
+    color: var(--empresa-087f99, #087f99);
 }
 
 .dashboard-modern .dashboard-empty__icon .ui-icon {
@@ -1890,7 +1890,7 @@
 }
 
 .dashboard-modern .dashboard-empty--card strong {
-    color: #264e5b;
+    color: var(--empresa-264e5b, #264e5b);
     font-size: 12px;
 }
 

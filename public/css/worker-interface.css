@@ -8,17 +8,17 @@
 .worker-interface .main-content { min-width: 0; }
 .worker-interface :is(h1, h2, h3, h4) { line-height: 1.25; overflow-wrap: anywhere; }
 .worker-interface :is(.page-header__title, .campo-topbar h2, .solicitudes-header h2, .ra-worker__hero h2) { font-size: clamp(24px, 2.3vw, 32px); letter-spacing: -.035em; }
-.worker-interface :is(.campo-topbar, .solicitudes-header, .ra-worker__hero) { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; padding: 24px; border: 1px solid var(--border); border-radius: 18px; background: linear-gradient(112deg, #d8f1f5, #f7fafb); }
+.worker-interface :is(.campo-topbar, .solicitudes-header, .ra-worker__hero) { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; padding: 24px; border: 1px solid var(--border); border-radius: 18px; background: linear-gradient(112deg, var(--empresa-d8f1f5, #d8f1f5), var(--empresa-f7fafb, #f7fafb)); }
 .worker-interface :is(.campo-topbar__copy, .ra-worker__hero-copy, .solicitudes-header > div) { min-width: 0; flex: 1 1 260px; }
 .worker-interface :is(.campo-topbar p, .solicitudes-header p, .ra-worker__hero p) { margin-bottom: 0; color: var(--text-muted); font-size: 14px; }
 .worker-interface :is(.button, .ra-btn, .btn) { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; gap: 8px; padding: 11px 16px; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 700; line-height: 1.3; text-align: center; white-space: normal; }
 .worker-interface :is(.button--small, .ra-btn--small) { min-height: 40px; padding: 9px 12px; font-size: 12px; }
-.worker-interface :is(.button--primary, .ra-btn--primary) { background: #087f9a; border-color: #087f9a; color: #fff; }
-.worker-interface :is(.button--primary, .ra-btn--primary):hover { background: #06677e; border-color: #06677e; }
-.worker-interface :is(.button--secondary, .ra-btn--secondary) { background: #fff; border: 1px solid var(--border); color: #087f9a; }
+.worker-interface :is(.button--primary, .ra-btn--primary) { background: var(--empresa-087f9a, #087f9a); border-color: var(--empresa-087f9a, #087f9a); color: #fff; }
+.worker-interface :is(.button--primary, .ra-btn--primary):hover { background: var(--empresa-06677e, #06677e); border-color: var(--empresa-06677e, #06677e); }
+.worker-interface :is(.button--secondary, .ra-btn--secondary) { background: #fff; border: 1px solid var(--border); color: var(--empresa-087f9a, #087f9a); }
 .worker-interface :is(button, input, select, textarea) { font-family: inherit; }
 .worker-interface :is(button, .button):disabled { opacity: .6; cursor: wait; }
-.worker-interface :is(.form-control, .form-select) { min-width: 0; max-width: 100%; min-height: 44px; border: 1px solid var(--border); border-radius: 10px; background: #f7fafb; color: var(--text); font-size: 14px; }
+.worker-interface :is(.form-control, .form-select) { min-width: 0; max-width: 100%; min-height: 44px; border: 1px solid var(--border); border-radius: 10px; background: var(--empresa-f7fafb, #f7fafb); color: var(--text); font-size: 14px; }
 .worker-interface textarea.form-control { min-height: 110px; resize: vertical; }
 .worker-interface :is(.form-label, .ra-field > span) { color: var(--text); font-size: 12px; font-weight: 650; }
 .worker-interface :is(input[type="date"], input[type="time"], time, .dashboard-metric__value, .ra-stat strong) { font-variant-numeric: tabular-nums; }
@@ -30,8 +30,8 @@
 .worker-interface :is(.ra-status--success, .solicitud-estado--aprobada, .vacacion-estado--aprobada, .campo-mini-mark--aprobada) { background: #e4f4ee; color: #25634f; }
 .worker-interface :is(.ra-status--warning, .solicitud-estado--pendiente, .vacacion-estado--pendiente, .campo-mini-mark--pendiente) { background: #fff3dc; color: #785823; }
 .worker-interface :is(.ra-status--danger, .solicitud-estado--rechazada, .vacacion-estado--rechazada, .campo-mini-mark--rechazada) { background: #f8e9e7; color: #93473f; }
-.worker-interface .ra-today { border-left: 3px solid #087f9a; }
-.worker-interface .ra-today__label { color: #087f9a; font-size: 11px; font-weight: 750; letter-spacing: .07em; }
+.worker-interface .ra-today { border-left: 3px solid var(--empresa-087f9a, #087f9a); }
+.worker-interface .ra-today__label { color: var(--empresa-087f9a, #087f9a); font-size: 11px; font-weight: 750; letter-spacing: .07em; }
 .worker-interface :is(.ra-tabs, .solicitudes-tabs) { display: flex; flex-wrap: wrap; gap: 8px; }
 .worker-interface :is(.ra-tabs__item, .solicitudes-tabs__link) { min-height: 44px; border-radius: 10px; font-size: 13px; }
 .worker-interface :is(.ra-history-filters, .solicitudes-filtros, .vacaciones-filtros) { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 14px; align-items: end; }
@@ -48,7 +48,7 @@
 .worker-interface .modal__content { max-width: 100%; border-radius: 18px; }
 .worker-interface .modal__header h2 { font-size: 19px; }
 .worker-interface :is(.modal__footer, .form-actions) { flex-wrap: wrap; gap: 10px; }
-.worker-interface :is(a, button, input, select, textarea, summary):focus-visible { outline: 2px solid #087f9a; outline-offset: 3px; }
+.worker-interface :is(a, button, input, select, textarea, summary):focus-visible { outline: 2px solid var(--empresa-087f9a, #087f9a); outline-offset: 3px; }
 /* Al pasar a columna, flex-basis no debe convertirse en una altura de 260px. */
 @media (max-width: 850px) {
     .worker-interface .campo-page .campo-topbar {
@@ -190,31 +190,31 @@
 .worker-interface .ra-worker .ra-filter-panel .ra-section-heading p { margin: 4px 0 0; font-size: 12px; color: var(--text-muted); }
 .worker-interface .ra-worker .ra-query-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
 .worker-interface .ra-worker .ra-report-days { flex: 1 1 190px; min-width: 0; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
-.worker-interface .ra-worker .ra-report-days > summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 10px 12px; list-style: none; color: #087f9a; font-size: 12px; font-weight: 700; cursor: pointer; }
+.worker-interface .ra-worker .ra-report-days > summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 10px 12px; list-style: none; color: var(--empresa-087f9a, #087f9a); font-size: 12px; font-weight: 700; cursor: pointer; }
 .worker-interface .ra-worker .ra-report-days > summary::-webkit-details-marker { display: none; }
 .worker-interface .ra-worker .ra-report-days > summary::after { content: '+'; font-size: 18px; }
 .worker-interface .ra-worker .ra-report-days[open] > summary::after { content: '−'; }
 .worker-interface .ra-worker .ra-report-days[open] { flex-basis: 100%; }
 .worker-interface .ra-worker .ra-calendar-periods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 0 10px 10px; }
-.worker-interface .ra-worker .ra-calendar-periods .ra-btn { min-height: 40px; padding: 8px; font-size: 11px; border: 1px solid var(--border); border-radius: 8px; background: #f7fafb; color: #087f9a; }
-.worker-interface .ra-worker .ra-calendar-periods .ra-btn--primary { background: #087f9a; border-color: #087f9a; color: #fff; }
+.worker-interface .ra-worker .ra-calendar-periods .ra-btn { min-height: 40px; padding: 8px; font-size: 11px; border: 1px solid var(--border); border-radius: 8px; background: var(--empresa-f7fafb, #f7fafb); color: var(--empresa-087f9a, #087f9a); }
+.worker-interface .ra-worker .ra-calendar-periods .ra-btn--primary { background: var(--empresa-087f9a, #087f9a); border-color: var(--empresa-087f9a, #087f9a); color: #fff; }
 .worker-interface .ra-worker .ra-report-days > p { padding: 0 12px 12px; margin: 0; font-size: 12px; color: var(--text-muted); }
 .worker-interface .ra-worker .ra-calendar { padding: 0 10px 10px; }
 .worker-interface .ra-worker .ra-calendar__range { margin: 0 0 10px; font-size: 11px; line-height: 1.5; color: var(--text-muted); }
 .worker-interface .ra-worker .ra-calendar__header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
-.worker-interface .ra-worker .ra-calendar__header a { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border); color: #087f9a; font-size: 23px; }
+.worker-interface .ra-worker .ra-calendar__header a { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border); color: var(--empresa-087f9a, #087f9a); font-size: 23px; }
 .worker-interface .ra-worker .ra-calendar__header strong { font-size: 13px; text-transform: capitalize; }
 .worker-interface .ra-worker .ra-calendar__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
 .worker-interface .ra-worker .ra-calendar__weekday { padding: 6px 0; color: var(--text-muted); font-size: 10px; text-align: center; }
 .worker-interface .ra-worker .ra-calendar__day { display: grid; place-items: center; position: relative; min-height: 40px; padding: 6px 0; border: 1px solid transparent; border-radius: 8px; font-size: 12px; color: var(--text); }
-.worker-interface .ra-worker .ra-calendar__day:hover { background: #e3f3f6; }
-.worker-interface .ra-worker .ra-calendar__day--record { background: #edf4f6; font-weight: 700; }
-.worker-interface .ra-worker .ra-calendar__day--record::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: #087f9a; border-radius: 50%; }
+.worker-interface .ra-worker .ra-calendar__day:hover { background: var(--empresa-e3f3f6, #e3f3f6); }
+.worker-interface .ra-worker .ra-calendar__day--record { background: var(--empresa-edf4f6, #edf4f6); font-weight: 700; }
+.worker-interface .ra-worker .ra-calendar__day--record::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: var(--empresa-087f9a, #087f9a); border-radius: 50%; }
 .worker-interface .ra-worker .ra-calendar__day--review::after { background: #93473f; }
-.worker-interface .ra-worker .ra-calendar__day--selected { border-color: #087f9a; background: #d8f1f5; color: #204c5b; }
+.worker-interface .ra-worker .ra-calendar__day--selected { border-color: var(--empresa-087f9a, #087f9a); background: var(--empresa-d8f1f5, #d8f1f5); color: var(--empresa-204c5b, #204c5b); }
 .worker-interface .ra-worker .ra-calendar__legend { margin: 10px 0 0; color: var(--text-muted); font-size: 10px; }
 .worker-interface .ra-worker .worker-history-search { border-top: 1px solid var(--border); }
-.worker-interface .ra-worker .worker-history-search > summary { display: flex; gap: 8px; align-items: center; min-height: 44px; padding: 10px 0 0; list-style: none; font-size: 12px; font-weight: 650; color: #087f9a; cursor: pointer; }
+.worker-interface .ra-worker .worker-history-search > summary { display: flex; gap: 8px; align-items: center; min-height: 44px; padding: 10px 0 0; list-style: none; font-size: 12px; font-weight: 650; color: var(--empresa-087f9a, #087f9a); cursor: pointer; }
 .worker-interface .ra-worker .worker-history-search > summary::-webkit-details-marker { display: none; }
 .worker-interface .ra-worker .worker-history-search > summary > span { margin-left: auto; }
 .worker-interface .ra-worker .worker-history-search .ra-history-filters { padding: 12px 0 0; gap: 10px; }
@@ -239,10 +239,10 @@
 .worker-interface .ra-worker .ra-worker-pending__status > time { grid-column: 1; font-size: 10px; margin: 0; }
 .worker-interface .ra-worker .ra-worker-pending__status > .ra-worker-pending__actions { grid-column: 2; grid-row: 1 / 3; display: flex; flex-direction: row; gap: 6px; margin: 0; padding: 0; width: auto; }
 .worker-interface .ra-worker .ra-worker-pending__actions form { margin: 0; width: auto; }
-.worker-interface .ra-worker .pending-icon-action { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: #fff; color: #087f9a; cursor: pointer; }
-.worker-interface .ra-worker .pending-icon-action:hover { background: #e3f3f6; }
-.worker-interface .ra-worker .pending-icon-action--finish { background: #087f9a; border-color: #087f9a; color: #fff; }
-.worker-interface .ra-worker .pending-icon-action--finish:hover { background: #06677e; }
+.worker-interface .ra-worker .pending-icon-action { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--empresa-087f9a, #087f9a); cursor: pointer; }
+.worker-interface .ra-worker .pending-icon-action:hover { background: var(--empresa-e3f3f6, #e3f3f6); }
+.worker-interface .ra-worker .pending-icon-action--finish { background: var(--empresa-087f9a, #087f9a); border-color: var(--empresa-087f9a, #087f9a); color: #fff; }
+.worker-interface .ra-worker .pending-icon-action--finish:hover { background: var(--empresa-06677e, #06677e); }
 .worker-interface .ra-worker .ra-worker-pending__content { padding: 0; margin: 0; }
 .worker-interface .ra-worker .ra-worker-pending__content h4 { margin: 0; font-size: 13px; line-height: 1.4; }
 .worker-interface .ra-worker .ra-worker-pending__detail { margin-top: 8px; }
@@ -262,7 +262,7 @@
 .worker-interface .worker-dashboard-disclosure { align-self: start; min-height: 0; }
 .worker-interface .worker-dashboard-disclosure > summary { cursor: pointer; list-style: none; margin: 0; }
 .worker-interface .worker-dashboard-disclosure > summary::-webkit-details-marker { display: none; }
-.worker-interface .worker-dashboard-disclosure > summary::after { content: '+'; display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 28px; border: 1px solid var(--border); border-radius: 8px; color: #087f9a; font-size: 19px; }
+.worker-interface .worker-dashboard-disclosure > summary::after { content: '+'; display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 28px; border: 1px solid var(--border); border-radius: 8px; color: var(--empresa-087f9a, #087f9a); font-size: 19px; }
 .worker-interface .worker-dashboard-disclosure[open] > summary::after { content: '−'; }
 .worker-interface .worker-dashboard-disclosure:not([open]) > summary { border-bottom: 0; }
 @media (max-width: 850px) {
@@ -306,20 +306,20 @@
     .worker-interface .modal .modal__content--medium { max-width: 640px; }
     .worker-interface .modal .modal__content--large { max-width: 840px; }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .modal__content { width: min(100%, 820px); max-height: calc(100dvh - 64px); border-radius: 18px; }
-    .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .modal__header { padding: 16px 20px; background: #f7fafb; }
+    .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .modal__header { padding: 16px 20px; background: var(--empresa-f7fafb, #f7fafb); }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .modal__header h2 { font-size: 19px; letter-spacing: -.4px; }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .modal__close { width: 36px; height: 36px; min-width: 36px; }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .modal__body { padding: 20px; }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .form { display: grid; gap: 16px; }
-    .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .reporte-modal-fecha { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 14px; margin: 0; border: 1px solid #c9e2e7; border-radius: 10px; background: #eaf5f7; font-size: 12px; }
-    .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .reporte-modal-fecha strong { color: #087f9a; font-size: 13px; }
+    .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .reporte-modal-fecha { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 14px; margin: 0; border: 1px solid var(--empresa-c9e2e7, #c9e2e7); border-radius: 10px; background: var(--empresa-eaf5f7, #eaf5f7); font-size: 12px; }
+    .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .reporte-modal-fecha strong { color: var(--empresa-087f9a, #087f9a); font-size: 13px; }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .form-section { display: grid; gap: 12px; margin: 0; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .form-section__header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 0; }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .form-section__header > div { flex: 1 1 260px; min-width: 0; }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .form-section__header h4 { font-size: 15px; margin: 0 0 5px; }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .form-section__header p { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
-    .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .sin-pendientes { min-height: 0; margin: 0; padding: 14px; border: 1px dashed var(--border); border-radius: 9px; background: #f7fafb; font-size: 12px; }
+    .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .sin-pendientes { min-height: 0; margin: 0; padding: 14px; border: 1px dashed var(--border); border-radius: 9px; background: var(--empresa-f7fafb, #f7fafb); font-size: 12px; }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .items-dinamicos:empty { display: none; }
-    .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .item-dinamico { padding: 14px; border-radius: 10px; background: #f7fafb; }
+    .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .item-dinamico { padding: 14px; border-radius: 10px; background: var(--empresa-f7fafb, #f7fafb); }
     .worker-interface :is(#modalCrearReporte, #modalEditarReporte, #modalAgregarAvance) .modal__actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin: 0; padding: 14px 0 0; border-top: 1px solid var(--border); }
 }

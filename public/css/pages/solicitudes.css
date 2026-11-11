@@ -1,7 +1,7 @@
 .solicitudes-page {
-    --sol-primary: var(--primary, #087f9a);
-    --sol-primary-hover: var(--primary-hover, #06677e);
-    --sol-primary-light: var(--primary-light, #d8f1f5);
+    --sol-primary: var(--primary, var(--empresa-087f9a, #087f9a));
+    --sol-primary-hover: var(--primary-hover, var(--empresa-06677e, #06677e));
+    --sol-primary-light: var(--primary-light, var(--empresa-d8f1f5, #d8f1f5));
     --sol-surface: var(--surface, #fff);
     --sol-subtle: var(--surface-secondary, #f4f6f5);
     --sol-text: var(--text, #17211f);
@@ -215,7 +215,7 @@
 .solicitudes-page .form-textarea:focus {
     border-color: var(--sol-primary);
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--empresa-0f766e, #0f766e) 10%, transparent);
 }
 
 .solicitudes-filtros__actions {
@@ -289,7 +289,7 @@
 }
 
 .solicitudes-table thead th {
-    background: #f7fafb;
+    background: var(--empresa-f7fafb, #f7fafb);
     color: var(--sol-muted);
     font-size: 9px;
     font-weight: 850;
@@ -307,7 +307,7 @@
 }
 
 .solicitud-table-row:hover {
-    background: #f7fafb;
+    background: var(--empresa-f7fafb, #f7fafb);
 }
 
 .solicitud-table-row:focus-visible {
@@ -395,7 +395,7 @@
 
 .solicitud-tipo--permiso {
     background: #eef2ff;
-    color: #087f9a;
+    color: var(--empresa-087f9a, #087f9a);
 }
 
 .solicitud-tipo--tardanza {
@@ -410,7 +410,7 @@
 
 .solicitud-tipo--omision-marcacion {
     background: #f0fdfa;
-    color: #087f9a;
+    color: var(--empresa-087f9a, #087f9a);
 }
 
 /* ESTADOS */
@@ -580,7 +580,7 @@
     padding: 12px 13px;
     border: 1px solid var(--sol-border);
     border-radius: 9px;
-    background: #f7fafb;
+    background: var(--empresa-f7fafb, #f7fafb);
     color: var(--sol-text);
     font-size: 12px;
     line-height: 1.6;
@@ -1086,14 +1086,14 @@
    ========================================================= */
 
 #modalDetalleSolicitud {
-    --sol-primary: var(--primary, #204c5b);
+    --sol-primary: var(--primary, var(--empresa-204c5b, #204c5b));
     --sol-primary-hover: var(--primary-hover, #172b55);
-    --sol-primary-light: var(--primary-light, #e3f3f6);
+    --sol-primary-light: var(--primary-light, var(--empresa-e3f3f6, #e3f3f6));
     --sol-surface: var(--surface, #ffffff);
-    --sol-subtle: var(--surface-secondary, #edf4f6);
-    --sol-text: var(--text, #285968);
-    --sol-muted: var(--text-muted, #58727b);
-    --sol-border: var(--border, #c9d9de);
+    --sol-subtle: var(--surface-secondary, var(--empresa-edf4f6, #edf4f6));
+    --sol-text: var(--text, var(--empresa-285968, #285968));
+    --sol-muted: var(--text-muted, var(--empresa-58727b, #58727b));
+    --sol-border: var(--border, var(--empresa-c9d9de, #c9d9de));
 }
 
 @media (max-width: 700px) {

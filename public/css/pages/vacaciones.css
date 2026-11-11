@@ -95,7 +95,7 @@
 
 .vacacion-estado--programada {
     background: #eef2ff;
-    color: #087f9a;
+    color: var(--empresa-087f9a, #087f9a);
 }
 
 .vacacion-estado--en-curso {
