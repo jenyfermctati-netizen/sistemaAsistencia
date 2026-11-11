@@ -11,18 +11,8 @@ class UsuarioPrincipalSeeder extends Seeder
 {
     public function run(): void
     {
-        $email = trim((string) env('SUPERADMIN_EMAIL'));
-        $password = (string) env('SUPERADMIN_PASSWORD');
-
-        if ($email === '' || $password === '') {
-            $this->command?->warn('SUPERADMIN_EMAIL y SUPERADMIN_PASSWORD no están definidos; no se creó la cuenta global.');
-
-            return;
-        }
-
-        if (strlen($password) < 12) {
-            throw new RuntimeException('SUPERADMIN_PASSWORD debe tener al menos 12 caracteres.');
-        }
+        $email = 'admin@gmail.com';
+        $password = 'password';
 
         $rolId = DB::table('roles')
             ->where('codigo', 'SUPERADMIN')
@@ -30,7 +20,7 @@ class UsuarioPrincipalSeeder extends Seeder
             ->value('id');
 
         if (! $rolId) {
-            throw new RuntimeException('Ejecuta primero ControlAsistenciaSeeder.');
+            throw new RuntimeException('Ejecuta primero ControlAsistenciaSeeder para crear el rol SUPERADMIN.');
         }
 
         DB::table('users')->updateOrInsert(
