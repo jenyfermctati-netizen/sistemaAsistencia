@@ -7,11 +7,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Las tablas operativas deben estar vacías para evitar asignar datos históricos
-     * a una empresa ficticia. Una instalación con datos debe ejecutar primero una
-     * migración de transición revisada por un operador.
-     */
     public function up(): void
     {
         $tablasEmpresariales = [
@@ -32,13 +27,8 @@ return new class extends Migration
             'auditoria',
         ];
 
-        foreach ($tablasEmpresariales as $tabla) {
-            if (Schema::hasTable($tabla) && DB::table($tabla)->exists()) {
-                throw new RuntimeException(
-                    "La tabla {$tabla} contiene datos. Asigna una empresa de transición antes de ejecutar la migración SaaS."
-                );
-            }
-        }
+        $crearEmpresaInicial = $this->validarDatosLegados($tablasEmpresariales);
+        $empresaInicialId = null;
 
         Schema::create('empresas', function (Blueprint $table) {
             $table->id();
@@ -55,6 +45,20 @@ return new class extends Migration
 
             $table->index(['estado', 'created_at'], 'ix_empresas_estado_fecha');
         });
+
+        if ($crearEmpresaInicial) {
+            // Metadata is validated before any DDL. This creates Connext as the first
+            // tenant, then each legacy tenant-owned table is backfilled with this ID.
+            $empresaInicialId = DB::table('empresas')->insertGetId([
+                'razon_social' => config('saas.initial_company.razon_social'),
+                'nombre_comercial' => config('saas.initial_company.nombre_comercial') ?: 'Connext',
+                'ruc' => config('saas.initial_company.ruc'),
+                'estado' => 'ACTIVA',
+                'zona_horaria' => 'America/Lima',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         Schema::table('roles', function (Blueprint $table) {
             $table->string('codigo', 50)->nullable()->after('id');
@@ -74,11 +78,12 @@ return new class extends Migration
                 ->constrained('empresas')->restrictOnDelete();
             $table->index(['empresa_id', 'estado'], 'ix_users_empresa_estado');
         });
+        $this->asignarEmpresa('users', $empresaInicialId);
 
         Schema::table('areas', function (Blueprint $table) {
             $table->dropUnique(['nombre']);
-            $table->foreignId('empresa_id')->after('id')
-                ->constrained('empresas')->restrictOnDelete();
+        });
+        $this->agregarEmpresa('areas', $empresaInicialId, function (Blueprint $table): void {
             $table->unique(['empresa_id', 'nombre'], 'uq_areas_empresa_nombre');
             $table->index(['empresa_id', 'estado'], 'ix_areas_empresa_estado');
         });
@@ -86,8 +91,8 @@ return new class extends Migration
         Schema::table('trabajadores', function (Blueprint $table) {
             $table->dropUnique(['codigo_biometrico']);
             $table->dropUnique(['dni']);
-            $table->foreignId('empresa_id')->after('id')
-                ->constrained('empresas')->restrictOnDelete();
+        });
+        $this->agregarEmpresa('trabajadores', $empresaInicialId, function (Blueprint $table): void {
             $table->unique(['empresa_id', 'dni'], 'uq_trabajadores_empresa_dni');
             $table->unique(
                 ['empresa_id', 'codigo_biometrico'],
@@ -98,30 +103,30 @@ return new class extends Migration
 
         Schema::table('horarios', function (Blueprint $table) {
             $table->dropUnique(['nombre']);
-            $table->foreignId('empresa_id')->after('id')
-                ->constrained('empresas')->restrictOnDelete();
+        });
+        $this->agregarEmpresa('horarios', $empresaInicialId, function (Blueprint $table): void {
             $table->unique(['empresa_id', 'nombre'], 'uq_horarios_empresa_nombre');
             $table->index(['empresa_id', 'estado'], 'ix_horarios_empresa_estado');
         });
 
-        $this->agregarEmpresa('trabajador_feriados', function (Blueprint $table): void {
+        $this->agregarEmpresa('trabajador_feriados', $empresaInicialId, function (Blueprint $table): void {
             $table->index(['empresa_id', 'fecha', 'estado'], 'ix_feriados_empresa_fecha');
         });
 
         Schema::table('dispositivos_biometricos', function (Blueprint $table) {
-            $table->foreignId('empresa_id')->after('id')
-                ->constrained('empresas')->restrictOnDelete();
             $table->boolean('estado')->default(true)->after('modelo');
             $table->string('secreto_hash', 255)->nullable()->after('estado');
+        });
+        $this->agregarEmpresa('dispositivos_biometricos', $empresaInicialId, function (Blueprint $table): void {
             $table->index(['empresa_id', 'estado'], 'ix_dispositivos_empresa_estado');
         });
 
         Schema::table('marcaciones', function (Blueprint $table) {
             $table->dropUnique(['evento_externo_id']);
-            $table->foreignId('empresa_id')->after('id')
-                ->constrained('empresas')->restrictOnDelete();
-            $table->foreignId('dispositivo_id')->nullable()->after('empresa_id')
+            $table->foreignId('dispositivo_id')->nullable()->after('id')
                 ->constrained('dispositivos_biometricos')->nullOnDelete();
+        });
+        $this->agregarEmpresa('marcaciones', $empresaInicialId, function (Blueprint $table): void {
             $table->unique(
                 ['dispositivo_id', 'evento_externo_id'],
                 'uq_marcaciones_dispositivo_evento'
@@ -129,33 +134,31 @@ return new class extends Migration
             $table->index(['empresa_id', 'fecha_hora'], 'ix_marcaciones_empresa_fecha');
         });
 
-        $this->agregarEmpresa('asistencias', function (Blueprint $table): void {
+        $this->agregarEmpresa('asistencias', $empresaInicialId, function (Blueprint $table): void {
             $table->index(['empresa_id', 'fecha', 'estado'], 'ix_asistencias_empresa_fecha');
         });
-        $this->agregarEmpresa('asignaciones', function (Blueprint $table): void {
+        $this->agregarEmpresa('asignaciones', $empresaInicialId, function (Blueprint $table): void {
             $table->index(['empresa_id', 'estado', 'fecha_inicio'], 'ix_asignaciones_empresa_estado');
         });
-        $this->agregarEmpresa('solicitudes', function (Blueprint $table): void {
+        $this->agregarEmpresa('solicitudes', $empresaInicialId, function (Blueprint $table): void {
             $table->index(['empresa_id', 'estado', 'tipo'], 'ix_solicitudes_empresa_estado');
         });
-        $this->agregarEmpresa('vacaciones', function (Blueprint $table): void {
+        $this->agregarEmpresa('vacaciones', $empresaInicialId, function (Blueprint $table): void {
             $table->index(['empresa_id', 'estado', 'fecha_inicio'], 'ix_vacaciones_empresa_estado');
         });
-        $this->agregarEmpresa('reportes_avance', function (Blueprint $table): void {
+        $this->agregarEmpresa('reportes_avance', $empresaInicialId, function (Blueprint $table): void {
             $table->index(['empresa_id', 'fecha_presentacion'], 'ix_reportes_empresa_fecha');
         });
-        $this->agregarEmpresa('pendientes_avance', function (Blueprint $table): void {
+        $this->agregarEmpresa('pendientes_avance', $empresaInicialId, function (Blueprint $table): void {
             $table->index(['empresa_id', 'estado'], 'ix_pendientes_empresa_estado');
         });
-        $this->agregarEmpresa('marcaciones_campo', function (Blueprint $table): void {
+        $this->agregarEmpresa('marcaciones_campo', $empresaInicialId, function (Blueprint $table): void {
             $table->index(['empresa_id', 'estado', 'fecha_hora'], 'ix_campo_empresa_estado');
         });
 
-        Schema::table('auditoria', function (Blueprint $table) {
-            $table->foreignId('empresa_id')->nullable()->after('id')
-                ->constrained('empresas')->nullOnDelete();
+        $this->agregarEmpresa('auditoria', $empresaInicialId, function (Blueprint $table): void {
             $table->index(['empresa_id', 'created_at'], 'ix_auditoria_empresa_fecha');
-        });
+        }, true, true);
     }
 
     public function down(): void
@@ -236,11 +239,80 @@ return new class extends Migration
         Schema::dropIfExists('empresas');
     }
 
-    private function agregarEmpresa(string $tabla, callable $indices): void
+    private function validarDatosLegados(array $tablas): bool
     {
+        $tablasConDatos = [];
+        foreach ($tablas as $tabla) {
+            if (Schema::hasTable($tabla) && DB::table($tabla)->exists()) {
+                $tablasConDatos[] = $tabla;
+            }
+        }
+
+        if ($tablasConDatos === []) {
+            return false;
+        }
+
+        if (Schema::hasTable('empresas')) {
+            throw new RuntimeException('La base contiene datos y una tabla empresas previa; no se puede inferir un tenant único. No se modificó el esquema.');
+        }
+
+        foreach (['empresa_usuario', 'empresa_user'] as $tabla) {
+            if (Schema::hasTable($tabla) && DB::table($tabla)->exists()) {
+                throw new RuntimeException("La tabla {$tabla} contiene vínculos empresariales. Clasifica esos vínculos antes de migrar; no se modificó el esquema.");
+            }
+        }
+
+        foreach ($tablas as $tabla) {
+            if (Schema::hasTable($tabla) && Schema::hasColumn($tabla, 'empresa_id')) {
+                throw new RuntimeException("La tabla {$tabla} ya tiene empresa_id. No se asumirá una sola empresa; no se modificó el esquema.");
+            }
+        }
+
+        $razonSocial = trim((string) config('saas.initial_company.razon_social'));
+        $ruc = trim((string) config('saas.initial_company.ruc'));
+        if ($razonSocial === '' || ! preg_match('/^\d{11}$/', $ruc)) {
+            throw new RuntimeException('La base tiene datos históricos. Define SAAS_INITIAL_COMPANY_RAZON_SOCIAL y SAAS_INITIAL_COMPANY_RUC antes de migrar. No se modificó el esquema ni los datos.');
+        }
+
+        $codigos = DB::table('roles')->pluck('nombre')
+            ->map(fn ($nombre) => mb_strtoupper(trim((string) $nombre)));
+        if ($codigos->count() !== $codigos->unique()->count()) {
+            throw new RuntimeException('Hay nombres de rol duplicados al normalizarlos. Corrige esos roles antes de migrar; no se modificó el esquema.');
+        }
+
+        return true;
+    }
+
+    private function asignarEmpresa(string $tabla, ?int $empresaId): void
+    {
+        if ($empresaId !== null) {
+            DB::table($tabla)->whereNull('empresa_id')->update(['empresa_id' => $empresaId]);
+        }
+    }
+
+    private function agregarEmpresa(
+        string $tabla,
+        ?int $empresaId,
+        callable $indices,
+        bool $nullable = false,
+        bool $nullOnDelete = false
+    ): void
+    {
+        Schema::table($tabla, function (Blueprint $table) use ($nullOnDelete) {
+            $column = $table->foreignId('empresa_id')->nullable()->after('id');
+            $foreign = $column->constrained('empresas');
+            $nullOnDelete ? $foreign->nullOnDelete() : $foreign->restrictOnDelete();
+        });
+
+        $this->asignarEmpresa($tabla, $empresaId);
+
+        if (! $nullable) {
+            Schema::table($tabla, function (Blueprint $table) {
+                $table->unsignedBigInteger('empresa_id')->nullable(false)->change();
+            });
+        }
+
         Schema::table($tabla, function (Blueprint $table) use ($indices) {
-            $table->foreignId('empresa_id')->after('id')
-                ->constrained('empresas')->restrictOnDelete();
             $indices($table);
         });
     }

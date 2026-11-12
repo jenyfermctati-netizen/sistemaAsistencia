@@ -2,7 +2,7 @@
 
 ## Estado general
 
-Implementación completada y verificada sobre Laravel 12, PHP 8.2 y MySQL. La base local fue verificada el 10/11/2026: las tablas operativas estaban vacías, la migración SaaS se aplicó correctamente y se sembraron únicamente los roles base. No se ejecutaron operaciones destructivas.
+Implementación multiempresa aplicada sobre Laravel 12, PHP 8.2 y MySQL local. El 12/11/2026 se restauró y verificó el histórico de `bdasistencias`, se asignó a Connext como primera empresa y se creó una cuenta global de superadministración. No se ejecutaron operaciones destructivas ni se modificó una base de producción.
 
 ## Arquitectura propuesta
 
@@ -70,6 +70,24 @@ Implementación completada y verificada sobre Laravel 12, PHP 8.2 y MySQL. La ba
 - MySQL no garantiza por sí solo que dos claves foráneas simples compartan `empresa_id`; la aplicación valida las combinaciones y las pruebas cubren intentos cruzados.
 - Correos, colas, scheduler, HTTPS y permisos de almacenamiento dependen del servidor y requieren verificación manual previa al despliegue.
 
+## Revisión de datos previa a la migración
+
+La migración `2026_11_10_000001_create_multiempresa_structure` ahora contempla la transición explícita de una base histórica de una sola empresa cuando se configuran los datos de la empresa inicial. Antes de migrar otro entorno:
+
+1. Obtener una copia de seguridad de la base de datos y verificar que puede restaurarse en un entorno aislado.
+2. Ejecutar `php artisan saas:preflight` con acceso a la misma base que se piensa migrar.
+3. Revisar las filas sin empresa, cuentas no vinculadas a trabajadores, relaciones huérfanas, empresas inexistentes y relaciones entre empresas distintas.
+4. Acordar explícitamente la razón social/RUC de la empresa inicial y clasificar cada hallazgo ambiguo. No editar ni ejecutar una migración de asignación hasta resolverlo.
+5. Repetir el diagnóstico después de una migración de transición y comparar conteos e integridad antes de habilitar tráfico.
+
+`saas:preflight` solo lee y muestra cantidades; no imprime datos personales ni altera el esquema. Un resultado limpio no acredita el respaldo ni sustituye la revisión funcional.
+
+### Verificación de datos y fuente histórica (12/11/2026)
+
+El respaldo `127_0_0_1.sql` se integró en la base local `bdasistencias`. La migración asignó los registros históricos a Connext (RUC `20625474994`) y conservó sus claves y relaciones existentes. El resumen posterior a la migración: 12 usuarios históricos, 11 trabajadores, 5 áreas, 1 horario, 17 feriados, 351 marcaciones, 247 asistencias, 7 asignaciones, 1 solicitud, 11 reportes, 6 pendientes, 11 marcaciones de campo, 1 dispositivo biométrico, 12 usuarios biométricos y 29 comandos. Se agregó una cuenta global SUPERADMIN, sin empresa asignada.
+
+El usuario administrador histórico de Connext es `connextventas@gmail.com`; la contraseña `password` coincide con el hash existente en el respaldo. La cuenta global se configura localmente con `SUPERADMIN_EMAIL` y `SUPERADMIN_PASSWORD`; no se deben reutilizar estas credenciales temporales en producción. La base local conserva los históricos; no se volvió a importar el dump sobre tablas existentes.
+
 ## Lista de tareas y estado
 
 ### Fase 1 — Base de datos
@@ -117,15 +135,15 @@ Implementación completada y verificada sobre Laravel 12, PHP 8.2 y MySQL. La ba
 
 ## Decisiones de migración
 
-La base inspeccionada no contiene registros operativos, por lo que los campos empresariales obligatorios pueden agregarse sin crear una empresa ficticia ni modificar datos. No se ejecutará `migrate:fresh`, `db:wipe` ni `migrate:reset`. En una instalación distinta que sí contenga datos, se debe abortar la migración y asignar explícitamente una empresa de transición; no se realizará una asignación silenciosa.
+La base local contenía el histórico de una sola empresa. La migración se ejecutó con Connext configurada como empresa inicial y asignó los registros existentes preservando sus relaciones. No se ejecutó `migrate:fresh`, `db:wipe` ni `migrate:reset`.
 
 ## Verificación final
 
 - Migración `2026_11_10_000001_create_multiempresa_structure` aplicada en MySQL local.
-- Migraciones completas ejecutadas repetidamente en SQLite en memoria mediante `RefreshDatabase`.
-- 21 pruebas automatizadas aprobadas, con 165 aserciones.
-- Sintaxis PHP revisada en `app`, `database`, `routes` y `tests`.
-- 105 rutas compiladas correctamente y vistas Blade almacenadas en caché sin errores.
+- Diagnóstico `saas:preflight` ejecutado después de la migración: una empresa, datos históricos presentes y relaciones sin huérfanos; 1 usuario sin empresa corresponde al superadministrador global.
+- Sintaxis PHP revisada en los archivos modificados.
+- `git diff --check` sin errores de espacios; Git informó solo cambios de fin de línea en dos hojas CSS preexistentes.
+- La suite automatizada no pudo arrancar en este entorno: PHPUnit informó que no puede abrir `vendor/autoload.php`. No se reportan pruebas automatizadas como aprobadas.
 - Archivos sensibles movidos del disco público al disco privado `local`, con acceso por controladores autorizados.
 
 ## Acciones manuales pendientes del despliegue

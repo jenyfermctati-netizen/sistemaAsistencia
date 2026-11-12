@@ -271,10 +271,22 @@ class SuperAdminController extends Controller
 
     private function reglasEmpresa(?Empresa $empresa = null): array
     {
+        $reglasRuc = [
+            'required',
+            'digits:11',
+            Rule::unique('empresas', 'ruc')->ignore($empresa?->id),
+        ];
+
+        // Keep an imported legacy identifier editable alongside other company
+        // details. Only validate its check digit when the RUC itself is changed.
+        if (! $empresa || request()->input('ruc') !== $empresa->ruc) {
+            $reglasRuc[] = new RucPeru;
+        }
+
         return [
             'razon_social' => ['required', 'string', 'max:200'],
             'nombre_comercial' => ['nullable', 'string', 'max:200'],
-            'ruc' => ['required', 'digits:11', new RucPeru, Rule::unique('empresas', 'ruc')->ignore($empresa?->id)],
+            'ruc' => $reglasRuc,
             'email' => ['nullable', 'email', 'max:255'],
             'telefono' => ['nullable', 'string', 'max:20'],
             'direccion' => ['nullable', 'string', 'max:500'],
