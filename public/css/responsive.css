@@ -62,6 +62,10 @@ body {
 
 .table-container,
 .solicitudes-table-wrap,
+.dashboard-table-wrap,
+.dashboard-report__table-wrap,
+.sa-table-wrap,
+.campo-history-table-wrap,
 .pagination-container {
     width: 100%;
     min-width: 0;
@@ -338,7 +342,11 @@ body {
     }
 
     .table-container,
-    .solicitudes-table-wrap {
+    .solicitudes-table-wrap,
+    .dashboard-table-wrap,
+    .dashboard-report__table-wrap,
+    .sa-table-wrap,
+    .campo-history-table-wrap {
         overflow-x: auto;
         overscroll-behavior-inline: contain;
     }
@@ -756,6 +764,61 @@ body {
         .ra-history-filters__actions
     ) .button {
         min-height: 40px;
+    }
+}
+
+/* Los estados vacíos ocupan toda la tarjeta de la tabla en móvil. */
+@media (max-width: 1199px) {
+    .asistencias-panel .attendance-empty-row {
+        display: block;
+        width: 100%;
+        margin: 0;
+    }
+
+    .asistencias-panel .attendance-empty-row > td {
+        display: block;
+        width: 100%;
+        min-height: 0;
+        padding: 28px 16px !important;
+        border: 0;
+        box-sizing: border-box;
+    }
+
+    .asistencias-panel .attendance-empty {
+        width: 100%;
+        max-width: 430px;
+        justify-items: center;
+        box-sizing: border-box;
+    }
+
+    .asistencias-panel .attendance-empty p {
+        width: 100%;
+        max-width: 36ch;
+        text-wrap: pretty;
+    }
+}
+
+@media (max-width: 700px) {
+    .areas-panel .areas-table tbody tr.areas-table__empty-row {
+        display: block;
+        width: 100%;
+        margin: 0;
+    }
+
+    .areas-panel .areas-table tbody tr.areas-table__empty-row > td {
+        display: block;
+        width: 100%;
+        min-height: 0;
+        padding: 18px 14px;
+        border: 0;
+        box-sizing: border-box;
+    }
+
+    .areas-panel .areas-table .areas-table__empty-row .empty-state {
+        width: 100%;
+        min-height: 150px;
+        padding: 22px 16px;
+        box-sizing: border-box;
     }
 }
 

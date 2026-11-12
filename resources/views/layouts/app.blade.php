@@ -6,10 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Sistema de Asistencia')</title>
 
-    {{-- Base, temas globales y adaptaciones. El CSS específico va al final. --}}
+    {{-- Base, temas globales y estilos de cada vista. --}}
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme-natural.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
     <link rel="stylesheet" href="{{ asset('css/ui-modern.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme-itrafic.css') }}">
     @stack('styles')
@@ -40,6 +39,8 @@
     @if($colorEmpresa)
         <link rel="stylesheet" href="{{ asset('css/company-theme.css') }}">
     @endif
+    {{-- La capa responsive se aplica al final para cubrir también los estilos de cada página. --}}
+    <link rel="stylesheet" href="{{ asset('css/responsive.css') }}?v={{ filemtime(public_path('css/responsive.css')) }}">
 </head>
 <body class="{{ auth()->user()?->roleCode() === 'TRABAJADOR' ? 'worker-interface' : '' }}" @if($colorEmpresa) data-empresa-theme="{{ $colorEmpresa }}" style="--company-color: {{ $colorEmpresa }}; --company-contrast: {{ $colorContraste }}; --primary: {{ $colorEmpresa }}; --primary-hover: color-mix(in srgb, {{ $colorEmpresa }} 82%, black); --primary-dark: color-mix(in srgb, {{ $colorEmpresa }} 62%, black); --primary-light: color-mix(in srgb, {{ $colorEmpresa }} 17%, white); --primary-mid: color-mix(in srgb, {{ $colorEmpresa }} 62%, white); --primary-soft: color-mix(in srgb, {{ $colorEmpresa }} 8%, white); --primary-border: color-mix(in srgb, {{ $colorEmpresa }} 30%, white); --accent: {{ $colorEmpresa }}; --accent-hover: var(--primary-hover); --accent-soft: var(--primary-light); --palette-smoke-blue: {{ $colorEmpresa }}; --canva-blue: {{ $colorEmpresa }}; --canva-gradient: linear-gradient(120deg, {{ $colorEmpresa }}, var(--primary-hover)); --ux-primary: {{ $colorEmpresa }}; --ux-primary-hover: var(--primary-hover); --ux-accent: {{ $colorEmpresa }}; --background: color-mix(in srgb, {{ $colorEmpresa }} 4%, #f7fafb); --surface-secondary: var(--primary-soft); --surface-hover: var(--primary-light); --border: var(--primary-border); --border-strong: color-mix(in srgb, {{ $colorEmpresa }} 42%, white); --company-sidebar-a: color-mix(in srgb, {{ $colorEmpresa }} 37%, #102027); --company-sidebar-b: color-mix(in srgb, {{ $colorEmpresa }} 31%, #0d1c22); --company-sidebar-c: color-mix(in srgb, {{ $colorEmpresa }} 26%, #09171d);" @endif>
     <a class="skip-link" href="#mainContent">Ir al contenido principal</a>
