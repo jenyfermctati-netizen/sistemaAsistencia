@@ -177,13 +177,20 @@ class MarcacionController extends Controller
     ) {
         $this->verificarAdministrador();
 
+        $data = $request->validate([
+            'hora' => ['required', 'date_format:H:i'],
+        ], [
+            'hora.required' => 'Indica la hora de la marcación.',
+            'hora.date_format' => 'Ingresa una hora válida.',
+        ]);
+
         abort_unless(
             $trabajador->estado === 'ACTIVO',
             422,
             'El trabajador no está activo.'
         );
 
-        $fechaHora = now();
+        $fechaHora = Carbon::today()->setTimeFromTimeString($data['hora']);
         $clasificacion = $this->clasificadorMarcacionService
             ->clasificarNuevaMarcacion($trabajador, $fechaHora);
 

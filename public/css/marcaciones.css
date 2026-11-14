@@ -711,6 +711,28 @@
     font-weight: 600;
 }
 
+.marcaciones-page .manual-cell--accion form[data-marcar-asistencia] {
+    display: grid;
+    gap: 8px;
+}
+
+.marcaciones-page .manual-time-field {
+    display: grid;
+    gap: 4px;
+    color: var(--mc-muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-align: left;
+}
+
+.marcaciones-page .manual-time-field input {
+    width: 100%;
+    min-width: 0;
+    min-height: 36px;
+    padding: 6px 8px;
+    font-size: 13px;
+}
+
 .marcaciones-page .registro-especial {
     padding: 20px 22px;
     border-bottom: 1px solid var(--mc-border);

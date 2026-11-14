@@ -229,8 +229,14 @@
                                         data-marcar-asistencia data-trabajador="{{ $trabajador->nombres }} {{ $trabajador->apellidos }}">
                                         @csrf
 
+                                        <label class="manual-time-field">
+                                            <span>Hora</span>
+                                            <input type="time" name="hora" value="{{ old('hora', now()->format('H:i')) }}"
+                                                class="form-control" required aria-label="Hora de la marcación para {{ $trabajador->nombres }} {{ $trabajador->apellidos }}">
+                                        </label>
+
                                         <button type="submit" class="button {{ $marcas->isNotEmpty() ? 'button--secondary' : 'button--primary' }} button--small">
-                                            {{ $turnoReferencialRegistrado ? 'Registrar retorno' : 'Registrar marca ahora' }}
+                                            {{ $turnoReferencialRegistrado ? 'Registrar retorno' : 'Registrar marca' }}
                                         </button>
                                     </form>
                                 @endif
