@@ -147,7 +147,7 @@
                     class="sidebar__item {{ request()->routeIs('reportesAvance.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="progress" /></span>
                     <span class="sidebar__label">Avances y pendientes</span>
-                    <x-sidebar-pending-count :count="$pendientesSidebar['avances']" label="registros entre actividades y pendientes" />
+                    <x-sidebar-pending-count :count="$pendientesSidebar['avances']" label="avances y pendientes por revisar" />
                 </a>
 
             </div>

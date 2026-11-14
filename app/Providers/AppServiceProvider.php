@@ -3,10 +3,10 @@
 namespace App\Providers;
 
 use App\Support\EmpresaContext;
-use App\Models\ActividadReporte;
 use App\Models\Marcacion;
 use App\Models\MarcacionCampo;
 use App\Models\PendienteAvance;
+use App\Models\ReporteAvance;
 use App\Models\Solicitud;
 use App\Models\Vacaciones;
 use App\Observers\MarcacionObserver;
@@ -55,8 +55,8 @@ class AppServiceProvider extends ServiceProvider
                 'vacaciones' => Vacaciones::where('estado', 'PENDIENTE')
                     ->whereHas('trabajador', fn ($query) => $query->where('tipo_vinculo', 'CONTRATADO'))
                     ->count(),
-                'avances' => PendienteAvance::abiertosOEnRevision()->count()
-                    + ActividadReporte::count(),
+                'avances' => ReporteAvance::where('estado', 'PENDIENTE')->count()
+                    + PendienteAvance::where('estado_revision', 'POR_REVISAR')->count(),
             ]);
         });
     }
