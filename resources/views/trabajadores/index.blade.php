@@ -166,7 +166,7 @@
                                             title="Ver el avance registrado">
                                             Avance registrado hoy
                                         </a>
-                                    @elseif ($trabajador->estado === 'ACTIVO')
+                                    @elseif ($trabajador->estado === 'ACTIVO' && auth()->user()->hasRole('ADMINISTRADOR'))
                                         <button type="button"
                                             class="button button--primary button--small trabajador-actions__primary"
                                             data-registrar-avance
@@ -178,6 +178,7 @@
                                         </button>
                                     @endif
 
+                                    @if (!$trabajador->user?->hasRole('ADMINISTRADOR') && (auth()->user()->hasRole('ADMINISTRADOR') || ((!$trabajador->user || $trabajador->user->hasRole('TRABAJADOR')) && !$trabajador->esEncargadoDeSuArea())))
                                     {{-- EDITAR --}}
                                     <button type="button"
                                         class="button button--secondary button--small trabajador-actions__edit"
@@ -207,6 +208,7 @@
                                         data-url="{{ route('trabajadores.estado', $trabajador) }}">
                                         {{ $trabajador->estado === 'ACTIVO' ? 'Desactivar' : 'Activar' }}
                                     </button>
+                                    @endif
                                 </div>
                                 </dialog>
                             </td>
@@ -392,7 +394,7 @@
                     <div class="form-group">
                         <input type="hidden" name="encargado_area" value="0">
                         <div class="form-check">
-                            <input id="crearEncargadoArea" type="checkbox" name="encargado_area" value="1"
+                            <input @disabled(auth()->user()->hasRole('RECURSOS_HUMANOS')) id="crearEncargadoArea" type="checkbox" name="encargado_area" value="1"
                                 @checked(old('encargado_area'))>
                             <label for="crearEncargadoArea">Designar como encargado de su área</label>
                         </div>
@@ -536,7 +538,7 @@
                     <div class="form-group">
                         <input type="hidden" name="encargado_area" value="0">
                         <div class="form-check">
-                            <input id="editarEncargadoArea" type="checkbox" name="encargado_area" value="1">
+                            <input @disabled(auth()->user()->hasRole('RECURSOS_HUMANOS')) id="editarEncargadoArea" type="checkbox" name="encargado_area" value="1">
                             <label for="editarEncargadoArea">Designar como encargado de su área</label>
                         </div>
                         <small class="form-help">Podrá consultar los avances de los demás trabajadores de su área.</small>

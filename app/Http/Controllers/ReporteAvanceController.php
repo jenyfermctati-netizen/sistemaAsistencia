@@ -31,7 +31,7 @@ class ReporteAvanceController extends Controller
         $vistaEquipo = $esEncargadoArea && $request->query('vista') === 'equipo';
         $esVistaPersonal = $esTrabajador && ! $vistaEquipo;
         $puedeGestionar = $rol === 'ADMINISTRADOR';
-        $puedeRevisar = in_array($rol, ['ADMINISTRADOR', 'GERENTE'], true);
+        $puedeRevisar = in_array($rol, ['ADMINISTRADOR', 'RECURSOS_HUMANOS', 'GERENTE'], true);
         $areaSupervisorId = match (true) {
             $rol === 'GERENTE' => $usuario->trabajador?->area_id,
             $vistaEquipo => $usuario->trabajador?->area_id,
@@ -91,7 +91,7 @@ class ReporteAvanceController extends Controller
             $query->where('estado', $request->estado);
         }
 
-        if ($rol === 'ADMINISTRADOR' && $request->filled('area_id')) {
+        if ($usuario->tienePermiso('reportes.consultar') && $request->filled('area_id')) {
             $areaId = $request->integer('area_id');
             $query->whereHas('trabajador', fn ($trabajador) => $trabajador->where('area_id', $areaId));
         }
@@ -166,7 +166,7 @@ class ReporteAvanceController extends Controller
             'revisadoPor',
         ])->abiertosOEnRevision();
 
-        if (! $puedeGestionar) {
+        if (! $puedeGestionar && ! $usuario->hasRole('RECURSOS_HUMANOS')) {
             $areaId = $usuario->trabajador?->area_id;
 
             if (! $areaId) {
@@ -399,7 +399,7 @@ class ReporteAvanceController extends Controller
         $usuario = Auth::user();
 
         abort_unless(
-            in_array($usuario->roleCode(), ['ADMINISTRADOR', 'GERENTE'], true),
+            in_array($usuario->roleCode(), ['ADMINISTRADOR', 'RECURSOS_HUMANOS', 'GERENTE'], true),
             403
         );
 
@@ -893,7 +893,7 @@ class ReporteAvanceController extends Controller
 
         $actividad->loadMissing('reporte.trabajador');
 
-        $esAdministrador = $usuario->roleCode() === 'ADMINISTRADOR';
+        $esAdministrador = $usuario->tienePermiso('reportes.consultar');
 
         $esGerenteDelArea = $usuario->roleCode() === 'GERENTE'
             && $usuario->trabajador?->area_id
@@ -916,7 +916,9 @@ class ReporteAvanceController extends Controller
     {
         $usuario = Auth::user();
 
-        if ($usuario->roleCode() === 'ADMINISTRADOR') {
+        if ($usuario->tienePermiso('reportes.revisar')) {
+            abort_if($usuario->hasRole('RECURSOS_HUMANOS') && (int) $usuario->trabajador_id === (int) $reporte->trabajador_id,
+                403, 'No puedes revisar tu propio reporte de avance.');
             return;
         }
 

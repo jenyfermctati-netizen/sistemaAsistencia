@@ -41,11 +41,22 @@
             <div class="sa-section-heading"><div><span class="sa-eyebrow">ACCESOS</span><h2>Administradores</h2><p>Ingresos, último acceso y estado de contraseña.</p></div><span class="sa-count-pill">{{ $administradores->count() }} cuentas</span></div>
             <div class="sa-table-wrap"><table class="sa-table sa-admin-table"><thead><tr><th>Administrador</th><th>Estado</th><th>Ingresos</th><th>Último acceso</th><th>Contraseña</th><th><span class="sr-only">Acciones</span></th></tr></thead><tbody>
                 @forelse($administradores as $admin)
-                    <tr><td data-label="Administrador"><strong>{{ $admin->name }}</strong><small>{{ $admin->email }}</small></td><td data-label="Estado"><span class="sa-status {{ $admin->estado ? '' : 'sa-status--INACTIVA' }}">{{ $admin->estado ? 'Activo' : 'Inactivo' }}</span></td><td data-label="Ingresos">{{ number_format($admin->ingresos_count) }}</td><td data-label="Último acceso">{{ $admin->ultimo_acceso?->format('d/m/Y H:i') ?: 'Nunca' }}</td><td data-label="Contraseña">{{ $admin->password_changed_at?->format('d/m/Y') ?: 'Sin cambio registrado' }}</td><td data-label="Acciones"><div class="sa-actions"><form method="POST" action="{{ route('superadmin.administradores.invitacion', [$empresa, $admin]) }}">@csrf<button class="sa-button sa-button--quiet" type="submit">Invitar</button></form><form method="POST" action="{{ route('superadmin.administradores.estado', [$empresa, $admin]) }}">@csrf @method('PATCH')<button class="sa-button {{ $admin->estado ? 'sa-button--danger' : 'sa-button--secondary' }}" type="submit">{{ $admin->estado ? 'Desactivar' : 'Activar' }}</button></form></div></td></tr>
+                    <tr><td data-label="Administrador"><strong>{{ $admin->name }}</strong><small>{{ $admin->email }}</small></td><td data-label="Estado"><span class="sa-status {{ $admin->estado ? '' : 'sa-status--INACTIVA' }}">{{ $admin->estado ? 'Activo' : 'Inactivo' }}</span></td><td data-label="Ingresos">{{ number_format($admin->ingresos_count) }}</td><td data-label="Último acceso">{{ $admin->ultimo_acceso?->format('d/m/Y H:i') ?: 'Nunca' }}</td><td data-label="Contraseña">{{ $admin->password_changed_at?->format('d/m/Y') ?: 'Sin cambio registrado' }}</td><td data-label="Acciones"><div class="sa-actions"><form method="POST" action="{{ route('superadmin.administradores.invitacion', [$empresa, $admin]) }}">@csrf<button class="sa-button sa-button--quiet" type="submit">Invitar</button></form><form method="POST" action="{{ route('superadmin.administradores.estado', [$empresa, $admin]) }}">@csrf @method('PATCH')<button class="sa-button {{ $admin->estado ? 'sa-button--danger' : 'sa-button--secondary' }}" type="submit" @disabled($admin->estado && $administradores->count() === 1)>{{ $admin->estado ? 'Desactivar' : 'Activar' }}</button></form></div></td></tr>
                 @empty
                     <tr><td colspan="6" class="sa-empty-state"><strong>Aún no hay administradores</strong><span>Añade una cuenta para continuar con la configuración.</span></td></tr>
                 @endforelse
             </tbody></table></div>
+            @if($administradores->count() === 1)
+                <details class="sa-inline-create"><summary>Transferir administración</summary>
+                    <p>El usuario elegido será el único administrador. El anterior pasará a trabajador si tiene ficha laboral; si no, quedará inactivo.</p>
+                    <form class="sa-inline-form" method="POST" action="{{ route('superadmin.administradores.transferir', $empresa) }}">@csrf
+                        <label><span>Nuevo administrador</span><select name="usuario_id" required><option value="">Seleccionar</option>@foreach($usuariosTransferencia as $usuario)<option value="{{ $usuario->id }}">{{ $usuario->name }} ({{ $usuario->email }})</option>@endforeach</select></label>
+                        <label><span>Tu contraseña actual</span><input type="password" name="password" autocomplete="current-password" required></label>
+                        <button class="sa-button" type="submit">Transferir administración</button>
+                    </form>
+                </details>
+            @endif
+            @if($administradores->isEmpty())
             <details class="sa-inline-create" @if($errors->has('name') || $errors->has('email')) open @endif>
                 <summary>+ <span>Añadir administrador</span></summary>
                 <form class="sa-inline-form" method="POST" action="{{ route('superadmin.administradores.store', $empresa) }}">@csrf
@@ -54,6 +65,7 @@
                     <button class="sa-button" type="submit">Crear y enviar invitación</button>
                 </form>
             </details>
+            @endif
         </section>
 
         <section class="sa-panel" id="configuracion">

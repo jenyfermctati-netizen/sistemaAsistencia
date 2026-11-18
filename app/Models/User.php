@@ -45,6 +45,39 @@ class User extends Authenticatable
         $this->notify(new RestablecerContrasena($token));
     }
 
+    public function tienePermiso(string $permiso): bool
+    {
+        return \App\Support\PermisosEmpresa::permite($this, $permiso);
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (User $user): void {
+            $admin = Rol::whereKey($user->rol_id)->where('codigo', 'ADMINISTRADOR')->exists();
+            $wasAdmin = $user->exists && Rol::whereKey($user->getOriginal('rol_id'))->where('codigo', 'ADMINISTRADOR')->exists();
+            if ($wasAdmin && (! $admin || ! $user->estado || $user->isDirty('empresa_id'))) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'rol_id' => 'Transfiere la administración antes de desactivar o cambiar al administrador.',
+                ]);
+            }
+            if ($admin) {
+                if (! $user->empresa_id || ! $user->estado) {
+                    throw \Illuminate\Validation\ValidationException::withMessages(['rol_id' => 'El administrador debe tener una empresa y estar activo.']);
+                }
+                if (static::withoutGlobalScopes()->where('administrador_empresa_id', $user->empresa_id)
+                    ->when($user->exists, fn ($q) => $q->where('id', '!=', $user->id))->exists()) {
+                    throw \Illuminate\Validation\ValidationException::withMessages(['rol_id' => 'La empresa ya tiene un administrador.']);
+                }
+            }
+            $user->administrador_empresa_id = $admin ? $user->empresa_id : null;
+        });
+        static::deleting(function (User $user): void {
+            if (Rol::whereKey($user->rol_id)->where('codigo', 'ADMINISTRADOR')->exists()) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['usuario' => 'Transfiere la administración antes de eliminar esta cuenta.']);
+            }
+        });
+    }
+
     public function roleCode(): string
     {
         return strtoupper(trim((string) ($this->rol?->codigo ?? '')));

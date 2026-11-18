@@ -32,7 +32,7 @@ class AsignacionCampoController extends Controller
     public function index(Request $request): View
     {
         $rol = $this->rolActual();
-        $esAdministrador = $rol === 'ADMINISTRADOR';
+        $esAdministrador = Auth::user()->tienePermiso('campo.revisar');
         $esTrabajador = $rol === 'TRABAJADOR';
 
         abort_unless($esAdministrador || $esTrabajador, 403);
@@ -499,7 +499,7 @@ class AsignacionCampoController extends Controller
         $esPropietario = $rol === 'TRABAJADOR'
             && (int) Auth::user()?->trabajador_id === (int) $marcacionCampo->trabajador_id;
 
-        abort_unless($rol === 'ADMINISTRADOR' || $esPropietario, 403);
+        abort_unless(Auth::user()->tienePermiso('campo.revisar') || $esPropietario, 403);
         abort_unless(
             $marcacionCampo->evidencia_path
             && Storage::disk('local')->exists($marcacionCampo->evidencia_path),
@@ -525,7 +525,8 @@ class AsignacionCampoController extends Controller
         Request $request,
         MarcacionCampo $marcacionCampo
     ): RedirectResponse {
-        $this->verificarAdministrador();
+        abort_unless(Auth::user()->tienePermiso('campo.revisar'), 403);
+        abort_if(Auth::user()->hasRole('RECURSOS_HUMANOS') && (int) Auth::user()->trabajador_id === (int) $marcacionCampo->trabajador_id, 403, 'No puedes revisar tus propias marcaciones.');
 
         $data = $request->validate([
             'decision' => ['required', Rule::in(['APROBAR', 'RECHAZAR'])],

@@ -23,7 +23,9 @@
             @if($esAdministrador)
                 <span class="campo-topbar__count"><x-ui-icon name="clock" /> {{ $marcacionesPendientes->count() }} pendientes</span>
             @endif
+@unless(auth()->user()->hasRole('RECURSOS_HUMANOS'))
             <button type="button" class="button button--primary" data-modal-open="modalCrearAsignacion"><x-ui-icon name="plus" /> Nueva asignación</button>
+@endunless
         </div>
     </header>
 
@@ -85,6 +87,7 @@
                                         <span class="campo-no-evidence">Sin evidencia fotográfica</span>
                                     @endif
                                 </div>
+                                @unless(auth()->user()->hasRole('RECURSOS_HUMANOS') && auth()->user()->trabajador_id == $marcacionCampo->trabajador_id)
                                 <form id="campo-revision-{{ $marcacionCampo->getKey() }}" method="POST" action="{{ route('marcaciones-campo.revisar', $marcacionCampo) }}" class="campo-review-form">
                                     @csrf
                                     @method('PATCH')
@@ -97,6 +100,9 @@
                                         <button type="submit" name="decision" value="APROBAR" class="button button--primary button--small">Aprobar</button>
                                     </div>
                                 </form>
+                                @else
+                                    <p>Tu marcación debe ser revisada por el administrador.</p>
+                                @endunless
                             </div>
                             </div>
                         </div>
@@ -378,7 +384,7 @@
                                 <x-ui-icon name="clock" /> Marcar ahora
                             </button>
                         </form>
-                    @elseif ($esAdministrador && $asignacion->estado !== 'CANCELADA')
+                    @elseif (auth()->user()->hasRole('ADMINISTRADOR') && $asignacion->estado !== 'CANCELADA')
                         <button type="button" class="campo-icon-btn campo-icon-btn--edit" title="Editar asignación" aria-label="Editar asignación" data-editar-asignacion
                             data-url="{{ route('asignaciones-campo.update', $asignacion) }}"
                             data-trabajador="{{ $asignacion->trabajador_id }}"

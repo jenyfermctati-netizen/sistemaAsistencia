@@ -3,7 +3,7 @@
         $usuarioActual = auth()->user();
         $rolUsuario = $usuarioActual?->roleCode() ?? '';
         $tipoVinculo = strtoupper(trim($usuarioActual?->trabajador?->tipo_vinculo ?? ''));
-        $esAdministrador = $rolUsuario === 'ADMINISTRADOR';
+        $esAdministrador = $usuarioActual?->tienePermiso('personal.gestionar');
         $esTrabajador = $rolUsuario === 'TRABAJADOR';
         $esGerente = $rolUsuario === 'GERENTE';
         $esSuperAdmin = $usuarioActual?->isSuperAdmin() ?? false;
@@ -68,11 +68,13 @@
             <div class="sidebar__section">
                 <div class="sidebar__title">Administración</div>
 
+                @if ($usuarioActual->hasRole('ADMINISTRADOR'))
                 <a href="{{ route('areas.index') }}"
                     class="sidebar__item {{ request()->routeIs('areas.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="areas" /></span>
                     <span class="sidebar__label">Áreas</span>
                 </a>
+                @endif
 
                 <a href="{{ route('trabajadores.index') }}"
                     class="sidebar__item {{ request()->routeIs('trabajadores.index') ? 'active' : '' }}">
@@ -92,11 +94,13 @@
                     <span class="sidebar__label">Feriados</span>
                 </a>
 
+                @if ($usuarioActual->hasRole('ADMINISTRADOR'))
                 <a href="{{ route('biometrico.index') }}"
                     class="sidebar__item {{ request()->routeIs('biometrico.*') ? 'active' : '' }}">
                     <span class="sidebar__icon"><x-nav-icon name="fingerprint" /></span>
                     <span class="sidebar__label">Biométrico</span>
                 </a>
+                @endif
             </div>
 
             <div class="sidebar__section">
@@ -150,6 +154,14 @@
                     <x-sidebar-pending-count :count="$pendientesSidebar['avances']" label="avances y pendientes por revisar" />
                 </a>
 
+            </div>
+        @endif
+
+        @if ($usuarioActual->hasRole('ADMINISTRADOR'))
+            <div class="sidebar__section">
+                <div class="sidebar__title">Empresa</div>
+                <a href="{{ route('empresa.configuracion') }}" class="sidebar__item {{ request()->routeIs('empresa.configuracion*') ? 'active' : '' }}"><span class="sidebar__icon"><x-nav-icon name="areas" /></span><span class="sidebar__label">Configuración y accesos</span></a>
+                <a href="{{ route('empresa.auditoria') }}" class="sidebar__item {{ request()->routeIs('empresa.auditoria') ? 'active' : '' }}"><span class="sidebar__icon"><x-nav-icon name="tasks" /></span><span class="sidebar__label">Auditoría</span></a>
             </div>
         @endif
 

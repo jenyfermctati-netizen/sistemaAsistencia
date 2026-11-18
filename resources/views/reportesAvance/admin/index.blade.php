@@ -289,7 +289,7 @@
 
                                                                 @endif
 
-                                                                @if($puedeRevisar && $reporte->estado !== 'REVISADO')
+                                                                @if($puedeRevisar && $reporte->estado !== 'REVISADO' && !(auth()->user()->hasRole('RECURSOS_HUMANOS') && auth()->user()->trabajador_id == $reporte->trabajador_id))
 
                                                                     <div class="ra-report-review">
 
@@ -305,8 +305,8 @@
 
                                                                             <button type="submit"
                                                                                 class="ra-review-btn ra-review-btn--approve"
-                                                                                title="Marcar como revisado"
-                                                                                aria-label="Marcar como revisado">
+                                                                                title="Aprobar reporte"
+                                                                                aria-label="Aprobar reporte">
                                                                                 ✓
                                                                             </button>
 
@@ -318,8 +318,8 @@
                                                                             data-url="{{ route('reportesAvance.revisar', $reporte) }}"
                                                                             data-trabajador="{{ $reporte->trabajador?->nombres }} {{ $reporte->trabajador?->apellidos }}"
                                                                             data-fecha="{{ $reporte->fecha_presentacion?->format('d/m/Y') }}"
-                                                                            title="Observar reporte"
-                                                                            aria-label="Observar reporte">
+                                                                            title="Rechazar con observación"
+                                                                            aria-label="Rechazar con observación">
                                                                             !
                                                                         </button>
 
@@ -873,7 +873,7 @@
 
                     <button type="submit"
                         class="button button--primary">
-                        Guardar observación
+                        Rechazar reporte
                     </button>
 
                 </div>
@@ -888,7 +888,7 @@
     @if($puedeRevisar)
 
         <x-modal id="modalObservarReporte"
-            title="Observar reporte">
+            title="Rechazar con observación">
 
             <form method="POST"
                 id="formObservarReporte"
@@ -902,7 +902,7 @@
                     value="OBSERVADO">
 
                 <p class="ra-modal-description">
-                    Registrar observación para el reporte de
+                    Indica el motivo del rechazo del reporte de
                     <strong id="reporteObservadoTrabajador"></strong>
                     correspondiente al
                     <strong id="reporteObservadoFecha"></strong>.
@@ -935,7 +935,7 @@
 
                     <button type="submit"
                         class="button button--primary">
-                        Guardar observación
+                        Rechazar reporte
                     </button>
 
                 </div>

@@ -17,7 +17,7 @@ class AsistenciaController extends Controller
     {
         $this->verificarConsulta();
 
-        $puedeProcesar = $this->rolActual() === 'ADMINISTRADOR';
+        $puedeProcesar = Auth::user()->tienePermiso('asistencias.gestionar');
         $query = Asistencia::with([
             'trabajador.area',
             'horario',
@@ -150,7 +150,7 @@ class AsistenciaController extends Controller
     private function verificarAdministrador(): void
     {
         abort_unless(
-            Auth::check() && $this->rolActual() === 'ADMINISTRADOR',
+            Auth::check() && Auth::user()->tienePermiso('asistencias.gestionar'),
             403
         );
     }
@@ -158,7 +158,7 @@ class AsistenciaController extends Controller
     private function verificarConsulta(): void
     {
         abort_unless(
-            Auth::check() && in_array($this->rolActual(), ['ADMINISTRADOR', 'GERENTE'], true),
+            Auth::check() && in_array($this->rolActual(), ['ADMINISTRADOR', 'RECURSOS_HUMANOS', 'GERENTE'], true),
             403
         );
     }

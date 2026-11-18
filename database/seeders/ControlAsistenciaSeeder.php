@@ -10,6 +10,7 @@ class ControlAsistenciaSeeder extends Seeder
     public function run(): void
     {
         $roles = [
+            ['codigo' => 'RECURSOS_HUMANOS', 'ambito' => 'EMPRESA', 'nombre' => 'Recursos Humanos', 'descripcion' => 'Gestiona personal, asistencia, solicitudes y vacaciones'],
             ['codigo' => 'SUPERADMIN', 'ambito' => 'GLOBAL', 'nombre' => 'Superadministrador', 'descripcion' => 'Administra la plataforma CONNEXT y sus empresas'],
             ['codigo' => 'GERENTE', 'ambito' => 'EMPRESA', 'nombre' => 'Gerente', 'descripcion' => 'Consulta información general, indicadores y reportes'],
             ['codigo' => 'ADMINISTRADOR', 'ambito' => 'EMPRESA', 'nombre' => 'Administrador', 'descripcion' => 'Gestiona personal, asistencia y configuraciones de su empresa'],

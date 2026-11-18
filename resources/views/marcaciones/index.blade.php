@@ -308,7 +308,7 @@
                                                 @endif
                                             </dl>
                                             <div class="marcacion-detalle__actions">
-                                    @if(!$marcacion->anulada)
+                                    @if(!$marcacion->anulada && auth()->user()->hasRole('ADMINISTRADOR'))
                                         <button type="button" class="button button--danger button--small"
                                             data-anular-marcacion
                                             data-url="{{ route('marcaciones.anular',$marcacion) }}"

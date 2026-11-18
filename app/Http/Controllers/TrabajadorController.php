@@ -79,6 +79,8 @@ class TrabajadorController extends Controller
 
         $roles = Rol::where('estado', true)
             ->where('ambito', 'EMPRESA')
+            ->where('codigo', '!=', 'ADMINISTRADOR')
+            ->when(Auth::user()->hasRole('RECURSOS_HUMANOS'), fn ($q) => $q->where('codigo', 'TRABAJADOR'))
             ->orderBy('nombre')
             ->get();
 
@@ -158,7 +160,8 @@ class TrabajadorController extends Controller
             ],
             'rol_id' => [
                 'required',
-                Rule::exists('roles', 'id')->where('ambito', 'EMPRESA')->where('estado', true),
+                Rule::exists('roles', 'id')->where('ambito', 'EMPRESA')->where('estado', true)
+                    ->whereIn('codigo', Auth::user()->hasRole('RECURSOS_HUMANOS') ? ['TRABAJADOR'] : ['TRABAJADOR', 'GERENTE', 'RECURSOS_HUMANOS']),
             ],
             'encargado_area' => [
                 'sometimes',
@@ -172,6 +175,9 @@ class TrabajadorController extends Controller
             ],
         ]);
 
+        if (Auth::user()->hasRole('RECURSOS_HUMANOS') && ($data['encargado_area'] ?? false)) {
+            abort(403, 'Solo el administrador puede designar responsables.');
+        }
         $this->validarDesignacionEncargado($data);
 
         DB::transaction(function () use ($data) {
@@ -231,6 +237,7 @@ class TrabajadorController extends Controller
     {
         $this->autorizarAdministrador();
 
+        $this->autorizarEdicionTrabajador($trabajador);
         $usuario = $trabajador->user;
 
         $data = $request->validate([
@@ -298,7 +305,8 @@ class TrabajadorController extends Controller
             ],
             'rol_id' => [
                 'required',
-                Rule::exists('roles', 'id')->where('ambito', 'EMPRESA')->where('estado', true),
+                Rule::exists('roles', 'id')->where('ambito', 'EMPRESA')->where('estado', true)
+                    ->whereIn('codigo', Auth::user()->hasRole('RECURSOS_HUMANOS') ? ['TRABAJADOR'] : ['TRABAJADOR', 'GERENTE', 'RECURSOS_HUMANOS']),
             ],
             'encargado_area' => [
                 'sometimes',
@@ -312,6 +320,9 @@ class TrabajadorController extends Controller
             ],
         ]);
 
+        if (Auth::user()->hasRole('RECURSOS_HUMANOS') && ($data['encargado_area'] ?? false)) {
+            abort(403, 'Solo el administrador puede designar responsables.');
+        }
         $this->validarDesignacionEncargado($data);
 
         DB::transaction(function () use (
@@ -388,6 +399,7 @@ class TrabajadorController extends Controller
     public function cambiarEstado(Trabajador $trabajador)
     {
         $this->autorizarAdministrador();
+        $this->autorizarEdicionTrabajador($trabajador);
 
         DB::transaction(function () use ($trabajador) {
             $nuevoEstado = $trabajador->estado === 'ACTIVO'
@@ -487,10 +499,19 @@ class TrabajadorController extends Controller
         ]);
     }
 
+    private function autorizarEdicionTrabajador(Trabajador $trabajador): void
+    {
+        abort_if($trabajador->user?->hasRole('ADMINISTRADOR'), 403, 'Gestiona al administrador desde la configuración de empresa.');
+        if (Auth::user()->hasRole('RECURSOS_HUMANOS')) {
+            abort_if($trabajador->user && ! $trabajador->user->hasRole('TRABAJADOR'), 403);
+            abort_if($trabajador->esEncargadoDeSuArea(), 403, 'Los responsables de área deben ser gestionados por el administrador.');
+        }
+    }
+
     private function autorizarAdministrador(): void
     {
         abort_unless(
-            Auth::check() && Auth::user()->roleCode() === 'ADMINISTRADOR',
+            Auth::check() && Auth::user()->tienePermiso('personal.gestionar'),
             403
         );
     }

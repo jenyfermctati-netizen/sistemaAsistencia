@@ -13,6 +13,7 @@ use App\Services\AuditoriaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -80,19 +81,36 @@ class SuperAdminController extends Controller
     public function storeEmpresa(Request $request): RedirectResponse
     {
         $request->mergeIfMissing(['color_turquesa' => '#00A9C7']);
-        $data = $request->validate($this->reglasEmpresa());
-        $empresa = Empresa::create($this->datosEmpresa($data));
-        $this->auditoria->modelo('CREAR_EMPRESA', $empresa);
-
+        $request->merge(['admin_email' => mb_strtolower(trim((string) $request->input('admin_email')))]);
+        $data = $request->validate($this->reglasEmpresa() + [
+            'admin_nombre' => ['required', 'string', 'max:150'],
+            'admin_email' => ['required', 'email', 'max:255', 'unique:users,email'],
+        ]);
+        [$empresa, $administrador] = DB::transaction(function () use ($data) {
+            $empresa = Empresa::create($this->datosEmpresa($data));
+            $administrador = User::withoutGlobalScopes()->create([
+                'empresa_id' => $empresa->id, 'rol_id' => $this->rolAdministrador()->id,
+                'name' => $data['admin_nombre'], 'email' => $data['admin_email'],
+                'password' => Str::random(64), 'estado' => true,
+            ]);
+            $this->auditoria->modelo('CREAR_EMPRESA', $empresa);
+            $this->auditoria->registrar('CREAR_ADMIN_EMPRESA', 'users', $administrador->id, null,
+                ['name' => $administrador->name, 'email' => $administrador->email], $empresa->id);
+            return [$empresa, $administrador];
+        });
+        $enviado = $this->enviarInvitacion($administrador, $empresa);
         return redirect(route('superadmin.empresas.show', $empresa).'#accesos')
-            ->with('success', 'Empresa creada. Añade sus administradores para continuar.');
+            ->with($enviado ? 'success' : 'warning', $enviado
+                ? 'Empresa y administrador creados. Invitación enviada.'
+                : 'Empresa y administrador creados. Reenvía la invitación: no se pudo enviar el correo.');
     }
 
     public function showEmpresa(Empresa $empresa): View
     {
         $administradores = $this->administradoresQuery($empresa)->orderBy('name')->get();
 
-        return view('superadmin.empresas.show', compact('empresa', 'administradores'));
+        $usuariosTransferencia = User::withoutGlobalScopes()->where('empresa_id', $empresa->id)->where('estado', true)->whereNotIn('id', $administradores->pluck('id'))->orderBy('name')->get();
+        return view('superadmin.empresas.show', compact('empresa', 'administradores', 'usuariosTransferencia'));
     }
 
     public function updateEmpresa(Request $request, Empresa $empresa): RedirectResponse
@@ -151,12 +169,20 @@ class SuperAdminController extends Controller
 
     public function storeAdministrador(Request $request, Empresa $empresa): RedirectResponse
     {
+        if ($this->administradoresQuery($empresa)->exists()) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['email' => 'La empresa ya tiene un administrador. Utiliza la transferencia.']);
+        }
         $data = $request->validate([
             'name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
         ]);
 
-        $administrador = User::withoutGlobalScopes()->create([
+        $administrador = DB::transaction(function () use ($empresa, $data) {
+            Empresa::whereKey($empresa->id)->lockForUpdate()->firstOrFail();
+            if ($this->administradoresQuery($empresa)->exists()) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['email' => 'La empresa ya tiene un administrador.']);
+            }
+            return User::withoutGlobalScopes()->create([
             'empresa_id' => $empresa->id,
             'trabajador_id' => null,
             'rol_id' => $this->rolAdministrador()->id,
@@ -165,12 +191,23 @@ class SuperAdminController extends Controller
             'password' => Str::random(64),
             'estado' => true,
         ]);
-        $this->auditoria->modelo('CREAR_ADMIN_EMPRESA', $administrador);
+        });
+        $this->auditoria->registrar('CREAR_ADMIN_EMPRESA', 'users', $administrador->id, null, $administrador->only(['name', 'email', 'rol_id']), $empresa->id);
         $enviado = $this->enviarInvitacion($administrador, $empresa);
 
         return back()->with($enviado ? 'success' : 'warning', $enviado
             ? 'Administrador creado e invitación enviada.'
             : 'Administrador creado, pero no se pudo enviar la invitación.');
+    }
+
+    public function transferirAdministrador(Request $request, Empresa $empresa, \App\Services\TransferirAdministradorService $service): RedirectResponse
+    {
+        $data = $request->validate([
+            'usuario_id' => ['required', 'integer'],
+            'password' => ['required', 'current_password'],
+        ]);
+        $service->transferir($empresa, $request->user(), (int) $data['usuario_id']);
+        return back()->with('success', 'Administración transferida.');
     }
 
     public function reenviarInvitacion(Empresa $empresa, User $administrador): RedirectResponse

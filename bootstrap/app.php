@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'superadmin' => EnsureSuperAdmin::class,
             'biometrico.dispositivo' => IdentifyBiometricDevice::class,
             'auditoria.empresa' => AuditTenantMutation::class,
+            'rrhh' => \App\Http\Middleware\EnsureHumanResourcesAccess::class,
         ]);
         $middleware->prependToPriorityList(
             SubstituteBindings::class,

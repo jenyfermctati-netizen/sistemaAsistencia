@@ -49,13 +49,11 @@
             </p>
         </div>
 
-        @unless ($esAdministrador)
             <div class="page-header__actions">
                 <button type="button" class="button button--primary" data-modal-open="modalCrearVacaciones">
-                    <x-ui-icon name="plus" /> Solicitar vacaciones
+                    <x-ui-icon name="plus" /> {{ $esAdministrador ? 'Registrar vacaciones' : 'Solicitar vacaciones' }}
                 </button>
             </div>
-        @endunless
     </div>
 
     {{-- FILTROS --}}
@@ -231,7 +229,7 @@
 
                 {{-- ACCIONES --}}
                 <div class="vacacion-card__footer">
-                    @if ($esAdministrador && $vacacion->estado === 'PENDIENTE')
+                    @if ($esAdministrador && !(auth()->user()->hasRole('RECURSOS_HUMANOS') && auth()->user()->trabajador_id == $vacacion->trabajador_id) && $vacacion->estado === 'PENDIENTE')
                         <button type="button" class="button button--primary button--small" data-revisar-vacacion
                             data-url="{{ route('vacaciones.revisar', $vacacion) }}"
                             data-trabajador="{{ $vacacion->trabajador?->nombres }} {{ $vacacion->trabajador?->apellidos }}"
@@ -240,7 +238,7 @@
                         </button>
                     @endif
 
-                    @if ($esAdministrador && in_array($vacacion->estado, ['APROBADA', 'PROGRAMADA']))
+                    @if ($esAdministrador && !(auth()->user()->hasRole('RECURSOS_HUMANOS') && auth()->user()->trabajador_id == $vacacion->trabajador_id) && in_array($vacacion->estado, ['APROBADA', 'PROGRAMADA']))
                         <button type="button" class="button button--secondary button--small" data-reprogramar-vacacion
                             data-url="{{ route('vacaciones.reprogramar', $vacacion) }}"
                             data-trabajador="{{ $vacacion->trabajador?->nombres }} {{ $vacacion->trabajador?->apellidos }}"
@@ -250,7 +248,7 @@
                         </button>
                     @endif
 
-                    @if ($esAdministrador && in_array($vacacion->estado, ['PENDIENTE', 'APROBADA', 'PROGRAMADA']))
+                    @if ($esAdministrador && !(auth()->user()->hasRole('RECURSOS_HUMANOS') && auth()->user()->trabajador_id == $vacacion->trabajador_id) && in_array($vacacion->estado, ['PENDIENTE', 'APROBADA', 'PROGRAMADA']))
                         <button type="button" class="button button--danger button--small" data-cancelar-vacacion
                             data-url="{{ route('vacaciones.cancelar', $vacacion) }}"
                             data-periodo="{{ $vacacion->fecha_inicio?->format('d/m/Y') }} - {{ $vacacion->fecha_fin?->format('d/m/Y') }}">
@@ -258,7 +256,7 @@
                         </button>
                     @endif
 
-                    @if (!$esAdministrador && $vacacion->estado === 'PENDIENTE')
+                    @if (!$esAdministrador && !(auth()->user()->hasRole('RECURSOS_HUMANOS') && auth()->user()->trabajador_id == $vacacion->trabajador_id) && $vacacion->estado === 'PENDIENTE')
                         <button type="button" class="button button--secondary button--small" data-editar-vacacion
                             data-url="{{ route('vacaciones.update', $vacacion) }}"
                             data-inicio="{{ $vacacion->fecha_inicio?->format('Y-m-d') }}"
@@ -294,13 +292,21 @@
     </div>
 
     {{-- MODAL CREAR --}}
-    @unless ($esAdministrador)
         <x-modal id="modalCrearVacaciones" title="Solicitar vacaciones">
             <form method="POST" action="{{ route('vacaciones.store') }}" class="form">
                 @csrf
+                @if ($esAdministrador)
+                    <label class="form-label">Trabajador</label>
+                    <select name="trabajador_id" class="form-select" required>
+                        <option value="">Seleccionar trabajador</option>
+                        @foreach ($trabajadores as $trabajador)
+                            <option value="{{ $trabajador->id }}" @selected(old('trabajador_id') == $trabajador->id)>{{ $trabajador->apellidos }} {{ $trabajador->nombres }}</option>
+                        @endforeach
+                    </select>
+                @endif
                 <div class="vacaciones-form-info">
                     <strong>Selecciona tu periodo de vacaciones</strong>
-                    <span>La solicitud será enviada al administrador para su revisión.</span>
+                    <span>La solicitud quedará pendiente de revisión. No puedes aprobar tus propias vacaciones como Recursos Humanos.</span>
                 </div>
 
                 <div class="form-grid form-grid--2">
@@ -367,7 +373,6 @@
                 </div>
             </form>
         </x-modal>
-    @endunless
 
     {{-- MODAL REVISAR - ADMIN --}}
     @if ($esAdministrador)

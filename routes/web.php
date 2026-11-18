@@ -73,6 +73,7 @@ Route::prefix('superadmin')->name('superadmin.')
         Route::post('/empresas/{empresa}/administradores', [SuperAdminController::class, 'storeAdministrador'])->name('administradores.store');
         Route::post('/empresas/{empresa}/administradores/{administrador}/invitacion', [SuperAdminController::class, 'reenviarInvitacion'])->name('administradores.invitacion');
         Route::patch('/empresas/{empresa}/administradores/{administrador}/estado', [SuperAdminController::class, 'cambiarEstadoAdministrador'])->name('administradores.estado');
+        Route::post('/empresas/{empresa}/transferir-administrador', [SuperAdminController::class, 'transferirAdministrador'])->middleware('throttle:5,1')->name('administradores.transferir');
         Route::get('/administradores', [SuperAdminController::class, 'administradores'])->name('administradores.index');
         Route::get('/dispositivos', [SuperAdminController::class, 'dispositivos'])->name('dispositivos.index');
         Route::post('/dispositivos', [SuperAdminController::class, 'storeDispositivo'])->name('dispositivos.store');
@@ -82,7 +83,11 @@ Route::prefix('superadmin')->name('superadmin.')
     });
 
 // Rutas autenticadas
-Route::middleware(['auth', 'empresa', 'auditoria.empresa'])->group(function () {
+Route::middleware(['auth', 'empresa', 'rrhh', 'auditoria.empresa'])->group(function () {
+    Route::get('/empresa/configuracion', [\App\Http\Controllers\ConfiguracionEmpresaController::class, 'index'])->middleware('role:ADMINISTRADOR')->name('empresa.configuracion');
+    Route::put('/empresa/configuracion', [\App\Http\Controllers\ConfiguracionEmpresaController::class, 'update'])->middleware('role:ADMINISTRADOR')->name('empresa.configuracion.update');
+    Route::post('/empresa/administrador/transferir', [\App\Http\Controllers\ConfiguracionEmpresaController::class, 'transferir'])->middleware(['role:ADMINISTRADOR', 'throttle:5,1'])->name('empresa.administrador.transferir');
+    Route::get('/empresa/auditoria', [\App\Http\Controllers\ConfiguracionEmpresaController::class, 'auditoria'])->middleware('role:ADMINISTRADOR')->name('empresa.auditoria');
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -94,37 +99,37 @@ Route::middleware(['auth', 'empresa', 'auditoria.empresa'])->group(function () {
 
     // Trabajadores
     Route::post('/trabajadores/consultar-dni', [ConsultaDniController::class, 'consultar'])
-        ->middleware(['role:ADMINISTRADOR', 'throttle:20,1'])
+        ->middleware(['role:ADMINISTRADOR,RECURSOS_HUMANOS', 'throttle:20,1'])
         ->name('trabajadores.consultar-dni');
-    Route::get('/trabajadores', [TrabajadorController::class, 'index'])->middleware('role:ADMINISTRADOR')->name('trabajadores.index');
-    Route::post('/trabajadores', [TrabajadorController::class, 'store'])->middleware('role:ADMINISTRADOR')->name('trabajadores.store');
-    Route::put('/trabajadores/{trabajador}', [TrabajadorController::class, 'update'])->middleware('role:ADMINISTRADOR')->name('trabajadores.update');
-    Route::patch('/trabajadores/{trabajador}/estado', [TrabajadorController::class, 'cambiarEstado'])->middleware('role:ADMINISTRADOR')->name('trabajadores.estado');
+    Route::get('/trabajadores', [TrabajadorController::class, 'index'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.index');
+    Route::post('/trabajadores', [TrabajadorController::class, 'store'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.store');
+    Route::put('/trabajadores/{trabajador}', [TrabajadorController::class, 'update'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.update');
+    Route::patch('/trabajadores/{trabajador}/estado', [TrabajadorController::class, 'cambiarEstado'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.estado');
     Route::post('/trabajadores/{trabajador}/reportes-avance', [ReporteAvanceController::class, 'storeParaTrabajador'])
         ->middleware('role:ADMINISTRADOR')->name('trabajadores.reportes-avance.store');
 
     // Horarios
-    Route::get('/trabajadores/horarios', [HorarioController::class, 'index'])->middleware('role:ADMINISTRADOR')->name('trabajadores.horarios');
-    Route::post('/trabajadores/horarios', [HorarioController::class, 'store'])->middleware('role:ADMINISTRADOR')->name('trabajadores.horarios.store');
-    Route::put('/trabajadores/horarios/{horario}', [HorarioController::class, 'update'])->middleware('role:ADMINISTRADOR')->name('trabajadores.horarios.update');
+    Route::get('/trabajadores/horarios', [HorarioController::class, 'index'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.horarios');
+    Route::post('/trabajadores/horarios', [HorarioController::class, 'store'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.horarios.store');
+    Route::put('/trabajadores/horarios/{horario}', [HorarioController::class, 'update'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.horarios.update');
 
     // Marcaciones
-    Route::get('/marcaciones', [MarcacionController::class, 'index'])->middleware('role:ADMINISTRADOR')->name('marcaciones.index');
-    Route::get('/marcaciones/manual', [MarcacionController::class, 'manual'])->middleware('role:ADMINISTRADOR')->name('marcaciones.manual');
-    Route::post('/marcaciones/manual/{trabajador}', [MarcacionController::class, 'marcarAhora'])->middleware('role:ADMINISTRADOR')->name('marcaciones.marcarAhora');
-    Route::post('/marcaciones', [MarcacionController::class, 'store'])->middleware('role:ADMINISTRADOR')->name('marcaciones.store');
+    Route::get('/marcaciones', [MarcacionController::class, 'index'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('marcaciones.index');
+    Route::get('/marcaciones/manual', [MarcacionController::class, 'manual'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('marcaciones.manual');
+    Route::post('/marcaciones/manual/{trabajador}', [MarcacionController::class, 'marcarAhora'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('marcaciones.marcarAhora');
+    Route::post('/marcaciones', [MarcacionController::class, 'store'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('marcaciones.store');
     Route::patch('/marcaciones/{marcacion}/anular', [MarcacionController::class, 'anular'])->middleware('role:ADMINISTRADOR')->name('marcaciones.anular');
 
     // Asistencias
-    Route::get('/asistencias', [AsistenciaController::class, 'index'])->middleware('role:ADMINISTRADOR,GERENTE')->name('asistencias.index');
-    Route::post('/asistencias/procesar', [AsistenciaController::class, 'procesar'])->middleware('role:ADMINISTRADOR')->name('asistencias.procesar');
+    Route::get('/asistencias', [AsistenciaController::class, 'index'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS,GERENTE')->name('asistencias.index');
+    Route::post('/asistencias/procesar', [AsistenciaController::class, 'procesar'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('asistencias.procesar');
 
     // Feriados
-    Route::get('/feriados', [FeriadoController::class, 'index'])->middleware('role:ADMINISTRADOR')->name('feriados.index');
-    Route::post('/feriados', [FeriadoController::class, 'store'])->middleware('role:ADMINISTRADOR')->name('feriados.store');
-    Route::post('/feriados/sincronizar', [FeriadoController::class, 'sincronizarNacionales'])->middleware('role:ADMINISTRADOR')->name('feriados.sincronizar');
-    Route::put('/feriados/{feriado}', [FeriadoController::class, 'update'])->middleware('role:ADMINISTRADOR')->name('feriados.update');
-    Route::patch('/feriados/{feriado}/estado', [FeriadoController::class, 'cambiarEstado'])->middleware('role:ADMINISTRADOR')->name('feriados.estado');
+    Route::get('/feriados', [FeriadoController::class, 'index'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('feriados.index');
+    Route::post('/feriados', [FeriadoController::class, 'store'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('feriados.store');
+    Route::post('/feriados/sincronizar', [FeriadoController::class, 'sincronizarNacionales'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('feriados.sincronizar');
+    Route::put('/feriados/{feriado}', [FeriadoController::class, 'update'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('feriados.update');
+    Route::patch('/feriados/{feriado}/estado', [FeriadoController::class, 'cambiarEstado'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('feriados.estado');
 
     // Trabajo en campo
     Route::get('/asignaciones-campo', [AsignacionCampoController::class, 'index'])->name('asignaciones-campo.index');

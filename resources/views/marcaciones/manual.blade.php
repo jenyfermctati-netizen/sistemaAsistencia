@@ -231,6 +231,7 @@
 
                                         <label class="manual-time-field">
                                             <span>Hora</span>
+                                            <input type="text" name="motivo_manual" class="form-control" placeholder="Motivo de la marcación" aria-label="Motivo de la marcación" maxlength="500" required>
                                             <input type="time" name="hora" value="{{ old('hora', now()->format('H:i')) }}"
                                                 class="form-control" required aria-label="Hora de la marcación para {{ $trabajador->nombres }} {{ $trabajador->apellidos }}">
                                         </label>

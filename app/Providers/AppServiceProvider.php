@@ -42,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
                     : 0);
             }
 
-            if ($rol !== 'ADMINISTRADOR') {
+            if (! $usuario?->tienePermiso('personal.gestionar')) {
                 return;
             }
 

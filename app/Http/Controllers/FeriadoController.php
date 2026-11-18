@@ -326,7 +326,7 @@ class FeriadoController extends Controller
     private function verificarAdministrador(): void
     {
         abort_unless(
-            Auth::check() && Auth::user()->roleCode() === 'ADMINISTRADOR',
+            Auth::check() && Auth::user()->tienePermiso('feriados.gestionar'),
             403
         );
     }

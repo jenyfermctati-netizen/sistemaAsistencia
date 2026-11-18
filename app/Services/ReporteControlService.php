@@ -140,10 +140,10 @@ class ReporteControlService
         $usuario->loadMissing(['rol', 'trabajador.area']);
         $rol = $usuario->roleCode();
 
-        if (in_array($rol, ['ADMINISTRADOR', 'GERENTE'], true)) {
+        if (in_array($rol, ['ADMINISTRADOR', 'RECURSOS_HUMANOS', 'GERENTE'], true)) {
             return [
                 'rol' => $rol,
-                'esAdministrador' => $rol === 'ADMINISTRADOR',
+                'esAdministrador' => $usuario->tienePermiso('reportes.consultar'),
                 'esVistaGeneral' => true,
                 'esResumido' => false,
                 'areaId' => null,

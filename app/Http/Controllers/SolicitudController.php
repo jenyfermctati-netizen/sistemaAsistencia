@@ -19,7 +19,7 @@ class SolicitudController extends Controller
     {
         $usuario = Auth::user();
         $rol = $usuario->roleCode();
-        $puedeGestionar = in_array($rol, ['ADMINISTRADOR', 'GERENTE'], true);
+        $puedeGestionar = in_array($rol, ['ADMINISTRADOR', 'RECURSOS_HUMANOS', 'GERENTE'], true);
         $puedeSolicitar = (bool) $usuario->trabajador_id;
         $seccion = $puedeGestionar
             ? ($request->query('seccion') === 'mis' ? 'mis' : 'bandeja')
@@ -38,13 +38,13 @@ class SolicitudController extends Controller
             } else {
                 $query->whereRaw('1 = 0');
             }
-        } elseif ($rol === 'ADMINISTRADOR') {
+        } elseif ($usuario->tienePermiso('solicitudes.gestionar')) {
             if ($seccion === 'mis') {
                 $query->where('trabajador_id', $usuario->trabajador_id ?? 0);
             } elseif ($usuario->trabajador_id) {
                 $query->where('trabajador_id', '!=', $usuario->trabajador_id);
             }
-        } elseif ($rol !== 'ADMINISTRADOR') {
+        } elseif (! $usuario->tienePermiso('solicitudes.gestionar')) {
             if (!$usuario->trabajador_id)
                 $query->whereRaw('1 = 0');
             else
@@ -429,7 +429,7 @@ class SolicitudController extends Controller
             'No puedes revisar tu propia solicitud.'
         );
 
-        if ($usuario?->roleCode() === 'ADMINISTRADOR') {
+        if ($usuario?->tienePermiso('solicitudes.gestionar')) {
             return;
         }
 
@@ -455,7 +455,7 @@ class SolicitudController extends Controller
 
         abort_unless(
             $usuario && (
-                $usuario->roleCode() === 'ADMINISTRADOR' ||
+                $usuario->tienePermiso('solicitudes.gestionar') ||
                 $esGerenteDelArea ||
                 $usuario->trabajador_id === $solicitud->trabajador_id
             ),

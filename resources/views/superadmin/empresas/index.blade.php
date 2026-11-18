@@ -13,7 +13,7 @@
         <details class="sa-create-panel sa-create-panel--first" id="nueva-empresa" @if($errors->any() || request('section') === 'new') open @endif>
             <summary class="sa-create-summary">
                 <span class="sa-create-icon" aria-hidden="true">+</span>
-                <span><strong>Nueva empresa</strong><small>Registra primero los datos generales de la empresa.</small></span>
+                <span><strong>Nueva empresa</strong><small>Registra la empresa y su administrador único.</small></span>
                 <span class="sa-create-toggle">Agregar empresa</span>
             </summary>
             <div class="sa-create-body">
@@ -26,7 +26,9 @@
                     <label><span>Correo empresarial <small>Opcional</small></span><input name="email" type="email" value="{{ old('email') }}"></label>
                     <label><span>Teléfono <small>Opcional</small></span><input name="telefono" value="{{ old('telefono') }}" maxlength="20"></label>
                     <label class="sa-field--full"><span>Dirección <small>Opcional</small></span><textarea name="direccion" maxlength="500" rows="2">{{ old('direccion') }}</textarea></label>
-                    <div class="sa-form-footer sa-field--full"><span>Después podrás añadir administradores y definir la configuración.</span><button class="sa-button" type="submit">Crear y continuar</button></div>
+                    <label><span>Nombre del administrador</span><input name="admin_nombre" value="{{ old('admin_nombre') }}" required maxlength="150"></label>
+                    <label><span>Correo del administrador</span><input name="admin_email" type="email" value="{{ old('admin_email') }}" required maxlength="255"></label>
+                    <div class="sa-form-footer sa-field--full"><span>Se enviará una invitación al administrador para establecer su contraseña.</span><button class="sa-button" type="submit">Crear y continuar</button></div>
                 </form>
             </div>
         </details>

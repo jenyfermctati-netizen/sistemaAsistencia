@@ -30,7 +30,7 @@ class DashboardController extends Controller
         $rol = $usuario->roleCode();
 
         $datos = match ($rol) {
-            'ADMINISTRADOR' => $this->datosAdministrador($usuario),
+            'ADMINISTRADOR', 'RECURSOS_HUMANOS' => $this->datosAdministrador($usuario),
             'GERENTE' => $this->datosGerente($usuario),
             'TRABAJADOR' => $this->datosTrabajador($usuario),
             default => abort(403, 'Tu cuenta no tiene un rol habilitado para acceder al inicio.'),
@@ -45,7 +45,7 @@ class DashboardController extends Controller
 
     private function puedeVerReporteControl(User $usuario, string $rol): bool
     {
-        if ($rol === 'ADMINISTRADOR') {
+        if ($usuario->tienePermiso('reportes.consultar')) {
             return true;
         }
 
@@ -98,7 +98,7 @@ class DashboardController extends Controller
 
         return [
             'dashboardView' => 'dashboard.administrador',
-            'pageTitle' => 'Panel administrativo',
+            'pageTitle' => $usuario->hasRole('RECURSOS_HUMANOS') ? 'Recursos Humanos' : 'Panel administrativo',
             'pageSubtitle' => 'Vista general del sistema',
             'heroEyebrow' => 'CONTROL GENERAL',
             'heroTitle' => 'Hola, '.$usuario->name,

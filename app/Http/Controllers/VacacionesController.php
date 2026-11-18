@@ -18,7 +18,7 @@ class VacacionesController extends Controller
         $this->verificarAccesoVacaciones();
 
         $usuario = Auth::user();
-        $esAdministrador = $usuario->roleCode() === 'ADMINISTRADOR';
+        $esAdministrador = $usuario->tienePermiso('vacaciones.gestionar');
 
         $this->actualizarEstadosAutomaticos();
 
@@ -74,7 +74,8 @@ class VacacionesController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('trabajadores.vacaciones', compact('vacaciones', 'esAdministrador'));
+        $trabajadores = $esAdministrador ? \App\Models\Trabajador::where('tipo_vinculo', 'CONTRATADO')->where('estado', 'ACTIVO')->orderBy('apellidos')->get() : collect();
+        return view('trabajadores.vacaciones', compact('vacaciones', 'esAdministrador', 'trabajadores'));
     }
 
     public function store(Request $request)
@@ -83,24 +84,23 @@ class VacacionesController extends Controller
 
         $usuario = Auth::user();
 
-        if ($usuario->roleCode() === 'ADMINISTRADOR') {
-            abort(403);
+        $trabajadorId = $usuario->trabajador_id;
+        if ($usuario->tienePermiso('vacaciones.gestionar')) {
+            $seleccion = $request->validate(['trabajador_id' => ['required', \App\Support\EmpresaRules::exists('trabajadores')]]);
+            $trabajadorId = (int) $seleccion['trabajador_id'];
         }
-
-        if (!$usuario->trabajador_id) {
-            return back()->with('error', 'Tu cuenta no está vinculada a un trabajador.');
-        }
-
+        $trabajador = \App\Models\Trabajador::findOrFail($trabajadorId);
+        abort_unless($trabajador->tipo_vinculo === 'CONTRATADO' && $trabajador->estado === 'ACTIVO', 403);
         $data = $this->validarVacaciones($request);
 
         $this->validarCruceFechas(
-            $usuario->trabajador_id,
+            $trabajadorId,
             $data['fecha_inicio'],
             $data['fecha_fin']
         );
 
         Vacaciones::create([
-            'trabajador_id' => $usuario->trabajador_id,
+            'trabajador_id' => $trabajadorId,
             'fecha_inicio' => $data['fecha_inicio'],
             'fecha_fin' => $data['fecha_fin'],
             'dias_solicitados' => $this->calcularDias($data['fecha_inicio'], $data['fecha_fin']),
@@ -151,6 +151,7 @@ class VacacionesController extends Controller
     public function revisar(Request $request, Vacaciones $vacacion)
     {
         $this->verificarAdministrador();
+        abort_if(Auth::user()->hasRole('RECURSOS_HUMANOS') && (int) Auth::user()->trabajador_id === (int) $vacacion->trabajador_id, 403, 'No puedes revisar o reprogramar tus propias vacaciones.');
         $this->verificarVacacionContratado($vacacion);
 
         if ($vacacion->estado !== 'PENDIENTE') {
@@ -198,9 +199,9 @@ class VacacionesController extends Controller
         $this->verificarVacacionContratado($vacacion);
 
         $usuario = Auth::user();
-        $esAdministrador = $usuario->roleCode() === 'ADMINISTRADOR';
+        $esAdministrador = $usuario->tienePermiso('vacaciones.gestionar');
 
-        if ($esAdministrador) {
+        if ($esAdministrador && ! (Auth::user()->hasRole('RECURSOS_HUMANOS') && (int) $usuario->trabajador_id === (int) $vacacion->trabajador_id)) {
             if (!in_array($vacacion->estado, ['PENDIENTE', 'APROBADA', 'PROGRAMADA'], true)) {
                 return back()->with('error', 'Estas vacaciones ya no pueden cancelarse.');
             }
@@ -222,6 +223,7 @@ class VacacionesController extends Controller
     public function reprogramar(Request $request, Vacaciones $vacacion)
     {
         $this->verificarAdministrador();
+        abort_if(Auth::user()->hasRole('RECURSOS_HUMANOS') && (int) Auth::user()->trabajador_id === (int) $vacacion->trabajador_id, 403, 'No puedes revisar o reprogramar tus propias vacaciones.');
         $this->verificarVacacionContratado($vacacion);
 
         if (!in_array($vacacion->estado, ['APROBADA', 'PROGRAMADA'], true)) {
@@ -375,7 +377,7 @@ class VacacionesController extends Controller
     {
         abort_unless(
             Auth::check() &&
-            Auth::user()->roleCode() === 'ADMINISTRADOR',
+            Auth::user()->tienePermiso('vacaciones.gestionar'),
             403
         );
     }
@@ -384,7 +386,7 @@ class VacacionesController extends Controller
     {
         $usuario = Auth::user();
 
-        if ($usuario->roleCode() === 'ADMINISTRADOR') {
+        if ($usuario->tienePermiso('vacaciones.gestionar')) {
             return;
         }
 

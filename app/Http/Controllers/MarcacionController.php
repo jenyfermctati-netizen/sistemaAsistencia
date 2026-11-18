@@ -179,6 +179,7 @@ class MarcacionController extends Controller
 
         $data = $request->validate([
             'hora' => ['required', 'date_format:H:i'],
+            'motivo_manual' => ['required', 'string', 'max:500'],
         ], [
             'hora.required' => 'Indica la hora de la marcación.',
             'hora.date_format' => 'Ingresa una hora válida.',
@@ -207,7 +208,7 @@ class MarcacionController extends Controller
             'tipo' => $clasificacion['tipo'],
             'origen' => 'MANUAL',
             'registrado_por' => Auth::id(),
-            'motivo_manual' => 'Marcación manual rápida registrada desde el panel administrativo.',
+            'motivo_manual' => $data['motivo_manual'],
             'anulada' => false,
         ]);
 
@@ -282,7 +283,7 @@ class MarcacionController extends Controller
 
     public function anular(Request $request, Marcacion $marcacion)
     {
-        $this->verificarAdministrador();
+        abort_unless(Auth::user()->hasRole('ADMINISTRADOR'), 403);
 
         if ($marcacion->anulada) {
             return $this->error(
@@ -362,7 +363,7 @@ class MarcacionController extends Controller
     {
         abort_unless(
             Auth::check() &&
-                Auth::user()->roleCode() === 'ADMINISTRADOR',
+                Auth::user()->tienePermiso('marcaciones.registrar'),
             403
         );
     }
