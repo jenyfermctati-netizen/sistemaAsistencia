@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToEmpresa;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,6 +34,20 @@ class Trabajador extends Model
             'fecha_ingreso' => 'date',
             'fecha_fin' => 'date',
         ];
+    }
+
+    public function scopeNameContainsAllTerms(Builder $query, string $search): Builder
+    {
+        $terms = preg_split('/\s+/u', trim($search), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        return $query->where(function (Builder $names) use ($terms) {
+            foreach ($terms as $term) {
+                $names->where(function (Builder $part) use ($term) {
+                    $part->where('nombres', 'like', '%'.$term.'%')
+                        ->orWhere('apellidos', 'like', '%'.$term.'%');
+                });
+            }
+        });
     }
 
     public function area()

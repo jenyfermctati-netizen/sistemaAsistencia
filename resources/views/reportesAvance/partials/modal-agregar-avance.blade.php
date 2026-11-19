@@ -64,58 +64,6 @@
             </div>
         </div>
 
-        <div class="form-section form-section--pendientes">
-            <div class="form-section__header">
-                <div>
-                    <h4>Nuevos pendientes</h4>
-                    <p>Si algo quedó por continuar, agrégalo para que sea visible en la pestaña Pendientes.</p>
-                </div>
-
-                <button type="button" class="button button--secondary button--small" id="agregarPendienteAdicional">
-                    <x-ui-icon name="plus" /> Agregar pendiente
-                </button>
-            </div>
-
-            <div id="pendientesAdicionalesContainer" class="items-dinamicos">
-                @foreach (old('pendientes', []) as $indice => $pendienteAnterior)
-                    <div class="item-dinamico pendiente-form-item">
-                        <div class="item-dinamico__header">
-                            <strong class="item-titulo">Pendiente {{ $indice + 1 }}</strong>
-                            <button type="button" class="item-eliminar" data-eliminar-item>Eliminar</button>
-                        </div>
-
-                        <input type="hidden" data-campo="id">
-
-                        <div class="form-group">
-                            <label class="form-label">¿Qué quedó pendiente? *</label>
-                            <input type="text" data-campo="descripcion"
-                                name="pendientes[{{ $indice }}][descripcion]"
-                                value="{{ $pendienteAnterior['descripcion'] ?? '' }}" class="form-control"
-                                maxlength="500" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Detalle</label>
-                            <textarea data-campo="detalle" name="pendientes[{{ $indice }}][detalle]"
-                                class="form-textarea" rows="3" maxlength="2000">{{ $pendienteAnterior['detalle'] ?? '' }}</textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Ruta o ubicación de archivos</label>
-                            <input type="text" data-campo="ruta_archivos"
-                                name="pendientes[{{ $indice }}][ruta_archivos]"
-                                value="{{ $pendienteAnterior['ruta_archivos'] ?? '' }}" class="form-control"
-                                maxlength="500">
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="sin-pendientes" id="sinPendientesAdicionales">
-                No has agregado nuevos pendientes.
-            </div>
-        </div>
-
         @if ($reporteHoy->estado === 'REVISADO')
             <p class="reporte-revision-aviso">
                 Al guardar nuevos avances, el reporte volverá a estado pendiente para que pueda revisarse otra vez.

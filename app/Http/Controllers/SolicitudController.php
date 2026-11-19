@@ -59,8 +59,7 @@ class SolicitudController extends Controller
                     ->orWhereHas('trabajador', function ($trabajador) use ($buscar) {
                         $trabajador
                             ->where('dni', 'like', "%{$buscar}%")
-                            ->orWhere('nombres', 'like', "%{$buscar}%")
-                            ->orWhere('apellidos', 'like', "%{$buscar}%");
+                            ->orWhere(fn ($nombres) => $nombres->nameContainsAllTerms($buscar));
                     });
             });
         }

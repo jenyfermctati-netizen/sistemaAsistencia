@@ -13,6 +13,8 @@
     $usuarioActual = auth()->user();
     $puedeCrear = $usuarioActual->trabajador_id !== null;
     $esPestanaAvances = $pestanaActiva === 'avances';
+    $puedeRegistrarPendiente = $usuarioActual->roleCode() === 'TRABAJADOR'
+        && $usuarioActual->trabajador?->area_id;
 @endphp
 
 <div class="ra-worker">
@@ -21,30 +23,39 @@
     <header class="ra-worker__hero">
         <div class="ra-worker__hero-copy">
             <span class="ra-worker__eyebrow">Bitácora de trabajo</span>
-            <h2>Mi actividad diaria</h2>
-            <p>Registra tu jornada, aunque no tengas actividades, y consulta el historial de tus avances.</p>
+            <h2>{{ $esPestanaAvances ? 'Mi actividad diaria' : 'Pendientes del área' }}</h2>
+            <p>{{ $esPestanaAvances
+                ? 'Registra tus avances y consulta el historial de tu actividad.'
+                : 'Consulta los pendientes compartidos y registra uno nuevo para tu equipo.' }}</p>
         </div>
 
-        @if($puedeCrear)
+        @if($esPestanaAvances && $puedeCrear)
             <div class="ra-worker__hero-actions">
                 @if(!$reporteHoy)
                     <button type="button"
                         class="button button--primary"
                         data-modal-open="modalCrearReporte">
-                        <x-ui-icon name="plus" /> Registrar reporte de hoy
+                        <x-ui-icon name="plus" /> Enviar avance de hoy
                     </button>
                 @else
                     <button type="button"
                         class="button button--primary"
                         data-modal-open="modalAgregarAvance">
-                        <x-ui-icon name="plus" /> Agregar avance
+                        <x-ui-icon name="plus" /> Enviar otro avance
                     </button>
                 @endif
+            </div>
+        @elseif(!$esPestanaAvances && $puedeRegistrarPendiente)
+            <div class="ra-worker__hero-actions">
+                <button type="button"
+                    class="button button--primary"
+                    data-modal-open="modalCrearPendienteTrabajador">
+                    <x-ui-icon name="plus" /> Registrar pendiente
+                </button>
             </div>
         @endif
     </header>
 
-    @unless(auth()->user()?->roleCode() === 'TRABAJADOR')
     {{-- MENSAJES --}}
     @if(session('success'))
         <div class="ra-alert ra-alert--success">{{ session('success') }}</div>
@@ -53,8 +64,6 @@
     @if(session('error'))
         <div class="ra-alert ra-alert--error">{{ session('error') }}</div>
     @endif
-
-    @endunless
 
     {{-- NAVEGACIÓN --}}
     <nav class="ra-tabs">
@@ -103,11 +112,6 @@
                     <div class="ra-stat">
                         <strong>{{ $reporteHoy->actividades->count() }}</strong>
                         <span>Actividades</span>
-                    </div>
-
-                    <div class="ra-stat">
-                        <strong>{{ $reporteHoy->pendientes->where('estado', 'PENDIENTE')->count() }}</strong>
-                        <span>Pendientes</span>
                     </div>
 
                     <div class="ra-stat">
@@ -494,6 +498,50 @@
 
     @endif
 
+    @if($usuarioActual->roleCode() === 'TRABAJADOR' && $usuarioActual->trabajador?->area_id)
+        <x-modal id="modalCrearPendienteTrabajador" title="Registrar pendiente del área" size="medium">
+            <form method="POST" action="{{ route('reportesAvance.pendientes.trabajador.store') }}" class="form">
+                @csrf
+
+                @if($errors->pendienteTrabajador->any())
+                    <div class="live-form-errors" role="alert">
+                        <strong>Revisa los datos del pendiente:</strong>
+                        <ul>
+                            @foreach($errors->pendienteTrabajador->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <p class="form-help">Este pendiente se compartirá con tu área sin depender del avance diario.</p>
+
+                <div class="form-group">
+                    <label class="form-label" for="nuevoPendienteDescripcion">¿Qué quedó pendiente? *</label>
+                    <input type="text" id="nuevoPendienteDescripcion" name="descripcion" class="form-control"
+                        value="{{ old('descripcion') }}" maxlength="500" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="nuevoPendienteDetalle">Detalle</label>
+                    <textarea id="nuevoPendienteDetalle" name="detalle" class="form-textarea" rows="4"
+                        maxlength="2000">{{ old('detalle') }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="nuevoPendienteRuta">Ruta o ubicación de archivos</label>
+                    <input type="text" id="nuevoPendienteRuta" name="ruta_archivos" class="form-control"
+                        value="{{ old('ruta_archivos') }}" maxlength="500">
+                </div>
+
+                <div class="modal__actions">
+                    <button type="button" class="button button--secondary" data-modal-close>Cancelar</button>
+                    <button type="submit" class="button button--primary">Enviar pendiente</button>
+                </div>
+            </form>
+        </x-modal>
+    @endif
+
     {{-- JSON PARA JS --}}
     <script type="application/json" id="reportesData">
 {!! $reportes->getCollection()->mapWithKeys(function ($reporte) {
@@ -593,29 +641,6 @@
 
                 </div>
 
-                <div class="form-section form-section--pendientes">
-
-                    <div class="form-section__header">
-                        <div>
-                            <h4>¿Dejaste algo pendiente?</h4>
-                            <p>Registra lo que deba continuar posteriormente tu equipo.</p>
-                        </div>
-
-                        <button type="button"
-                            class="button button--secondary button--small"
-                            id="agregarPendiente">
-                            <x-ui-icon name="plus" /> Agregar pendiente
-                        </button>
-                    </div>
-
-                    <div id="pendientesContainer" class="items-dinamicos"></div>
-
-                    <div class="sin-pendientes" id="sinPendientes">
-                        No has agregado pendientes.
-                    </div>
-
-                </div>
-
                 <div class="modal__actions">
                     <button type="button" class="button button--secondary" data-modal-close>
                         Cancelar
@@ -670,25 +695,6 @@
                 <div class="sin-pendientes" id="sinActividadesEditar">
                     Este reporte no tiene actividades. Puedes dejarlo así o agregar una.
                 </div>
-
-            </div>
-
-            <div class="form-section form-section--pendientes">
-
-                <div class="form-section__header">
-                    <div>
-                        <h4>Pendientes</h4>
-                        <p>Actualiza los pendientes registrados en este reporte.</p>
-                    </div>
-
-                    <button type="button"
-                        class="button button--secondary button--small"
-                        id="agregarPendienteEditar">
-                        <x-ui-icon name="plus" /> Agregar pendiente
-                    </button>
-                </div>
-
-                <div id="editarPendientesContainer" class="items-dinamicos"></div>
 
             </div>
 
@@ -837,65 +843,13 @@
 
     </template>
 
-    {{-- TEMPLATE PENDIENTE --}}
-    <template id="templatePendiente">
-
-        <div class="item-dinamico pendiente-form-item">
-
-            <div class="item-dinamico__header">
-                <strong class="item-titulo">Pendiente</strong>
-                <button type="button" class="item-eliminar" data-eliminar-item>
-                    Eliminar
-                </button>
-            </div>
-
-            <input type="hidden" data-campo="id">
-
-            <div class="form-group">
-                <label class="form-label">¿Qué quedó pendiente? *</label>
-
-                <input type="text"
-                    data-campo="descripcion"
-                    class="form-control"
-                    maxlength="500"
-                    placeholder="Ej. Terminar cuadro comparativo">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Detalle</label>
-
-                <textarea data-campo="detalle"
-                    class="form-textarea"
-                    rows="3"
-                    maxlength="2000"
-                    placeholder="Indica qué falta o qué debe considerar quien continúe el trabajo."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Ruta o ubicación de archivos</label>
-
-                <input type="text"
-                    data-campo="ruta_archivos"
-                    class="form-control"
-                    maxlength="500"
-                    placeholder="Ej. \\Servidor\Cotizaciones\ClienteABC">
-
-                <small class="form-help">
-                    Opcional. Indica dónde están los archivos necesarios.
-                </small>
-            </div>
-
-        </div>
-
-    </template>
-
 </div>
 @endsection
 
 @push('scripts')
     <script src="{{ asset('js/pages/reportes-avance.js') }}"></script>
 
-    @if($errors->any())
+    @if($errors->default->any())
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 if (document.getElementById('modalCrearReporte')) {
@@ -912,6 +866,12 @@
                     window.AppModal?.open('modalAgregarAvance');
                 }
             });
+        </script>
+    @endif
+
+    @if($errors->pendienteTrabajador->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', () => window.AppModal?.open('modalCrearPendienteTrabajador'));
         </script>
     @endif
 @endpush

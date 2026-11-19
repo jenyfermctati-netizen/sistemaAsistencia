@@ -462,6 +462,11 @@ button {
     accent-color: var(--login-primary-dark);
 }
 
+.session-close-note {
+    color: var(--login-muted);
+    line-height: 1.4;
+}
+
 .login-submit {
     width: 100%;
     min-height: 58px;

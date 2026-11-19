@@ -300,6 +300,54 @@
 .worker-incidents__list strong { font-size: 13px; color: #785823; }
 .worker-incidents__list p { font-size: 12px; margin: 6px 0 10px; overflow-wrap: anywhere; }
 
+/* Mi avance: resumen y filtros compactos con controles adaptables. */
+.worker-interface .ra-worker .ra-today { border-radius: 14px; }
+.worker-interface .ra-worker .ra-today__head { padding: 12px 16px; }
+.worker-interface .ra-worker .ra-today__head h3 { font-size: 15px; }
+.worker-interface .ra-worker .ra-today__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.worker-interface .ra-worker .ra-stat { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px; padding: 10px 16px; }
+.worker-interface .ra-worker .ra-stat strong { font-size: 20px; }
+.worker-interface .ra-worker .ra-stat span { font-size: 9px; }
+.worker-interface .ra-worker .ra-today__actions { padding: 8px 12px; }
+.worker-interface .ra-worker .ra-filter-panel { padding: 14px; border-radius: 14px; }
+.worker-interface .ra-worker .ra-filter-panel .ra-section-heading { margin-bottom: 8px; }
+.worker-interface .ra-worker .ra-filter-panel .ra-section-heading h3 { font-size: 16px; }
+.worker-interface .ra-worker .ra-query-actions { margin-bottom: 6px; }
+.worker-interface .ra-worker .ra-report-days > summary { min-height: 40px; padding: 8px 11px; }
+.worker-interface .ra-worker .ra-calendar-periods .ra-btn { min-height: 36px; }
+.worker-interface .ra-worker .ra-calendar__header a { width: 34px; height: 34px; }
+.worker-interface .ra-worker .ra-calendar__day { min-height: 34px; }
+.worker-interface .ra-worker .worker-history-search > summary { min-height: 38px; padding-top: 7px; }
+.worker-interface .ra-worker .ra-history { gap: 8px; }
+.worker-interface .ra-worker .ra-history-card { border-radius: 12px; }
+.worker-interface .ra-worker .ra-history-card__summary { gap: 9px; padding: 10px 12px; }
+.worker-interface .ra-worker .ra-history-card__day { width: 36px; height: 36px; border-radius: 10px; font-size: 14px; }
+.worker-interface .ra-worker .ra-history-card__body { padding: 10px; }
+.worker-interface .ra-worker .ra-history-card__actions { margin-top: 8px; padding-top: 8px; }
+
+@media (max-width: 600px) {
+    .worker-interface .ra-worker .ra-today__head { flex-direction: row; align-items: center; padding: 0 0 9px; margin-bottom: 9px; }
+    .worker-interface .ra-worker .ra-today__head h3 { font-size: 13px; }
+    .worker-interface .ra-worker .ra-today__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .worker-interface .ra-worker .ra-stat { padding: 9px 8px; }
+    .worker-interface .ra-worker .ra-stat span { font-size: 8px; }
+    .worker-interface .ra-worker .ra-today__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 8px 0 0; }
+    .worker-interface .ra-worker .ra-today__actions .button { width: 100%; min-height: 36px; padding: 7px 8px; font-size: 10px; }
+    .worker-interface .ra-worker .ra-filter-panel { padding: 11px; }
+    .worker-interface .ra-worker .ra-query-actions { gap: 6px; }
+    .worker-interface .ra-worker .ra-query-actions > .ra-report-days { flex: 1 1 100%; }
+    .worker-interface .ra-worker .ra-query-actions > .download-menu { flex: 1 1 100%; }
+    .worker-interface .ra-worker .ra-query-actions > .download-menu > summary { width: 100%; justify-content: center; }
+    .worker-interface .ra-worker .ra-history-card__summary { align-items: center; }
+    .worker-interface .ra-worker .ra-history-card__date { min-width: 0; gap: 8px; }
+    .worker-interface .ra-worker .ra-history-card__date strong { font-size: 10px; }
+    .worker-interface .ra-worker .ra-history-card__date div span { font-size: 9px; }
+    .worker-interface .ra-worker .ra-history-card__meta { align-items: center; flex-direction: row; gap: 5px; }
+    .worker-interface .ra-worker .ra-history-card__meta .ra-status { padding: 4px 6px; font-size: 8px; }
+    .worker-interface .ra-worker .ra-history-card__actions { flex-direction: row; }
+    .worker-interface .ra-worker .ra-history-card__actions .button { width: auto; flex: 1; min-height: 36px; padding: 7px; font-size: 10px; }
+}
+
 /* PC: diálogos proporcionados; la presentación móvil se conserva. */
 @media (min-width: 851px) {
     .worker-interface .modal .modal__content--small { max-width: 460px; }

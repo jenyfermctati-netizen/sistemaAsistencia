@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BiometricoController;
 use App\Http\Controllers\BiometricoEstadoController;
 use App\Http\Controllers\ConsultaDniController;
+use App\Http\Controllers\ConsultaRucController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FeriadoController;
 use App\Http\Controllers\HorarioController;
@@ -70,10 +71,12 @@ Route::prefix('superadmin')->name('superadmin.')
         Route::get('/empresas/{empresa}', [SuperAdminController::class, 'showEmpresa'])->name('empresas.show');
         Route::put('/empresas/{empresa}', [SuperAdminController::class, 'updateEmpresa'])->name('empresas.update');
         Route::patch('/empresas/{empresa}/estado', [SuperAdminController::class, 'cambiarEstado'])->name('empresas.estado');
+        Route::post('/empresas/consultar-ruc', [ConsultaRucController::class, 'consultar'])->middleware('throttle:10,1')->name('empresas.consultar-ruc');
         Route::post('/empresas/{empresa}/administradores', [SuperAdminController::class, 'storeAdministrador'])->name('administradores.store');
         Route::post('/empresas/{empresa}/administradores/{administrador}/invitacion', [SuperAdminController::class, 'reenviarInvitacion'])->name('administradores.invitacion');
-        Route::patch('/empresas/{empresa}/administradores/{administrador}/estado', [SuperAdminController::class, 'cambiarEstadoAdministrador'])->name('administradores.estado');
+        Route::patch('/empresas/{empresa}/administradores/{administrador}', [SuperAdminController::class, 'actualizarAdministrador'])->name('administradores.update');
         Route::post('/empresas/{empresa}/transferir-administrador', [SuperAdminController::class, 'transferirAdministrador'])->middleware('throttle:5,1')->name('administradores.transferir');
+        Route::patch('/empresas/{empresa}/administradores/{administrador}/estado', [SuperAdminController::class, 'cambiarEstadoAdministrador'])->name('administradores.estado');
         Route::get('/administradores', [SuperAdminController::class, 'administradores'])->name('administradores.index');
         Route::get('/dispositivos', [SuperAdminController::class, 'dispositivos'])->name('dispositivos.index');
         Route::post('/dispositivos', [SuperAdminController::class, 'storeDispositivo'])->name('dispositivos.store');
@@ -105,6 +108,8 @@ Route::middleware(['auth', 'empresa', 'rrhh', 'auditoria.empresa'])->group(funct
     Route::post('/trabajadores', [TrabajadorController::class, 'store'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.store');
     Route::put('/trabajadores/{trabajador}', [TrabajadorController::class, 'update'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.update');
     Route::patch('/trabajadores/{trabajador}/estado', [TrabajadorController::class, 'cambiarEstado'])->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.estado');
+    Route::get('/trabajadores/{trabajador}/reporte-asistencia', [TrabajadorController::class, 'descargarReporte'])
+        ->middleware('role:ADMINISTRADOR,RECURSOS_HUMANOS')->name('trabajadores.reporte-asistencia');
     Route::post('/trabajadores/{trabajador}/reportes-avance', [ReporteAvanceController::class, 'storeParaTrabajador'])
         ->middleware('role:ADMINISTRADOR')->name('trabajadores.reportes-avance.store');
 

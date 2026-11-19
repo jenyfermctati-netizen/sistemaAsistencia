@@ -7,7 +7,6 @@ use App\Models\Area;
 use App\Models\PendienteAvance;
 use App\Models\ReporteAvance;
 use App\Models\Trabajador;
-use App\Models\User;
 use App\Services\ReporteActividadesExportService;
 use App\Support\EmpresaRules;
 use App\Support\EmpresaContext;
@@ -76,8 +75,7 @@ class ReporteAvanceController extends Controller
             $query->where(function ($q) use ($buscar) {
                 $q->whereHas('trabajador', function ($trabajador) use ($buscar) {
                     $trabajador
-                        ->where('nombres', 'like', "%{$buscar}%")
-                        ->orWhere('apellidos', 'like', "%{$buscar}%")
+                        ->where(fn ($nombres) => $nombres->nameContainsAllTerms($buscar))
                         ->orWhere('dni', 'like', "%{$buscar}%");
                 })->orWhereHas('actividades', fn ($actividad) => $actividad->where('descripcion', 'like', "%{$buscar}%"))->orWhereHas('pendientes', function ($pendiente) use ($buscar) {
                     $pendiente
@@ -261,9 +259,7 @@ class ReporteAvanceController extends Controller
         $this->crearReporte(
             $request,
             $data,
-            $usuario->trabajador,
-            $usuario,
-            'TRABAJADOR'
+            $usuario->trabajador
         );
 
         return redirect()
@@ -294,9 +290,7 @@ class ReporteAvanceController extends Controller
         $this->crearReporte(
             $request,
             $data,
-            $trabajador,
-            $usuario,
-            'ADMINISTRADOR'
+            $trabajador
         );
 
         return redirect()
@@ -320,7 +314,6 @@ class ReporteAvanceController extends Controller
 
         DB::transaction(function () use ($request, $data, $reporte) {
             $this->sincronizarActividades($request, $reporte, $data['actividades'] ?? []);
-            $this->sincronizarPendientes($reporte, $data['pendientes'] ?? []);
 
             if ($reporte->estado === 'OBSERVADO') {
                 $reporte->update([
@@ -366,18 +359,6 @@ class ReporteAvanceController extends Controller
                 $reporte->actividades()->create([
                     'descripcion' => $actividad['descripcion'],
                     'archivo' => $ruta,
-                ]);
-            }
-
-            foreach ($data['pendientes'] ?? [] as $pendiente) {
-                $reporte->pendientes()->create([
-                    'area_id' => $usuario->trabajador->area_id,
-                    'creado_por' => $usuario->id,
-                    'origen' => 'TRABAJADOR',
-                    'descripcion' => $pendiente['descripcion'],
-                    'detalle' => $pendiente['detalle'] ?? null,
-                    'ruta_archivos' => $pendiente['ruta_archivos'] ?? null,
-                    'estado' => 'PENDIENTE',
                 ]);
             }
 
@@ -659,16 +640,11 @@ class ReporteAvanceController extends Controller
                 'mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
                 'max:5120',
             ],
-            'pendientes' => ['nullable', 'array'],
-            'pendientes.*.descripcion' => ['required', 'string', 'max:500'],
-            'pendientes.*.detalle' => ['nullable', 'string', 'max:2000'],
-            'pendientes.*.ruta_archivos' => ['nullable', 'string', 'max:500'],
         ], [
             'actividades.required' => 'Debes registrar al menos una actividad realizada.',
             'actividades.min' => 'Debes registrar al menos una actividad realizada.',
             'actividades.*.descripcion.required' => 'Cada actividad debe tener una descripción.',
             'actividades.*.archivo.max' => 'Cada archivo debe pesar como máximo 5 MB.',
-            'pendientes.*.descripcion.required' => 'Cada pendiente debe tener una descripción.',
         ]);
     }
 
@@ -684,17 +660,11 @@ class ReporteAvanceController extends Controller
                 'mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
                 'max:5120',
             ],
-            'pendientes' => ['nullable', 'array'],
-            'pendientes.*.id' => ['nullable', 'integer'],
-            'pendientes.*.descripcion' => ['required', 'string', 'max:500'],
-            'pendientes.*.detalle' => ['nullable', 'string', 'max:2000'],
-            'pendientes.*.ruta_archivos' => ['nullable', 'string', 'max:500'],
         ];
 
         $mensajes = [
             'actividades.*.descripcion.required' => 'Cada actividad debe tener una descripción.',
             'actividades.*.archivo.max' => 'Cada archivo debe pesar como máximo 5 MB.',
-            'pendientes.*.descripcion.required' => 'Cada pendiente debe tener una descripción.',
         ];
 
         return $errorBag
@@ -705,17 +675,9 @@ class ReporteAvanceController extends Controller
     private function crearReporte(
         Request $request,
         array $data,
-        Trabajador $trabajador,
-        User $usuario,
-        string $origenPendientes
+        Trabajador $trabajador
     ): ReporteAvance {
-        return DB::transaction(function () use (
-            $request,
-            $data,
-            $trabajador,
-            $usuario,
-            $origenPendientes
-        ) {
+        return DB::transaction(function () use ($request, $data, $trabajador) {
             $reporte = ReporteAvance::create([
                 'trabajador_id' => $trabajador->id,
                 'fecha_presentacion' => today(),
@@ -738,22 +700,6 @@ class ReporteAvanceController extends Controller
                             'local'
                         )
                         : null,
-                ]);
-            }
-
-            foreach ($data['pendientes'] ?? [] as $pendiente) {
-                if (blank($pendiente['descripcion'] ?? null)) {
-                    continue;
-                }
-
-                $reporte->pendientes()->create([
-                    'area_id' => $trabajador->area_id,
-                    'creado_por' => $usuario->id,
-                    'origen' => $origenPendientes,
-                    'descripcion' => $pendiente['descripcion'],
-                    'detalle' => $pendiente['detalle'] ?? null,
-                    'ruta_archivos' => $pendiente['ruta_archivos'] ?? null,
-                    'estado' => 'PENDIENTE',
                 ]);
             }
 
@@ -811,48 +757,6 @@ class ReporteAvanceController extends Controller
             $actividad->archivo = $ruta;
             $actividad->reporte_avance_id = $reporte->id;
             $actividad->save();
-        }
-    }
-
-    private function sincronizarPendientes(
-        ReporteAvance $reporte,
-        array $pendientes
-    ): void {
-        $ids = collect($pendientes)
-            ->pluck('id')
-            ->filter()
-            ->map(fn ($id) => (int) $id);
-
-        $reporte
-            ->pendientes()
-            ->where('estado', 'PENDIENTE')
-            ->whereNotIn('id', $ids)
-            ->delete();
-
-        foreach ($pendientes as $data) {
-            if (blank($data['descripcion'] ?? null)) {
-                continue;
-            }
-
-            $pendiente = isset($data['id'])
-                ? $reporte
-                    ->pendientes()
-                    ->where('estado', 'PENDIENTE')
-                    ->findOrFail($data['id'])
-                : new PendienteAvance([
-                    'reporte_avance_id' => $reporte->id,
-                    'area_id' => $reporte->trabajador->area_id,
-                    'creado_por' => Auth::id(),
-                    'origen' => 'TRABAJADOR',
-                    'estado' => 'PENDIENTE',
-                ]);
-
-            $pendiente->descripcion = $data['descripcion'];
-            $pendiente->detalle = $data['detalle'] ?? null;
-            $pendiente->ruta_archivos = $data['ruta_archivos'] ?? null;
-            $pendiente->reporte_avance_id = $reporte->id;
-            $pendiente->area_id = $reporte->trabajador->area_id;
-            $pendiente->save();
         }
     }
 

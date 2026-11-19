@@ -83,10 +83,7 @@
                 </div>
 
                 <div class="login-options">
-                    <label class="remember-option">
-                        <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
-                        <span>Recordar mi sesión</span>
-                    </label>
+                    <span class="session-close-note">Por seguridad, la sesión termina al cerrar el navegador.</span>
                     <a href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
                 </div>
 

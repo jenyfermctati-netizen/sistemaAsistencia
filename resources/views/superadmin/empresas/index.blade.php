@@ -7,6 +7,9 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/pages/superadmin.css') }}">
 @endpush
+@push('scripts')
+    <script src="{{ asset('js/pages/superadmin-ruc.js') }}" defer></script>
+@endpush
 
 @section('content')
     <div class="sa-page">
@@ -17,18 +20,18 @@
                 <span class="sa-create-toggle">Agregar empresa</span>
             </summary>
             <div class="sa-create-body">
-                <form method="POST" action="{{ route('superadmin.empresas.store') }}" class="sa-form sa-form--create">
+                <form method="POST" action="{{ route('superadmin.empresas.store') }}" class="sa-form sa-form--create" data-consulta-ruc-url="{{ route('superadmin.empresas.consultar-ruc') }}">
                     @csrf
+                    <label><span>RUC</span><input name="ruc" value="{{ old('ruc') }}" required inputmode="numeric" pattern="[0-9]{11}" minlength="11" maxlength="11" autocomplete="off" aria-describedby="consulta-ruc-status"><small id="consulta-ruc-status" class="sa-ruc-status" role="status" aria-live="polite">Ingresa primero los 11 dígitos para consultar y completar los datos disponibles.</small></label>
                     <label><span>Razón social</span><input name="razon_social" value="{{ old('razon_social') }}" required maxlength="200"></label>
                     <label><span>Nombre comercial <small>Opcional</small></span><input name="nombre_comercial" value="{{ old('nombre_comercial') }}" maxlength="200"></label>
-                    <label><span>RUC</span><input name="ruc" value="{{ old('ruc') }}" required inputmode="numeric" minlength="11" maxlength="11"></label>
                     <label><span>Zona horaria</span><input name="zona_horaria" value="{{ old('zona_horaria', 'America/Lima') }}" required></label>
                     <label><span>Correo empresarial <small>Opcional</small></span><input name="email" type="email" value="{{ old('email') }}"></label>
-                    <label><span>Teléfono <small>Opcional</small></span><input name="telefono" value="{{ old('telefono') }}" maxlength="20"></label>
+                    <label><span>Celular <small>Opcional · 9 dígitos, empieza con 9</small></span><input type="tel" name="telefono" value="{{ old('telefono') }}" inputmode="numeric" pattern="9[0-9]{8}" minlength="9" maxlength="9" title="Ingresa un celular peruano de 9 dígitos que empiece con 9"></label>
                     <label class="sa-field--full"><span>Dirección <small>Opcional</small></span><textarea name="direccion" maxlength="500" rows="2">{{ old('direccion') }}</textarea></label>
                     <label><span>Nombre del administrador</span><input name="admin_nombre" value="{{ old('admin_nombre') }}" required maxlength="150"></label>
                     <label><span>Correo del administrador</span><input name="admin_email" type="email" value="{{ old('admin_email') }}" required maxlength="255"></label>
-                    <div class="sa-form-footer sa-field--full"><span>Se enviará una invitación al administrador para establecer su contraseña.</span><button class="sa-button" type="submit">Crear y continuar</button></div>
+                    <div class="sa-form-footer sa-field--full"><span>Al agregar la empresa se enviará una invitación al administrador para crear su contraseña. Luego podrás reenviarla con “Invitar”.</span><button class="sa-button" type="submit">Agregar empresa</button></div>
                 </form>
             </div>
         </details>

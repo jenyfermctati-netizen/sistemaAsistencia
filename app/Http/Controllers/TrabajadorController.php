@@ -9,6 +9,7 @@ use App\Models\Rol;
 use App\Models\Trabajador;
 use App\Models\User;
 use App\Services\HorarioEmpresaService;
+use App\Services\ReporteAsistenciaMensualService;
 use App\Support\EmpresaRules;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -46,8 +47,7 @@ class TrabajadorController extends Controller
 
             $query->where(function ($q) use ($buscar) {
                 $q->where('dni', 'like', "%{$buscar}%")
-                    ->orWhere('nombres', 'like', "%{$buscar}%")
-                    ->orWhere('apellidos', 'like', "%{$buscar}%")
+                    ->orWhere(fn ($nombres) => $nombres->nameContainsAllTerms($buscar))
                     ->orWhere('codigo_biometrico', 'like', "%{$buscar}%")
                     ->orWhereHas('user', function ($userQuery) use ($buscar) {
                         $userQuery->where('email', 'like', "%{$buscar}%");
@@ -435,6 +435,28 @@ class TrabajadorController extends Controller
                 'success',
                 'Estado del trabajador actualizado correctamente.'
             );
+    }
+
+    public function descargarReporte(Request $request, Trabajador $trabajador, ReporteAsistenciaMensualService $reporte)
+    {
+        $this->autorizarAdministrador();
+
+        $datos = $request->validate([
+            'mes' => ['required', 'integer', 'between:1,12'],
+            'anio' => ['required', 'integer', 'between:2010,2100'],
+            'formato' => ['required', 'in:pdf,xlsx'],
+        ]);
+
+        $periodo = sprintf('%04d-%02d', $datos['anio'], $datos['mes']);
+        $desde = \Carbon\Carbon::createFromFormat('!Y-m', $periodo)->startOfMonth();
+        $hasta = $desde->copy()->endOfMonth();
+
+        return $reporte->descargar(
+            $datos['formato'],
+            $desde,
+            $hasta,
+            ['buscar' => $trabajador->dni, 'individual' => true],
+        );
     }
 
     private function validarDesignacionEncargado(array $data): void

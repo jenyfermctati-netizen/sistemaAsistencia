@@ -163,16 +163,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (formAvance) {
         const actividadesContainer = document.getElementById('actividadesAvanceTrabajador');
-        const pendientesContainer = document.getElementById('pendientesAvanceTrabajador');
         const templateActividad = document.getElementById('templateActividadAvanceTrabajador');
-        const templatePendiente = document.getElementById('templatePendienteAvanceTrabajador');
         const trabajadorId = document.getElementById('reporteTrabajadorId');
         const trabajadorNombreValor = document.getElementById('reporteTrabajadorNombreValor');
         const trabajadorAreaValor = document.getElementById('reporteTrabajadorAreaValor');
         const trabajadorNombre = document.getElementById('reporteTrabajadorNombre');
         const trabajadorArea = document.getElementById('reporteTrabajadorArea');
         let indiceActividad = siguienteIndice(actividadesContainer, '[data-actividad-avance]');
-        let indicePendiente = siguienteIndice(pendientesContainer, '[data-pendiente-avance]');
 
         function siguienteIndice(container, selector) {
             const indices = Array.from(container.querySelectorAll(selector))
@@ -195,16 +192,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 item.querySelector('[data-quitar-actividad-avance]').hidden = actividades.length === 1;
             });
 
-            pendientesContainer.querySelectorAll('[data-pendiente-avance]').forEach(function (item, indice) {
-                item.querySelector('[data-numero-pendiente]').textContent = indice + 1;
-            });
         }
 
         function reiniciarListas() {
             actividadesContainer.innerHTML = '';
-            pendientesContainer.innerHTML = '';
             indiceActividad = 0;
-            indicePendiente = 0;
             agregarDesdeTemplate(actividadesContainer, templateActividad, indiceActividad++);
             actualizarNumeracion();
         }
@@ -244,11 +236,6 @@ document.addEventListener('DOMContentLoaded', function () {
             actualizarNumeracion();
         });
 
-        document.querySelector('[data-agregar-pendiente-avance]')?.addEventListener('click', function () {
-            agregarDesdeTemplate(pendientesContainer, templatePendiente, indicePendiente++);
-            actualizarNumeracion();
-        });
-
         actividadesContainer.addEventListener('click', function (event) {
             const button = event.target.closest('[data-quitar-actividad-avance]');
             if (!button || actividadesContainer.querySelectorAll('[data-actividad-avance]').length === 1) {
@@ -256,16 +243,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             button.closest('[data-actividad-avance]').remove();
-            actualizarNumeracion();
-        });
-
-        pendientesContainer.addEventListener('click', function (event) {
-            const button = event.target.closest('[data-quitar-pendiente-avance]');
-            if (!button) {
-                return;
-            }
-
-            button.closest('[data-pendiente-avance]').remove();
             actualizarNumeracion();
         });
 

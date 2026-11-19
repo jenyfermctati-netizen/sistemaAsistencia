@@ -199,6 +199,43 @@
                                         Editar
                                     </button>
 
+                                    <form method="GET" action="{{ route('trabajadores.reporte-asistencia', $trabajador) }}"
+                                        class="trabajador-report-form">
+                                        <label>
+                                            <span>Mes</span>
+                                            <select name="mes" class="form-select" required>
+                                                @foreach (range(1, 12) as $numeroMes)
+                                                    <option value="{{ $numeroMes }}" @selected(now()->month === $numeroMes)>
+                                                        {{ ucfirst(\Carbon\Carbon::create()->month($numeroMes)->locale('es')->translatedFormat('F')) }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </label>
+                                        <label>
+                                            <span>Año</span>
+                                            <select name="anio" class="form-select" required>
+                                                @foreach (range(now()->year, 2010) as $anioReporte)
+                                                    <option value="{{ $anioReporte }}" @selected(now()->year === $anioReporte)>{{ $anioReporte }}</option>
+                                                @endforeach
+                                            </select>
+                                        </label>
+                                        <details class="download-menu trabajador-report-export">
+                                            <summary class="button button--secondary button--small">
+                                                <x-ui-icon name="download" /> Exportar <x-ui-icon name="chevron-down" />
+                                            </summary>
+                                            <div class="download-menu__options">
+                                                <button type="submit" name="formato" value="xlsx">
+                                                    <span class="trabajador-report-export__badge trabajador-report-export__badge--excel">XLS</span>
+                                                    Descargar Excel
+                                                </button>
+                                                <button type="submit" name="formato" value="pdf">
+                                                    <span class="trabajador-report-export__badge trabajador-report-export__badge--pdf">PDF</span>
+                                                    Descargar PDF
+                                                </button>
+                                            </div>
+                                        </details>
+                                    </form>
+
                                     {{-- CAMBIAR ESTADO --}}
                                     <button type="button"
                                         class="button button--small trabajador-actions__status {{ $trabajador->estado === 'ACTIVO' ? 'button--danger' : 'button--primary' }}"

@@ -59,6 +59,7 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/live-forms.js') }}"></script>
     <script src="{{ asset('js/ux-system.js') }}"></script>
+    <script src="{{ asset('js/filter-suggestions.js') }}?v={{ filemtime(public_path('js/filter-suggestions.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

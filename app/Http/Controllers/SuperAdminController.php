@@ -85,7 +85,7 @@ class SuperAdminController extends Controller
         $data = $request->validate($this->reglasEmpresa() + [
             'admin_nombre' => ['required', 'string', 'max:150'],
             'admin_email' => ['required', 'email', 'max:255', 'unique:users,email'],
-        ]);
+        ], ['telefono.regex' => 'El celular debe tener 9 dígitos y empezar con 9.']);
         [$empresa, $administrador] = DB::transaction(function () use ($data) {
             $empresa = Empresa::create($this->datosEmpresa($data));
             $administrador = User::withoutGlobalScopes()->create([
@@ -108,15 +108,26 @@ class SuperAdminController extends Controller
     public function showEmpresa(Empresa $empresa): View
     {
         $administradores = $this->administradoresQuery($empresa)->orderBy('name')->get();
+        $usuariosTransferencia = User::withoutGlobalScopes()
+            ->with('trabajador')
+            ->where('empresa_id', $empresa->id)
+            ->where('estado', true)
+            ->whereNotNull('trabajador_id')
+            ->whereDoesntHave('rol', fn ($query) => $query->where('codigo', 'ADMINISTRADOR'))
+            ->whereHas('rol', fn ($query) => $query->where('ambito', 'EMPRESA')->where('estado', true))
+            ->whereHas('trabajador', fn ($query) => $query->where('estado', 'ACTIVO'))
+            ->orderBy('name')
+            ->get();
 
-        $usuariosTransferencia = User::withoutGlobalScopes()->where('empresa_id', $empresa->id)->where('estado', true)->whereNotIn('id', $administradores->pluck('id'))->orderBy('name')->get();
         return view('superadmin.empresas.show', compact('empresa', 'administradores', 'usuariosTransferencia'));
     }
 
     public function updateEmpresa(Request $request, Empresa $empresa): RedirectResponse
     {
         $request->mergeIfMissing(['color_turquesa' => $empresa->color_turquesa ?: '#00A9C7']);
-        $data = $request->validate($this->reglasEmpresa($empresa));
+        $data = $request->validate($this->reglasEmpresa($empresa), [
+            'telefono.regex' => 'El celular debe tener 9 dígitos y empezar con 9.',
+        ]);
         $anteriores = $empresa->getAttributes();
         $empresa->update($this->datosEmpresa($data));
         $this->auditoria->modelo('ACTUALIZAR_EMPRESA', $empresa, $anteriores);
@@ -200,16 +211,6 @@ class SuperAdminController extends Controller
             : 'Administrador creado, pero no se pudo enviar la invitación.');
     }
 
-    public function transferirAdministrador(Request $request, Empresa $empresa, \App\Services\TransferirAdministradorService $service): RedirectResponse
-    {
-        $data = $request->validate([
-            'usuario_id' => ['required', 'integer'],
-            'password' => ['required', 'current_password'],
-        ]);
-        $service->transferir($empresa, $request->user(), (int) $data['usuario_id']);
-        return back()->with('success', 'Administración transferida.');
-    }
-
     public function reenviarInvitacion(Empresa $empresa, User $administrador): RedirectResponse
     {
         abort_unless((int) $administrador->empresa_id === (int) $empresa->id, 404);
@@ -219,6 +220,48 @@ class SuperAdminController extends Controller
 
         return back()->with($enviado ? 'success' : 'error',
             'La invitación '.($enviado ? 'fue enviada.' : 'no pudo enviarse.'));
+    }
+
+    public function actualizarAdministrador(Request $request, Empresa $empresa, User $administrador): RedirectResponse
+    {
+        abort_unless((int) $administrador->empresa_id === (int) $empresa->id, 404);
+        abort_unless($administrador->roleCode() === 'ADMINISTRADOR', 404);
+
+        $request->merge(['email' => mb_strtolower(trim((string) $request->input('email')))]);
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($administrador->id)],
+        ]);
+
+        $anteriores = $administrador->only(['name', 'email']);
+        $cambioCorreo = $administrador->email !== $data['email'];
+        if ($cambioCorreo) {
+            Password::broker()->deleteToken($administrador);
+        }
+        $administrador->update($data);
+        $this->auditoria->modelo('ACTUALIZAR_ADMIN_EMPRESA', $administrador, $anteriores);
+
+        if (! $cambioCorreo) {
+            return back()->with('success', 'Datos del administrador actualizados.');
+        }
+
+        $enviado = $this->enviarInvitacion($administrador, $empresa);
+
+        return back()->with($enviado ? 'success' : 'warning', $enviado
+            ? 'Correo actualizado. Se envió una nueva invitación a la dirección corregida.'
+            : 'Correo actualizado, pero no se pudo enviar la invitación. Usa “Invitar” para reenviarla.');
+    }
+
+    public function transferirAdministrador(Request $request, Empresa $empresa, \App\Services\TransferirAdministradorService $service): RedirectResponse
+    {
+        $data = $request->validate([
+            'usuario_id' => ['required', 'integer'],
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $service->transferir($empresa, $request->user(), (int) $data['usuario_id']);
+
+        return back()->with('success', 'La administración se transfirió al trabajador seleccionado.');
     }
 
     public function cambiarEstadoAdministrador(Empresa $empresa, User $administrador): RedirectResponse
@@ -325,7 +368,7 @@ class SuperAdminController extends Controller
             'nombre_comercial' => ['nullable', 'string', 'max:200'],
             'ruc' => $reglasRuc,
             'email' => ['nullable', 'email', 'max:255'],
-            'telefono' => ['nullable', 'string', 'max:20'],
+            'telefono' => ['nullable', 'regex:/^9[0-9]{8}$/'],
             'direccion' => ['nullable', 'string', 'max:500'],
             'zona_horaria' => ['required', 'timezone:all'],
             'color_turquesa' => ['required', 'regex:/^#[A-Fa-f0-9]{6}$/'],

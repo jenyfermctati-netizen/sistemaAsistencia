@@ -64,8 +64,7 @@ class AsignacionCampoController extends Controller
                     ->orWhereHas('trabajador', function ($trabajadorQuery) use ($buscar) {
                         $trabajadorQuery
                             ->where('dni', 'like', "%{$buscar}%")
-                            ->orWhere('nombres', 'like', "%{$buscar}%")
-                            ->orWhere('apellidos', 'like', "%{$buscar}%");
+                            ->orWhere(fn ($nombres) => $nombres->nameContainsAllTerms($buscar));
                     });
             });
         }

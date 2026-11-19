@@ -4,6 +4,7 @@ use App\Http\Middleware\AuditTenantMutation;
 use App\Http\Middleware\EnsureEmpresaContext;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Middleware\EnsureSuperAdmin;
+use App\Http\Middleware\EnsureSingleDeviceSession;
 use App\Http\Middleware\IdentifyBiometricDevice;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->appendToGroup('web', EnsureSingleDeviceSession::class);
         $middleware->alias([
             'empresa' => EnsureEmpresaContext::class,
             'role' => EnsureRole::class,

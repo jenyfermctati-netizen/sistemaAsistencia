@@ -3,23 +3,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const reportesData = reportesDataElement ? JSON.parse(reportesDataElement.textContent) : {};
 
     const templateActividad = document.getElementById('templateActividad');
-    const templatePendiente = document.getElementById('templatePendiente');
 
     const actividadesContainer = document.getElementById('actividadesContainer');
-    const pendientesContainer = document.getElementById('pendientesContainer');
     const actividadesAdicionalesContainer = document.getElementById('actividadesAdicionalesContainer');
-    const pendientesAdicionalesContainer = document.getElementById('pendientesAdicionalesContainer');
     const editarActividadesContainer = document.getElementById('editarActividadesContainer');
-    const editarPendientesContainer = document.getElementById('editarPendientesContainer');
     const sinActividades = document.getElementById('sinActividades');
     const sinActividadesEditar = document.getElementById('sinActividadesEditar');
 
     const agregarActividad = document.getElementById('agregarActividad');
-    const agregarPendiente = document.getElementById('agregarPendiente');
     const agregarActividadAdicional = document.getElementById('agregarActividadAdicional');
-    const agregarPendienteAdicional = document.getElementById('agregarPendienteAdicional');
     const agregarActividadEditar = document.getElementById('agregarActividadEditar');
-    const agregarPendienteEditar = document.getElementById('agregarPendienteEditar');
 
     const formEditar = document.getElementById('formEditarReporte');
     const formEditarPendiente = document.getElementById('formEditarPendiente');
@@ -51,35 +44,14 @@ document.addEventListener('DOMContentLoaded', function () {
         actualizarTitulos(container, 'Actividad');
     }
 
-    function actualizarNombresPendiente(container, prefijo = 'pendientes') {
-        if (!container) return;
-
-        container.querySelectorAll('.pendiente-form-item').forEach((item, index) => {
-            const id = item.querySelector('[data-campo="id"]');
-            const descripcion = item.querySelector('[data-campo="descripcion"]');
-            const detalle = item.querySelector('[data-campo="detalle"]');
-            const ruta = item.querySelector('[data-campo="ruta_archivos"]');
-
-            if (id) id.name = `${prefijo}[${index}][id]`;
-            if (descripcion) descripcion.name = `${prefijo}[${index}][descripcion]`;
-            if (detalle) detalle.name = `${prefijo}[${index}][detalle]`;
-            if (ruta) ruta.name = `${prefijo}[${index}][ruta_archivos]`;
-        });
-
-        actualizarTitulos(container, 'Pendiente');
-    }
-
-    function configurarEliminar(item, container, tipo) {
+    function configurarEliminar(item, container) {
         const boton = item.querySelector('[data-eliminar-item]');
         if (!boton) return;
 
         boton.addEventListener('click', function () {
             item.remove();
 
-            if (tipo === 'actividad') actualizarNombresActividad(container);
-            if (tipo === 'pendiente') actualizarNombresPendiente(container);
-
-            actualizarEstadoSinPendientes();
+            actualizarNombresActividad(container);
             actualizarEstadoSinActividades();
         });
     }
@@ -107,46 +79,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        configurarEliminar(item, container, 'actividad');
+        configurarEliminar(item, container);
         container.appendChild(fragmento);
         actualizarNombresActividad(container);
         actualizarEstadoSinActividades();
-    }
-
-    function crearPendiente(container, datos = null) {
-        if (!templatePendiente || !container) return;
-
-        const fragmento = templatePendiente.content.cloneNode(true);
-        const item = fragmento.querySelector('.pendiente-form-item');
-
-        if (datos) {
-            const id = item.querySelector('[data-campo="id"]');
-            const descripcion = item.querySelector('[data-campo="descripcion"]');
-            const detalle = item.querySelector('[data-campo="detalle"]');
-            const ruta = item.querySelector('[data-campo="ruta_archivos"]');
-
-            if (id) id.value = datos.id ?? '';
-            if (descripcion) descripcion.value = datos.descripcion ?? '';
-            if (detalle) detalle.value = datos.detalle ?? '';
-            if (ruta) ruta.value = datos.ruta_archivos ?? '';
-        }
-
-        configurarEliminar(item, container, 'pendiente');
-        container.appendChild(fragmento);
-        actualizarNombresPendiente(container);
-        actualizarEstadoSinPendientes();
-    }
-
-    function actualizarEstadoSinPendientes() {
-        const sinPendientes = document.getElementById('sinPendientes');
-        if (sinPendientes && pendientesContainer) {
-            sinPendientes.style.display = pendientesContainer.children.length ? 'none' : 'block';
-        }
-
-        const sinPendientesAdicionales = document.getElementById('sinPendientesAdicionales');
-        if (sinPendientesAdicionales && pendientesAdicionalesContainer) {
-            sinPendientesAdicionales.style.display = pendientesAdicionalesContainer.children.length ? 'none' : 'block';
-        }
     }
 
     function actualizarEstadoSinActividades() {
@@ -166,17 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     actividadesContainer?.querySelectorAll('.actividad-form-item').forEach(function (item) {
-        configurarEliminar(item, actividadesContainer, 'actividad');
-    });
-
-    if (agregarPendiente && pendientesContainer) {
-        agregarPendiente.addEventListener('click', function () {
-            crearPendiente(pendientesContainer);
-        });
-    }
-
-    pendientesContainer?.querySelectorAll('.pendiente-form-item').forEach(function (item) {
-        configurarEliminar(item, pendientesContainer, 'pendiente');
+        configurarEliminar(item, actividadesContainer);
     });
 
     if (agregarActividadAdicional && actividadesAdicionalesContainer) {
@@ -186,17 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     actividadesAdicionalesContainer?.querySelectorAll('.actividad-form-item').forEach(function (item) {
-        configurarEliminar(item, actividadesAdicionalesContainer, 'actividad');
-    });
-
-    if (agregarPendienteAdicional && pendientesAdicionalesContainer) {
-        agregarPendienteAdicional.addEventListener('click', function () {
-            crearPendiente(pendientesAdicionalesContainer);
-        });
-    }
-
-    pendientesAdicionalesContainer?.querySelectorAll('.pendiente-form-item').forEach(function (item) {
-        configurarEliminar(item, pendientesAdicionalesContainer, 'pendiente');
+        configurarEliminar(item, actividadesAdicionalesContainer);
     });
 
     if (agregarActividadEditar && editarActividadesContainer) {
@@ -205,11 +121,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (agregarPendienteEditar && editarPendientesContainer) {
-        agregarPendienteEditar.addEventListener('click', function () {
-            crearPendiente(editarPendientesContainer);
-        });
-    }
 
     document.querySelectorAll('[data-editar-reporte]').forEach(function (button) {
         button.addEventListener('click', function () {
@@ -220,17 +131,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             formEditar.action = button.dataset.url;
             editarActividadesContainer.innerHTML = '';
-            editarPendientesContainer.innerHTML = '';
 
             reporte.actividades.forEach(function (actividad) {
                 crearActividad(editarActividadesContainer, actividad);
             });
-
-            reporte.pendientes
-                .filter(pendiente => pendiente.estado === 'PENDIENTE')
-                .forEach(function (pendiente) {
-                    crearPendiente(editarPendientesContainer, pendiente);
-                });
 
             actualizarEstadoSinActividades();
 
@@ -384,9 +288,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     actualizarNombresActividad(actividadesContainer);
-    actualizarNombresPendiente(pendientesContainer);
     actualizarNombresActividad(actividadesAdicionalesContainer);
-    actualizarNombresPendiente(pendientesAdicionalesContainer);
-    actualizarEstadoSinPendientes();
     actualizarEstadoSinActividades();
 });

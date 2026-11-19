@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class AuthController extends Controller
 {
@@ -29,7 +30,7 @@ class AuthController extends Controller
 
         $credenciales['estado'] = 1;
 
-        if (Auth::attempt($credenciales, $request->boolean('remember'))) {
+        if (Auth::attempt($credenciales, false)) {
             $request->session()->regenerate();
             $usuario = Auth::user();
 
@@ -49,9 +50,15 @@ class AuthController extends Controller
                 ])->onlyInput('email');
             }
 
-            DB::table('users')->where('id', $usuario->getKey())->increment('ingresos_count', 1, [
+            $actualizacion = [
                 'ultimo_acceso' => now(),
-            ]);
+            ];
+
+            if (Schema::hasColumn('users', 'active_session_id')) {
+                $actualizacion['active_session_id'] = $request->session()->getId();
+            }
+
+            DB::table('users')->where('id', $usuario->getKey())->increment('ingresos_count', 1, $actualizacion);
 
             return redirect()
                 ->intended(route($accesoGlobalValido ? 'superadmin.dashboard' : 'dashboard'));
@@ -70,6 +77,16 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        $usuario = Auth::user();
+        $sessionId = $request->session()->getId();
+
+        if ($usuario && Schema::hasColumn('users', 'active_session_id')) {
+            DB::table('users')
+                ->where('id', $usuario->getKey())
+                ->where('active_session_id', $sessionId)
+                ->update(['active_session_id' => null]);
+        }
+
         Auth::logout();
 
         $request->session()->invalidate();

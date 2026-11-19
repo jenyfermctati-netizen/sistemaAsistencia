@@ -1149,7 +1149,7 @@
 .trabajadores-panel dialog.tw-modal .trabajador-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
+    gap: 8px;
     width: auto;
     margin: 0 20px 20px;
 }
@@ -1161,7 +1161,106 @@
     font-size: 12px;
 }
 .trabajadores-panel dialog.tw-modal .trabajador-actions__primary {
+    grid-column: auto;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-actions__status {
     grid-column: 1 / -1;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-actions > :is(.button, .badge) {
+    width: 100%;
+    justify-content: center;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-report-form {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(82px, .65fr) 130px;
+    align-items: end;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #e3e9e9;
+    border-radius: 10px;
+    background: #f7fafa;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-report-form label {
+    display: grid;
+    gap: 5px;
+    color: #52666a;
+    font-size: 10px;
+    font-weight: 700;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-report-form :is(.form-control, .form-select) {
+    min-height: 38px;
+    width: 100%;
+    min-width: 0;
+    padding: 7px;
+    font-size: 12px;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-report-export {
+    position: relative;
+    width: 100%;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-report-export > summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    min-height: 38px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-report-export > summary .ui-icon {
+    width: 15px;
+    height: 15px;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-report-export .download-menu__options {
+    inset: auto 0 calc(100% + 6px) auto;
+    z-index: 20;
+    min-width: 100%;
+    padding: 6px;
+    border-color: #dce5e8;
+    border-radius: 11px;
+    box-shadow: 0 10px 24px #18384424;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-report-export .download-menu__options button {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 10px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #183844;
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.trabajadores-panel dialog.tw-modal .trabajador-report-export .download-menu__options button:hover,
+.trabajadores-panel dialog.tw-modal .trabajador-report-export .download-menu__options button:focus-visible {
+    background: #eaf3f4;
+}
+.trabajador-report-export__badge {
+    display: inline-grid;
+    place-items: center;
+    min-width: 24px;
+    height: 25px;
+    padding: 0 4px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 800;
+}
+.trabajador-report-export__badge--excel { color: #13834f; background: #e2f5eb; }
+.trabajador-report-export__badge--pdf { color: #dc3545; background: #fde8ea; }
+@media (max-width: 520px) {
+    .trabajadores-panel dialog.tw-modal .trabajador-report-export {
+        grid-column: 1 / -1;
+    }
+    .trabajadores-panel dialog.tw-modal .trabajador-report-export .download-menu__options {
+        inset-inline: 0;
+    }
 }
 @media (max-width: 700px) {
     .trabajadores-panel .trabajadores-table .trabajador-actions-cell,
@@ -1189,6 +1288,21 @@
     }
     .trabajadores-panel .tw-modal__header {
         padding: 17px;
+    }
+}
+@media (max-width: 520px) {
+    .trabajadores-panel dialog.tw-modal .trabajador-actions {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .trabajadores-panel dialog.tw-modal .trabajador-actions__primary,
+    .trabajadores-panel dialog.tw-modal .trabajador-actions__status {
+        grid-column: 1;
+    }
+    .trabajadores-panel dialog.tw-modal .trabajador-report-form {
+        grid-template-columns: minmax(0, 1fr) minmax(90px, .65fr);
+    }
+    .trabajadores-panel dialog.tw-modal .trabajador-report-form .button {
+        grid-column: 1 / -1;
     }
 }
 

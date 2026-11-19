@@ -4,7 +4,6 @@
     $trabajadorSeleccionadoNombre = old('reporte_trabajador_nombre', 'Selecciona un trabajador');
     $trabajadorSeleccionadoArea = old('reporte_trabajador_area', 'Sin área');
     $actividadesAvance = old('actividades', [['descripcion' => '']]);
-    $pendientesAvance = old('pendientes', []);
     $rutaAvanceBase = route('trabajadores.reportes-avance.store', '__TRABAJADOR__');
 @endphp
 
@@ -123,69 +122,6 @@
             </div>
         </section>
 
-        <section class="avance-form-section">
-            <div class="avance-form-section__heading">
-                <div>
-                    <h3>Pendientes</h3>
-                    <p>Agrega las tareas que deberán continuarse posteriormente.</p>
-                </div>
-
-                <button type="button"
-                    class="button button--secondary button--small"
-                    data-agregar-pendiente-avance>
-                    <x-ui-icon name="plus" /> Agregar pendiente
-                </button>
-            </div>
-
-            <div id="pendientesAvanceTrabajador" class="avance-items">
-                @foreach($pendientesAvance as $indice => $pendiente)
-                    <div class="avance-item avance-item--pendiente"
-                        data-pendiente-avance
-                        data-index="{{ $indice }}">
-
-                        <div class="avance-item__heading">
-                            <strong>
-                                Pendiente <span data-numero-pendiente>{{ $loop->iteration }}</span>
-                            </strong>
-
-                            <button type="button"
-                                class="button-link button-link--danger"
-                                data-quitar-pendiente-avance>
-                                Quitar
-                            </button>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Descripción *</label>
-                            <input type="text"
-                                name="pendientes[{{ $indice }}][descripcion]"
-                                value="{{ $pendiente['descripcion'] ?? '' }}"
-                                class="form-control"
-                                maxlength="500"
-                                required>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Detalle</label>
-                            <textarea name="pendientes[{{ $indice }}][detalle]"
-                                class="form-textarea"
-                                rows="3"
-                                maxlength="2000">{{ $pendiente['detalle'] ?? '' }}</textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Ruta o ubicación de archivos</label>
-                            <input type="text"
-                                name="pendientes[{{ $indice }}][ruta_archivos]"
-                                value="{{ $pendiente['ruta_archivos'] ?? '' }}"
-                                class="form-control"
-                                maxlength="500">
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </section>
-
         <div class="modal__actions">
             <button type="button" class="button button--secondary" data-modal-close>
                 Cancelar
@@ -229,44 +165,4 @@
         </div>
     </template>
 
-    <template id="templatePendienteAvanceTrabajador">
-        <div class="avance-item avance-item--pendiente"
-            data-pendiente-avance
-            data-index="__INDEX__">
-
-            <div class="avance-item__heading">
-                <strong>Pendiente <span data-numero-pendiente></span></strong>
-                <button type="button"
-                    class="button-link button-link--danger"
-                    data-quitar-pendiente-avance>
-                    Quitar
-                </button>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Descripción *</label>
-                <input type="text"
-                    name="pendientes[__INDEX__][descripcion]"
-                    class="form-control"
-                    maxlength="500"
-                    required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Detalle</label>
-                <textarea name="pendientes[__INDEX__][detalle]"
-                    class="form-textarea"
-                    rows="3"
-                    maxlength="2000"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Ruta o ubicación de archivos</label>
-                <input type="text"
-                    name="pendientes[__INDEX__][ruta_archivos]"
-                    class="form-control"
-                    maxlength="500">
-            </div>
-        </div>
-    </template>
 </x-modal>

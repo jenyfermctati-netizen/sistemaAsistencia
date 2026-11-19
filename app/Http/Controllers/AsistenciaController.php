@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asistencia;
 use App\Services\AsistenciaService;
-use App\Services\ReporteTablaExportService;
+use App\Services\ReporteAsistenciaMensualService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +16,34 @@ class AsistenciaController extends Controller
     public function index(Request $request)
     {
         $this->verificarConsulta();
+
+        $fechas = $request->validate([
+            'fecha_desde' => ['nullable', 'date_format:Y-m-d'],
+            'fecha_hasta' => ['nullable', 'date_format:Y-m-d'],
+        ]);
+        $hoy = now();
+        $desdeReferencia = ! empty($fechas['fecha_desde'])
+            ? Carbon::parse($fechas['fecha_desde'])->startOfDay()
+            : (! empty($fechas['fecha_hasta'])
+                ? Carbon::parse($fechas['fecha_hasta'])->startOfMonth()
+                : $hoy->copy()->startOfMonth());
+        $hastaReferencia = ! empty($fechas['fecha_hasta'])
+            ? Carbon::parse($fechas['fecha_hasta'])->endOfDay()
+            : (! empty($fechas['fecha_desde'])
+                ? Carbon::parse($fechas['fecha_desde'])->endOfDay()
+                : $hoy->copy()->endOfMonth());
+
+        if ($desdeReferencia->gt($hastaReferencia)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'fecha_hasta' => 'La fecha final debe ser igual o posterior a la fecha inicial.',
+            ]);
+        }
+
+        $desdeReporte = $desdeReferencia->copy()->startOfMonth();
+        $hastaReporte = $hastaReferencia->copy()->endOfMonth();
+        $areaIdReporte = $this->rolActual() === 'GERENTE'
+            ? (int) (Auth::user()?->trabajador?->area_id ?? 0)
+            : null;
 
         $puedeProcesar = Auth::user()->tienePermiso('asistencias.gestionar');
         $query = Asistencia::with([
@@ -39,8 +67,7 @@ class AsistenciaController extends Controller
             $buscar = trim($request->buscar);
             $query->whereHas('trabajador', function ($trabajador) use ($buscar) {
                 $trabajador->where('dni', 'like', "%{$buscar}%")
-                    ->orWhere('nombres', 'like', "%{$buscar}%")
-                    ->orWhere('apellidos', 'like', "%{$buscar}%");
+                    ->orWhere(fn ($nombres) => $nombres->nameContainsAllTerms($buscar));
             });
         }
 
@@ -100,26 +127,12 @@ class AsistenciaController extends Controller
 
         $formato = $request->query('descargar');
         if (in_array($formato, ['xlsx', 'pdf'], true)) {
-            $fechas = $request->validate([
-                'fecha_desde' => ['nullable', 'date_format:Y-m-d'],
-                'fecha_hasta' => ['nullable', 'date_format:Y-m-d'],
-            ]);
-            $filas = $query->withOnly('trabajador.area')->lazy()->map(fn (Asistencia $asistencia) => [
-                $asistencia->fecha?->format('d/m/Y'),
-                $asistencia->trabajador?->area?->nombre,
-                trim($asistencia->trabajador?->nombres.' '.$asistencia->trabajador?->apellidos),
-                $asistencia->hora_entrada,
-                $asistencia->hora_salida,
-                $asistencia->minutos_trabajados,
-                $asistencia->minutos_tardanza,
-                $asistencia->estado,
-            ]);
-
-            return app(ReporteTablaExportService::class)->descargar(
-                $formato, 'resumen-diario', 'Resumen diario de asistencia',
-                ['Fecha', 'Área', 'Trabajador', 'Entrada', 'Salida', 'Min. trabajados', 'Min. tardanza', 'Estado'],
-                ['A' => 14, 'B' => 24, 'C' => 28, 'D' => 12, 'E' => 12, 'F' => 18, 'G' => 18, 'H' => 20],
-                $filas, $fechas['fecha_desde'] ?? null, $fechas['fecha_hasta'] ?? null,
+            return app(ReporteAsistenciaMensualService::class)->descargar(
+                $formato,
+                $desdeReporte,
+                $hastaReporte,
+                $request->only(['estado', 'tipo_control']),
+                $areaIdReporte,
             );
         }
 

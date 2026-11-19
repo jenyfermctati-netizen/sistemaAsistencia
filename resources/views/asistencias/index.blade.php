@@ -135,10 +135,10 @@
                 <div>
                     <span class="asistencias-eyebrow">Registros procesados</span>
                     <h3 id="asistenciasListadoTitulo">Jornadas del personal</h3>
-                    <p>La tabla resume lo importante; el botón de detalle conserva toda la información de la jornada.</p>
+                    <p>El reporte general incluye a todo el personal y respeta el período y los filtros de asistencia. El reporte individual está disponible desde la ficha del trabajador.</p>
                 </div>
                 @php
-                    $filtrosDescarga = request()->only(['buscar', 'fecha_desde', 'fecha_hasta', 'estado', 'tipo_control']);
+                    $filtrosDescarga = request()->only(['fecha_desde', 'fecha_hasta', 'estado', 'tipo_control']);
                 @endphp
                 <x-download-menu
                     :excel="route('asistencias.index', $filtrosDescarga + ['descargar' => 'xlsx'])"

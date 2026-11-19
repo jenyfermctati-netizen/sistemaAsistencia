@@ -40,8 +40,7 @@ class VacacionesController extends Controller
 
             $query->whereHas('trabajador', function ($q) use ($buscar) {
                 $q->where('dni', 'like', "%{$buscar}%")
-                    ->orWhere('nombres', 'like', "%{$buscar}%")
-                    ->orWhere('apellidos', 'like', "%{$buscar}%");
+                    ->orWhere(fn ($nombres) => $nombres->nameContainsAllTerms($buscar));
             });
         }
 
